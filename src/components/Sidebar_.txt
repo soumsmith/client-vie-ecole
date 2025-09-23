@@ -111,7 +111,180 @@ const allMenuSections = [
   },
 
 
-  
+  // {
+  //   type: "section",
+  //   title: "GUIZ APPS",
+  //   profiles: ["admin", "manager", "user", ""],
+  //   items: [
+  //     {
+  //       type: "item",
+  //       eventKey: "save-questionnaire",
+  //       icon: "DashboardIcon",
+  //       title: "Save questionnaire",
+  //       profiles: ["admin", "manager", "user", "Fondateur"],
+  //     },
+  //     {
+  //       type: "item",
+  //       eventKey: "datatable",
+  //       icon: "TableIcon",
+  //       title: "Ajouter au panier",
+  //       profiles: ["admin", "manager", "user", "Fondateur"],
+  //     },
+  //     {
+  //       type: "menu",
+  //       eventKey: "admin-panel",
+  //       icon: "SettingIcon",
+  //       title: "Questionnaires",
+  //       profiles: ["admin", "manager", "user", "Fondateur"],
+  //       children: [
+  //         {
+  //           eventKey: "listQuestionnaire",
+  //           title: "Liste des questions",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //         {
+  //           eventKey: "saveQuestionnaire",
+  //           title: "Save questionnaire",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       type: "menu",
+  //       eventKey: "quiz-panel",
+  //       icon: "SettingIcon",
+  //       title: "Quizz",
+  //       profiles: ["admin", "manager", "user", "Fondateur"],
+  //       children: [
+  //         {
+  //           eventKey: "listQuizz",
+  //           title: "Liste des quizz",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //         {
+  //           eventKey: "saveQuizz",
+  //           title: "Save quizz",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       type: "menu",
+  //       eventKey: "lesson-panel",
+  //       icon: "SettingIcon",
+  //       title: "Leçon",
+  //       profiles: ["admin", "manager", "user", "Fondateur"],
+  //       children: [
+  //         {
+  //           eventKey: "listLesson",
+  //           title: "Liste des leçons",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //         {
+  //           eventKey: "saveLesson",
+  //           title: "Save leçons",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       type: "menu",
+  //       eventKey: "domaine-panel",
+  //       icon: "SettingIcon",
+  //       title: "Domaine",
+  //       profiles: ["admin", "manager", "user", "Fondateur"],
+  //       children: [
+  //         {
+  //           eventKey: "listDomaine",
+  //           title: "Liste domaine",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //         {
+  //           eventKey: "listLevelDomaine",
+  //           title: "Liste domaine / niveau",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //         {
+  //           eventKey: "listSubDomaine",
+  //           title: "Liste sous domaine",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //       ],
+  //     },
+
+  //     {
+  //       type: "menu",
+  //       eventKey: "courses-panel",
+  //       icon: "SettingIcon",
+  //       title: "Cours",
+  //       profiles: ["admin", "manager", "user", "Fondateur"],
+  //       children: [
+  //         {
+  //           eventKey: "listCours",
+  //           title: "Liste des cours",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //         {
+  //           eventKey: "saveCours",
+  //           title: "Save cours",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       type: "menu",
+  //       eventKey: "exercice-panel",
+  //       icon: "SettingIcon",
+  //       title: "Exercice",
+  //       profiles: ["admin", "manager", "user", "Fondateur"],
+  //       children: [
+  //         {
+  //           eventKey: "listExercice",
+  //           title: "Liste des exercices",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //         {
+  //           eventKey: "saveExercice",
+  //           title: "Save exercice",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       type: "menu",
+  //       eventKey: "general",
+  //       icon: "GroupIcon",
+  //       title: "Ma Messagerie",
+  //       profiles: ["admin", "manager", "Fondateur"],
+  //       children: [
+  //         {
+  //           eventKey: "users",
+  //           title: "Messages envoyés",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //         {
+  //           eventKey: "teams",
+  //           title: "Équipes",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //         {
+  //           eventKey: "roles",
+  //           title: "Rôles",
+  //           profiles: ["admin", "manager", "user", "Fondateur"],
+  //         },
+  //       ],
+  //     },
+
+  //     {
+  //       type: "item",
+  //       eventKey: "RecrutementPersonnel",
+  //       icon: "SettingIcon",
+  //       title: "Recruté un Agent",
+  //       profiles: ["admin", "Fondateur"],
+  //     },
+  //   ],
+  // },
+
   // ===========================
   // FONDATEUR
   // ===========================
@@ -891,55 +1064,33 @@ const getUserProfile = () => {
   }
 };
 
-// Fonction corrigée pour filtrer les sections selon le profil
+// Fonction pour filtrer les sections selon le profil
 const filterSectionsByProfile = (sections, userProfile) => {
   return sections.filter((section) => {
-    // Vérifier si la section est autorisée pour ce profil
     if (section.profiles && !section.profiles.includes(userProfile)) {
       return false;
     }
 
-    // Filtrer les items de la section
     const filteredItems = section.items.filter((item) => {
-      // CORRECTION PRINCIPALE : Si l'item a une propriété profiles définie,
-      // il doit contenir le profil de l'utilisateur pour être affiché
-      if (item.profiles) {
-        const isItemAllowed = item.profiles.includes(userProfile);
-        
-        if (!isItemAllowed) {
-          return false;
-        }
+      if (!item.profiles) return true;
 
-        // Gérer les sous-menus (items de type "menu" avec des children)
-        if (item.type === "menu" && item.children) {
-          const filteredChildren = item.children.filter((child) => {
-            // Même logique pour les enfants : si profiles existe, vérifier l'inclusion
-            if (child.profiles) {
-              return child.profiles.includes(userProfile);
-            }
-            // Si pas de profiles défini pour l'enfant, l'afficher (comportement par défaut)
-            return true;
-          });
+      const isItemAllowed = item.profiles.includes(userProfile);
 
-          // Mettre à jour les children filtrés
-          item.children = filteredChildren;
-          
-          // Ne garder le menu que s'il a au moins un enfant visible
-          return filteredChildren.length > 0;
-        }
+      if (!isItemAllowed) return false;
 
-        return true;
+      if (item.type === "menu" && item.children && isItemAllowed) {
+        const filteredChildren = item.children.filter((child) => {
+          return !child.profiles || child.profiles.includes(userProfile);
+        });
+
+        item.children = filteredChildren;
+        return filteredChildren.length > 0;
       }
-      
-      // Si l'item n'a pas de propriété profiles, l'afficher par défaut
-      // OPTION : Vous pouvez changer cette logique selon vos besoins
+
       return true;
     });
 
-    // Mettre à jour les items filtrés de la section
     section.items = filteredItems;
-    
-    // Ne garder la section que si elle a au moins un item visible
     return filteredItems.length > 0;
   });
 };

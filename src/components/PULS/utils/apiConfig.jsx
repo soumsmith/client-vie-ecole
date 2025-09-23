@@ -305,8 +305,7 @@ const usePersonnelUrls = () => {
          * Méthode: POST
          * Corps de requête: { identifiant_ecole, identifiant_personnel, panier_personnel_date_creation }
          */
-        addToPanier: () =>
-            `${baseUrl}/api/panier-personnel`,
+        addToPanier: () => `${baseUrl}/api/panier-personnel`,
 
         /**
          * Récupère le panier de personnel (utilise automatiquement l'école de l'utilisateur connecté)
@@ -1430,8 +1429,7 @@ const useProfilsUrls = () => {
         /**
          * Récupère les profils visibles
          */
-        getProfilVisible: () =>
-            `${baseUrl}/api/profil/profil-visible`,
+        getProfilVisible: () => `${baseUrl}/api/profil/profil-visible`,
 
     }), [baseUrl]);
 };
