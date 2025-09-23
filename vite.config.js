@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api': {
-          target: 'http://10.3.119.232:8889', //https://api-pro.pouls-scolaire.net //http://10.3.119.232:8889
+          target: 'http://46.105.52.105:8889',//'http://10.3.119.232:8889' // //http://10.3.119.232:8889
           changeOrigin: true,
           //secure: true,
           secure: false,
