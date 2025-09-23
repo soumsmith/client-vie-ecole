@@ -74,83 +74,83 @@ export const navigationData = {
     ]
   },
   mainMenu: [
-    {
-      id: 1,
-      text: "Accueil",
-      link: routeConfig.home,
-      type: "route",
-      current: true,
-      hasChildren: true,
-      children: [
-        { 
-          id: 11, 
-          text: "Accueil principal", 
-          link: routeConfig.home, 
-          type: "route",
-          current: true 
-        },
-        { 
-          id: 12, 
-          text: "Accueil secondaire", 
-          link: routeConfig.homeSecondary, 
-          type: "route"
-        },
-        { 
-          id: 13, 
-          text: "Accueil primaire", 
-          link: routeConfig.homePrimary, 
-          type: "route"
-        },
-        {
-          id: 14,
-          text: "Styles d'en-tête",
-          link: "#",
-          type: "dropdown",
-          hasChildren: true,
-          children: [
-            { 
-              id: 141, 
-              text: "En-tête un", 
-              link: routeConfig.headerStyleOne, 
-              type: "route"
-            },
-            { 
-              id: 142, 
-              text: "En-tête deux", 
-              link: routeConfig.headerStyleTwo, 
-              type: "route"
-            },
-            { 
-              id: 143, 
-              text: "En-tête trois", 
-              link: routeConfig.headerStyleThree, 
-              type: "route"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: 2,
-      text: "Pages",
-      link: "#",
-      type: "dropdown",
-      hasChildren: true,
-      children: [
-        { 
-          id: 21, 
-          text: "À propos", 
-          link: routeConfig.about, 
-          type: "route"
-        },
-        { 
-          id: 22, 
-          text: "Notre équipe", 
-          link: routeConfig.team, 
-          type: "route"
-        }
-      ]
-    },
+    // {
+    //   id: 1,
+    //   text: "Accueil",
+    //   link: routeConfig.home,
+    //   type: "route",
+    //   current: true,
+    //   hasChildren: true,
+    //   children: [
+    //     { 
+    //       id: 11, 
+    //       text: "Accueil principal", 
+    //       link: routeConfig.home, 
+    //       type: "route",
+    //       current: true 
+    //     },
+    //     { 
+    //       id: 12, 
+    //       text: "Accueil secondaire", 
+    //       link: routeConfig.homeSecondary, 
+    //       type: "route"
+    //     },
+    //     { 
+    //       id: 13, 
+    //       text: "Accueil primaire", 
+    //       link: routeConfig.homePrimary, 
+    //       type: "route"
+    //     },
+    //     {
+    //       id: 14,
+    //       text: "Styles d'en-tête",
+    //       link: "#",
+    //       type: "dropdown",
+    //       hasChildren: true,
+    //       children: [
+    //         { 
+    //           id: 141, 
+    //           text: "En-tête un", 
+    //           link: routeConfig.headerStyleOne, 
+    //           type: "route"
+    //         },
+    //         { 
+    //           id: 142, 
+    //           text: "En-tête deux", 
+    //           link: routeConfig.headerStyleTwo, 
+    //           type: "route"
+    //         },
+    //         { 
+    //           id: 143, 
+    //           text: "En-tête trois", 
+    //           link: routeConfig.headerStyleThree, 
+    //           type: "route"
+    //         }
+    //       ]
+    //     }
+    //   ]
+    // },
+    // {
+    //   id: 2,
+    //   text: "Pages",
+    //   link: "#",
+    //   type: "dropdown",
+    //   hasChildren: true,
+    //   children: [
+    //     { 
+    //       id: 21, 
+    //       text: "À propos", 
+    //       link: routeConfig.about, 
+    //       type: "route"
+    //     },
+    //     { 
+    //       id: 22, 
+    //       text: "Notre équipe", 
+    //       link: routeConfig.team, 
+    //       type: "route"
+    //     }
+    //   ]
+    // },
     // {
     //   id: 3,
     //   text: "Programmes",
@@ -211,39 +211,39 @@ export const navigationData = {
     //     }
     //   ]
     // },
-    {
-      id: 5,
-      text: "Actualités",
-      link: routeConfig.news,
-      type: "route",
-      hasChildren: true,
-      children: [
-        { 
-          id: 51, 
-          text: "Toutes les actualités", 
-          link: routeConfig.news, 
-          type: "route"
-        },
-        { 
-          id: 52, 
-          text: "Annonces importantes", 
-          link: "/actualites/annonces", 
-          type: "route"
-        },
-        { 
-          id: 53, 
-          text: "Success stories", 
-          link: "/actualites/success-stories", 
-          type: "route"
-        }
-      ]
-    },
-    {
-      id: 6,
-      text: "Contact",
-      link: routeConfig.contact,
-      type: "route"
-    }
+    // {
+    //   id: 5,
+    //   text: "Actualités",
+    //   link: routeConfig.news,
+    //   type: "route",
+    //   hasChildren: true,
+    //   children: [
+    //     { 
+    //       id: 51, 
+    //       text: "Toutes les actualités", 
+    //       link: routeConfig.news, 
+    //       type: "route"
+    //     },
+    //     { 
+    //       id: 52, 
+    //       text: "Annonces importantes", 
+    //       link: "/actualites/annonces", 
+    //       type: "route"
+    //     },
+    //     { 
+    //       id: 53, 
+    //       text: "Success stories", 
+    //       link: "/actualites/success-stories", 
+    //       type: "route"
+    //     }
+    //   ]
+    // },
+    // {
+    //   id: 6,
+    //   text: "Contact",
+    //   link: routeConfig.contact,
+    //   type: "route"
+    // }
   ],
   cta: {
     icon: "paroti-icon-volunteer",

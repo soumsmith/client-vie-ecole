@@ -264,7 +264,7 @@ const ListePersonnel = ({typeDeListe}) => {
                 <div className="col-lg-12">
                     <DataTable
                         title="Liste du Personnel"
-                        subtitle={`${personnel.length} membre${personnel.length > 1 ? 's' : ''} du personnel`}
+                        subtitle={`membre${personnel.length > 1 ? 's' : ''} du personnel`}
                         data={personnel}
                         loading={loading}
                         error={error}

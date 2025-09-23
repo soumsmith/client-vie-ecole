@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
 import { Container, Header, Content, Drawer, IconButton, Nav, Navbar, Sidebar as RSuiteSidebar, FlexboxGrid } from 'rsuite';
 import MenuIcon from '@rsuite/icons/Menu';
+import {allMenuSections } from './menuConfig'; 
+
 
 // Import du nouveau TopBar
 import LightTopBar from './LightTopBar';
 
 import Sidebar from './Sidebar';
 import Dashboard from './Dashboard';
+import Dashboard2 from './Dashboard2';
 import DataTable from './DataTable';
 import RecrutementPersonnel from './RecrutementPersonnel';
 import SaveQuestionnaire from './QUIZAPP/Questions/SaveQuestionnaire';
@@ -115,6 +118,7 @@ const Layout = ({ onLogout }) => {
   console.log('dynamicEcoleId', dynamicEcoleId);
   console.log('dynamicAcademicYearId', dynamicAcademicYearId);
   console.log('personnelInfo==>', personnelInfo);
+
 
   const hideFilterFor = ["Professeur", "SuperAdmin"];
   const showMatiereFilter = hideFilterFor.includes(personnelInfo?.profil); // true si Fondateur ou SuperAdmin
@@ -657,6 +661,9 @@ const Layout = ({ onLogout }) => {
     return items;
   };
 
+
+    const userProfil = localStorage.getItem("userProfil");
+
   return (
     <Container className="dashboard-container">
       {/* Header avec menu hamburger pour mobile */}
@@ -730,6 +737,7 @@ const Layout = ({ onLogout }) => {
             <Sidebar 
               onItemClick={handlePageChange} 
               activeKey={getCurrentPageKey()}
+              //allMenuSections={allMenuSections}
             />
           </Drawer.Body>
         </Drawer>
@@ -743,7 +751,7 @@ const Layout = ({ onLogout }) => {
               onLogout={onLogout}
               userInfo={{
                 name: personnelInfo?.nom || personnelInfo?.name || "Utilisateur",
-                role: personnelInfo?.profil || "Membre",
+                role: userProfil || "Membre",
                 email: personnelInfo?.email || "user@example.com",
                 avatar: personnelInfo?.avatar || ""
               }}
@@ -754,8 +762,16 @@ const Layout = ({ onLogout }) => {
           <div className="content-body">
             <Routes>
               {/* Route par défaut vers Dashboard */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/" element={<Dashboard />} />
+
+              {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+              {/* <Route path="/" element={<Dashboard />} /> */}
+
+              {userProfil === "Fondateur" && (
+                <Route path="/dashboard" element={<Dashboard2 />} />
+              )}
+              {userProfil === "Professeur" && (
+                <Route path="/dashboard" element={<Dashboard />} />
+              )}
               
               {/* Routes pour les exercices */}
               <Route path="/exercises" element={<ExercisesList />} />
