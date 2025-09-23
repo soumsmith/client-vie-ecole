@@ -1,0 +1,173 @@
+[
+    {
+        "branche": {
+            "filiere": {
+                "code": "F001",
+                "id": 1,
+                "libelle": "GENERAL"
+            },
+            "id": 10,
+            "libelle": "2ND C",
+            "niveau": {
+                "code": "08",
+                "id": 8,
+                "libelle": "Seconde C",
+                "ordre": 6
+            },
+            "niveauEnseignement": {
+                "code": "2",
+                "id": 2,
+                "libelle": "Enseignement Secondaire Générale"
+            },
+            "programme": {
+                "code": "PRG_CI",
+                "dateCreation": "2024-07-28T12:39:46Z[UTC]",
+                "dateUpdate": "2024-07-28T12:39:46Z[UTC]",
+                "id": "efae384a-688f-4b0e-b6fd-9e960ebf78fc",
+                "libelle": "Ivoirien"
+            },
+            "serie": {
+                "code": "C",
+                "id": 1,
+                "libelle": "C"
+            }
+        },
+        "code": "2ndeC3",
+        "ecole": {
+            "code": "057955",
+            "id": 38,
+            "libelle": "Collège Privé Hînneh Biabou ",
+            "niveauEnseignement": {
+                "code": "2",
+                "id": 2,
+                "libelle": "Enseignement Secondaire Générale"
+            },
+            "nomSignataire": "M.SANGARE",
+            "tel": "0789353025"
+        },
+        "effectif": 50,
+        "id": 4248,
+        "langueVivante": {
+            "code": "LV2",
+            "id": 2,
+            "libelle": "ESP",
+            "type": "2"
+        },
+        "libelle": "2NDE C3",
+        "visible": 1
+    },
+    {
+        "branche": {
+            "filiere": {
+                "code": "F001",
+                "id": 1,
+                "libelle": "GENERAL"
+            },
+            "id": 10,
+            "libelle": "2ND C",
+            "niveau": {
+                "code": "08",
+                "id": 8,
+                "libelle": "Seconde C",
+                "ordre": 6
+            },
+            "niveauEnseignement": {
+                "code": "2",
+                "id": 2,
+                "libelle": "Enseignement Secondaire Générale"
+            },
+            "programme": {
+                "code": "PRG_CI",
+                "dateCreation": "2024-07-28T12:39:46Z[UTC]",
+                "dateUpdate": "2024-07-28T12:39:46Z[UTC]",
+                "id": "efae384a-688f-4b0e-b6fd-9e960ebf78fc",
+                "libelle": "Ivoirien"
+            },
+            "serie": {
+                "code": "C",
+                "id": 1,
+                "libelle": "C"
+            }
+        },
+        "code": "2ndeC2",
+        "ecole": {
+            "code": "057955",
+            "id": 38,
+            "libelle": "Collège Privé Hînneh Biabou ",
+            "niveauEnseignement": {
+                "code": "2",
+                "id": 2,
+                "libelle": "Enseignement Secondaire Générale"
+            },
+            "nomSignataire": "M.SANGARE",
+            "tel": "0789353025"
+        },
+        "effectif": 33,
+        "id": 36255,
+        "langueVivante": {
+            "code": "LV2",
+            "id": 2,
+            "libelle": "ESP",
+            "type": "2"
+        },
+        "libelle": "2NDE C2",
+        "visible": 1
+    },
+    {
+        "branche": {
+            "filiere": {
+                "code": "F001",
+                "id": 1,
+                "libelle": "GENERAL"
+            },
+            "id": 10,
+            "libelle": "2ND C",
+            "niveau": {
+                "code": "08",
+                "id": 8,
+                "libelle": "Seconde C",
+                "ordre": 6
+            },
+            "niveauEnseignement": {
+                "code": "2",
+                "id": 2,
+                "libelle": "Enseignement Secondaire Générale"
+            },
+            "programme": {
+                "code": "PRG_CI",
+                "dateCreation": "2024-07-28T12:39:46Z[UTC]",
+                "dateUpdate": "2024-07-28T12:39:46Z[UTC]",
+                "id": "efae384a-688f-4b0e-b6fd-9e960ebf78fc",
+                "libelle": "Ivoirien"
+            },
+            "serie": {
+                "code": "C",
+                "id": 1,
+                "libelle": "C"
+            }
+        },
+        "code": "18",
+        "ecole": {
+            "code": "057955",
+            "id": 38,
+            "libelle": "Collège Privé Hînneh Biabou ",
+            "niveauEnseignement": {
+                "code": "2",
+                "id": 2,
+                "libelle": "Enseignement Secondaire Générale"
+            },
+            "nomSignataire": "M.SANGARE",
+            "tel": "0789353025"
+        },
+        "effectif": 41,
+        "id": 67175,
+        "langueVivante": {
+            "code": "LV1",
+            "id": 1,
+            "libelle": "ALL",
+            "type": "1"
+        },
+        "libelle": "2NDE C1",
+        "visible": 1
+    }
+]

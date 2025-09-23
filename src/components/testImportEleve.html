@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur Excel Élèves Complet - Test Import</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #1e293b;
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            color: #64748b;
+            margin: 0;
+            font-size: 16px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .info-section {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-section h3 {
+            color: #059669;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .category-item {
+            background: #fefce8;
+            border: 1px solid #facc15;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+        }
+        
+        .category-name {
+            font-weight: 600;
+            color: #a16207;
+            margin-bottom: 5px;
+        }
+        
+        .category-columns {
+            color: #92400e;
+            font-size: 11px;
+            line-height: 1.3;
+        }
+        
+        .required {
+            color: #dc2626;
+            font-weight: 600;
+        }
+        
+        .optional {
+            color: #059669;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .preview-container {
+            max-height: 400px;
+            overflow: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            min-width: 1500px;
+        }
+        
+        .preview-table th {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 6px 4px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 9px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .preview-table td {
+            padding: 4px 3px;
+            border-bottom: 1px solid #e2e8f0;
+            border-right: 1px solid #f3f4f6;
+            font-size: 9px;
+            color: #374151;
+            text-align: center;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .preview-table tbody tr:hover {
+            background-color: #f0fdf4;
+        }
+        
+        .preview-table tbody tr:nth-child(even) {
+            background-color: #fefce8;
+        }
+
+        .cell-valid { color: #059669; }
+        .cell-invalid { color: #dc2626; font-weight: 600; }
+        .cell-empty { color: #6b7280; font-style: italic; }
+        .cell-required { background-color: #fef2f2; }
+        .cell-optional { background-color: #f0fdf4; }
+        
+        .example-section {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .example-section h3 {
+            color: #92400e;
+            margin: 0 0 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Générateur Excel Élèves Complet</h1>
+            <p>Générateur de fichier Excel avec toutes les colonnes internes pour l'import d'élèves</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value" id="totalColumns">25</div>
+                <div class="stat-label">Colonnes Totales</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">7</div>
+                <div class="stat-label">Catégories</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">12</div>
+                <div class="stat-label">Élèves Test</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">85%</div>
+                <div class="stat-label">Données Remplies</div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="generateExcel()">
+                📊 Télécharger Excel Complet
+            </button>
+            <button class="btn btn-secondary" onclick="generateCSV()">
+                📄 Télécharger CSV Complet
+            </button>
+            <button class="btn btn-success" onclick="generateExcelMinimal()">
+                📝 Excel Minimal (colonnes essentielles)
+            </button>
+        </div>
+
+        <div class="info-section">
+            <h3>📋 Toutes les colonnes internes du système</h3>
+            <div class="categories-grid" id="categoriesGrid">
+                <!-- Généré par JavaScript -->
+            </div>
+        </div>
+
+        <div class="example-section">
+            <h3>💡 Règles de validation</h3>
+            <p><strong>Colonnes obligatoires :</strong> matricule, nom, prenoms, sexe</p>
+            <p><strong>Valeurs pour sexe :</strong> M/F, Masculin/Féminin, MASCULIN/FEMININ</p>
+            <p><strong>Valeurs booléennes :</strong> Oui/Non, 1/0, true/false pour les champs ivoirien, redoublant, etc.</p>
+            <p><strong>Dates :</strong> Format JJ/MM/AAAA ou JJ-MM-AAAA</p>
+        </div>
+
+        <h3 style="color: #1e293b; margin: 30px 0 15px 0;">🔍 Aperçu des premières données :</h3>
+        
+        <div class="preview-container">
+            <table class="preview-table">
+                <thead>
+                    <tr id="previewHeader">
+                        <!-- En-têtes générés par JavaScript -->
+                    </tr>
+                </thead>
+                <tbody id="previewTable">
+                    <!-- Données générées par JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // Liste complète des colonnes internes
+        const COLONNES_ELEVE = [
+            'matricule', 'nom', 'prenoms', 'statut', 'nationalite',
+            'ivoirien', 'etranger_africain', 'etranger_non_africain',
+            'sexe', 'lv2', 'datenaissance', 'branche', 'lieun', 'adresse',
+            'mobile', 'mobile2', 'pere', 'mere', 'tuteur', 'redoublant',
+            'regime', 'decision_ant', 'extrait_numero', 'extrait_date',
+            'extrait_lieu', 'decision_aff'
+        ];
+
+        // Catégories des colonnes
+        const CATEGORIES_COLONNES = {
+            'Identification': ['matricule', 'nom', 'prenoms', 'statut'],
+            'Nationalité': ['nationalite', 'ivoirien', 'etranger_africain', 'etranger_non_africain'],
+            'Info. personnelles': ['sexe', 'datenaissance', 'lieun', 'adresse'],
+            'Scolarité': ['branche', 'lv2', 'redoublant', 'regime', 'decision_ant'],
+            'Contact': ['mobile', 'mobile2'],
+            'Famille': ['pere', 'mere', 'tuteur'],
+            'État civil': ['extrait_numero', 'extrait_date', 'extrait_lieu', 'decision_aff']
+        };
+
+        // Colonnes minimales essentielles
+        const COLONNES_MINIMALES = [
+            'matricule', 'nom', 'prenoms', 'sexe', 'datenaissance', 
+            'nationalite', 'mobile', 'pere', 'mere'
+        ];
+
+        // Générer des données aléatoires
+        function generateRandomBoolean() {
+            const values = ['OUI', 'NON', ''];
+            return values[Math.floor(Math.random() * values.length)];
+        }
+
+        function generateRandomNationalite() {
+            const nationalites = ['Ivoirienne', 'Malienne', 'Burkinabé', 'Sénégalaise', 'Française', 'Ghanéenne'];
+            return nationalites[Math.floor(Math.random() * nationalites.length)];
+        }
+
+        function generateRandomLV2() {
+            const langues = ['Espagnol', 'Allemand', 'Italien', 'Arabe', ''];
+            return langues[Math.floor(Math.random() * langues.length)];
+        }
+
+        function generateRandomRegime() {
+            const regimes = ['Externe', 'Demi-pensionnaire', 'Interne', ''];
+            return regimes[Math.floor(Math.random() * regimes.length)];
+        }
+
+        // Générer les données de test complètes
+        function generateTestDataComplete() {
+            const testData = [];
+            const noms = ['KOUAME', 'KONE', 'YAO', 'DIALLO', 'ASSI', 'TRAORE', 'BAMBA', 'OUATTARA', 'DIABATE', 'KOFFI'];
+            const prenoms = ['Jean Baptiste', 'Marie Claire', 'Michel', 'Aminata', 'Koffi Emmanuel', 'Fatoumata', 'Sekou', 'Awa', 'Ibrahim', 'Adjoua Bernadette'];
+            const lieux = ['Abidjan', 'Bouaké', 'Yamoussoukro', 'Korhogo', 'San-Pédro', 'Daloa', 'Gagnoa', 'Man', 'Odienné', 'Divo'];
+            const sexes = ['MASCULIN', 'FEMININ', 'M', 'F'];
+            const branches = ['6ème', '5ème', '4ème', '3ème', '2nde', '1ère', 'Terminale'];
+
+            for (let i = 1; i <= 12; i++) {
+                const isError = i > 10; // Dernières lignes avec erreurs
+                const nom = isError ? (i === 11 ? '' : 'TEST_ERREUR') : noms[(i - 1) % noms.length];
+                const prenom = isError ? (i === 12 ? '' : 'Erreur Prénom') : prenoms[(i - 1) % prenoms.length];
+                const sexe = isError && i === 12 ? 'AUTRE' : sexes[Math.floor(Math.random() * sexes.length)];
+                const nationalite = generateRandomNationalite();
+                const isIvoirien = nationalite === 'Ivoirienne';
+                
+                const student = {
+                    matricule: isError && i === 11 ? '' : `MAT2024${String(i).padStart(3, '0')}`,
+                    nom: nom,
+                    prenoms: prenom,
+                    statut: Math.random() < 0.8 ? 'ACTIF' : 'NOUVEAU',
+                    nationalite: nationalite,
+                    ivoirien: isIvoirien ? 'OUI' : 'NON',
+                    etranger_africain: !isIvoirien && ['Malienne', 'Burkinabé', 'Sénégalaise', 'Ghanéenne'].includes(nationalite) ? 'OUI' : 'NON',
+                    etranger_non_africain: nationalite === 'Française' ? 'OUI' : 'NON',
+                    sexe: sexe,
+                    lv2: generateRandomLV2(),
+                    datenaissance: isError && i === 12 ? '32/13/2010' : `${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}/${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}/${2009 + Math.floor(Math.random() * 2)}`,
+                    branche: branches[Math.floor(Math.random() * branches.length)],
+                    lieun: lieux[(i - 1) % lieux.length],
+                    adresse: `Quartier ${['Riviera', 'Commerce', 'Habitat', 'Résidentiel', 'Lobia'][Math.floor(Math.random() * 5)]}, ${lieux[(i - 1) % lieux.length]}`,
+                    mobile: Math.random() < 0.9 ? `070${Math.floor(Math.random() * 10)}${String(Math.floor(Math.random() * 1000000)).padStart(6, '0')}` : '',
+                    mobile2: Math.random() < 0.4 ? `070${Math.floor(Math.random() * 10)}${String(Math.floor(Math.random() * 1000000)).padStart(6, '0')}` : '',
+                    pere: Math.random() < 0.9 ? `${nom} ${['Pierre', 'Jean', 'Paul', 'André', 'Michel'][Math.floor(Math.random() * 5)]}` : '',
+                    mere: Math.random() < 0.9 ? `${nom} ${['Marie', 'Awa', 'Fatou', 'Adjoua', 'Aminata'][Math.floor(Math.random() * 5)]}` : '',
+                    tuteur: Math.random() < 0.3 ? `Tuteur ${nom}` : '',
+                    redoublant: generateRandomBoolean(),
+                    regime: generateRandomRegime(),
+                    decision_ant: Math.random() < 0.6 ? ['ADMIS', 'PASSE EN CLASSE SUPERIEURE', 'REDOUBLE'][Math.floor(Math.random() * 3)] : '',
+                    extrait_numero: Math.random() < 0.7 ? `EXT${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}` : '',
+                    extrait_date: Math.random() < 0.7 ? `${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}/${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}/201${Math.floor(Math.random() * 10)}` : '',
+                    extrait_lieu: Math.random() < 0.7 ? lieux[Math.floor(Math.random() * lieux.length)] : '',
+                    decision_aff: Math.random() < 0.5 ? ['AFFECTE', 'EN ATTENTE', 'REFUSE'][Math.floor(Math.random() * 3)] : ''
+                };
+                
+                testData.push(student);
+            }
+            
+            return testData;
+        }
+
+        // Afficher les catégories
+        function displayCategories() {
+            const grid = document.getElementById('categoriesGrid');
+            grid.innerHTML = '';
+            
+            Object.entries(CATEGORIES_COLONNES).forEach(([categorie, columns]) => {
+                const item = document.createElement('div');
+                item.className = 'category-item';
+                item.innerHTML = `
+                    <div class="category-name">${categorie}</div>
+                    <div class="category-columns">${columns.join(', ')}</div>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        // Afficher l'aperçu avec toutes les colonnes
+        function displayPreview() {
+            const testData = generateTestDataComplete();
+            
+            // En-têtes
+            const headerRow = document.getElementById('previewHeader');
+            headerRow.innerHTML = '';
+            COLONNES_ELEVE.forEach(col => {
+                const th = document.createElement('th');
+                th.textContent = col;
+                th.title = col;
+                headerRow.appendChild(th);
+            });
+            
+            // Données (afficher seulement les 6 premières lignes)
+            const tbody = document.getElementById('previewTable');
+            tbody.innerHTML = '';
+            
+            testData.slice(0, 6).forEach(student => {
+                const row = document.createElement('tr');
+                
+                COLONNES_ELEVE.forEach(col => {
+                    const td = document.createElement('td');
+                    const value = student[col] || '';
+                    
+                    // Classification des cellules
+                    let cellClass = '';
+                    if (['matricule', 'nom', 'prenoms', 'sexe'].includes(col)) {
+                        cellClass = value ? 'cell-required cell-valid' : 'cell-required cell-invalid';
+                    } else {
+                        cellClass = value ? 'cell-optional cell-valid' : 'cell-optional cell-empty';
+                    }
+                    
+                    // Validation spéciale pour certains champs
+                    if (col === 'sexe' && value && !['MASCULIN', 'FEMININ', 'M', 'F'].includes(value)) {
+                        cellClass = 'cell-required cell-invalid';
+                    }
+                    
+                    td.className = cellClass;
+                    td.textContent = value || '-';
+                    td.title = `${col}: ${value || 'vide'}`;
+                    row.appendChild(td);
+                });
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Générer Excel complet
+        function generateExcel() {
+            try {
+                const testData = generateTestDataComplete();
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(testData);
+                
+                XLSX.utils.book_append_sheet(wb, ws, "Eleves_Complet");
+                XLSX.writeFile(wb, "eleves_complet_import_test.xlsx");
+                
+                showStatus("✅ Fichier Excel complet généré (25 colonnes)!", "success");
+            } catch (error) {
+                showStatus("❌ Erreur: " + error.message, "error");
+            }
+        }
+
+        // Générer Excel minimal
+        function generateExcelMinimal() {
+            try {
+                const testDataComplete = generateTestDataComplete();
+                
+                // Filtrer seulement les colonnes minimales
+                const testDataMinimal = testDataComplete.map(student => {
+                    const minimalStudent = {};
+                    COLONNES_MINIMALES.forEach(col => {
+                        minimalStudent[col] = student[col] || '';
+                    });
+                    return minimalStudent;
+                });
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(testDataMinimal);
+                
+                XLSX.utils.book_append_sheet(wb, ws, "Eleves_Minimal");
+                XLSX.writeFile(wb, "eleves_minimal_import_test.xlsx");
+                
+                showStatus("✅ Fichier Excel minimal généré (9 colonnes essentielles)!", "success");
+            } catch (error) {
+                showStatus("❌ Erreur: " + error.message, "error");
+            }
+        }
+
+        // Générer CSV complet
+        function generateCSV() {
+            try {
+                const testData = generateTestDataComplete();
+                
+                let csvContent = COLONNES_ELEVE.join(',') + '\n';
+                
+                testData.forEach(row => {
+                    const values = COLONNES_ELEVE.map(col => {
+                        const value = row[col] || '';
+                        // Échapper les guillemets et virgules
+                        if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+                            return '"' + value.replace(/"/g, '""') + '"';
+                        }
+                        return value;
+                    });
+                    csvContent += values.join(',') + '\n';
+                });
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                
+                if (link.download !== undefined) {
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', 'eleves_complet_import_test.csv');
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+                
+                showStatus("✅ Fichier CSV complet généré (25 colonnes)!", "success");
+            } catch (error) {
+                showStatus("❌ Erreur: " + error.message, "error");
+            }
+        }
+
+        // Afficher un message de statut
+        function showStatus(message, type = "success") {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            
+            setTimeout(() => {
+                statusDiv.textContent = '';
+                statusDiv.className = 'status';
+            }, 5000);
+        }
+
+        // Mettre à jour les stats
+        function updateStats() {
+            document.getElementById('totalColumns').textContent = COLONNES_ELEVE.length;
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            displayCategories();
+            displayPreview();
+            updateStats();
+        });
+    </script>
+</body>
+</html>

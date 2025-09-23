@@ -1,0 +1,38 @@
+#Fondateur .sidebar-nav .rs-sidenav-item-active {
+    background-color: red !important;
+    color: white !important;
+}
+
+#Fondateur .add-button {
+    background-color: rgb(44 179 97);
+    border: none;
+}
+
+#Fondateur .sidebar-container, #Fondateur .desktop-sidebar {
+    background: #1e293b !important;
+    color: white !important;
+    
+}
+
+#Fondateur .sidebar-nav .rs-sidenav-item {
+    color: white !important;
+}
+
+#Fondateur .sidebar-nav .rs-sidenav-item:hover {
+    background-color: rgb(44 179 97) !important;
+    color: white !important;
+}
+
+#Fondateur .sidebar-nav .rs-sidenav-item-active {
+    background-color: rgb(44 179 97) !important;
+    color: white !important;
+}
+
+#Fondateur .brand-title, #Fondateur .rs-sidenav-subtle .rs-dropdown-item{
+    color: white !important;
+}
+
+#Fondateur .rs-table-cell-header div{
+    background: #1e293b !important;
+    color: white !important;
+}

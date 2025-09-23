@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur Excel Complet - Test Import Notes</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #1e293b;
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            color: #64748b;
+            margin: 0;
+            font-size: 16px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .info-section {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-section h3 {
+            color: #d97706;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        
+        .matieres-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .matiere-item {
+            background: #f0f9ff;
+            border: 1px solid #0891b2;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+        }
+        
+        .matiere-name {
+            font-weight: 600;
+            color: #0369a1;
+            margin-bottom: 5px;
+        }
+        
+        .matiere-columns {
+            color: #64748b;
+            font-size: 11px;
+        }
+        
+        .required {
+            color: #dc2626;
+            font-weight: 600;
+        }
+        
+        .optional {
+            color: #059669;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .status.success {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .example-section {
+            background: #f0f9ff;
+            border: 1px solid #38bdf8;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .example-section h3 {
+            color: #0369a1;
+            margin: 0 0 10px 0;
+        }
+        
+        .format-code {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .preview-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        
+        .preview-table th {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 8px 6px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .preview-table td {
+            padding: 6px 4px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 10px;
+            color: #374151;
+            text-align: center;
+        }
+        
+        .preview-table tbody tr:hover {
+            background-color: #fffbeb;
+        }
+        
+        .preview-table tbody tr:nth-child(even) {
+            background-color: #fefce8;
+        }
+
+        .note-cell {
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .note-valid {
+            color: #059669;
+        }
+
+        .note-invalid {
+            color: #dc2626;
+        }
+
+        .note-empty {
+            color: #6b7280;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Générateur Excel Complet - Import Notes</h1>
+            <p>Générateur de fichier Excel avec toutes les matières pour tester l'importation de notes</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value" id="totalColumns">130</div>
+                <div class="stat-label">Colonnes Notes</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">26</div>
+                <div class="stat-label">Matières</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">8</div>
+                <div class="stat-label">Élèves Test</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">75%</div>
+                <div class="stat-label">Notes Remplies</div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="generateExcel()">
+                📊 Télécharger Excel Complet
+            </button>
+            <button class="btn btn-secondary" onclick="generateCSV()">
+                📄 Télécharger CSV Complet
+            </button>
+            <button class="btn btn-success" onclick="generateExcelLight()">
+                📝 Excel Léger (5 matières)
+            </button>
+        </div>
+
+        <div class="info-section">
+            <h3>📋 Format du fichier de notes complet</h3>
+            <p><strong>Colonne obligatoire :</strong></p>
+            <ul>
+                <li class="required">matricule</li>
+            </ul>
+            
+            <p><strong>Toutes les matières disponibles (5 notes par matière) :</strong></p>
+            <div class="matieres-grid" id="matieresGrid">
+                <!-- Généré par JavaScript -->
+            </div>
+        </div>
+
+        <div class="example-section">
+            <h3>💡 Règles de validation</h3>
+            <p><strong>Notes valides :</strong> 0 à 20 (décimales autorisées, ex: 15.5)</p>
+            <p><strong>Cases vides :</strong> Autorisées (note non évaluée)</p>
+            <p><strong>Notes invalides :</strong> Valeurs négatives, > 20, ou texte</p>
+        </div>
+
+        <h3 style="color: #1e293b; margin: 30px 0 15px 0;">🔍 Aperçu des premières colonnes :</h3>
+        
+        <div class="preview-container">
+            <table class="preview-table">
+                <thead>
+                    <tr id="previewHeader">
+                        <!-- En-têtes générés par JavaScript -->
+                    </tr>
+                </thead>
+                <tbody id="previewTable">
+                    <!-- Données générées par JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // Liste complète de toutes les matières avec leurs colonnes
+        const MATIERES_COMPLETES = {
+            'Français': ['noteFran1', 'noteFran2', 'noteFran3', 'noteFran4', 'noteFran5'],
+            'Expression Orale': ['noteExpreOral1', 'noteExpreOral2', 'noteExpreOral3', 'noteExpreOral4', 'noteExpreOral5'],
+            'Composition Français': ['noteCompoFr1', 'noteCompoFr2', 'noteCompoFr3', 'noteCompoFr4', 'noteCompoFr5'],
+            'Orthographe/Grammaire': ['noteOrthoGram1', 'noteOrthoGram2', 'noteOrthoGram3', 'noteOrthoGram4', 'noteOrthoGram5'],
+            'Philosophie': ['notephiloso1', 'notephiloso2', 'notephiloso3', 'notephiloso4', 'notephiloso5'],
+            'Anglais': ['noteAng1', 'noteAng2', 'noteAng3', 'noteAng4', 'noteAng5'],
+            'Mathématiques': ['noteMath1', 'noteMath2', 'noteMath3', 'noteMath4', 'noteMath5'],
+            'Physique': ['notePhysiq1', 'notePhysiq2', 'notePhysiq3', 'notePhysiq4', 'notePhysiq5'],
+            'SVT': ['noteSVT1', 'noteSVT2', 'noteSVT3', 'noteSVT4', 'noteSVT5'],
+            'Espagnol': ['noteEsp1', 'noteEsp2', 'noteEsp3', 'noteEsp4', 'noteEsp5'],
+            'Allemand': ['noteAll1', 'noteAll2', 'noteAll3', 'noteAll4', 'noteAll5'],
+            'Arts Plastiques': ['noteArplat1', 'noteArplat2', 'noteArplat3', 'noteArplat4', 'noteArplat5'],
+            'TIC': ['noteTic1', 'noteTic2', 'noteTic3', 'noteTic4', 'noteTic5'],
+            'Informatique': ['noteInfor1', 'noteInfor2', 'noteInfor3', 'noteInfor4', 'noteInfor5'],
+            'Conduite': ['noteConduite1', 'noteConduite2', 'noteConduite3', 'noteConduite4', 'noteConduite5'],
+            'EPS': ['noteEps1', 'noteEps2', 'noteEps3', 'noteEps4', 'noteEps5'],
+            'Histoire-Géographie': ['noteHg1', 'noteHg2', 'noteHg3', 'noteHg4', 'noteHg5'],
+            'EDHC': ['noteEdhc1', 'noteEdhc2', 'noteEdhc3', 'noteEdhc4', 'noteEdhc5'],
+            'Arabe': ['noteArabe1', 'noteArabe2', 'noteArabe3', 'noteArabe4', 'noteArabe5'],
+            'Arts Visuels': ['noteArtVisu1', 'noteArtVisu2', 'noteArtVisu3', 'noteArtVisu4', 'noteArtVisu5'],
+            'EMR': ['noteEmr1', 'noteEmr2', 'noteEmr3', 'noteEmr4', 'noteEmr5'],
+            'Fiqh': ['noteFiq1', 'noteFiq2', 'noteFiq3', 'noteFiq4', 'noteFiq5'],
+            'Assirah': ['noteAssirah1', 'noteAssirah2', 'noteAssirah3', 'noteAssirah4', 'noteAssirah5'],
+            'Alquidah': ['noteAlquidah1', 'noteAlquidah2', 'noteAlquidah3', 'noteAlquidah4', 'noteAlquidah5'],
+            'Al Akhlaq': ['noteAlAklaq1', 'noteAlAklaq2', 'noteAlAklaq3', 'noteAlAklaq4', 'noteAlAklaq5'],
+            'Mémorisation': ['noteMemo1', 'noteMemo2', 'noteMemo3', 'noteMemo4', 'noteMemo5']
+        };
+
+        // Matières légères pour version simplifiée
+        const MATIERES_LEGERES = {
+            'Français': ['noteFran1', 'noteFran2', 'noteFran3', 'noteFran4', 'noteFran5'],
+            'Mathématiques': ['noteMath1', 'noteMath2', 'noteMath3', 'noteMath4', 'noteMath5'],
+            'Anglais': ['noteAng1', 'noteAng2', 'noteAng3', 'noteAng4', 'noteAng5'],
+            'Physique': ['notePhysiq1', 'notePhysiq2', 'notePhysiq3', 'notePhysiq4', 'notePhysiq5'],
+            'SVT': ['noteSVT1', 'noteSVT2', 'noteSVT3', 'noteSVT4', 'noteSVT5']
+        };
+
+        // Générer toutes les colonnes dans l'ordre
+        function getAllColumns(matieres = MATIERES_COMPLETES) {
+            const allColumns = ['matricule'];
+            Object.values(matieres).forEach(columns => {
+                allColumns.push(...columns);
+            });
+            return allColumns;
+        }
+
+        // Générer des notes aléatoires
+        function generateRandomNote() {
+            const random = Math.random();
+            if (random < 0.15) return ''; // 15% de cases vides
+            if (random < 0.02) return Math.random() < 0.5 ? 25 : -2; // 2% d'erreurs
+            if (random < 0.03) return 'ABC'; // 1% de texte invalide
+            return (Math.random() * 20).toFixed(1); // Notes valides
+        }
+
+        // Générer les données de test
+        function generateTestData(matieres = MATIERES_COMPLETES) {
+            const allColumns = getAllColumns(matieres);
+            const testData = [];
+            
+            for (let i = 1; i <= 8; i++) {
+                const student = {
+                    matricule: i === 6 ? '' : `MAT2024${String(i).padStart(3, '0')}`
+                };
+                
+                // Ajouter les notes pour toutes les colonnes
+                Object.values(matieres).forEach(columns => {
+                    columns.forEach(col => {
+                        student[col] = generateRandomNote();
+                    });
+                });
+                
+                testData.push(student);
+            }
+            
+            return testData;
+        }
+
+        // Afficher la grille des matières
+        function displayMatieres() {
+            const grid = document.getElementById('matieresGrid');
+            grid.innerHTML = '';
+            
+            Object.entries(MATIERES_COMPLETES).forEach(([matiere, columns]) => {
+                const item = document.createElement('div');
+                item.className = 'matiere-item';
+                item.innerHTML = `
+                    <div class="matiere-name">${matiere}</div>
+                    <div class="matiere-columns">${columns.length} notes: ${columns[0].replace(/\d/g, '')}1-5</div>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        // Afficher l'aperçu
+        function displayPreview() {
+            const testData = generateTestData(MATIERES_COMPLETES);
+            const previewColumns = ['matricule', 'noteFran1', 'noteFran2', 'noteMath1', 'noteMath2', 'noteAng1', 'notePhysiq1', 'noteSVT1'];
+            
+            // En-têtes
+            const headerRow = document.getElementById('previewHeader');
+            headerRow.innerHTML = '';
+            previewColumns.forEach(col => {
+                const th = document.createElement('th');
+                th.textContent = col;
+                headerRow.appendChild(th);
+            });
+            
+            // Données
+            const tbody = document.getElementById('previewTable');
+            tbody.innerHTML = '';
+            
+            testData.slice(0, 6).forEach(student => {
+                const row = document.createElement('tr');
+                
+                previewColumns.forEach(col => {
+                    const td = document.createElement('td');
+                    const value = student[col];
+                    
+                    let cellClass = 'note-cell ';
+                    if (col === 'matricule') {
+                        cellClass += value ? 'note-valid' : 'note-invalid';
+                        td.textContent = value || 'VIDE';
+                    } else {
+                        if (value === "" || value === null || value === undefined) {
+                            cellClass += 'note-empty';
+                            td.textContent = '-';
+                        } else if (typeof value === 'number' && value >= 0 && value <= 20) {
+                            cellClass += 'note-valid';
+                            td.textContent = value;
+                        } else if (!isNaN(parseFloat(value)) && parseFloat(value) >= 0 && parseFloat(value) <= 20) {
+                            cellClass += 'note-valid';
+                            td.textContent = value;
+                        } else {
+                            cellClass += 'note-invalid';
+                            td.textContent = value;
+                        }
+                    }
+                    
+                    td.className = cellClass;
+                    row.appendChild(td);
+                });
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Générer le fichier Excel complet
+        function generateExcel() {
+            try {
+                const testData = generateTestData(MATIERES_COMPLETES);
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(testData);
+                
+                XLSX.utils.book_append_sheet(wb, ws, "Notes_Completes");
+                XLSX.writeFile(wb, "notes_completes_import_test.xlsx");
+                
+                showStatus("✅ Fichier Excel complet généré (130 colonnes)!", "success");
+            } catch (error) {
+                showStatus("❌ Erreur: " + error.message, "error");
+            }
+        }
+
+        // Générer le fichier Excel léger
+        function generateExcelLight() {
+            try {
+                const testData = generateTestData(MATIERES_LEGERES);
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(testData);
+                
+                XLSX.utils.book_append_sheet(wb, ws, "Notes_Legeres");
+                XLSX.writeFile(wb, "notes_legeres_import_test.xlsx");
+                
+                showStatus("✅ Fichier Excel léger généré (5 matières)!", "success");
+            } catch (error) {
+                showStatus("❌ Erreur: " + error.message, "error");
+            }
+        }
+
+        // Générer le fichier CSV
+        function generateCSV() {
+            try {
+                const testData = generateTestData(MATIERES_COMPLETES);
+                const allColumns = getAllColumns(MATIERES_COMPLETES);
+                
+                let csvContent = allColumns.join(',') + '\n';
+                
+                testData.forEach(row => {
+                    const values = allColumns.map(header => {
+                        const value = row[header];
+                        if (value === "" || value === null || value === undefined) return "";
+                        return value;
+                    });
+                    csvContent += values.join(',') + '\n';
+                });
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                
+                if (link.download !== undefined) {
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', 'notes_completes_import_test.csv');
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+                
+                showStatus("✅ Fichier CSV complet généré (130 colonnes)!", "success");
+            } catch (error) {
+                showStatus("❌ Erreur: " + error.message, "error");
+            }
+        }
+
+        // Afficher un message de statut
+        function showStatus(message, type = "success") {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            
+            setTimeout(() => {
+                statusDiv.textContent = '';
+                statusDiv.className = 'status';
+            }, 5000);
+        }
+
+        // Mettre à jour le nombre total de colonnes
+        function updateStats() {
+            const totalColumns = getAllColumns(MATIERES_COMPLETES).length - 1; // -1 pour exclure matricule
+            document.getElementById('totalColumns').textContent = totalColumns;
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            displayMatieres();
+            displayPreview();
+            updateStats();
+        });
+    </script>
+</body>
+</html>

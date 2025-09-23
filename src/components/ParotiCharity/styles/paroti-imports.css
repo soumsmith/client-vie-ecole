@@ -1,0 +1,135 @@
+/* ===========================
+   IMPORTS CSS PAROTI CHARITY
+   =========================== */
+
+/* Bootstrap */
+@import url('../../../components/assets/vendors/bootstrap/css/bootstrap.min.css');
+
+/* Animate CSS */
+@import url('../../../components/assets/vendors/animate/animate.min.css');
+
+/* FontAwesome */
+@import url('../../../components/assets/vendors/fontawesome/css/all.min.css');
+
+/* Owl Carousel */
+@import url('../../../components/assets/vendors/owl-carousel/owl.carousel.min.css');
+@import url('../../../components/assets/vendors/owl-carousel/owl.theme.default.min.css');
+
+/* Magnific Popup */
+@import url('../../../components/assets/vendors/jquery-magnific-popup/jquery.magnific-popup.css');
+
+/* Paroti Icons */
+@import url('../../../components/assets/vendors/paroti-icons/style.css');
+
+/* Tiny Slider */
+@import url('../../../components/assets/vendors/tiny-slider/tiny-slider.min.css');
+
+/* Style principal Paroti */
+@import url('../../../components/assets/css/paroti.css');
+
+/* ===========================
+   STYLES SPÉCIFIQUES REACT
+   =========================== */
+
+/* Corrections pour React */
+.page-wrapper {
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Preloader adjustments */
+.preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mobile nav fixes */
+.mobile-nav__wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.mobile-nav__wrapper.expanded {
+  pointer-events: auto;
+}
+
+/* Search popup fixes */
+.search-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.search-popup.active {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+/* Owl Carousel React fixes */
+.owl-carousel .owl-item {
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+.owl-carousel .owl-item img {
+  display: block;
+  width: 100%;
+}
+
+/* Count animations */
+.count-box.counted .count-text {
+  animation: countUp 2s ease-in-out;
+}
+
+@keyframes countUp {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Progress bar animations */
+.progress-box__bar__inner.counted {
+  transition: width 2s ease-in-out;
+}
+
+/* Hover effects preservation */
+.donation-card:hover,
+.donation-card-two:hover {
+  transform: translateY(-5px);
+  transition: transform 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .main-menu__list {
+    display: none;
+  }
+  
+  .main-header__toggler {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .main-header__toggler {
+    display: none;
+  }
+}

@@ -1,0 +1,399 @@
+/* ===========================
+   PV EVALUATIONS - STYLES CSS
+   =========================== */
+
+/* ===========================
+   LAYOUT GÉNÉRAL
+   =========================== */
+.pv-evaluations-container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 20px 0;
+}
+
+/* ===========================
+   COMPOSANT FILTRES - CONTAINER
+   =========================== */
+.pv-filters-container {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    margin-bottom: 20px;
+}
+
+/* ===========================
+   EN-TÊTE DES FILTRES
+   =========================== */
+.pv-filters-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.pv-filters-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pv-filters-title {
+    margin: 0;
+    color: #334155;
+    font-weight: 600;
+}
+
+.pv-filters-subtitle {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* ===========================
+   MESSAGES D'ERREUR
+   =========================== */
+.pv-error-message {
+    margin-bottom: 20px;
+}
+
+.pv-error-data {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+
+.pv-error-form {
+    background: #fffbeb;
+    border: 1px solid #fed7aa;
+}
+
+/* ===========================
+   FORMULAIRE ET CHAMPS
+   =========================== */
+.pv-form-group {
+    margin-bottom: 20px;
+}
+
+.pv-form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #475569;
+    font-size: 14px;
+}
+
+.pv-form-label-transparent {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: transparent;
+    font-size: 14px;
+}
+
+.pv-select-picker {
+    width: 100%;
+}
+
+/* ===========================
+   BOUTONS D'ACTION
+   =========================== */
+.pv-actions-container {
+    display: flex;
+    gap: 8px;
+    height: 40px;
+}
+
+.pv-search-button {
+    flex: 1;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.pv-clear-button {
+    min-width: 45px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+/* ===========================
+   INDICATEUR DE PROGRESSION
+   =========================== */
+.pv-steps-container {
+    margin-top: 15px;
+}
+
+.pv-steps-background {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+/* ===========================
+   LOADER DISCRET
+   =========================== */
+.pv-loading-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    padding: 10px 15px;
+    background: #f0f9ff;
+    border-radius: 8px;
+    border: 1px solid #bae6fd;
+}
+
+.pv-loading-text {
+    font-size: 14px;
+    color: #0369a1;
+}
+
+/* ===========================
+   MESSAGES D'INFORMATION
+   =========================== */
+.pv-info-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.pv-info-icon {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pv-info-title {
+    margin: 0;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.pv-info-description {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* ===========================
+   MESSAGES D'ERREUR GLOBAUX
+   =========================== */
+.pv-error-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.pv-error-icon {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pv-error-title {
+    margin: 0;
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.pv-error-description {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* ===========================
+   CONTENEUR DATATABLE
+   =========================== */
+.pv-datatable-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    overflow: hidden;
+}
+
+/* ===========================
+   MESSAGES AUCUN RÉSULTAT
+   =========================== */
+.pv-no-results-card {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+    text-align: center;
+}
+
+.pv-no-results-icon {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border-radius: 20px;
+    padding: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.pv-no-results-title {
+    margin: 0 0 10px 0;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.pv-no-results-description {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.pv-create-button {
+    margin-top: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+/* ===========================
+   STYLES DATATABLE PERSONNALISÉS
+   =========================== */
+.pv-datatable-custom-container {
+    background-color: transparent;
+}
+
+.pv-datatable-custom-panel {
+    min-height: 600px;
+    border: none;
+    box-shadow: none;
+}
+
+/* ===========================
+   RESPONSIVE DESIGN
+   =========================== */
+@media (max-width: 768px) {
+    .pv-filters-container {
+        padding: 20px;
+    }
+    
+    .pv-filters-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .pv-info-card,
+    .pv-error-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .pv-no-results-card {
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .pv-evaluations-container {
+        padding: 10px 0;
+    }
+    
+    .pv-form-group {
+        margin-bottom: 15px;
+    }
+    
+    .pv-actions-container {
+        flex-direction: column;
+        height: auto;
+        gap: 10px;
+    }
+    
+    .pv-search-button,
+    .pv-clear-button {
+        width: 100%;
+    }
+}
+
+/* ===========================
+   ANIMATIONS ET TRANSITIONS
+   =========================== */
+.pv-filters-container,
+.pv-info-card,
+.pv-error-card,
+.pv-datatable-container,
+.pv-no-results-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pv-filters-container:hover,
+.pv-info-card:hover,
+.pv-datatable-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.pv-search-button,
+.pv-clear-button,
+.pv-create-button {
+    transition: all 0.2s ease;
+}
+
+.pv-search-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.pv-clear-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ===========================
+   UTILITAIRES
+   =========================== */
+.pv-margin-bottom-20 {
+    margin-bottom: 20px;
+}
+
+.pv-margin-bottom-15 {
+    margin-bottom: 15px;
+}
+
+.pv-margin-top-15 {
+    margin-top: 15px;
+}
+
+.pv-text-center {
+    text-align: center;
+}
+
+.pv-flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pv-full-width {
+    width: 100%;
+}

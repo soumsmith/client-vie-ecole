@@ -1,0 +1,302 @@
+import React from "react";
+import { Modal, Button, Badge } from "rsuite";
+import { FiUser, FiMail, FiPhone, FiCalendar, FiAward, FiBook, FiMapPin, FiFileText } from "react-icons/fi";
+
+const AgentModal = ({ modalState, onClose, onSave }) => {
+    if (!modalState.isOpen || !modalState.selectedAgent) {
+        return null;
+    }
+
+    const agent = modalState.selectedAgent;
+    const { type } = modalState;
+
+    // Fonction pour formater la date
+    const formatDate = (dateString) => {
+        if (!dateString) return 'Non renseigné';
+        return new Date(dateString).toLocaleDateString('fr-FR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
+
+    // Fonction pour calculer l'âge
+    const calculateAge = (dateNaissance) => {
+        if (!dateNaissance) return 'Non renseigné';
+        const today = new Date();
+        const birthDate = new Date(dateNaissance);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        
+        return `${age} ans`;
+    };
+
+    // Configuration des modaux selon le type
+    const getModalConfig = () => {
+        switch (type) {
+            case 'view':
+                return {
+                    title: 'Détails de l\'agent',
+                    size: 'lg',
+                    showSave: false,
+                    saveText: '',
+                    content: (
+                        <div className="agent-details">
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <div className="info-section mb-4">
+                                        <h6 className="text-primary mb-3">
+                                            <FiUser className="me-2" />
+                                            Informations personnelles
+                                        </h6>
+                                        <div className="info-item mb-2">
+                                            <strong>Nom complet :</strong> {agent.nomComplet}
+                                        </div>
+                                        <div className="info-item mb-2">
+                                            <strong>Date de naissance :</strong> {formatDate(agent.dateNaissance)}
+                                        </div>
+                                        <div className="info-item mb-2">
+                                            <strong>Âge :</strong> {calculateAge(agent.dateNaissance)}
+                                        </div>
+                                    </div>
+
+                                    <div className="info-section mb-4">
+                                        <h6 className="text-primary mb-3">
+                                            <FiPhone className="me-2" />
+                                            Contact
+                                        </h6>
+                                        <div className="info-item mb-2">
+                                            <strong>Téléphone :</strong> {agent.contact}
+                                        </div>
+                                        <div className="info-item mb-2">
+                                            <strong>Email :</strong> {agent.email}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="col-md-6">
+                                    <div className="info-section mb-4">
+                                        <h6 className="text-primary mb-3">
+                                            <FiAward className="me-2" />
+                                            Formation et expérience
+                                        </h6>
+                                        <div className="info-item mb-2">
+                                            <strong>Diplôme récent :</strong> 
+                                            <Badge color="blue" className="ms-2">{agent.diplomeRecent}</Badge>
+                                        </div>
+                                        <div className="info-item mb-2">
+                                            <strong>Domaine de formation :</strong> {agent.domaineFormation}
+                                        </div>
+                                        <div className="info-item mb-2">
+                                            <strong>Fonction :</strong> {agent.fonction}
+                                        </div>
+                                        <div className="info-item mb-2">
+                                            <strong>Expérience :</strong> 
+                                            <Badge color="green" className="ms-2">
+                                                {agent.experience} an{agent.experience > 1 ? 's' : ''}
+                                            </Badge>
+                                        </div>
+                                    </div>
+
+                                    <div className="info-section mb-4">
+                                        <h6 className="text-primary mb-3">
+                                            <FiMapPin className="me-2" />
+                                            École actuelle
+                                        </h6>
+                                        <div className="info-item mb-2">
+                                            <strong>École :</strong> {agent.ecole}
+                                        </div>
+                                        <div className="info-item mb-2">
+                                            <strong>Date de candidature :</strong> {formatDate(agent.dateCreation)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {agent.lienAutorisation && (
+                                <div className="info-section mt-4">
+                                    <h6 className="text-primary mb-3">
+                                        <FiFileText className="me-2" />
+                                        Documents
+                                    </h6>
+                                    <div className="info-item mb-2">
+                                        <strong>Autorisation :</strong> 
+                                        <a href={agent.lienAutorisation} target="_blank" rel="noopener noreferrer" className="ms-2">
+                                            {agent.lienAutorisation}
+                                        </a>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )
+                };
+
+            case 'recruter':
+                return {
+                    title: 'Recruter cet agent',
+                    size: 'md',
+                    showSave: true,
+                    saveText: 'Confirmer le recrutement',
+                    content: (
+                        <div className="text-center">
+                            <div className="mb-4">
+                                <FiUser size={48} className="text-success mb-3" />
+                                <h5>Confirmer le recrutement</h5>
+                            </div>
+                            <div className="alert alert-info">
+                                <p className="mb-0">
+                                    Vous êtes sur le point de recruter <strong>{agent.nomComplet}</strong> 
+                                    en tant que <strong>{agent.fonction}</strong>.
+                                </p>
+                            </div>
+                            <div className="agent-summary p-3 border rounded bg-light">
+                                <div className="row text-start">
+                                    <div className="col-6">
+                                        <small><strong>Email :</strong> {agent.email}</small><br />
+                                        <small><strong>Téléphone :</strong> {agent.contact}</small><br />
+                                        <small><strong>Diplôme :</strong> {agent.diplomeRecent}</small>
+                                    </div>
+                                    <div className="col-6">
+                                        <small><strong>Formation :</strong> {agent.domaineFormation}</small><br />
+                                        <small><strong>Expérience :</strong> {agent.experience} ans</small><br />
+                                        <small><strong>École :</strong> {agent.ecole}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <p className="text-muted mt-3">
+                                Cette action est irréversible. L'agent sera ajouté à votre équipe.
+                            </p>
+                        </div>
+                    )
+                };
+
+            case 'contact':
+                return {
+                    title: 'Contacter l\'agent',
+                    size: 'md',
+                    showSave: true,
+                    saveText: 'Envoyer le message',
+                    content: (
+                        <div>
+                            <div className="mb-4">
+                                <h6>Contact : {agent.nomComplet}</h6>
+                                <p className="text-muted">
+                                    <FiPhone className="me-1" />{agent.contact} | 
+                                    <FiMail className="ms-2 me-1" />{agent.email}
+                                </p>
+                            </div>
+                            
+                            <div className="mb-3">
+                                <label className="form-label">Objet du message</label>
+                                <input 
+                                    type="text" 
+                                    className="form-control" 
+                                    placeholder="Ex: Proposition de recrutement"
+                                />
+                            </div>
+                            
+                            <div className="mb-3">
+                                <label className="form-label">Message</label>
+                                <textarea 
+                                    className="form-control" 
+                                    rows="4"
+                                    placeholder="Tapez votre message ici..."
+                                ></textarea>
+                            </div>
+                        </div>
+                    )
+                };
+
+            case 'document':
+                return {
+                    title: 'Documents de l\'agent',
+                    size: 'md',
+                    showSave: false,
+                    saveText: '',
+                    content: (
+                        <div>
+                            <div className="mb-4">
+                                <h6>Documents disponibles pour {agent.nomComplet}</h6>
+                            </div>
+                            
+                            <div className="documents-list">
+                                {agent.lienAutorisation ? (
+                                    <div className="document-item p-3 border rounded mb-2">
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <FiFileText className="me-2" />
+                                                <strong>Autorisation</strong>
+                                                <br />
+                                                <small className="text-muted">{agent.lienAutorisation}</small>
+                                            </div>
+                                            <a 
+                                                href={agent.lienAutorisation} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="btn btn-outline-primary btn-sm"
+                                            >
+                                                Télécharger
+                                            </a>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="text-muted text-center p-4">
+                                        <FiFileText size={32} className="mb-3" />
+                                        <p>Aucun document disponible</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )
+                };
+
+            default:
+                return {
+                    title: 'Agent',
+                    size: 'md',
+                    showSave: false,
+                    saveText: '',
+                    content: <div>Action non reconnue</div>
+                };
+        }
+    };
+
+    const config = getModalConfig();
+
+    return (
+        <Modal 
+            open={modalState.isOpen} 
+            onClose={onClose}
+            size={config.size}
+        >
+            <Modal.Header>
+                <Modal.Title>{config.title}</Modal.Title>
+            </Modal.Header>
+            
+            <Modal.Body>
+                {config.content}
+            </Modal.Body>
+            
+            <Modal.Footer>
+                <Button onClick={onClose} appearance="subtle">
+                    Annuler
+                </Button>
+                {config.showSave && (
+                    <Button 
+                        onClick={onSave} 
+                        appearance="primary"
+                        color={type === 'recruter' ? 'green' : 'blue'}
+                    >
+                        {config.saveText}
+                    </Button>
+                )}
+            </Modal.Footer>
+        </Modal>
+    );
+};
+
+export default AgentModal;

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstaClub - Reach More Compassionate People</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --orange-primary: #ff8c42;
+            --purple-primary: #8b5a96;
+            --purple-hover: #7a4d85;
+            --bg-gradient: radial-gradient(ellipse 100% 70% at 80% 20%, rgba(255, 140, 66, 0.15) 0%, rgba(139, 90, 150, 0.08) 30%, rgba(255, 255, 255, 0.95) 70%);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #f9f6f1 0%, #f5f1eb 50%, #ede8e0 100%);
+            z-index: -2;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-gradient);
+            z-index: -1;
+        }
+
+        /* Header Styles */
+        .custom-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .logo-orange {
+            color: var(--orange-primary);
+        }
+
+        .logo-dark {
+            color: #333;
+        }
+
+        .nav-link {
+            color: #666 !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--orange-primary) !important;
+        }
+
+        .nav-link.active {
+            color: #333 !important;
+            font-weight: 600;
+        }
+
+        .language-selector {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .btn-contact {
+            background: transparent;
+            border: 2px solid var(--orange-primary);
+            color: var(--orange-primary);
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-contact:hover {
+            background: var(--orange-primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-title {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #333;
+            line-height: 1.2;
+        }
+
+        .title-orange {
+            color: var(--orange-primary);
+        }
+
+        .title-line {
+            width: 200px;
+            height: 4px;
+            background: #333;
+            margin: 20px 0;
+        }
+
+        .btn-get-started {
+            background: var(--purple-primary);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-get-started:hover {
+            background: var(--purple-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(139, 90, 150, 0.3);
+            color: white;
+        }
+
+        .phone-icon {
+            width: 40px;
+            height: 40px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .hotline-label {
+            color: #999;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .hotline-number {
+            color: #333;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Enhanced Statistics Design */
+        .stats-container {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            border-radius: 15px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%);
+            border: 1px solid rgba(255, 140, 66, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--orange-primary), var(--purple-primary));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-item:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--orange-primary), var(--purple-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--orange-primary), var(--purple-primary));
+            color: white;
+            box-shadow: 0 8px 16px rgba(255, 140, 66, 0.3);
+        }
+
+        .stat-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-desc {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Person Illustration */
+        .person-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .person-image {
+            width: 400px;
+            height: 500px;
+            background: linear-gradient(45deg, #f0c27b, #4b1248);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .person {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 450px;
+            background: linear-gradient(180deg, var(--purple-primary) 0%, #4a90e2 100%);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .phone {
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-15deg);
+            width: 60px;
+            height: 100px;
+            background: #333;
+            border-radius: 10px;
+            border: 3px solid #fff;
+        }
+
+        .beanie {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 40px;
+            background: #ffb6c1;
+            border-radius: 50px 50px 20px 20px;
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            background: var(--orange-primary);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .floating-1 {
+            width: 60px;
+            height: 60px;
+            top: 20%;
+            right: -30px;
+            animation-delay: 0s;
+        }
+
+        .floating-2 {
+            width: 70px;
+            height: 70px;
+            bottom: 30%;
+            right: -40px;
+            animation-delay: 2s;
+        }
+
+        .floating-3 {
+            width: 50px;
+            height: 50px;
+            top: 60%;
+            left: -25px;
+            animation-delay: 1s;
+        }
+
+        /* Testimonial */
+        .testimonial {
+            position: absolute;
+            bottom: -50px;
+            right: 0px;
+            width: 400px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 300px;
+            z-index: 10;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .testimonial-author {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stars {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .author-image {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #4a90e2, var(--purple-primary));
+            border-radius: 10px;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(5deg);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+
+            .testimonial {
+                position: static;
+                margin-top: 30px;
+            }
+
+            .person-image {
+                width: 300px;
+                height: 400px;
+            }
+
+            .person {
+                width: 250px;
+                height: 350px;
+            }
+
+            .stats-container {
+                padding: 1.5rem;
+            }
+
+            .stat-item {
+                margin-bottom: 1rem;
+            }
+
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+
+    <!-- Main Content -->
+    <main class="container-fluid py-5">
+        
+    </main>
+
+    <!-- Bootstrap JS -->
+</body>
+
+</html>

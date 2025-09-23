@@ -1,0 +1,171 @@
+[
+    {
+        "annee": {
+            "anneeDebut": 2024,
+            "customLibelle": "Année 2024 - 2025",
+            "dateCreation": "2024-08-06T13:52:26Z[UTC]",
+            "dateUpdate": "2024-08-06T14:01:14Z[UTC]",
+            "id": 226,
+            "libelle": "Année 2024 - 2025",
+            "nbreEval": 9,
+            "niveau": "CENTRAL",
+            "niveauEnseignement": {
+                "code": "2",
+                "id": 2,
+                "libelle": "Enseignement Secondaire Générale"
+            },
+            "periodicite": {
+                "code": "2",
+                "dateCreation": "2023-09-01T00:00:00Z[UTC]",
+                "dateUpdate": "2023-09-01T00:00:00Z[UTC]",
+                "id": 2,
+                "isDefault": "DEFAULT",
+                "libelle": "Trimestrielle",
+                "ordre": "2"
+            },
+            "statut": "DIFFUSE",
+            "user": "34"
+        },
+        "classe": {
+            "branche": {
+                "filiere": {
+                    "code": "F001",
+                    "id": 1,
+                    "libelle": "GENERAL"
+                },
+                "id": 14,
+                "libelle": "TLE C",
+                "niveau": {
+                    "code": "11",
+                    "id": 11,
+                    "libelle": "Terminale C",
+                    "ordre": 13
+                },
+                "niveauEnseignement": {
+                    "code": "2",
+                    "id": 2,
+                    "libelle": "Enseignement Secondaire Générale"
+                },
+                "programme": {
+                    "code": "PRG_CI",
+                    "dateCreation": "2024-07-28T12:39:46Z[UTC]",
+                    "dateUpdate": "2024-07-28T12:39:46Z[UTC]",
+                    "id": "efae384a-688f-4b0e-b6fd-9e960ebf78fc",
+                    "libelle": "Ivoirien"
+                },
+                "serie": {
+                    "code": "C",
+                    "id": 1,
+                    "libelle": "C"
+                }
+            },
+            "code": "TleC",
+            "dateCreation": "2024-09-20T14:33:40Z[UTC]",
+            "dateUpdate": "2024-09-20T14:33:40Z[UTC]",
+            "ecole": {
+                "code": "057955",
+                "id": 38,
+                "libelle": "Collège Privé Hînneh Biabou ",
+                "niveauEnseignement": {
+                    "code": "2",
+                    "id": 2,
+                    "libelle": "Enseignement Secondaire Générale"
+                },
+                "nomSignataire": "M.SANGARE",
+                "tel": "0789353025"
+            },
+            "effectif": 2,
+            "id": 63037,
+            "libelle": "Tle C",
+            "visible": 1
+        },
+        "code": "613ade49-6bbb-4c4e-a57e-cbeb9a24895e",
+        "date": "2024-11-04T14:47:24Z[UTC]",
+        "dateCreation": "2024-11-04T14:48:11.722Z[UTC]",
+        "dateLimite": "",
+        "dateToFilter": "04/11/2024",
+        "dateUpdate": "2024-11-04T14:58:44Z[UTC]",
+        "duree": "02-00",
+        "etat": "",
+        "heure": "",
+        "id": 49690,
+        "matiereEcole": {
+            "bonus": 0,
+            "categorie": {
+                "code": "03",
+                "id": 3,
+                "libelle": "Littéraire"
+            },
+            "code": "01",
+            "dateCreation": "2023-05-16T22:35:48",
+            "dateUpdate": "2024-02-04T20:47:18",
+            "ecole": {
+                "code": "057955",
+                "id": 38,
+                "libelle": "Collège Privé Hînneh Biabou ",
+                "niveauEnseignement": {
+                    "code": "2",
+                    "id": 2,
+                    "libelle": "Enseignement Secondaire Générale"
+                },
+                "nomSignataire": "M.SANGARE",
+                "tel": "0789353025"
+            },
+            "id": 2018,
+            "libelle": "FRANCAIS",
+            "matiere": {
+                "bonus": 0,
+                "categorie": {
+                    "code": "03",
+                    "id": 3,
+                    "libelle": "Littéraire"
+                },
+                "code": "01",
+                "id": 1,
+                "libelle": "FRANCAIS",
+                "matiereParent": "1",
+                "niveauEnseignement": {
+                    "code": "2",
+                    "id": 2,
+                    "libelle": "Enseignement Secondaire Générale"
+                },
+                "numOrdre": 1,
+                "parentMatiereLibelle": "FRANCAIS",
+                "pec": 0
+            },
+            "niveauEnseignement": {
+                "code": "2",
+                "id": 2,
+                "libelle": "Enseignement Secondaire Générale"
+            },
+            "numOrdre": 1,
+            "parentMatiereLibelle": "FRANCAIS",
+            "pec": 1
+        },
+        "noteSur": "20",
+        "numero": 10817,
+        "pec": 1,
+        "periode": {
+            "coef": "1.0",
+            "id": 1,
+            "libelle": "Premier Trimestre",
+            "niveau": 1,
+            "periodicite": {
+                "code": "2",
+                "dateCreation": "2023-09-01T00:00:00Z[UTC]",
+                "dateUpdate": "2023-09-01T00:00:00Z[UTC]",
+                "id": 2,
+                "isDefault": "DEFAULT",
+                "libelle": "Trimestrielle",
+                "ordre": "2"
+            }
+        },
+        "type": {
+            "id": 1,
+            "libelle": "Devoir",
+            "niveauEnseignement": 2,
+            "typeSeance": "EVAL"
+        },
+        "user": "427"
+    }
+]

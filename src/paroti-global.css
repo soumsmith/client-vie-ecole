@@ -1,0 +1,331 @@
+/* ===========================
+   STYLES GLOBAUX PAROTI CHARITY
+   =========================== */
+
+/* Import des styles vendors - SEULEMENT LES FICHIERS QUI EXISTENT */
+@import url('./components/assets/vendors/bootstrap/css/bootstrap.min.css');
+@import url('./components/assets/vendors/animate/animate.min.css');
+@import url('./components/assets/vendors/fontawesome/css/all.min.css');
+@import url('./components/assets/vendors/owl-carousel/owl.carousel.min.css');
+@import url('./components/assets/vendors/owl-carousel/owl.theme.default.min.css');
+@import url('./components/assets/vendors/jquery-magnific-popup/jquery.magnific-popup.css');
+@import url('./components/assets/vendors/paroti-icons/style.css');
+@import url('./components/assets/vendors/tiny-slider/dist/tiny-slider.css');
+@import url('./components/assets/vendors/youtube-popup/youtube-popup.css');
+
+/* Style principal Paroti */
+@import url('./components/assets/css/paroti.css');
+
+/* ===========================
+   STYLES SPÉCIFIQUES REACT
+   =========================== */
+
+/* Page wrapper */
+.page-wrapper {
+  position: relative;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Preloader */
+.preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preloader__image {
+  width: 100px;
+  height: 100px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mobile Navigation */
+.mobile-nav__wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-nav__wrapper.expanded {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.mobile-nav__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.mobile-nav__content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+  background: #fff;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.mobile-nav__wrapper.expanded .mobile-nav__content {
+  transform: translateX(0);
+}
+
+/* Search Popup */
+.search-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-popup.active {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.search-popup__content {
+  background: #fff;
+  padding: 40px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+}
+
+.search-popup__content form {
+  display: flex;
+  gap: 10px;
+}
+
+.search-popup__content input {
+  flex: 1;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.search-popup__content button {
+  padding: 15px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Owl Carousel Fixes */
+.owl-carousel .owl-item {
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  min-height: 1px;
+  float: left;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-touch-callout: none;
+}
+
+.owl-carousel .owl-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.owl-carousel .owl-nav {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.owl-carousel .owl-nav button {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.owl-carousel .owl-nav button:hover {
+  background: #fff;
+  transform: scale(1.1);
+}
+
+.owl-carousel .owl-dots {
+  text-align: center;
+  padding-top: 20px;
+}
+
+.owl-carousel .owl-dots .owl-dot {
+  display: inline-block;
+  margin: 0 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.owl-carousel .owl-dots .owl-dot.active,
+.owl-carousel .owl-dots .owl-dot:hover {
+  background: #fff;
+}
+
+/* Count Animations */
+.count-box.counted .count-text {
+  animation: countUp 2s ease-in-out;
+}
+
+@keyframes countUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Progress Bar Animations */
+.progress-box__bar__inner.counted {
+  transition: width 2s ease-in-out;
+  animation: progressFill 2s ease-in-out;
+}
+
+@keyframes progressFill {
+  from { width: 0%; }
+}
+
+/* Card Hover Effects */
+.donation-card:hover,
+.donation-card-two:hover {
+  transform: translateY(-5px);
+  transition: transform 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Button Hover Effects */
+.thm-btn:hover {
+  transform: translateY(-2px);
+  transition: transform 0.3s ease;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 991px) {
+  .main-menu__list {
+    display: none;
+  }
+  
+  .main-header__toggler {
+    display: block !important;
+  }
+  
+  .main-menu__right {
+    gap: 10px;
+  }
+}
+
+@media (min-width: 992px) {
+  .main-header__toggler {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .slider-one__title {
+    font-size: 2rem;
+  }
+  
+  .sec-title__title {
+    font-size: 1.8rem;
+  }
+  
+  .donation-card,
+  .donation-card-two {
+    margin-bottom: 30px;
+  }
+}
+
+@media (max-width: 576px) {
+  .container-fluid {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  
+  .slider-one__title {
+    font-size: 1.5rem;
+  }
+  
+  .main-menu__cta {
+    display: none;
+  }
+}
+
+/* Fix pour les icônes manquantes */
+.paroti-icon-volunteer:before,
+.paroti-icon-sponsor:before,
+.paroti-icon-solidarity:before,
+.paroti-icon-organic-food:before,
+.paroti-icon-education:before,
+.paroti-icon-patient:before,
+.paroti-icon-magnifying-glass:before,
+.paroti-icon-shopping-cart:before,
+.paroti-icon-left-arrow:before,
+.paroti-icon-right-arrow:before {
+  font-family: 'Font Awesome 5 Free', 'Font Awesome 5 Brands';
+  font-weight: 900;
+}
+
+.paroti-icon-volunteer:before { content: '\f4c0'; }
+.paroti-icon-sponsor:before { content: '\f4b9'; }
+.paroti-icon-solidarity:before { content: '\f4c4'; }
+.paroti-icon-organic-food:before { content: '\f5d1'; }
+.paroti-icon-education:before { content: '\f19d'; }
+.paroti-icon-patient:before { content: '\f7fd'; }
+.paroti-icon-magnifying-glass:before { content: '\f002'; }
+.paroti-icon-shopping-cart:before { content: '\f07a'; }
+.paroti-icon-left-arrow:before { content: '\f104'; }
+.paroti-icon-right-arrow:before { content: '\f105'; }
