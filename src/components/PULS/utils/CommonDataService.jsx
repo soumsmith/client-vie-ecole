@@ -258,6 +258,7 @@ export const useClassesData = (refreshTrigger = 0) => {
 
   useEffect(() => {
     if (userProfile) {
+      console.log("🔄 UseEffect Classes déclenché pour école:", appParams.ecoleId);
       fetchClasses(false);
     }
   }, [appParams.ecoleId, refreshTrigger, fetchClasses]);
@@ -659,6 +660,7 @@ export const useMatieresData = (
   const personnelUrls = usePersonnelUrls();
   const matieresUrls = useMatieresUrls();
   const finalEcoleId = ecoleId || appParams.ecoleId;
+  const userProfile = getUserProfile();
 
   // Fonction fetchMatieres exposée publiquement pour usage manuel
   const fetchMatieres = useCallback(
