@@ -45,7 +45,7 @@ export const useOffresData = (refreshTrigger = 0) => {
 
             // Pour l'instant, on utilise des données simulées car vous n'avez pas encore fourni l'API des offres
             // Vous pouvez remplacer par votre vraie API quand elle sera disponible
-            // const response = await axios.get(`${getFullUrl()}/api/offres-emploi`);
+            // const response = await axios.get(`${getFullUrl()}offres-emploi`);
             
             const simulatedOffres = [
                 {

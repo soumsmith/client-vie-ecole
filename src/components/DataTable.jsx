@@ -932,7 +932,6 @@ const DataTable = ({
                 >
                   <HeaderCell style={{
                     fontWeight: '600',
-                    backgroundColor: '#f8f9fa',
                     ...column.headerStyle
                   }}>
                     {column.title}

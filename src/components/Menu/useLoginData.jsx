@@ -13,15 +13,15 @@ import { useUserContext } from '../../hooks/useUserContext';
  */
 const useLoginData = (config) => {
     const navigate = useNavigate();
-    const { 
-        updateFromLoginData, 
-        updateUserParams, 
+    const {
+        updateFromLoginData,
+        updateUserParams,
         clearUserParams,
         isInitialized,
         isAuthenticated
     } = useUserContext();
 
-     const getDefaultHeaders = () => {
+    const getDefaultHeaders = () => {
         return {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -62,7 +62,7 @@ const useLoginData = (config) => {
     // ===========================
     // FONCTIONS UTILITAIRES
     // ===========================
-    
+
     /**
      * Nettoie un item pour ne garder que ceux ayant des données utiles
      */
@@ -215,50 +215,64 @@ const useLoginData = (config) => {
             }
         });
 
-        console.log('🔄 Données mappées:', { 
-            formData, 
-            loginFields, 
-            mappedData 
+        console.log('🔄 Données mappées:', {
+            formData,
+            loginFields,
+            mappedData
         });
 
         return mappedData;
     };
 
     /**
-     * Effectue la requête de connexion selon la méthode configurée
-     * @param {string} url - URL de l'endpoint de connexion
-     * @param {object} loginData - Données de connexion mappées
-     * @param {string} method - Méthode HTTP (GET ou POST)
-     * @returns {Promise} - Réponse de la requête
-     */
+ * Effectue la requête de connexion selon la méthode configurée
+ * @param {string} url - URL de l'endpoint de connexion
+ * @param {object} loginData - Données de connexion mappées
+ * @param {string} method - Méthode HTTP (GET ou POST)
+ * @returns {Promise} - Réponse de la requête
+ */
     const performLoginRequest = async (url, loginData, method = 'POST') => {
-        const headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept',
-            'Origin': 'http://localhost:5173',
-            'User-Agent': 'Mozilla/5.0 (compatible; MyApp/1.0)',
-        };
+        // ✅ Headers simplifiés - Le proxy Vite gère CORS automatiquement
 
-        const requestConfig = {
-            headers,
-            withCredentials: false,
-            timeout: 10000,
-        };
+        try {
+            if (method.toUpperCase() === 'GET') {
+                // Pour GET, ajouter les paramètres à l'URL
+                const params = new URLSearchParams(loginData);
+                const fullUrl = `${url}?${params.toString()}`;
 
-        if (method.toUpperCase() === 'GET') {
-            // Pour GET, ajouter les paramètres à l'URL
-            const params = new URLSearchParams(loginData);
-            const fullUrl = `${url}?${params.toString()}`;
-            
-            console.log(`🔗 Requête GET vers: ${fullUrl}`);
-            return await axios.get(fullUrl, requestConfig);
-        } else {
-            // Pour POST, les données vont dans le body
-            console.log(`🔗 Requête POST vers: ${url}`, loginData);
-            return await axios.post(url, loginData, requestConfig);
+                console.log(`🔗 Requête GET vers: ${fullUrl}`);
+                return await axios.get(fullUrl);
+            } else {
+                // Pour POST, les données vont dans le body
+                console.log(`🔗 Requête POST vers: ${url}`, loginData);
+                return await axios.post(url, loginData);
+            }
+        } catch (error) {
+            // ✅ Meilleure gestion des erreurs
+            console.error('❌ Erreur lors de la requête de connexion:', {
+                message: error.message,
+                status: error.response?.status,
+                statusText: error.response?.statusText,
+                data: error.response?.data,
+                url: url,
+                method: method,
+                loginData: loginData
+            });
+
+            // ✅ Messages d'erreur plus spécifiques
+            if (error.response?.status === 403) {
+                throw new Error('Accès refusé - Vérifiez vos identifiants');
+            } else if (error.response?.status === 404) {
+                throw new Error('Service de connexion non trouvé');
+            } else if (error.response?.status >= 500) {
+                throw new Error('Erreur serveur - Réessayez plus tard');
+            } else if (error.code === 'ECONNABORTED') {
+                throw new Error('Timeout - Connexion trop lente');
+            } else if (error.code === 'ERR_NETWORK') {
+                throw new Error('Erreur réseau - Vérifiez votre connexion');
+            }
+
+            throw error;
         }
     };
 
@@ -302,9 +316,9 @@ const useLoginData = (config) => {
      */
     const initializeUserContextFromStorage = () => {
         console.log('🔄 Initialisation du contexte utilisateur depuis localStorage...');
-        
+
         const storedData = getStoredUserData();
-        
+
         if (!storedData || !storedData.isAuthenticated) {
             console.log('❌ Aucune donnée utilisateur trouvée ou utilisateur non authentifié');
             setInitializingFromStorage(false);
@@ -318,16 +332,16 @@ const useLoginData = (config) => {
                 email: storedData.userData?.email || storedData.completeUserData?.email,
                 userId: storedData.userId,
                 profileId: storedData.userData?.profileId || storedData.completeUserData?.profileId,
-                
+
                 // IDs institutionnels
                 ecoleId: storedData.userData?.schoolId || storedData.completeUserData?.schoolId || 38,
                 academicYearId: storedData.academicYearMain?.anneeid || storedData.academicYearMain?.id || 226,
                 periodiciteId: 2, // Valeur par défaut
-                
+
                 // Informations détaillées
                 personnelInfo: storedData.userPersonnelInfo,
                 academicYearInfo: storedData.academicYearInfo,
-                
+
                 // Métadonnées
                 loginTime: storedData.completeUserData?.loginTime || storedData.userData?.loginTime,
                 userType: storedData.completeUserData?.userType || storedData.userData?.userType || 'user'
@@ -345,7 +359,7 @@ const useLoginData = (config) => {
             if (storedData.academicYearInfo) setAcademicYearInfo(storedData.academicYearInfo);
 
             console.log('✅ Contexte utilisateur initialisé avec succès depuis localStorage');
-            
+
         } catch (error) {
             console.error('❌ Erreur lors de l\'initialisation du contexte:', error);
         } finally {
@@ -356,7 +370,7 @@ const useLoginData = (config) => {
     // ===========================
     // FONCTIONS DE CHARGEMENT DES DONNÉES DE BASE
     // ===========================
-    
+
     /**
      * Charge la liste des écoles depuis l'API
      */
@@ -365,7 +379,7 @@ const useLoginData = (config) => {
         setSchoolsError(null);
 
         try {
-            const response = await axios.get(`${getFullUrl()}/api/connecte/ecole`);
+            const response = await axios.get(`${getFullUrl()}connecte/ecole`);
             const extractedData = extractDataFromResponse(response.data, 'schools');
             const transformed = transformSchoolsData(extractedData);
 
@@ -387,7 +401,7 @@ const useLoginData = (config) => {
         setProfilesError(null);
 
         try {
-            const response = await axios.get(`${getFullUrl()}/api/profil`);
+            const response = await axios.get(`${getFullUrl()}profil`);
             const extractedData = extractDataFromResponse(response.data, 'profiles');
             const transformed = transformProfilesData(extractedData);
 
@@ -412,18 +426,18 @@ const useLoginData = (config) => {
         try {
             console.log(`Récupération des infos personnel: ${email}/${schoolId}/${profileId}`);
             const response = await axios.get(
-                `${getFullUrl()}/api/connexion/id-utilisateur-connecte/${encodeURIComponent(email)}`
+                `${getFullUrl()}connexion/id-utilisateur-connecte/${encodeURIComponent(email)}`
             );
 
             const response__2 = await axios.get(
-                `${getFullUrl()}/api/connexion/infos-personnel-connecte-v2/${email}/${schoolId}/${profileId}`
+                `${getFullUrl()}connexion/infos-personnel-connecte-v2/${email}/${schoolId}/${profileId}`
             );
-            
-            
+
+
             const personnelInfo = response.data;
             setUserPersonnelInfo(personnelInfo);
             localStorage.setItem('userPersonnelInfo', JSON.stringify(personnelInfo));
-            
+
             console.log('Informations personnel récupérées:', personnelInfo);
             return personnelInfo;
         } catch (error) {
@@ -439,17 +453,17 @@ const useLoginData = (config) => {
         try {
             console.log(`Récupération ID utilisateur: ${encodeURIComponent(email)}`);
             const response = await axios.get(
-                `${getFullUrl()}/api/connexion/id-utilisateur-connecte-v2?login=${encodeURIComponent(email)}`,
+                `${getFullUrl()}connexion/id-utilisateur-connecte-v2?login=${encodeURIComponent(email)}`,
                 {
                     headers: getDefaultHeaders(),
                     timeout: 10000
                 }
             );
-            
+
             const userIdValue = response.data;
             setUserId(userIdValue);
             localStorage.setItem('userId', userIdValue.toString());
-            
+
             console.log('ID utilisateur récupéré:', userIdValue);
             return userIdValue;
         } catch (error) {
@@ -465,13 +479,13 @@ const useLoginData = (config) => {
         try {
             console.log(`Récupération année académique principale: école ${schoolId}`);
             const response = await axios.get(
-                `${getFullUrl()}/api/annee/get-main-annee-by-ecole/${schoolId}`
+                `${getFullUrl()}annee/get-main-annee-by-ecole/${schoolId}`
             );
-            
+
             const academicYear = response.data;
             setAcademicYearMain(academicYear);
             localStorage.setItem('academicYearMain', JSON.stringify(academicYear));
-            
+
             console.log('Année académique principale récupérée:', academicYear);
             return academicYear;
         } catch (error) {
@@ -487,13 +501,13 @@ const useLoginData = (config) => {
         try {
             console.log(`Récupération infos année académique: école ${schoolId}`);
             const response = await axios.get(
-                `${getFullUrl()}/api/annee/info-annee/${schoolId}`
+                `${getFullUrl()}annee/info-annee/${schoolId}`
             );
-            
+
             const academicYearInfoData = response.data;
             setAcademicYearInfo(academicYearInfoData);
             localStorage.setItem('academicYearInfo', JSON.stringify(academicYearInfoData));
-            
+
             console.log('Informations année académique récupérées:', academicYearInfoData);
             return academicYearInfoData;
         } catch (error) {
@@ -511,7 +525,7 @@ const useLoginData = (config) => {
 
         try {
             console.log('🔄 Début de la récupération des données utilisateur...');
-            
+
             const [personnelInfo, userIdValue, academicYearMain, academicYearInfoData] = await Promise.allSettled([
                 fetchUserPersonnelInfo(email, schoolId, profileId),
                 fetchUserId(email),
@@ -569,7 +583,7 @@ const useLoginData = (config) => {
     // ===========================
     // FONCTION DE CONNEXION MISE À JOUR AVEC SUPPORT GET/POST
     // ===========================
-    
+
     /**
      * Soumet le formulaire de connexion et récupère les données utilisateur
      * Supporte maintenant les méthodes GET et POST avec mapping des champs configurables
@@ -599,6 +613,7 @@ const useLoginData = (config) => {
             );
 
             const data = response.data;
+            let userProfil = "";
 
             const isSuccess = response.status === 200 && data && Object.keys(data).length > 0 &&
                 (data?.success === true ||
@@ -609,203 +624,207 @@ const useLoginData = (config) => {
                     data?.user ||
                     data?.utilisateur);
 
-            if (isSuccess || data === "Fondateur" || data === "Professeur" || data === "Admin" || data === "Candidat") {
-                console.log('✅ Connexion réussie !');
-                
-                const basicUserData = {
-                    email: formData.email,
-                    schoolId: formData.schoolId,
-                    profileId: formData.profileId,
-                    loginTime: new Date().toISOString(),
-                    userType: config.modalType || 'user',
-                    method: method // Stocker la méthode utilisée pour info
-                };
+            if (isSuccess || data === "Fondateur" || data === "Professeur" || data === "Admin" || data === "Mot de passe correct!") {
+                    console.log('✅ Connexion réussie !');
 
-                localStorage.setItem('userProfil', data);
-                localStorage.setItem('userData', JSON.stringify(basicUserData));
-                localStorage.setItem('isAuthenticated', 'true');
-                localStorage.setItem('userType', config.modalType || 'user');
+                    // 👉 Transformation avec ternaire
+                    userProfil = data === "Mot de passe correct!" ? "Candidat" : data;
 
-                try {
-                    console.log('🔄 Récupération des données utilisateur...');
-                    const completeUserData = await fetchAllUserData(
-                        formData.email,
-                        formData.schoolId,
-                        formData.profileId
-                    );
-
-                    // Mettre à jour le contexte utilisateur avec les nouvelles données
-                    updateFromLoginData({ userCompleteData: completeUserData });
-
-                    return { 
-                        success: true, 
-                        data,
-                        userCompleteData: completeUserData,
-                        method: method
+                    const basicUserData = {
+                        email: formData.email,
+                        schoolId: formData.schoolId,
+                        profileId: formData.profileId,
+                        loginTime: new Date().toISOString(),
+                        userType: config.modalType || 'user',
+                        method: method // Stocker la méthode utilisée pour info
                     };
-                } catch (userDataError) {
-                    console.warn('⚠️ Connexion réussie mais erreur lors de la récupération des données utilisateur:', userDataError.message);
-                    return { 
-                        success: true, 
-                        data,
-                        userCompleteData: null,
-                        method: method,
-                        warning: 'Connexion réussie mais certaines données utilisateur n\'ont pas pu être récupérées'
-                    };
+
+                    localStorage.setItem('userProfil', userProfil);
+                    localStorage.setItem('userData', JSON.stringify(basicUserData));
+                    localStorage.setItem('isAuthenticated', 'true');
+                    localStorage.setItem('userType', config.modalType || 'user');
+
+                    try {
+                        console.log('🔄 Récupération des données utilisateur...');
+                        const completeUserData = await fetchAllUserData(
+                            formData.email,
+                            formData.schoolId,
+                            formData.profileId
+                        );
+
+                        // Mettre à jour le contexte utilisateur avec les nouvelles données
+                        updateFromLoginData({ userCompleteData: completeUserData });
+
+                        return {
+                            success: true,
+                            data,
+                            userCompleteData: completeUserData,
+                            method: method
+                        };
+                    } catch (userDataError) {
+                        console.warn('⚠️ Connexion réussie mais erreur lors de la récupération des données utilisateur:', userDataError.message);
+                        return {
+                            success: true,
+                            data,
+                            userCompleteData: null,
+                            method: method,
+                            warning: 'Connexion réussie mais certaines données utilisateur n\'ont pas pu être récupérées'
+                        };
+                    }
+                } else {
+                    const errorMessage = data?.message || data?.error || 'Échec de la connexion';
+                    throw new Error(errorMessage);
                 }
-            } else {
-                const errorMessage = data?.message || data?.error || 'Échec de la connexion';
-                throw new Error(errorMessage);
+
+            } catch (error) {
+                console.error('❌ Erreur de connexion:', error.message);
+
+                if (error.message.includes('CORS') || error.code === 'ERR_NETWORK') {
+                    setSubmitError('Erreur de connexion au serveur. Vérifiez votre connexion.');
+                } else {
+                    setSubmitError(error.message || 'Erreur de connexion');
+                }
+
+                return { success: false, data: null };
+            } finally {
+                setSubmitting(false);
             }
-        } catch (error) {
-            console.error('❌ Erreur de connexion:', error.message);
-            
-            if (error.message.includes('CORS') || error.code === 'ERR_NETWORK') {
-                setSubmitError('Erreur de connexion au serveur. Vérifiez votre connexion.');
-            } else {
-                setSubmitError(error.message || 'Erreur de connexion');
-            }
-            
-            return { success: false, data: null };
-        } finally {
-            setSubmitting(false);
-        }
-    };
+        };
 
-    // ===========================
-    // FONCTIONS UTILITAIRES
-    // ===========================
-    
-    /**
-     * Efface toutes les erreurs
-     */
-    const clearErrors = () => {
-        setSchoolsError(null);
-        setProfilesError(null);
-        setSubmitError(null);
-        setUserDataError(null);
-    };
+        // ===========================
+        // FONCTIONS UTILITAIRES
+        // ===========================
 
-    /**
-     * Rafraîchit toutes les données
-     */
-    const refreshData = () => {
-        loadSchools();
-        loadProfiles();
-    };
+        /**
+         * Efface toutes les erreurs
+         */
+        const clearErrors = () => {
+            setSchoolsError(null);
+            setProfilesError(null);
+            setSubmitError(null);
+            setUserDataError(null);
+        };
 
-    /**
-     * Nettoie toutes les données utilisateur (déconnexion)
-     */
-    const clearUserData = () => {
-        // Nettoyer les états
-        setUserPersonnelInfo(null);
-        setUserId(null);
-        setAcademicYearMain(null);
-        setAcademicYearInfo(null);
-
-        // Nettoyer le localStorage
-        localStorage.removeItem('completeUserData');
-        localStorage.removeItem('userPersonnelInfo');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('academicYearMain');
-        localStorage.removeItem('academicYearInfo');
-        localStorage.removeItem('userData');
-        localStorage.removeItem('userProfil');
-        localStorage.removeItem('isAuthenticated');
-        localStorage.removeItem('userType');
-
-        // Nettoyer le contexte utilisateur
-        clearUserParams();
-
-        console.log('🧹 Données utilisateur nettoyées');
-    };
-
-    // ===========================
-    // EFFET POUR LE CHARGEMENT INITIAL
-    // ===========================
-    useEffect(() => {
-        console.log('🚀 Initialisation du hook useLoginData...');
-        
-        // Charger les données de base si config est disponible
-        if (config) {
-            console.log('📋 Configuration reçue:', {
-                method: config.method || 'POST (default)',
-                loginFields: config.loginFields,
-                apis: config.apis
-            });
-            
+        /**
+         * Rafraîchit toutes les données
+         */
+        const refreshData = () => {
             loadSchools();
             loadProfiles();
-        }
+        };
 
-        // Initialiser le contexte utilisateur depuis localStorage
-        if (!isInitialized && !initializingFromStorage) {
-            initializeUserContextFromStorage();
-        }
-    }, [config, isInitialized]);
+        /**
+         * Nettoie toutes les données utilisateur (déconnexion)
+         */
+        const clearUserData = () => {
+            // Nettoyer les états
+            setUserPersonnelInfo(null);
+            setUserId(null);
+            setAcademicYearMain(null);
+            setAcademicYearInfo(null);
 
-    // ===========================
-    // RETOUR DU HOOK
-    // ===========================
-    return {
-        // Données de base
-        schools: schools.length > 0 ? schools : [{ value: 1, label: 'École par défaut' }],
-        profiles: profiles.length > 0 ? profiles : [{ value: 1, label: 'Profil par défaut' }],
-        
-        // Données utilisateur
-        userPersonnelInfo,
-        userId,
-        academicYearMain,
-        academicYearInfo,
-        
-        // États de chargement
-        loadingSchools,
-        loadingProfiles,
-        submitting,
-        loadingUserData,
-        initializingFromStorage,
-        
-        // États du contexte
-        isAuthenticated,
-        isInitialized,
-        
-        // Erreurs
-        schoolsError,
-        profilesError,
-        submitError,
-        userDataError,
-        
-        // Fonctions principales
-        submitLogin,
-        fetchAllUserData,
-        getStoredUserData,
-        clearUserData,
-        initializeUserContextFromStorage,
-        
-        // Fonctions utilitaires
-        clearErrors,
-        refreshData,
-        loadSchools,
-        loadProfiles,
-        
-        // Fonctions spécifiques pour récupérer les données
-        fetchUserPersonnelInfo,
-        fetchUserId,
-        fetchAcademicYearMain,
-        fetchAcademicYearInfo,
-        
-        // Nouvelles fonctions utilitaires
-        mapFormDataToLoginData,
-        performLoginRequest,
-        
-        // Informations sur la configuration actuelle
-        currentConfig: {
-            method: config?.method || 'POST',
-            loginFields: config?.loginFields,
-            modalType: config?.modalType
-        }
+            // Nettoyer le localStorage
+            localStorage.removeItem('completeUserData');
+            localStorage.removeItem('userPersonnelInfo');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('academicYearMain');
+            localStorage.removeItem('academicYearInfo');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('userProfil');
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('userType');
+
+            // Nettoyer le contexte utilisateur
+            clearUserParams();
+
+            console.log('🧹 Données utilisateur nettoyées');
+        };
+
+        // ===========================
+        // EFFET POUR LE CHARGEMENT INITIAL
+        // ===========================
+        useEffect(() => {
+            console.log('🚀 Initialisation du hook useLoginData...');
+
+            // Charger les données de base si config est disponible
+            if (config) {
+                console.log('📋 Configuration reçue:', {
+                    method: config.method || 'POST (default)',
+                    loginFields: config.loginFields,
+                    apis: config.apis
+                });
+
+                loadSchools();
+                loadProfiles();
+            }
+
+            // Initialiser le contexte utilisateur depuis localStorage
+            if (!isInitialized && !initializingFromStorage) {
+                initializeUserContextFromStorage();
+            }
+        }, [config, isInitialized]);
+
+        // ===========================
+        // RETOUR DU HOOK
+        // ===========================
+        return {
+            // Données de base
+            schools: schools.length > 0 ? schools : [{ value: 1, label: 'École par défaut' }],
+            profiles: profiles.length > 0 ? profiles : [{ value: 1, label: 'Profil par défaut' }],
+
+            // Données utilisateur
+            userPersonnelInfo,
+            userId,
+            academicYearMain,
+            academicYearInfo,
+
+            // États de chargement
+            loadingSchools,
+            loadingProfiles,
+            submitting,
+            loadingUserData,
+            initializingFromStorage,
+
+            // États du contexte
+            isAuthenticated,
+            isInitialized,
+
+            // Erreurs
+            schoolsError,
+            profilesError,
+            submitError,
+            userDataError,
+
+            // Fonctions principales
+            submitLogin,
+            fetchAllUserData,
+            getStoredUserData,
+            clearUserData,
+            initializeUserContextFromStorage,
+
+            // Fonctions utilitaires
+            clearErrors,
+            refreshData,
+            loadSchools,
+            loadProfiles,
+
+            // Fonctions spécifiques pour récupérer les données
+            fetchUserPersonnelInfo,
+            fetchUserId,
+            fetchAcademicYearMain,
+            fetchAcademicYearInfo,
+
+            // Nouvelles fonctions utilitaires
+            mapFormDataToLoginData,
+            performLoginRequest,
+
+            // Informations sur la configuration actuelle
+            currentConfig: {
+                method: config?.method || 'POST',
+                loginFields: config?.loginFields,
+                modalType: config?.modalType
+            }
+        };
     };
-};
 
-export default useLoginData;
+    export default useLoginData;

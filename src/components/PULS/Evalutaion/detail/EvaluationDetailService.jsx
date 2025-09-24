@@ -287,7 +287,7 @@ export const useEvaluationNotes = (evaluationCode) => {
             );
 
             // Appel API pour sauvegarder (à implémenter selon votre backend)
-            // await axios.put(`${getFullUrl()}/api/notes/${noteId}`, { note: newNote, pec: newPec });
+            // await axios.put(`${getFullUrl()}notes/${noteId}`, { note: newNote, pec: newPec });
             
         } catch (err) {
             // En cas d'erreur, restaurer les données précédentes

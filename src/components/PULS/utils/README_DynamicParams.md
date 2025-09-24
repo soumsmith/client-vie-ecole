@@ -51,7 +51,7 @@ export const useMonService = () => {
             return;
         }
         
-        const response = await axios.get(`/api/data?ecole=${ecoleId}&annee=${academicYearId}`);
+        const response = await axios.get(`data?ecole=${ecoleId}&annee=${academicYearId}`);
     }, [ecoleId, academicYearId, isAuthenticated, isInitialized]);
 };
 ```
@@ -91,7 +91,7 @@ const MonService = () => {
     
     // apiParams = { ecoleId: 38, academicYearId: 226 }
     
-    const response = await axios.get('/api/data', { params: apiParams });
+    const response = await axios.get('data', { params: apiParams });
 };
 ```
 
@@ -256,7 +256,7 @@ export const useEvaluationsData = () => {
     const fetchEvaluations = useCallback(async () => {
         if (!isAuthenticated || !isInitialized) return;
         
-        const response = await axios.get('/api/evaluations', {
+        const response = await axios.get('evaluations', {
             params: { ecoleId, academicYearId, periodiciteId }
         });
     }, [ecoleId, academicYearId, periodiciteId, isAuthenticated, isInitialized]);
@@ -271,7 +271,7 @@ export const useClassesData = () => {
     const fetchClasses = useCallback(async () => {
         if (!isAuthenticated || !isInitialized) return;
         
-        const response = await axios.get(`/api/classes?ecole=${ecoleId}`);
+        const response = await axios.get(`classes?ecole=${ecoleId}`);
     }, [ecoleId, isAuthenticated, isInitialized]);
 };
 ```

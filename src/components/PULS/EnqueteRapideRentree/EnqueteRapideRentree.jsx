@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Panel, Toggle, Button, Notification, Loader, Divider, Badge } from 'rsuite';
+import { Panel, Toggle, Button, Loader, Divider, Badge, Notification, useToaster } from 'rsuite';
 import { FiDownload, FiSave, FiPlus, FiEdit } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -16,24 +16,60 @@ import {
     clearEnqueteCache
 } from './EnqueteRapideServiceManager';
 import { usePulsParams } from '../../hooks/useDynamicParams';
+import { useAllApiUrls } from '../utils/apiConfig';
 
-
-const EnqueteRapideRentree = ({ anneeId = 1 }) => {
+const EnqueteRapideRentree = ({ AcademicYearId = 1 }) => {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [presenceModalVisible, setPresenceModalVisible] = useState(false);
     const [editPresenceData, setEditPresenceData] = useState(null);
     const [savingReunions, setSavingReunions] = useState(false);
     const [downloading, setDownloading] = useState(false);
 
+    // Hook pour les notifications RSuite v5
+    const toaster = useToaster();
+
     const {
         ecoleId: dynamicEcoleId
-      } = usePulsParams();
+    } = usePulsParams();
+
+    // URLs des API
+    const apiUrls = useAllApiUrls();
 
     // ===========================
     // DONNÉES DE L'ENQUÊTE
     // ===========================
-    const { enqueteData, loading: enqueteLoading, error: enqueteError } = useEnqueteRapideData(dynamicEcoleId, anneeId, refreshTrigger);
-    const { reunions, ecoleInfo, loading: reunionsLoading, setReunions } = useReunionsData(dynamicEcoleId, anneeId, refreshTrigger);
+    const { enqueteData, loading: enqueteLoading, error: enqueteError } = useEnqueteRapideData(dynamicEcoleId, AcademicYearId, refreshTrigger);
+    const { reunions, ecoleInfo, loading: reunionsLoading, setReunions } = useReunionsData(dynamicEcoleId, AcademicYearId, refreshTrigger);
+
+    // ===========================
+    // FONCTIONS UTILITAIRES POUR LES NOTIFICATIONS
+    // ===========================
+    const showSuccessNotification = useCallback((title, description) => {
+        toaster.push(
+            <Notification type="success" header={title} closable>
+                {description}
+            </Notification>,
+            { placement: 'topEnd', duration: 4000 }
+        );
+    }, [toaster]);
+
+    const showErrorNotification = useCallback((title, description) => {
+        toaster.push(
+            <Notification type="error" header={title} closable>
+                {description}
+            </Notification>,
+            { placement: 'topEnd', duration: 5000 }
+        );
+    }, [toaster]);
+
+    const showInfoNotification = useCallback((title, description) => {
+        toaster.push(
+            <Notification type="info" header={title} closable>
+                {description}
+            </Notification>,
+            { placement: 'topEnd', duration: 2000 }
+        );
+    }, [toaster]);
 
     // ===========================
     // GESTION DES SWITCHES
@@ -81,7 +117,7 @@ const EnqueteRapideRentree = ({ anneeId = 1 }) => {
             console.log('Données des réunions à enregistrer:', reunions);
 
             // Appel de la nouvelle API
-            const response = await saveReunions(dynamicEcoleId, anneeId, reunions);
+            const response = await saveReunions(dynamicEcoleId, AcademicYearId, reunions, apiUrls);
             
             console.log('Réponse de l\'API:', response);
 
@@ -113,7 +149,7 @@ const EnqueteRapideRentree = ({ anneeId = 1 }) => {
         } finally {
             setSavingReunions(false);
         }
-    }, [reunions, dynamicEcoleId, anneeId]);
+    }, [reunions, dynamicEcoleId, AcademicYearId]);
 
     // ===========================
     // GESTION DU TABLEAU
@@ -143,13 +179,13 @@ const EnqueteRapideRentree = ({ anneeId = 1 }) => {
         setRefreshTrigger(prev => prev + 1);
         
         const action = editPresenceData ? 'modifiées' : 'ajoutées';
-        Notification.success({
-            title: `Informations ${action}`,
-            description: `Les informations de présence ont été ${action} avec succès.`,
-            placement: 'topEnd',
-            duration: 4000,
-        });
-    }, [editPresenceData]);
+        
+        // Utiliser la nouvelle fonction de notification
+        showSuccessNotification(
+            `Informations ${action}`,
+            `Les informations de présence ont été ${action} avec succès.`
+        );
+    }, [editPresenceData, showSuccessNotification]);
 
     const handlePresenceModalClose = useCallback(() => {
         setPresenceModalVisible(false);
@@ -162,27 +198,26 @@ const EnqueteRapideRentree = ({ anneeId = 1 }) => {
     const handleDownload = useCallback(async () => {
         try {
             setDownloading(true);
-            await downloadRapport(dynamicEcoleId, anneeId);
+            await downloadRapport(dynamicEcoleId, AcademicYearId, apiUrls);
             
-            Notification.success({
-                title: 'Téléchargement réussi',
-                description: 'Le rapport d\'enquête de rentrée a été téléchargé.',
-                placement: 'topEnd',
-                duration: 3000,
-            });
+            // Utiliser la nouvelle fonction de notification
+            showSuccessNotification(
+                'Téléchargement réussi',
+                'Le rapport d\'enquête de rentrée a été téléchargé.'
+            );
             
         } catch (error) {
             console.error('Erreur lors du téléchargement:', error);
-            Notification.error({
-                title: 'Erreur de téléchargement',
-                description: error.message || 'Erreur lors du téléchargement du rapport.',
-                placement: 'topEnd',
-                duration: 5000,
-            });
+            
+            // Utiliser la nouvelle fonction de notification d'erreur
+            showErrorNotification(
+                'Erreur de téléchargement',
+                error.message || 'Erreur lors du téléchargement du rapport.'
+            );
         } finally {
             setDownloading(false);
         }
-    }, [dynamicEcoleId, anneeId]);
+    }, [dynamicEcoleId, AcademicYearId, showSuccessNotification, showErrorNotification]);
 
     // ===========================
     // GESTION DU RAFRAÎCHISSEMENT
@@ -191,13 +226,12 @@ const EnqueteRapideRentree = ({ anneeId = 1 }) => {
         clearEnqueteCache();
         setRefreshTrigger(prev => prev + 1);
         
-        Notification.info({
-            title: 'Données actualisées',
-            description: 'Les données d\'enquête ont été mises à jour.',
-            placement: 'topEnd',
-            duration: 2000,
-        });
-    }, []);
+        // Utiliser la nouvelle fonction de notification
+        showInfoNotification(
+            'Données actualisées',
+            'Les données d\'enquête ont été mises à jour.'
+        );
+    }, [showInfoNotification]);
 
     // ===========================
     // CONFIGURATION DES SWITCHES
@@ -395,7 +429,7 @@ const EnqueteRapideRentree = ({ anneeId = 1 }) => {
                                                         Total Affectés
                                                     </div>
                                                     <div style={{ fontSize: '32px', fontWeight: 'bold', lineHeight: '1' }}>
-                                                        {enqueteData.reduce((sum, item) => sum + (item.nombreAffecte || 0), 0)}
+                                                        {enqueteData.reduce((sum, item) => sum + (Number(item.nombreAffecte) || 0), 0)}
                                                     </div>
                                                 </div>
                                                 <div style={{ fontSize: '36px', opacity: 0.8 }}>
@@ -421,7 +455,7 @@ const EnqueteRapideRentree = ({ anneeId = 1 }) => {
                                                         Non Affectés
                                                     </div>
                                                     <div style={{ fontSize: '32px', fontWeight: 'bold', lineHeight: '1' }}>
-                                                        {enqueteData.reduce((sum, item) => sum + (item.nombreNonAffecte || 0), 0)}
+                                                        {enqueteData.reduce((sum, item) => sum + (Number(item.nombreNonAffecte) || 0), 0)}
                                                     </div>
                                                 </div>
                                                 <div style={{ fontSize: '36px', opacity: 0.8 }}>
@@ -447,7 +481,7 @@ const EnqueteRapideRentree = ({ anneeId = 1 }) => {
                                                         Total Élèves
                                                     </div>
                                                     <div style={{ fontSize: '32px', fontWeight: 'bold', lineHeight: '1' }}>
-                                                        {enqueteData.reduce((sum, item) => sum + (item.nombreAffecte || 0) + (item.nombreNonAffecte || 0), 0)}
+                                                        {enqueteData.reduce((sum, item) => sum + (Number(item.nombreAffecte) || 0) + (Number(item.nombreNonAffecte) || 0), 0)}
                                                     </div>
                                                 </div>
                                                 <div style={{ fontSize: '36px', opacity: 0.8 }}>
@@ -491,13 +525,13 @@ const EnqueteRapideRentree = ({ anneeId = 1 }) => {
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                     <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#11998e' }}>
                                                         {enqueteData.length > 0 ? (
-                                                            Math.round((enqueteData.reduce((sum, item) => sum + (item.nombreAffecte || 0), 0) / 
-                                                            enqueteData.reduce((sum, item) => sum + (item.nombreAffecte || 0) + (item.nombreNonAffecte || 0), 0)) * 100)
+                                                            Math.round((enqueteData.reduce((sum, item) => sum + (Number(item.nombreAffecte) || 0), 0) / 
+                                                            enqueteData.reduce((sum, item) => sum + (Number(item.nombreAffecte) || 0) + (Number(item.nombreNonAffecte) || 0), 0)) * 100)
                                                         ) : 0}%
                                                     </span>
                                                     <Badge color="green" style={{ fontSize: '12px' }}>
-                                                        {enqueteData.reduce((sum, item) => sum + (item.nombreAffecte || 0), 0) > 
-                                                         enqueteData.reduce((sum, item) => sum + (item.nombreNonAffecte || 0), 0) ? 'Excellent' : 'À améliorer'}
+                                                        {enqueteData.reduce((sum, item) => sum + (Number(item.nombreAffecte) || 0), 0) > 
+                                                         enqueteData.reduce((sum, item) => sum + (Number(item.nombreNonAffecte) || 0), 0) ? 'Excellent' : 'À améliorer'}
                                                     </Badge>
                                                 </div>
                                             </div>
@@ -511,7 +545,7 @@ const EnqueteRapideRentree = ({ anneeId = 1 }) => {
                                                     borderRadius: '50%',
                                                     background: 'linear-gradient(135deg, #ff6a00 0%, #ee0979 100%)',
                                                     marginRight: '12px'
-                                }}></div>
+                                                }}></div>
                                                 <span style={{ fontSize: '15px', fontWeight: '500', color: '#2c3e50' }}>
                                                     Élèves en attente
                                                 </span>
@@ -524,13 +558,13 @@ const EnqueteRapideRentree = ({ anneeId = 1 }) => {
                                             }}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                     <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#ff6a00' }}>
-                                                        {enqueteData.reduce((sum, item) => sum + (item.nombreNonAffecte || 0), 0)}
+                                                        {enqueteData.reduce((sum, item) => sum + (Number(item.nombreNonAffecte) || 0), 0)}
                                                     </span>
                                                     <Badge 
-                                                        color={enqueteData.reduce((sum, item) => sum + (item.nombreNonAffecte || 0), 0) === 0 ? 'green' : 'orange'} 
+                                                        color={enqueteData.reduce((sum, item) => sum + (Number(item.nombreNonAffecte) || 0), 0) === 0 ? 'green' : 'orange'} 
                                                         style={{ fontSize: '12px' }}
                                                     >
-                                                        {enqueteData.reduce((sum, item) => sum + (item.nombreNonAffecte || 0), 0) === 0 ? 'Complet' : 'Action requise'}
+                                                        {enqueteData.reduce((sum, item) => sum + (Number(item.nombreNonAffecte) || 0), 0) === 0 ? 'Complet' : 'Action requise'}
                                                     </Badge>
                                                 </div>
                                             </div>
@@ -597,7 +631,7 @@ const EnqueteRapideRentree = ({ anneeId = 1 }) => {
                 onSuccess={handlePresenceSuccess}
                 editData={editPresenceData}
                 ecoleId={dynamicEcoleId}
-                anneeId={anneeId}
+                anneeId={AcademicYearId}
             />
         </>
     );

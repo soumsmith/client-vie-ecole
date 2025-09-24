@@ -9,9 +9,9 @@ import './App.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { usePulsParams } from './hooks/useDynamicParams';
-import './Theme.css';
 
 import Paroti from './components/ParotiCharity/ParotiCharity';
+import './Theme.css';
 
 function App() {
   return (

@@ -2,7 +2,7 @@
  * Service pour la gestion des questions
  */
 
-const API_URL = "http://localhost/CRUDPHP/api/questions_api.php?action=get_all_questions";
+const API_URL = "http://localhost/CRUDPHPquestions_api.php?action=get_all_questions";
 
 /**
  * Récupère les questions depuis l'API
@@ -67,7 +67,7 @@ export const fetchQuestions = async (updateQuestionsState, preventLoadingState =
  */
 export const createQuestion = async (questionData) => {
     try {
-        const response = await fetch('http://localhost/CRUDPHP/api/questions_api.php', {
+        const response = await fetch('http://localhost/CRUDPHPquestions_api.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ export const createQuestion = async (questionData) => {
  */
 export const updateQuestion = async (questionId, questionData) => {
     try {
-        const response = await fetch('http://localhost/CRUDPHP/api/questions_api.php', {
+        const response = await fetch('http://localhost/CRUDPHPquestions_api.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -134,7 +134,7 @@ export const updateQuestion = async (questionId, questionData) => {
  */
 export const deleteQuestion = async (questionId) => {
     try {
-        const response = await fetch('http://localhost/CRUDPHP/api/questions_api.php', {
+        const response = await fetch('http://localhost/CRUDPHPquestions_api.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -33,7 +33,7 @@ import { usePulsParams } from '../../hooks/useDynamicParams';
 //                     return;
 //                 }
 //             }
-//             const response = await axios.get(`${getFullUrl()}/api/classes/list-by-ecole?ecole=${ecoleId}`);
+//             const response = await axios.get(`${getFullUrl()}classes/list-by-ecole?ecole=${ecoleId}`);
 //             const processedClasses = response.data && Array.isArray(response.data)
 //                 ? response.data.map(classe => ({
 //                     value: classe.id || classe.classeid,
@@ -90,7 +90,7 @@ import { usePulsParams } from '../../hooks/useDynamicParams';
 //                     return;
 //                 }
 //             }
-//             const response = await axios.get(`${getFullUrl()}/api/periodes/list-by-periodicite?id=${periodicitieId}`);
+//             const response = await axios.get(`${getFullUrl()}periodes/list-by-periodicite?id=${periodicitieId}`);
 //             const processedPeriodes = response.data && Array.isArray(response.data)
 //                 ? response.data.map(periode => ({
 //                     value: periode.id || periode.periodeid,
@@ -385,14 +385,14 @@ export const useNoteSearch = (profil, showMatiereFilter = false) => {
         if (showMatiereFilter) {
             if (matiereId && matiereId !== null) {
                 //if (profil === 'Professeur') {}
-                return `${baseUrl}/api/notes/list-classe-matiere-notes/${classeId}/${matiereId}/${academicYearId}/${periodeId}`;
+                return `${baseUrl}notes/list-classe-matiere-notes/${classeId}/${matiereId}/${academicYearId}/${periodeId}`;
             } else {
                 // Mode toutes matières
-                return `${baseUrl}/api/notes/list-classe-notes-all-matieres/${classeId}/${periodeId}`;
+                return `${baseUrl}notes/list-classe-notes-all-matieres/${classeId}/${periodeId}`;
             }
         } else {
             // Mode classique
-            return `${baseUrl}/api/notes/list-classe-notes/${classeId}/${academicYearId}/${periodeId}`;
+            return `${baseUrl}notes/list-classe-notes/${classeId}/${academicYearId}/${periodeId}`;
         }
     };
 
@@ -418,7 +418,7 @@ export const useNoteSearch = (profil, showMatiereFilter = false) => {
 
             // Requêtes parallèles
             const notesPromise = axios.get(notesUrl);
-            const classePromise = axios.get(`${getFullUrl()}/api/classes/${classeId}`);
+            const classePromise = axios.get(`${getFullUrl()}classes/${classeId}`);
             
             const [notesResponse, classeResponse] = await Promise.all([notesPromise, classePromise]);
             

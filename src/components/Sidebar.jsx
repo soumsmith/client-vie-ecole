@@ -85,7 +85,7 @@ const sidebarStyles = {
     textOverflow: 'ellipsis',
   },
   profileIndicator: {
-    backgroundColor: '#f8f9fa',
+    //backgroundColor: '#f8f9fa',
     padding: '8px 12px',
     borderRadius: '6px',
     border: '1px solid #e9ecef',
@@ -111,7 +111,7 @@ const allMenuSections = [
   },
 
 
-  
+
   // ===========================
   // FONDATEUR
   // ===========================
@@ -464,14 +464,14 @@ const allMenuSections = [
   {
     type: "section",
     title: "Espace Candidat",
-    profiles: ["Professeur"],
+    profiles: ["Candidat"],
     items: [
       {
         type: "item",
         eventKey: "postulerOffre",
         icon: "TableIcon",
         title: "Postuler a une offre",
-        profiles: ["Professeur"],
+        profiles: ["Candidat"],
       },
 
       {
@@ -479,7 +479,7 @@ const allMenuSections = [
         eventKey: "demandeOffre",
         icon: "TableIcon",
         title: "Mes demandes d'offres",
-        profiles: ["Professeur"],
+        profiles: ["Candidat"],
       },
 
       {
@@ -487,7 +487,7 @@ const allMenuSections = [
         eventKey: "loginMotDePasse",
         icon: "TableIcon",
         title: "Login & mot de passe",
-        profiles: ["Professeur"],
+        profiles: ["Candidat"],
       },
 
       {
@@ -495,7 +495,7 @@ const allMenuSections = [
         eventKey: "mesDocuments",
         icon: "TableIcon",
         title: "Mes documents",
-        profiles: ["Professeur"],
+        profiles: ["Candidat"],
       },
 
       // Professeur - Matiere
@@ -504,7 +504,7 @@ const allMenuSections = [
         eventKey: "profileUtilisateur",
         icon: "TableIcon",
         title: "Mon profil",
-        profiles: ["Professeur"],
+        profiles: ["Candidat"],
       },
       // Personnel - Classe
       {
@@ -512,7 +512,7 @@ const allMenuSections = [
         eventKey: "miseAJoursInfo",
         icon: "TableIcon",
         title: "modifier mes infos personnelles ",
-        profiles: ["Professeur"],
+        profiles: ["Candidat"],
       },
     ],
   },
@@ -905,7 +905,7 @@ const filterSectionsByProfile = (sections, userProfile) => {
       // il doit contenir le profil de l'utilisateur pour être affiché
       if (item.profiles) {
         const isItemAllowed = item.profiles.includes(userProfile);
-        
+
         if (!isItemAllowed) {
           return false;
         }
@@ -923,14 +923,14 @@ const filterSectionsByProfile = (sections, userProfile) => {
 
           // Mettre à jour les children filtrés
           item.children = filteredChildren;
-          
+
           // Ne garder le menu que s'il a au moins un enfant visible
           return filteredChildren.length > 0;
         }
 
         return true;
       }
-      
+
       // Si l'item n'a pas de propriété profiles, l'afficher par défaut
       // OPTION : Vous pouvez changer cette logique selon vos besoins
       return true;
@@ -938,7 +938,7 @@ const filterSectionsByProfile = (sections, userProfile) => {
 
     // Mettre à jour les items filtrés de la section
     section.items = filteredItems;
-    
+
     // Ne garder la section que si elle a au moins un item visible
     return filteredItems.length > 0;
   });
@@ -1210,6 +1210,7 @@ const Sidebar = ({
             title={title}
             icon={iconElement}
             placement="rightStart"
+            className="custom-dropdown-menu"
           >
             {children &&
               children.map((child, childIndex) => (
@@ -1219,9 +1220,8 @@ const Sidebar = ({
                   onClick={(event) =>
                     handleMenuItemClick(child.eventKey, event)
                   }
-                  className={
-                    activeKey === child.eventKey ? "rs-sidenav-item-active" : ""
-                  }
+                  className={`custom-dropdown-item ${activeKey === child.eventKey ? "rs-sidenav-item-active" : ""
+                    }`}
                 >
                   {child.title}
                   {child.badge && <span style={badgeStyle}>{child.badge}</span>}
@@ -1267,8 +1267,10 @@ const Sidebar = ({
     borderColor: "#e5e5e7",
   };
 
+  const userProfil = localStorage.getItem("userProfil");
+
   return (
-    <div style={sidebarStyles.container} className="sidebar-container">
+    <div style={sidebarStyles.container} className="sidebar-container" id={userProfil}>
       <div style={sidebarStyles.header} className="sidebar-header">
         <div className="d-flex align-items-center">
           <img

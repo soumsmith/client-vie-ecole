@@ -134,13 +134,7 @@ const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
             const url = messagesUrls.sendToPersonnel(candidat.id);
             console.log('🔗 URL d\'envoi:', url);
 
-            const response = await axios.post(url, apiData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                timeout: 10000
-            });
+            const response = await axios.post(url, apiData);
 
             console.log('✅ Réponse du serveur:', response);
 

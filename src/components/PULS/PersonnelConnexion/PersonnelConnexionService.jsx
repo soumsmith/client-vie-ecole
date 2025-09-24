@@ -24,8 +24,8 @@ import axios from "axios";
 // ===========================
 // CONFIGURATION GLOBALE
 // ===========================
-const ECOLES_ENDPOINT = "api/connecte/ecole";
-const PERSONNEL_CONNEXION_ENDPOINT = "api/personnel/infos-connexion-personnels";
+const ECOLES_ENDPOINT = "connecte/ecole";
+const PERSONNEL_CONNEXION_ENDPOINT = "personnel/infos-connexion-personnels";
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // ===========================

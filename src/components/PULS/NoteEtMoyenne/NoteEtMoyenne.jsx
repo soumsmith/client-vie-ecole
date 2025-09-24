@@ -41,7 +41,7 @@ import { usePulsParams } from '../../hooks/useDynamicParams';
 const saveAbsenceToAPI = async (etudiantData, classeInfo, periodeId, academicYearId, field, value) => {
     try {
         const baseUrl = getFullUrl();
-        const apiUrl = `${baseUrl}/api/absence-eleve/save-list-process`;
+        const apiUrl = `${baseUrl}absence-eleve/save-list-process`;
         
         // Construction du payload selon le format demandé
         const payload = [{

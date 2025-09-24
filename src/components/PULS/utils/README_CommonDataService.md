@@ -230,7 +230,7 @@ const [loading, setLoading] = useState(true);
 useEffect(() => {
     const fetchClasses = async () => {
         try {
-            const response = await axios.get(`${getFullUrl()}/api/classes/list-by-ecole-sorted?ecole=38`);
+            const response = await axios.get(`${getFullUrl()}classes/list-by-ecole-sorted?ecole=38`);
             setClasses(response.data);
         } catch (err) {
             setError(err.message);

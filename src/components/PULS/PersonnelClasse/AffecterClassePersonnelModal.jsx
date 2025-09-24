@@ -3,6 +3,7 @@ import { Modal, Form, SelectPicker, Button, Message, Loader, Table, Panel, Divid
 import axios from 'axios';
 import { useAllApiUrls } from '../utils/apiConfig';
 import { usePulsParams } from '../../hooks/useDynamicParams';
+import getFullUrl from "../../hooks/urlUtils";
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -57,7 +58,7 @@ const useProfesseursData = () => {
             // API pour les professeurs principaux (profil=8)
             const response = await axios.get(apiUrls.personnel.getByEcoleAndProfil(8));
             // const responses = await axios.get(
-            //     `http://94.23.162.171:8889/api/personnels/get-by-ecole-and-profil?ecole=${dynamicEcoleId}&profil=8`
+            //     `${getFullUrl()}personnels/get-by-ecole-and-profil?ecole=${dynamicEcoleId}&profil=8`
             // );
 
             const formattedProfesseurs = (response.data || []).map(prof => ({

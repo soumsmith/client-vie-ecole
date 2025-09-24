@@ -94,7 +94,7 @@ export const usePeriodesData = (refreshTrigger = 0) => {
                 }
             }
 
-            const response = await axios.get(`${getFullUrl()}/api/periodes/list`);
+            const response = await axios.get(`${getFullUrl()}periodes/list`);
             const formattedPeriodes = (response.data || []).map(periode => ({
                 label: periode.libelle,
                 value: periode.id,
@@ -212,7 +212,7 @@ export const useNiveauxData = (ecoleId = 38, refreshTrigger = 0) => {
                 }
             }
 
-            const response = await axios.get(`${getFullUrl()}/api/branche/get-by-niveau-enseignement?ecole=${ecoleId}`);
+            const response = await axios.get(`${getFullUrl()}branche/get-by-niveau-enseignement?ecole=${ecoleId}`);
             const formattedNiveaux = (response.data || []).map(niveau => ({
                 label: `${niveau.niveau?.libelle || niveau.libelle} - ${niveau.serie?.libelle || ''}`,
                 value: niveau.id,
@@ -332,7 +332,7 @@ export const useMatieresData = (ecoleId = 38, classeId = null, refreshTrigger = 
                 }
             }
 
-            const response = await axios.get(`${getFullUrl()}/api/imprimer-matrice-classe/matieres-ecole-web/${ecoleId}/${classeId}`);
+            const response = await axios.get(`${getFullUrl()}imprimer-matrice-classe/matieres-ecole-web/${ecoleId}/${classeId}`);
             const formattedMatieres = (response.data || []).map(matiere => ({
                 label: matiere.libelle,
                 value: matiere.id,
@@ -387,7 +387,7 @@ export const useRapportsData = (niveauEnseignementId = 2, refreshTrigger = 0) =>
                 }
             }
 
-            const response = await axios.get(`${getFullUrl()}/api/rapports/${niveauEnseignementId}`);
+            const response = await axios.get(`${getFullUrl()}rapports/${niveauEnseignementId}`);
             const formattedRapports = Array.isArray(response.data) ? response.data : [response.data];
 
             setToCache(cacheKey, formattedRapports);
@@ -485,8 +485,8 @@ const rapportFunctions = {
         });
 
         // URL exacte selon l'exemple fourni
-        // /api/imprimer-bulletin-list/spider-bulletin/38/Premier%20Trimestre/Ann%C3%A9e%202024%20-%202025/48166/true/2/true/true/true/true/false/true/false/false/false/false
-        const url = `${getFullUrl()}/api/imprimer-bulletin-list/spider-bulletin/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}/true/${niveauEnseignementId}/true/true/true/true/false/true/false/false/false/false`;
+        // imprimer-bulletin-list/spider-bulletin/38/Premier%20Trimestre/Ann%C3%A9e%202024%20-%202025/48166/true/2/true/true/true/true/false/true/false/false/false/false
+        const url = `${getFullUrl()}imprimer-bulletin-list/spider-bulletin/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}/true/${niveauEnseignementId}/true/true/true/true/false/true/false/false/false/false`;
 
         return downloadFile(url, `Bulletin_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -508,7 +508,7 @@ const rapportFunctions = {
         });
 
         // URL pour bulletin par matricule
-        const url = `${getFullUrl()}/api/imprimer-bulletin-list/spider-bulletin-matricule/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}/${matriculeEleves}/true/${niveauEnseignementId}/true/true/true/true/false/true/false/false/false/false`;
+        const url = `${getFullUrl()}imprimer-bulletin-list/spider-bulletin-matricule/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}/${matriculeEleves}/true/${niveauEnseignementId}/true/true/true/true/false/true/false/false/false/false`;
 
         return downloadFile(url, `Bulletin_${matriculeEleves}_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -520,7 +520,7 @@ const rapportFunctions = {
 
         console.log('🔄 R03 - Paramètres:', { ecoleId, periodeLabel, anneeLabel });
 
-        const url = `${getFullUrl()}/api/imprimer-rapport-dsps/pouls-rapport-dsps/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}`;
+        const url = `${getFullUrl()}imprimer-rapport-dsps/pouls-rapport-dsps/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}`;
 
         return downloadFile(url, `fichier_dspd_${periodeLabel.replace(/\s+/g, '_')}.xls`);
     },
@@ -532,7 +532,7 @@ const rapportFunctions = {
 
         console.log('🔄 R04 - Paramètres:', { ecoleId, periodeLabel, anneeLabel });
 
-        const url = `${getFullUrl()}/api/imprimer-rapport-cio/pouls-rapport-cio/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}`;
+        const url = `${getFullUrl()}imprimer-rapport-cio/pouls-rapport-cio/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}`;
 
         return downloadFile(url, `rapport_cio_trimestrielle_${periodeLabel.replace(/\s+/g, '_')}.xls`);
     },
@@ -544,7 +544,7 @@ const rapportFunctions = {
 
         console.log('🔄 R05 - Paramètres:', { ecoleId, periodeLabel, anneeLabel, modeleDrena });
 
-        const url = `${getFullUrl()}/api/imprimer-rapport/pouls-rapport/${ecoleId}/docx/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}/${annee}/${modeleDrena}`;
+        const url = `${getFullUrl()}imprimer-rapport/pouls-rapport/${ecoleId}/docx/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}/${annee}/${modeleDrena}`;
 
         return downloadFile(url, `rapport_trimestrielle_${periodeLabel.replace(/\s+/g, '_')}.docx`);
     },
@@ -555,7 +555,7 @@ const rapportFunctions = {
 
         console.log('🔄 R06 - Paramètres:', { ecoleId, anneeLabel });
 
-        const url = `${getFullUrl()}/api/imprimer-rapport-annuelle/pouls-rapport/${ecoleId}/docx/${encodeURIComponent(anneeLabel)}/Troisième Trimestre`;
+        const url = `${getFullUrl()}imprimer-rapport-annuelle/pouls-rapport/${ecoleId}/docx/${encodeURIComponent(anneeLabel)}/Troisième Trimestre`;
 
         return downloadFile(url, `rapport_annuelle.docx`);
     },
@@ -568,7 +568,7 @@ const rapportFunctions = {
 
         console.log('🔄 R07 - Paramètres:', { ecoleId, periodeLabel, anneeLabel, classeLabel });
 
-        const url = `${getFullUrl()}/api/imprimer-livret-list/spider-livret/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(classeLabel)}/true/true/true/true/true`;
+        const url = `${getFullUrl()}imprimer-livret-list/spider-livret/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(classeLabel)}/true/true/true/true/true`;
 
         return downloadFile(url, `Livret_Scolaire_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -581,7 +581,7 @@ const rapportFunctions = {
 
         console.log('🔄 R08 - Paramètres:', { ecoleId, periodeLabel, anneeLabel, classeLabel, matriculeEleves });
 
-        const url = `${getFullUrl()}/api/imprimer-livret-list/spider-livret-matricule/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(classeLabel)}/${matriculeEleves}/true/true/true/true/true`;
+        const url = `${getFullUrl()}imprimer-livret-list/spider-livret-matricule/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(classeLabel)}/${matriculeEleves}/true/true/true/true/true`;
 
         return downloadFile(url, `Livret_Scolaire_${matriculeEleves}_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -594,7 +594,7 @@ const rapportFunctions = {
 
         const format = formatExcel ? '/xls' : '';
         const extension = formatExcel ? 'xls' : 'docx';
-        const url = `${getFullUrl()}/api/imprimer-rapport-rentree-spider${format}/${ecoleId}/${annee}/${encodeURIComponent(anneeLabel)}`;
+        const url = `${getFullUrl()}imprimer-rapport-rentree-spider${format}/${ecoleId}/${annee}/${encodeURIComponent(anneeLabel)}`;
 
         return downloadFile(url, `Rapport_de_rentree.${extension}`);
     },
@@ -605,7 +605,7 @@ const rapportFunctions = {
 
         console.log('🔄 R10 - Paramètres:', { ecoleId, annee, classe, classeLabel });
 
-        const url = `${getFullUrl()}/api/emploi-du-temps/imprimer/${ecoleId}/${annee}/${classe}`;
+        const url = `${getFullUrl()}emploi-du-temps/imprimer/${ecoleId}/${annee}/${classe}`;
 
         return downloadFile(url, `Emploi_du_temps_${classeLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -617,7 +617,7 @@ const rapportFunctions = {
 
         console.log('🔄 R11 - Paramètres:', { ecoleId, periodeLabel, anneeLabel });
 
-        const url = `${getFullUrl()}/api/imprimer-major-list/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}`;
+        const url = `${getFullUrl()}imprimer-major-list/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}`;
 
         return downloadFile(url, `Liste_majors_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -629,7 +629,7 @@ const rapportFunctions = {
 
         const format = formatExcel ? '-xls' : '';
         const extension = formatExcel ? 'xls' : 'pdf';
-        const url = `${getFullUrl()}/api/imprimer-perspnnel/personnel-administratif${format}/${ecoleId}`;
+        const url = `${getFullUrl()}imprimer-perspnnel/personnel-administratif${format}/${ecoleId}`;
 
         return downloadFile(url, `personnel_administratif.${extension}`);
     },
@@ -641,7 +641,7 @@ const rapportFunctions = {
 
         const format = formatExcel ? '-xls' : '';
         const extension = formatExcel ? 'xls' : 'pdf';
-        const url = `${getFullUrl()}/api/imprimer-perspnnel/personnel-enseignant${format}/${annee}/${ecoleId}`;
+        const url = `${getFullUrl()}imprimer-perspnnel/personnel-enseignant${format}/${annee}/${ecoleId}`;
 
         return downloadFile(url, `personnel_enseignant.${extension}`);
     },
@@ -661,7 +661,7 @@ const rapportFunctions = {
 
         console.log('🔄 R16 - Paramètres:', { ecoleId, matriculeEleves, annee, nomSignataire, fonctionSignataire });
 
-        const url = `${getFullUrl()}/api/certificat-scolarite/imprimer/${ecoleId}/${matriculeEleves}/${annee}/${encodeURIComponent(nomSignataire || '')}/${encodeURIComponent(fonctionSignataire || '')}/Troisième Trimestre`;
+        const url = `${getFullUrl()}certificat-scolarite/imprimer/${ecoleId}/${matriculeEleves}/${annee}/${encodeURIComponent(nomSignataire || '')}/${encodeURIComponent(fonctionSignataire || '')}/Troisième Trimestre`;
 
         return downloadFile(url, `Certificat_scolarite_${matriculeEleves}.docx`);
     },
@@ -675,7 +675,7 @@ const rapportFunctions = {
 
         const format = formatExcel ? '-xls' : '';
         const extension = formatExcel ? 'xls' : 'pdf';
-        const url = `${getFullUrl()}/api/imprimer-matrice-classe/imprimer-spider${format}/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}/${annee}/${classe}`;
+        const url = `${getFullUrl()}imprimer-matrice-classe/imprimer-spider${format}/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}/${annee}/${classe}`;
 
         return downloadFile(url, `matrice_classe.${extension}`);
     },
@@ -688,7 +688,7 @@ const rapportFunctions = {
 
         console.log('🔄 R20 - Paramètres:', { ecoleId, anneeLabel, periodeLabel, classeLabel });
 
-        const url = `${getFullUrl()}/api/imprimer-rapport-pv-conseil-classe/pouls-Conseil-classe/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(classeLabel)}/${annee}/${classe}`;
+        const url = `${getFullUrl()}imprimer-rapport-pv-conseil-classe/pouls-Conseil-classe/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(classeLabel)}/${annee}/${classe}`;
 
         return downloadFile(url, `Proces_verbal_conseil_de_classe_${classeLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -702,7 +702,7 @@ const rapportFunctions = {
 
         const format = formatExcel ? '-xls' : '';
         const extension = formatExcel ? 'xls' : 'pdf';
-        const url = `${getFullUrl()}/api/imprimer-matrice-Annuelle/imprimer-spider-annuelle${format}/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}/${annee}/${classe}`;
+        const url = `${getFullUrl()}imprimer-matrice-Annuelle/imprimer-spider-annuelle${format}/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}/${annee}/${classe}`;
 
         return downloadFile(url, `matrice_Annuelle.${extension}`);
     },
@@ -713,7 +713,7 @@ const rapportFunctions = {
 
         console.log('🔄 R22 - Paramètres:', { ecoleId, matriculeEleves, anneeLabel, nomSignataire, fonctionSignataire, autreModeleCertificat });
 
-        const url = `${getFullUrl()}/api/certificat-scolarite/certificat-de-frequentation/${matriculeEleves}/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(nomSignataire || '')}/${encodeURIComponent(fonctionSignataire || '')}/${autreModeleCertificat}`;
+        const url = `${getFullUrl()}certificat-scolarite/certificat-de-frequentation/${matriculeEleves}/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(nomSignataire || '')}/${encodeURIComponent(fonctionSignataire || '')}/${autreModeleCertificat}`;
 
         return downloadFile(url, `Certificat_frequentation_${matriculeEleves}.docx`);
     },
@@ -725,7 +725,7 @@ const rapportFunctions = {
 
         console.log('🔄 R23 - Paramètres:', { ecoleId, periodeLabel, anneeLabel, classe });
 
-        const url = `${getFullUrl()}/api/imprimer-tableau-honneur/spider-tableau/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}`;
+        const url = `${getFullUrl()}imprimer-tableau-honneur/spider-tableau/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}`;
 
         return downloadFile(url, `tableau_honneur_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -738,7 +738,7 @@ const rapportFunctions = {
 
         // Utilise sessionStorage.getItem('AnneEncours') comme dans l'original
         const anneeEncours = sessionStorage.getItem('AnneEncours') || annee;
-        const url = `${getFullUrl()}/api/moyenneProf/${classe}/${matiere}/${anneeEncours}/${periode}`;
+        const url = `${getFullUrl()}moyenneProf/${classe}/${matiere}/${anneeEncours}/${periode}`;
 
         return downloadFile(url, `Moyenne_par_professeur_${matiereLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -750,7 +750,7 @@ const rapportFunctions = {
 
         console.log('🔄 R25 - Paramètres:', { ecoleId, periodeLabel, anneeLabel, classe });
 
-        const url = `${getFullUrl()}/api/imprimer-trois-premiers/par-classe/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}`;
+        const url = `${getFullUrl()}imprimer-trois-premiers/par-classe/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}`;
 
         return downloadFile(url, `Liste_trois_premiers_par_classe_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -762,7 +762,7 @@ const rapportFunctions = {
 
         console.log('🔄 R26 - Paramètres:', { ecoleId, periodeLabel, anneeLabel, niveau });
 
-        const url = `${getFullUrl()}/api/imprimer-trois-premiers/par-niveau/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${niveau}`;
+        const url = `${getFullUrl()}imprimer-trois-premiers/par-niveau/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${niveau}`;
 
         return downloadFile(url, `Liste_trois_premiers_par_niveau_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -777,7 +777,7 @@ const rapportFunctions = {
 
         const format = formatExcel ? '-xls' : '';
         const extension = formatExcel ? 'xls' : 'pdf';
-        const url = `${getFullUrl()}/api/imprimer-matrice-Annuelle/imprimer-spider-discpline${format}/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}/${annee}/${classe}/${encodeURIComponent(matiereLabel)}`;
+        const url = `${getFullUrl()}imprimer-matrice-Annuelle/imprimer-spider-discpline${format}/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}/${annee}/${classe}/${encodeURIComponent(matiereLabel)}`;
 
         return downloadFile(url, `matrice_discipline.${extension}`);
     },
@@ -791,7 +791,7 @@ const rapportFunctions = {
 
         const format = formatExcel ? '-xls' : '';
         const extension = formatExcel ? 'xls' : 'pdf';
-        const url = `${getFullUrl()}/api/imprimer-matrice-Annuelle/imprimer-spider-annuelle-dfa${format}/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}/${annee}/${classe}`;
+        const url = `${getFullUrl()}imprimer-matrice-Annuelle/imprimer-spider-annuelle-dfa${format}/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}/${annee}/${classe}`;
 
         return downloadFile(url, `matrice_Annuelle_avec_dfa.${extension}`);
     },
@@ -803,7 +803,7 @@ const rapportFunctions = {
 
         console.log('🔄 R29 - Paramètres:', { ecoleId, periodeLabel, anneeLabel, classe });
 
-        const url = `${getFullUrl()}/api/imprimer-trois-premiers/par-classe-annuelle/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}`;
+        const url = `${getFullUrl()}imprimer-trois-premiers/par-classe-annuelle/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}`;
 
         return downloadFile(url, `Liste_trois_premiers_par_classe_annuelle_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -815,7 +815,7 @@ const rapportFunctions = {
 
         console.log('🔄 R30 - Paramètres:', { ecoleId, periodeLabel, anneeLabel, niveau });
 
-        const url = `${getFullUrl()}/api/imprimer-trois-premiers/par-niveau-annuelle/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${niveau}`;
+        const url = `${getFullUrl()}imprimer-trois-premiers/par-niveau-annuelle/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${niveau}`;
 
         return downloadFile(url, `Liste_trois_premiers_par_niveau_annuelle_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -826,7 +826,7 @@ const rapportFunctions = {
 
         console.log('🔄 R31 - Paramètres:', { classe, annee, classeLabel });
 
-        const url = `${getFullUrl()}/api/imprimer-etats/liste-classe-arabe/${classe}/${annee}`;
+        const url = `${getFullUrl()}imprimer-etats/liste-classe-arabe/${classe}/${annee}`;
 
         return downloadFile(url, `liste_de_classe_${classeLabel.replace(/\s+/g, '_')}.pdf`);
     }
@@ -888,7 +888,7 @@ const generateListeEleves = async (params, includeAverage = false) => {
 
     console.log('🔍 Query String:', queryString);
 
-    const url = `${getFullUrl()}/api/imprimer-perspnnel/${endpoint}${format}?${queryString}`;
+    const url = `${getFullUrl()}imprimer-perspnnel/${endpoint}${format}?${queryString}`;
 
     return downloadFile(url, `Liste_des_eleves${includeAverage ? '_par_moyenne' : ''}.${extension}`);
 };
@@ -1001,7 +1001,7 @@ export const genererRapportParCode = async (code, parametres) => {
  */
 export const testerConnexionAPI = async () => {
     try {
-        const response = await axios.get(`${getFullUrl()}/api/health`, {
+        const response = await axios.get(`${getFullUrl()}health`, {
             timeout: 5000
         });
         console.log('✅ Test de connexion API réussi:', response.status);

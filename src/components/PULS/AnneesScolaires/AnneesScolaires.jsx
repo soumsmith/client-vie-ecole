@@ -436,7 +436,7 @@ const AnneesScolaires = () => {
             console.log('Clôturer l\'année:', selectedAnnee);
             
             // Simulation d'un appel API
-            // await axios.put(`${getFullUrl()}/api/annee/cloturer/${selectedAnnee.id}`);
+            // await axios.put(`${getFullUrl()}annee/cloturer/${selectedAnnee.id}`);
             
             toaster.push(
                 <Notification type="success" header="Année clôturée">
@@ -464,7 +464,7 @@ const AnneesScolaires = () => {
             console.log('Ouvrir l\'année:', annee);
             
             // Simulation d'un appel API pour ouvrir l'année
-            // await axios.put(`${getFullUrl()}/api/annee/ouvrir/${annee.id}`);
+            // await axios.put(`${getFullUrl()}annee/ouvrir/${annee.id}`);
             
             toaster.push(
                 <Notification type="success" header="Année ouverte">

@@ -113,7 +113,7 @@ const PresenceInfoModal = ({ visible, onClose, onSuccess, editData = null, ecole
             };
 
             // Utiliser la même URL pour création et modification
-            const url = apiUrls.enqueteRapide.reunion();
+            const url = apiUrls.enqueteRapide.saveEnquetteRapide();
             
             const response = await axios.post(url, presenceData);
             

@@ -5,8 +5,8 @@ import getFullUrl from './urlUtils';
 // Configuration globale d'Axios
 const api = axios.create({
   baseURL: getFullUrl(),
-  timeout: 10000,
-  withCredentials: true, // Important pour les cookies de session
+  timeout: 15000, // Timeout plus long pour les connexions
+  withCredentials: false, // ✅ Force à false pour éviter les problèmes CORS
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
@@ -39,25 +39,36 @@ api.interceptors.request.use(
 );
 
 // Intercepteur pour les réponses
-api.interceptors.response.use(
-  (response) => {
-    console.log(`✅ Réponse: ${response.status} ${response.config.url}`);
-    return response;
-  },
-  (error) => {
-    console.error(`❌ Erreur réponse: ${error.response?.status} ${error.config?.url}`);
+// Dans axiosConfig.js, modifie l'intercepteur temporairement :
+api.interceptors.request.use(
+  (config) => {
+    console.log(`🔄 Requête: ${config.method?.toUpperCase()} ${config.url}`);
     
-    // Gestion des erreurs 401/403 (non autorisé)
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      console.warn('🔒 Session expirée, redirection vers login');
-      // Nettoyer le localStorage
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('userData');
-      localStorage.removeItem('isAuthenticated');
-      // Rediriger vers la page de connexion
-      window.location.href = '/';
+    // ✅ AJOUTE CECI TEMPORAIREMENT pour debug
+    if (config.url.includes('connexion') || config.url.includes('se-connecter')) {
+      console.log('🔥 DEBUG CONNEXION:');
+      console.log('URL complète:', config.baseURL + config.url);
+      console.log('Méthode:', config.method);
+      console.log('Headers:', config.headers);
+      console.log('Données envoyées:', config.data);
+      console.log('Params:', config.params);
     }
     
+    // Le reste du code...
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      config.headers.Authorization = `Bearer ${authToken}`;
+    }
+    
+    const userProfil = localStorage.getItem('userProfil');
+    if (userProfil) {
+      config.headers['X-User-Profile'] = userProfil;
+    }
+    
+    return config;
+  },
+  (error) => {
+    console.error('❌ Erreur intercepteur requête:', error);
     return Promise.reject(error);
   }
 );

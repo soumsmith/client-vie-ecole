@@ -144,7 +144,7 @@ export const loadSubDomains = async (domainId, setReferenceData) => {
  * Charge les données de contexte pour les exercices
  */
 export const fetchContextData = async (contextType, updateContextState) => {
-  const CONTEXTS_API_URL = "http://localhost/CRUDPHP/api/courses-api.php";
+  const CONTEXTS_API_URL = "http://localhost/CRUDPHPcourses-api.php";
 
   try {
     updateContextState(contextType, { loading: true, error: null });

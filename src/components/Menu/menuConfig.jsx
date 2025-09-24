@@ -93,9 +93,9 @@ export const modalConfig = {
     description: "Connectez-vous à votre espace personnel",
     icon: "👨‍💼",
     apis: {
-      schools: "/api/connecte/ecole",
-      profiles: "/api/profil",
-      login: "/api/connexion/se-connecter-admin"
+      schools: "/connecte/ecole",
+      profiles: "/profil",
+      login: "connexion/se-connecter-admin"
     },
     // Nouvelle configuration pour la méthode HTTP
     method: "POST", // ou "GET"
@@ -120,9 +120,9 @@ export const modalConfig = {
     description: "Connectez-vous à votre espace personnel",
     icon: "👨‍💼",
     apis: {
-      schools: "/api/connecte/ecole",
-      profiles: "/api/profil",
-      login: "/api/connexion/se-connecter"
+      schools: "/connecte/ecole",
+      profiles: "/profil",
+      login: "connexion/se-connecter"
     },
     method: "POST",
     loginFields: {
@@ -146,9 +146,9 @@ export const modalConfig = {
     description: "Accédez à votre espace candidat",
     icon: "🎓",
     apis: {
-      schools: "/api/connecte/ecole",
-      profiles: "/api/profil",
-      login: "/api/connexion/checkPassword_v2"
+      schools: "/connecte/ecole",
+      profiles: "/profil",
+      login: "connexion/checkPassword"
     },
     method: "GET", // Exemple d'utilisation de GET
     loginFields: {
@@ -170,9 +170,9 @@ export const modalConfig = {
     description: "Suivez la scolarité de votre enfant",
     icon: "👨‍👩‍👧‍👦",
     apis: {
-      schools: "/api/connecte/ecole",
-      profiles: "/api/profil",
-      login: "/api/connexion/se-connecter"
+      schools: "/connecte/ecole",
+      profiles: "/profil",
+      login: "connexion/se-connecter"
     },
     method: "POST",
     loginFields: {
@@ -194,9 +194,9 @@ export const modalConfig = {
     description: "Accédez à votre espace étudiant",
     icon: "🎒",
     apis: {
-      schools: "/api/connecte/ecole",
-      profiles: "/api/profil",
-      login: "/api/connexion/se-connecter"
+      schools: "/connecte/ecole",
+      profiles: "/profil",
+      login: "connexion/se-connecter"
     },
     method: "POST",
     loginFields: {

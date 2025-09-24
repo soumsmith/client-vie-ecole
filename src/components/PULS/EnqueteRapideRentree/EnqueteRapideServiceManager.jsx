@@ -196,6 +196,7 @@ export const useBranchesNiveaux = (ecoleId = 38) => {
  * @param {number} ecoleId 
  * @param {number} anneeId 
  * @param {object} reunionsData 
+ * @param {object} apiUrls
  */
 export const saveReunions = async (ecoleId, anneeId, reunionsData, apiUrls) => {
     try {
@@ -229,26 +230,89 @@ export const saveReunions = async (ecoleId, anneeId, reunionsData, apiUrls) => {
  * Fonction pour télécharger le rapport
  * @param {number} ecoleId 
  * @param {number} anneeId 
+ * @param {object} apiUrls - URLs des API
  */
 export const downloadRapport = async (ecoleId, anneeId, apiUrls) => {
     try {
-        const response = await axios.get(apiUrls.enqueteRapide.downloadRapport(ecoleId, anneeId), {
-            responseType: 'blob'
+        console.log('Début du téléchargement du rapport...');
+        console.log('URL API:', apiUrls.enqueteRapide.downloadRapport());
+        
+        const response = await axios.get(apiUrls.enqueteRapide.downloadRapport(), {
+            responseType: 'blob',
+            timeout: 30000, // Timeout de 30 secondes
         });
         
+        console.log('Réponse reçue:', response);
+        console.log('Type de contenu:', response.headers['content-type']);
+        
+        // Vérifier que la réponse contient bien un blob
+        if (!response.data || response.data.size === 0) {
+            throw new Error('Le fichier téléchargé est vide');
+        }
+        
+        // Déterminer l'extension du fichier selon le type de contenu
+        const contentType = response.headers['content-type'] || '';
+        let extension = 'pdf';
+        let mimeType = 'application/pdf';
+        
+        if (contentType.includes('excel') || contentType.includes('spreadsheet')) {
+            extension = 'xlsx';
+            mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        } else if (contentType.includes('word')) {
+            extension = 'docx';
+            mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        }
+        
+        // Créer un blob avec le bon type MIME
+        const blob = new Blob([response.data], { type: mimeType });
+        
         // Créer un lien de téléchargement
-        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `rapport-enquete-rentree-${ecoleId}-${anneeId}.pdf`);
+        link.setAttribute('download', `rapport-enquete-rentree-${ecoleId}-${anneeId}.${extension}`);
+        
+        // Ajouter le lien au DOM temporairement et cliquer dessus
         document.body.appendChild(link);
         link.click();
-        link.remove();
+        
+        // Nettoyer
+        document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
         
+        console.log('Téléchargement terminé avec succès');
         return true;
+        
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Erreur lors du téléchargement du rapport');
+        console.error('Erreur détaillée lors du téléchargement:', error);
+        console.error('Status:', error.response?.status);
+        console.error('Headers:', error.response?.headers);
+        console.error('Data:', error.response?.data);
+        
+        let errorMessage = 'Erreur lors du téléchargement du rapport';
+        
+        if (error.code === 'ECONNABORTED') {
+            errorMessage = 'Timeout : Le téléchargement a pris trop de temps';
+        } else if (error.response?.status === 404) {
+            errorMessage = 'Rapport non trouvé sur le serveur';
+        } else if (error.response?.status === 500) {
+            errorMessage = 'Erreur interne du serveur';
+        } else if (error.response?.data) {
+            // Essayer de lire le message d'erreur du serveur
+            if (error.response.data instanceof Blob) {
+                const text = await error.response.data.text();
+                try {
+                    const jsonError = JSON.parse(text);
+                    errorMessage = jsonError.message || errorMessage;
+                } catch (e) {
+                    errorMessage = text || errorMessage;
+                }
+            } else {
+                errorMessage = error.response.data.message || errorMessage;
+            }
+        }
+        
+        throw new Error(errorMessage);
     }
 };
 

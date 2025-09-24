@@ -137,7 +137,6 @@ const EditSalleModal = ({ show, salle, onClose, onSave, mode = 'edit' }) => {
                 apiUrl = apiUrls.salles.updateDisplay();
             } else {
                 // Mode création
-                alert( dynamicEcoleId);
                 apiData = {
                     code: formData.code,
                     libelle: formData.libelle,
@@ -149,13 +148,7 @@ const EditSalleModal = ({ show, salle, onClose, onSave, mode = 'edit' }) => {
                 apiUrl = apiUrls.salles.saveAndDisplay();
             }
 
-            const response = await axios.post(apiUrl, apiData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                timeout: 10000
-            });
+            const response = await axios.post(apiUrl, apiData);
 
             if (response.status === 200 || response.status === 201) {
                 await Swal.fire({

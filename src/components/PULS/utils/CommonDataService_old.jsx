@@ -83,7 +83,7 @@ export const useClassesByBrancheData = (ecoleId = null, refreshTrigger = 0) => {
       }
       // Appel direct à l'API
       const response = await axios.get(
-        `${getFullUrl()}/api/classes/get-visible-by-branche?branche=${brancheId}&ecole=${finalEcoleId}`
+        `${getFullUrl()}classes/get-visible-by-branche?branche=${brancheId}&ecole=${finalEcoleId}`
       );
 
       // Traitement des classes
@@ -195,13 +195,13 @@ const {
 
         if (personnelInfo?.profil === "Professeur") {
           response = await axios.get(
-            `${getFullUrl()}/api/personnel-matiere-classe/get-by-prof?annee=${dynamicAcademicYearId}&prof=${
+            `${getFullUrl()}personnel-matiere-classe/get-by-prof?annee=${dynamicAcademicYearId}&prof=${
               personnelInfo.personnelid
             }&ecole=${dynamicEcoleId}`
           );
         } else if (personnelInfo?.profil === "Fondateur") {
           response = await axios.get(
-            `${getFullUrl()}/api/classes/list-by-ecole-sorted?ecole=${dynamicEcoleId}`
+            `${getFullUrl()}classes/list-by-ecole-sorted?ecole=${dynamicEcoleId}`
           );
         }
 
@@ -298,7 +298,7 @@ export const useNiveauxData = (ecoleId = null, refreshTrigger = 0) => {
         }
 
         const response = await axios.get(
-          `${getFullUrl()}/api/niveau-enseignement/get-visible-by-branche?ecole=${finalEcoleId}`
+          `${getFullUrl()}niveau-enseignement/get-visible-by-branche?ecole=${finalEcoleId}`
         );
         const processed =
           response.data && Array.isArray(response.data)
@@ -377,7 +377,7 @@ export const useNiveauxBranchesData = (ecoleId = null, refreshTrigger = 0) => {
 
         // Appel direct à l'API
         const response = await axios.get(
-          `${getFullUrl()}/api/branche/get-by-niveau-enseignement?ecole=${finalEcoleId}`
+          `${getFullUrl()}branche/get-by-niveau-enseignement?ecole=${finalEcoleId}`
         );
 
         // Traitement simple et direct des données
@@ -514,7 +514,7 @@ export const useMatieresEcoleData = (ecoleId = null, refreshTrigger = 0) => {
 
         // Appel direct à l'API
         const response = await axios.get(
-          `${getFullUrl()}/api/matiere-ecole/get-by-ecole-via-niveau-enseignement?id=${finalEcoleId}`
+          `${getFullUrl()}matiere-ecole/get-by-ecole-via-niveau-enseignement?id=${finalEcoleId}`
         );
 
         // Traitement des données de matières
@@ -716,16 +716,16 @@ export const useMatieresData = (
 
         if (personnelInfo?.profil === "Professeur") {
           response = await axios.get(
-            `${getFullUrl()}/api/personnel-matiere-classe/get-by-prof-classe?prof=${
+            `${getFullUrl()}personnel-matiere-classe/get-by-prof-classe?prof=${
               personnelInfo.personnelid
             }&classe=${targetClasseId}&annee=${dynamicAcademicYearId}`
           );
         } else if (personnelInfo?.profil === "Fondateur") {
-          //response = await axios.get(`${getFullUrl()}/api/classes/${targetClasseId}`);
+          //response = await axios.get(`${getFullUrl()}classes/${targetClasseId}`);
           response = await axios.get(
-            `${getFullUrl()}/api/classe-matiere/get-all-by-branche-via-classe?branche=${targetClasseId}&ecole=${targetEcoleId}`
+            `${getFullUrl()}classe-matiere/get-all-by-branche-via-classe?branche=${targetClasseId}&ecole=${targetEcoleId}`
           );
-          //response = await axios.get(`${getFullUrl()}/api/imprimer-matrice-classe/matieres-ecole-web/${targetEcoleId}/${targetClasseId}`);
+          //response = await axios.get(`${getFullUrl()}imprimer-matrice-classe/matieres-ecole-web/${targetEcoleId}/${targetClasseId}`);
         }
 
         let processed = [];
@@ -856,7 +856,7 @@ export const usePeriodesData = (periodicitieId = null, refreshTrigger = 0) => {
         }
 
         const response = await axios.get(
-          `${getFullUrl()}/api/periodes/list-by-periodicite?id=${finalPeriodicitieId}`
+          `${getFullUrl()}periodes/list-by-periodicite?id=${finalPeriodicitieId}`
         );
         const processed =
           response.data && Array.isArray(response.data)
@@ -971,7 +971,7 @@ export const useMessagesData = (
       }
 
       const response = await axios.get(
-        `${getFullUrl()}/api/message-personnel/boite-${typeMessage}/${userConnectedId}`
+        `${getFullUrl()}message-personnel/boite-${typeMessage}/${userConnectedId}`
       );
 
       const processedMessages =
@@ -1055,7 +1055,7 @@ export const useElevesData = (
         }
 
         const response = await axios.get(
-          `${getFullUrl()}/api/classe-eleve/retrieve-by-classe/${newClasseId}/${newAnneeId}`
+          `${getFullUrl()}classe-eleve/retrieve-by-classe/${newClasseId}/${newAnneeId}`
         );
         let processedEleves = [];
 
@@ -1176,7 +1176,7 @@ export const useFonctionsData = (ecoleId = null, refreshTrigger = 0) => {
         }
 
         const response = await axios.get(
-          `${getFullUrl()}/api/fonction/list-by-ecole?ecole=${finalEcoleId}`
+          `${getFullUrl()}fonction/list-by-ecole?ecole=${finalEcoleId}`
         );
         const processed =
           response.data && Array.isArray(response.data)
@@ -1263,9 +1263,9 @@ export const useAnneesData = (refreshTrigger = 0) => {
         }
       }
 
-      //const response = await axios.get(`${getFullUrl()}/api/annee-scolaire/list`);
+      //const response = await axios.get(`${getFullUrl()}annee-scolaire/list`);
       const response = await axios.get(
-        `${getFullUrl()}/api/annee/list-opened-or-closed-to-ecole?ecole=${dynamicEcoleId}`
+        `${getFullUrl()}annee/list-opened-or-closed-to-ecole?ecole=${dynamicEcoleId}`
       );
 
       const processed =
@@ -1363,7 +1363,7 @@ export const useEnseignantsData = (profProfilId, refreshTrigger = 0) => {
 
 
         const response = await axios.get(
-          `${getFullUrl()}/api/personnels/get-by-ecole-and-profil?ecole=${dynamicEcoleId}&profil=${profProfilId || profileId}`
+          `${getFullUrl()}personnels/get-by-ecole-and-profil?ecole=${dynamicEcoleId}&profil=${profProfilId || profileId}`
         );
 
         // Traitement des données d'enseignants
@@ -1674,7 +1674,7 @@ export const useEvaluationsDataByFilters = (refreshTrigger = 0) => {
         });
 
         // Construction de l'URL et des paramètres
-        let apiUrl = `${getFullUrl()}/api/evaluation/get-by-filters`;
+        let apiUrl = `${getFullUrl()}evaluation/get-by-filters`;
 
         // Paramètres de requête
         const params = {

@@ -378,7 +378,7 @@ export const useActivitesByClasseJour = (classeId, jourId, refreshTrigger = 0) =
             }
 
             const response = await axios.get(
-                `${getFullUrl()}/api/activite/list-by-classe-jour?annee=${dynamicEcoleId}&classe=${classeId}&jour=${jourId}`
+                `${getFullUrl()}activite/list-by-classe-jour?annee=${dynamicEcoleId}&classe=${classeId}&jour=${jourId}`
             );
 
             const processedActivites = response.data && Array.isArray(response.data)

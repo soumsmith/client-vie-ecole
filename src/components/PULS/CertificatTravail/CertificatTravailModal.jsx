@@ -22,7 +22,9 @@ import {
 } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 import { genererCertificatTravail } from './CertificatTravailService';
+import { useCertificatTravailGenerator } from './CertificatTravailService';
 import { usePulsParams } from '../../hooks/useDynamicParams';
+import { useAllApiUrls } from '../utils/apiConfig';
 
 const CertificatTravailModal = ({ open, onClose, personnel, onSuccess }) => {
     // État du formulaire pour les informations du signataire
@@ -33,9 +35,10 @@ const CertificatTravailModal = ({ open, onClose, personnel, onSuccess }) => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const {
-        ecoleId: dynamicEcoleId
-      } = usePulsParams();
+    const { generer, isGenerating, error: generationError } = useCertificatTravailGenerator();
+    const { ecoleId: dynamicEcoleId } = usePulsParams();
+    const apiUrls = useAllApiUrls();
+
 
     // Charger les données du personnel quand le modal s'ouvre
     useEffect(() => {
@@ -94,20 +97,23 @@ const CertificatTravailModal = ({ open, onClose, personnel, onSuccess }) => {
             return;
         }
 
-        setIsSubmitting(true);
-
         try {
             console.log('Génération du certificat de travail...');
             
-            // Appel à l'API pour générer le certificat
-            const response = await genererCertificatTravail(
-                dynamicEcoleId, // ID de l'école (hardcodé comme dans votre exemple)
+            // Construire l'URL dans le composant (où les hooks sont autorisés)
+            const certificatUrl = apiUrls.personnel.imprimerCertificatTravail(
+                dynamicEcoleId || apiUrls.params.ecoleId,
                 personnel.id,
                 formData.nomSignataire.trim(),
                 formData.fonctionSignataire.trim()
             );
 
-            console.log('Certificat généré avec succès:', response.data);
+            console.log('URL générée:', certificatUrl);
+            
+            // Appel à la fonction utilitaire avec l'URL construite
+            const response = await generer(certificatUrl, personnel.id);
+
+            console.log('Certificat généré avec succès:', response);
 
             await Swal.fire({
                 icon: 'success',
@@ -134,8 +140,6 @@ const CertificatTravailModal = ({ open, onClose, personnel, onSuccess }) => {
                 footer: error.message || 'Erreur inconnue',
                 confirmButtonColor: '#ef4444'
             });
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -271,7 +275,7 @@ const CertificatTravailModal = ({ open, onClose, personnel, onSuccess }) => {
                     }}
                     bodyStyle={{ padding: '20px' }}
                 >
-                    <Grid fluid>
+                    <Grid fluid className='mt-3'>
                         <Row gutter={12}>
                             <Col xs={12}>
                                 <InfoItem
@@ -324,7 +328,7 @@ const CertificatTravailModal = ({ open, onClose, personnel, onSuccess }) => {
                     bodyStyle={{ padding: '20px' }}
                 >
                     <Form fluid>
-                        <Grid fluid>
+                        <Grid fluid className='mt-3'>
                             <Row gutter={16}>
                                 <Col xs={12}>
                                     <Form.Group>

@@ -94,10 +94,10 @@ const ListeSalles = () => {
     const handleSalleModalSave = useCallback(async (data) => {
         try {
             console.log('Salle sauvegardée:', data);
-            
+
             // Actualiser les données après sauvegarde
             setRefreshTrigger(prev => prev + 1);
-            
+
             // Fermer le modal
             closeSalleModal();
         } catch (error) {
@@ -142,9 +142,8 @@ const ListeSalles = () => {
             });
 
             // Appel API pour supprimer
-            const response = await axios.delete(apiUrls.salles.delete(salle.id), {
-                timeout: 10000
-            });
+            const response = await axios.delete(apiUrls.salles.delete(salle.id));
+
 
             if (response.status === 200) {
                 await Swal.fire({
@@ -167,7 +166,7 @@ const ListeSalles = () => {
             console.error('Erreur lors de la suppression de la salle:', error);
 
             let errorMessage = 'Une erreur inattendue est survenue lors de la suppression.';
-            
+
             if (error.response) {
                 if (error.response.status === 400) {
                     errorMessage = 'Impossible de supprimer cette salle. Elle est peut-être utilisée ailleurs.';
@@ -212,7 +211,7 @@ const ListeSalles = () => {
 
         // Récupérer les salles sélectionnées
         const selectedSalles = salles?.filter(salle => selectedItems.includes(salle.id)) || [];
-        
+
         if (selectedSalles.length === 0) {
             return;
         }
@@ -257,7 +256,7 @@ const ListeSalles = () => {
             });
 
             // Supprimer les salles une par une (ou en lot selon votre API)
-            const deletePromises = selectedSalles.map(salle => 
+            const deletePromises = selectedSalles.map(salle =>
                 axios.delete(apiUrls.salles.delete(salle.id), { timeout: 10000 })
             );
 
@@ -451,7 +450,7 @@ const ListeSalles = () => {
                 <div className="col-lg-12">
                     <DataTable
                         title="Liste des Salles"
-                        subtitle={`${salles?.length || 0} salle(s) disponible(s)`}
+                        subtitle={`salle(s) disponible(s)`}
                         data={salles}
                         loading={loading}
                         error={error}

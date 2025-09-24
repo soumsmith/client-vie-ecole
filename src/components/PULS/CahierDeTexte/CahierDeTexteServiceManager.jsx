@@ -113,7 +113,7 @@ export const useMatieresByClasseData = (classeId, refreshTrigger = 0) => {
 
             // Utilisation de l'API fournie
             const response = await axios.get(
-                `${getFullUrl()}/api/personnel-matiere-classe/get-enseignant-matiere-classe?annee=226&classe=${classeId}`
+                `${getFullUrl()}personnel-matiere-classe/get-enseignant-matiere-classe?annee=226&classe=${classeId}`
             );
 
             const processedMatieres = response.data && Array.isArray(response.data)
@@ -191,7 +191,7 @@ export const useCahierDeTexteData = (classeId, matiereId, refreshTrigger = 0) =>
 
             // API maintenant prête
             const response = await axios.get(
-                `${getFullUrl()}/api/progression-seance/get-by-classe-matiere-annee?classe=${classeId}&matiere=${matiereId}&annee=226`
+                `${getFullUrl()}progression-seance/get-by-classe-matiere-annee?classe=${classeId}&matiere=${matiereId}&annee=226`
             );
 
             const processedData = response.data && Array.isArray(response.data)

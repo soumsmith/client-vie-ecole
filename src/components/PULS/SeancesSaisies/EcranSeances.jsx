@@ -539,7 +539,7 @@ const EcranSeances = () => {
                     <div style={cardBodyStyle}>
                         <Row gutter={24}>
                             <Col xs={24} sm={5}>
-                                <label style={labelStyle}>Classe</label>
+                                <label style={labelStyle}>Classes</label>
                                 <SelectPicker
                                     data={classes}
                                     value={filtres.classe}

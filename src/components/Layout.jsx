@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
 import { Container, Header, Content, Drawer, IconButton, Nav, Navbar, Sidebar as RSuiteSidebar, FlexboxGrid } from 'rsuite';
 import MenuIcon from '@rsuite/icons/Menu';
-import {allMenuSections } from './menuConfig'; 
+import { allMenuSections } from './menuConfig';
 
 
 // Import du nouveau TopBar
@@ -13,23 +13,8 @@ import Dashboard from './Dashboard';
 import Dashboard2 from './Dashboard2';
 import DataTable from './DataTable';
 import RecrutementPersonnel from './RecrutementPersonnel';
-import SaveQuestionnaire from './QUIZAPP/Questions/SaveQuestionnaire';
-import SaveQuiz from './QUIZAPP/Quiz/SaveQuiz';
-import ListQuestionnaire from './QUIZAPP/Questions/ListQuestionnaire';
-import SaveExercise from './QUIZAPP/Exercices/SaveExercice';
-import ExercisesList from './QUIZAPP/Exercices/ExercisesList';
 import ThemeToggle from '../contrexts/ThemeToggle';
 import UserMenu from '../menu/UserMenu';
-import ListQuiz from './QUIZAPP/Quiz/ListQuiz';
-import SaveCourses from './QUIZAPP/Course/SaveCourses';
-import ListCourses from './QUIZAPP/Course/ListCourses';
-
-import LessonList from './QUIZAPP/Lesson/LessonList';
-import SaveLesson from './QUIZAPP/Lesson/SaveLesson';
-
-import DomaineList from './QUIZAPP/Domaine/DomaineList';
-import SaveLevelDomains from './QUIZAPP/Domaine/SaveLevelDomains';
-import SaveSubDomains from './QUIZAPP/Domaine/SaveSubDomains';
 
 // ===========================
 // FONDATEUR
@@ -44,7 +29,7 @@ import ListeSalles from './PULS/Salles/ListeSalles';
 import ListeClasses from './PULS/Classes/ListeClasses';
 import ListeEmploiDuTemps from './PULS/Emploi_du_temps/ListeEmploiDuTemps';
 import ListeMessages from './PULS/Messages/ListeMessages';
-import Eleves from './PULS/Eleves/Eleves';  
+import Eleves from './PULS/Eleves/Eleves';
 import PvEvaluations from './PULS/PvEvaluation/PvEvaluations';
 import EvaluationProfesseur from './PULS/EvaluationProfesseur/EvaluationsProfesseur';
 import MonPanier from './PULS/MonPanier/MonPanier';
@@ -108,7 +93,7 @@ const Layout = ({ onLogout }) => {
   // Liste des eventKeys qui correspondent à des menus déroulants (ne doivent pas naviguer)
   const dropdownMenuKeys = [
     'admin-panel',
-    'quiz-panel', 
+    'quiz-panel',
     'courses-panel',
     'exercice-panel',
     'general'
@@ -149,7 +134,7 @@ const Layout = ({ onLogout }) => {
   // Fonction pour gérer la navigation avec React Router
   const handlePageChange = (pageKey) => {
     console.log('Layout - handlePageChange appelé avec:', pageKey);
-    
+
     // Ignorer les clics sur les menus déroulants
     if (dropdownMenuKeys.includes(pageKey)) {
       console.log('Layout - Menu déroulant ignoré:', pageKey);
@@ -220,7 +205,7 @@ const Layout = ({ onLogout }) => {
       'affectationProfilPersonel': '/affectationProfilPersonel',
       'saisirSeances': '/saisirSeances',
       'listeSeances': '/listeSeances',
-      
+
 
       // ===========================
       // INSCRIPTION
@@ -250,13 +235,13 @@ const Layout = ({ onLogout }) => {
       'cartificatTravail': '/cartificatTravail',
       'ConsultationDesSeances': '/ConsultationDesSeances',
       'progressionPedagogique': '/progressionPedagogique',
-       'profileUtilisateur': '/profileUtilisateur',
-       'cahierDeTexte': '/cahierDeTexte',
-       
+      'profileUtilisateur': '/profileUtilisateur',
+      'cahierDeTexte': '/cahierDeTexte',
+
     };
 
     const route = routeMap[pageKey];
-    
+
     if (route) {
       console.log('Layout - Navigation vers:', route);
       navigate(route);
@@ -264,7 +249,7 @@ const Layout = ({ onLogout }) => {
       console.log('Layout - Route non trouvée pour:', pageKey, '- navigation vers dashboard');
       navigate('/dashboard');
     }
-    
+
     if (isMobile) {
       closeDrawer();
     }
@@ -273,45 +258,22 @@ const Layout = ({ onLogout }) => {
   // Fonction pour déterminer la page active basée sur l'URL
   const getCurrentPageKey = () => {
     const path = location.pathname;
-    
+
     if (path.includes('/exercises')) return 'listExercice';
     if (path.includes('/questions')) return 'listQuestionnaire';
     if (path.includes('/quiz')) return 'listQuizz';
     if (path.includes('/courses')) return 'listCours';
     if (path.includes('/datatable')) return 'users';
     if (path.includes('/recrutement')) return 'RecrutementPersonnel';
-    
+
     return 'dashboard';
   };
 
   // Fonction pour obtenir le titre de la page
   const getPageTitle = () => {
     const path = location.pathname;
-    
-    if (path.includes('/exercises')) {
-      if (path.includes('/create')) return 'Créer un Exercice';
-      if (path.includes('/edit')) return 'Modifier un Exercice';
-      return 'Gestion des Exercices';
-    }
-    
-    if (path.includes('/questions')) {
-      if (path.includes('/create')) return 'Créer une Question';
-      if (path.includes('/edit')) return 'Modifier une Question';
-      return 'Gestion des Questions';
-    }
-    
-    if (path.includes('/quiz')) {
-      if (path.includes('/create')) return 'Créer un Quiz';
-      if (path.includes('/edit')) return 'Modifier un Quiz';
-      return 'Gestion des Quiz';
-    }
-    
-    if (path.includes('/courses')) {
-      if (path.includes('/create')) return 'Créer un Cours';
-      if (path.includes('/edit')) return 'Modifier un Cours';
-      return 'Gestion des Cours';
-    }
-    
+
+
     const titles = {
       '/dashboard': 'Tableau de Bord',
       '/datatable': 'Gestion des Utilisateurs',
@@ -371,9 +333,9 @@ const Layout = ({ onLogout }) => {
       '/progressionPedagogique': 'Progression Pédagogique',
       '/cahierDeTexte': 'Cahier de texte',
 
-      
+
     };
-    
+
     return titles[path] || 'Mon Dashboard Moderne';
   };
 
@@ -381,75 +343,10 @@ const Layout = ({ onLogout }) => {
   const getBreadcrumbItems = () => {
     const path = location.pathname;
     const items = [];
-    
-    // Quiz App routes
-    if (path.includes('/exercises')) {
-      items.push({ label: "Quiz App", href: "#" });
-      if (path.includes('/create')) {
-        items.push({ label: "Exercices", href: "/exercises" });
-        items.push({ label: "Créer", active: true });
-      } else if (path.includes('/edit')) {
-        items.push({ label: "Exercices", href: "/exercises" });
-        items.push({ label: "Modifier", active: true });
-      } else {
-        items.push({ label: "Exercices", active: true });
-      }
-    } 
-    else if (path.includes('/questions')) {
-      items.push({ label: "Quiz App", href: "#" });
-      if (path.includes('/create')) {
-        items.push({ label: "Questions", href: "/questions" });
-        items.push({ label: "Créer", active: true });
-      } else if (path.includes('/edit')) {
-        items.push({ label: "Questions", href: "/questions" });
-        items.push({ label: "Modifier", active: true });
-      } else {
-        items.push({ label: "Questions", active: true });
-      }
-    }
-    else if (path.includes('/quiz')) {
-      items.push({ label: "Quiz App", href: "#" });
-      if (path.includes('/create')) {
-        items.push({ label: "Quiz", href: "/quiz" });
-        items.push({ label: "Créer", active: true });
-      } else if (path.includes('/edit')) {
-        items.push({ label: "Quiz", href: "/quiz" });
-        items.push({ label: "Modifier", active: true });
-      } else {
-        items.push({ label: "Quiz", active: true });
-      }
-    }
-    else if (path.includes('/courses')) {
-      items.push({ label: "Quiz App", href: "#" });
-      if (path.includes('/create')) {
-        items.push({ label: "Cours", href: "/courses" });
-        items.push({ label: "Créer", active: true });
-      } else if (path.includes('/edit')) {
-        items.push({ label: "Cours", href: "/courses" });
-        items.push({ label: "Modifier", active: true });
-      } else {
-        items.push({ label: "Cours", active: true });
-      }
-    }
-    else if (path.includes('/lesson')) {
-      items.push({ label: "Quiz App", href: "#" });
-      if (path.includes('/create')) {
-        items.push({ label: "Leçons", href: "/lesson" });
-        items.push({ label: "Créer", active: true });
-      } else if (path.includes('/edit')) {
-        items.push({ label: "Leçons", href: "/lesson" });
-        items.push({ label: "Modifier", active: true });
-      } else {
-        items.push({ label: "Leçons", active: true });
-      }
-    }
-    else if (path.includes('/domaine')) {
-      items.push({ label: "Quiz App", href: "#" });
-      items.push({ label: "Domaines", active: true });
-    }
-    
+
+
     // PULS - Section Fondateur
-    else if (path.includes('/listeProfils')) {
+    if (path.includes('/listeProfils')) {
       items.push({ label: "PULS", href: "#" });
       items.push({ label: "Fondateur", href: "#" });
       items.push({ label: "Profils", active: true });
@@ -520,14 +417,14 @@ const Layout = ({ onLogout }) => {
       items.push({ label: "Séances", active: true });
     }
 
-     else if (path.includes('/listeSeances')) {
+    else if (path.includes('/listeSeances')) {
       //items.push({ label: "PULS", href: "#" });
       //items.push({ label: "Fondateur", href: "#" });
       items.push({ label: "Liste Séances", active: true });
     }
 
-    
-    
+
+
     // PULS - Section Inscription
     else if (path.includes('/importerEleves')) {
       items.push({ label: "PULS", href: "#" });
@@ -549,7 +446,7 @@ const Layout = ({ onLogout }) => {
       items.push({ label: "Inscription", href: "#" });
       items.push({ label: "Élèves par Classe", active: true });
     }
-    
+
     // PULS - Section Paramétrage
     else if (path.includes('/listeMatieres')) {
       items.push({ label: "PULS", href: "#" });
@@ -576,7 +473,7 @@ const Layout = ({ onLogout }) => {
       items.push({ label: "Paramétrage", href: "#" });
       items.push({ label: "Années Scolaires", active: true });
     }
-    
+
     // PULS - Section Administration
     else if (path.includes('/desctiveUtilisaterur')) {
       items.push({ label: "PULS", href: "#" });
@@ -618,7 +515,7 @@ const Layout = ({ onLogout }) => {
       items.push({ label: "Administration", href: "#" });
       items.push({ label: "Consultation Séances", active: true });
     }
-    
+
     // Autres routes générales
     else if (path.includes('/datatable')) {
       items.push({ label: "Gestion", href: "#" });
@@ -653,24 +550,24 @@ const Layout = ({ onLogout }) => {
       items.push({ label: "Cahier de texte", active: true });
     }
 
-    
 
-    
-    
-    
+
+
+
+
     return items;
   };
 
 
-    const userProfil = localStorage.getItem("userProfil");
+  const userProfil = localStorage.getItem("userProfil");
 
   return (
     <Container className="dashboard-container">
       {/* Header avec menu hamburger pour mobile */}
       {isMobile && (
         <Header className="mobile-header">
-          <Navbar 
-            appearance="inverse" 
+          <Navbar
+            appearance="inverse"
             className="navbar-custom"
             style={{
               background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
@@ -690,8 +587,8 @@ const Layout = ({ onLogout }) => {
               </Nav.Item>
             </Nav>
             <Nav pullRight>
-              <Nav.Item 
-                className="brand-mobile fw-bold text-dark" 
+              <Nav.Item
+                className="brand-mobile fw-bold text-dark"
                 style={{ fontSize: '16px' }}
               >
                 {getPageTitle()}
@@ -714,9 +611,9 @@ const Layout = ({ onLogout }) => {
       <Container className="main-container">
         {/* Sidebar permanente pour desktop */}
         {!isMobile && (
-          <RSuiteSidebar className="desktop-sidebar">
-            <Sidebar 
-              onItemClick={handlePageChange} 
+          <RSuiteSidebar className="desktop-sidebar" id={userProfil} >
+            <Sidebar
+              onItemClick={handlePageChange}
               activeKey={getCurrentPageKey()}
             />
           </RSuiteSidebar>
@@ -734,10 +631,10 @@ const Layout = ({ onLogout }) => {
             <Drawer.Title>Menu Navigation</Drawer.Title>
           </Drawer.Header>
           <Drawer.Body className="drawer-body">
-            <Sidebar 
-              onItemClick={handlePageChange} 
+            <Sidebar
+              onItemClick={handlePageChange}
               activeKey={getCurrentPageKey()}
-              //allMenuSections={allMenuSections}
+            //allMenuSections={allMenuSections}
             />
           </Drawer.Body>
         </Drawer>
@@ -758,7 +655,7 @@ const Layout = ({ onLogout }) => {
               breadcrumbItems={getBreadcrumbItems()}
             />
           )}
-          
+
           <div className="content-body">
             <Routes>
               {/* Route par défaut vers Dashboard */}
@@ -772,36 +669,7 @@ const Layout = ({ onLogout }) => {
               {userProfil === "Professeur" && (
                 <Route path="/dashboard" element={<Dashboard />} />
               )}
-              
-              {/* Routes pour les exercices */}
-              <Route path="/exercises" element={<ExercisesList />} />
-              <Route path="/exercises/create" element={<SaveExercise />} />
-              <Route path="/exercises/edit/:exerciseId" element={<SaveExercise />} />
 
-              <Route path="/lesson" element={<LessonList />} />
-              <Route path="/lesson/create" element={<SaveLesson />} />
-              <Route path="/lesson/edit/:lessonId" element={<SaveLesson />} />
-
-              <Route path="/levelDomaine" element={<SaveLevelDomains />} />
-              <Route path="/listSubDomaine" element={<SaveSubDomains />} />
-
-              <Route path="/domaine" element={<DomaineList />} />
-
-              {/* Routes pour les questions */}
-              <Route path="/questions" element={<ListQuestionnaire />} />
-              <Route path="/questions/create" element={<SaveQuestionnaire />} />
-              <Route path="/questions/edit/:questionId" element={<SaveQuestionnaire />} />
-              
-              {/* Routes pour les quiz */}
-              <Route path="/quiz" element={<ListQuiz />} />
-              <Route path="/quiz/create" element={<SaveQuiz />} />
-              <Route path="/quiz/edit/:quizId" element={<SaveQuiz />} />
-              
-              {/* Routes pour les cours */}
-              <Route path="/courses" element={<ListCourses />} />
-              <Route path="/courses/create" element={<SaveCourses />} />
-              <Route path="/courses/edit/:id" element={<SaveCourses />} />
-              
               {/* Autres routes */}
               <Route path="/datatable" element={<DataTable />} />
               <Route path="/recrutement" element={<RecrutementPersonnel />} />
@@ -822,27 +690,27 @@ const Layout = ({ onLogout }) => {
               <Route path="/messagesEnvoye" element={<ListeMessages typeMessage="envoie" />} />
               <Route path="/OffreEmploi" element={<ListeOffresEmploi />} />
 
-              <Route path="/cahierDeTexte" element={<CahierDeTexte primaryColor="#f59e0b"  />} />
+              <Route path="/cahierDeTexte" element={<CahierDeTexte primaryColor="#f59e0b" />} />
 
               <Route path="/bulletinScolaire" element={<BulletinScolaire />} />
 
-              <Route path="/classe-eleves" element={<Eleves />} /> 
+              <Route path="/classe-eleves" element={<Eleves />} />
               <Route path="/pv-evaluation" element={<PvEvaluations />} />
               <Route path="/evaluation-professeur" element={<EvaluationProfesseur profProfilId={8} />} />
               <Route path="/MonPanier" element={<MonPanier />} />
 
               <Route path="/monPersonel" element={<ListePersonnel typeDeListe="listePersonnel" />} />
               <Route path="/affectationProfilPersonel" element={<ListePersonnel typeDeListe="affectationPersonel" />} />
-              
+
               <Route path="/saisirSeances" element={<ListeSeancesSaisies />} />
               <Route path="/listeSeances" element={<ListeSeancesSaisies />} />
               <Route path="/evaluations/detail/:evaluationCode" element={<EvaluationDetail />} />
-              
+
               {/* ===========================
                    INSCRIPTION
                    =========================== */}
               <Route path="/importerEleves" element={<ImportEleves />} />
-              <Route path="/inscriptionAValider" element={<InscriptionsAValider />} /> 
+              <Route path="/inscriptionAValider" element={<InscriptionsAValider />} />
               <Route path="/listeElevesParClasse" element={<ListeElevesParClasse />} />
               <Route path="/identificationEleves" element={<IdentificationEleves />} />
 
@@ -859,7 +727,7 @@ const Layout = ({ onLogout }) => {
               {/* ===========================
                    ENQUETE RAPIDE
                    =========================== */}
-              <Route path="/enqueteRapideRentree" element={<EnqueteRapideRentree />} />
+              <Route path="/enqueteRapideRentree" element={<EnqueteRapideRentree AcademicYearId ={dynamicAcademicYearId} />} />
               <Route path="/rapport" element={<EcranRapports />} />
 
               {/* ===========================
@@ -867,7 +735,7 @@ const Layout = ({ onLogout }) => {
                    =========================== */}
               <Route path="/profileUtilisateur" element={< ProfilUtilisateur />} />
 
-              
+
 
               {/* ===========================
                    ADMIN
@@ -875,16 +743,16 @@ const Layout = ({ onLogout }) => {
               <Route path="/desctiveUtilisaterur" element={<DesactiverProfil />} />
               <Route path="/InitialiserAnnee" element={<InitialisationAnneesScolaires />} />
               <Route path="/validerPersonnels" element={<SouscriptionsAValider />} />
-              <Route path="/validerFondateur" element={<FondateursAValider typeValidation = "EN ATTENTE" />} />
-              <Route path="/listeFondateurvalider" element={<FondateursAValider typeValidation = "VALIDEE" />} />
-              <Route path="/listeEcolesValidee" element={<EcolesAValider typeValidation = "VALIDEE" />} />
-              <Route path="/listeEcolesAValidee" element={<EcolesAValider typeValidation = "EN_ATTENTE" />} />
+              <Route path="/validerFondateur" element={<FondateursAValider typeValidation="EN ATTENTE" />} />
+              <Route path="/listeFondateurvalider" element={<FondateursAValider typeValidation="VALIDEE" />} />
+              <Route path="/listeEcolesValidee" element={<EcolesAValider typeValidation="VALIDEE" />} />
+              <Route path="/listeEcolesAValidee" element={<EcolesAValider typeValidation="EN_ATTENTE" />} />
               <Route path="/infosConnexion" element={<PersonnelConnexion />} />
               <Route path="/listeMatiere" element={<ListeMatieresAdmin />} />
               <Route path="/cartificatTravail" element={<CertificatTravail />} />
               <Route path="/ConsultationDesSeances" element={<EcranSeances />} />
               <Route path="/progressionPedagogique" element={<ProgressionPedagogique />} />
-              
+
             </Routes>
           </div>
         </Content>

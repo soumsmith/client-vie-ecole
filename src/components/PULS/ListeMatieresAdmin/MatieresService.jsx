@@ -14,9 +14,9 @@ import axios from 'axios';
 // ===========================
 // CONFIGURATION GLOBALE
 // ===========================
-const MATIERES_ENDPOINT = 'api/matiere/list';
-const CATEGORIES_ENDPOINT = 'api/categorie-matiere/list';
-const NIVEAUX_ENDPOINT = 'api/niveau-enseignement/list';
+const MATIERES_ENDPOINT = 'matiere/list';
+const CATEGORIES_ENDPOINT = 'categorie-matiere/list';
+const NIVEAUX_ENDPOINT = 'niveau-enseignement/list';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // ===========================

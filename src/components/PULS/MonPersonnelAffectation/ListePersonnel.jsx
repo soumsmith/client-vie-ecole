@@ -6,6 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import PersonnelModal from './PersonnelModal';
 import DataTable from "../../DataTable";
 import { usePersonnelData, getPersonnelTableConfig } from './PersonnelServiceManager';
+import getFullUrl from "../../hooks/urlUtils";
 
 const ListePersonnel = ({typeDeListe}) => {
     const navigate = useNavigate();
@@ -102,7 +103,7 @@ const ListePersonnel = ({typeDeListe}) => {
         // Ouvrir chaque document dans un nouvel onglet
         documents.forEach(doc => {
             if (doc.url && doc.url.trim() !== '') {
-                const fullUrl = doc.url.startsWith('http') ? doc.url : `http://94.23.162.171:8889/uploads/${doc.url}`;
+                const fullUrl = doc.url.startsWith('http') ? doc.url : `${getFullUrl()}uploads/${doc.url}`;
                 window.open(fullUrl, '_blank');
             }
         });

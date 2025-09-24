@@ -9,6 +9,7 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { getFromCache, setToCache } from "./cacheUtils";
+import { getUserProfile } from "../../hooks/userUtils";
 import { 
   useAllApiUrls,
   useAppParams,
@@ -30,6 +31,8 @@ import {
 // CONFIGURATION GLOBALE
 // ===========================
 const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
+//let userProfile = localStorage.getItem('userProfile');
+
 
 // ===========================
 // FONCTIONS UTILITAIRES POUR MATIÈRES
@@ -171,6 +174,7 @@ export const useClassesData = (refreshTrigger = 0) => {
   const appParams = useAppParams();
   const classesUrls = useClassesUrls();
   const personnelUrls = usePersonnelUrls();
+  const userProfile = getUserProfile();
 
   const fetchClasses = useCallback(
     
@@ -191,12 +195,13 @@ export const useClassesData = (refreshTrigger = 0) => {
 
         let response;
         let url;
+        console.log("🔄 userProfile:", userProfile);
 
-        if (appParams.userProfile === "Professeur") {
-          
+        if (userProfile === "Professeur") {
           url = personnelUrls.getMatiereClasseByProf();
           response = await axios.get(url);
-        } else if (appParams.userProfile === "Fondateur") {
+        } else if (userProfile === "Fondateur") {
+
           url = classesUrls.listByEcoleSorted();
           response = await axios.get(url);
         }
@@ -204,7 +209,7 @@ export const useClassesData = (refreshTrigger = 0) => {
         let processed = [];
 
         if (response.data && Array.isArray(response.data)) {
-          if (appParams.userProfile === "Professeur") {
+          if (userProfile === "Professeur") {
             // Pour le professeur : la classe est dans response.data[].classe
             processed = response.data.map((item) => {
               const classe = item.classe;
@@ -217,7 +222,7 @@ export const useClassesData = (refreshTrigger = 0) => {
                 raw_data: classe,
               };
             });
-          } else if (appParams.userProfile === "Fondateur") {
+          } else if (userProfile === "Fondateur") {
             // Pour le fondateur : la classe est directement dans response.data[]
             processed = response.data.map((classe) => ({
               value: classe.id,
@@ -252,8 +257,7 @@ export const useClassesData = (refreshTrigger = 0) => {
   );
 
   useEffect(() => {
-    if (appParams.ecoleId && appParams.userProfile) {
-      console.log("🔄 UseEffect Classes déclenché pour école:", appParams.ecoleId);
+    if (userProfile) {
       fetchClasses(false);
     }
   }, [appParams.ecoleId, refreshTrigger, fetchClasses]);
@@ -699,13 +703,13 @@ export const useMatieresData = (
         let response;
         let url;
 
-        if (appParams.userProfile === "Professeur") {
+        if (userProfile === "Professeur") {
           url = personnelUrls.getMatiereClasseByProfClasse(
             appParams.personnelId,
             targetClasseId
           );
           response = await axios.get(url);
-        } else if (appParams.userProfile === "Fondateur") {
+        } else if (userProfile === "Fondateur") {
           url = matieresUrls.getAllByBrancheViaClasse(targetClasseId, targetEcoleId);
           response = await axios.get(url);
         }
@@ -771,7 +775,7 @@ export const useMatieresData = (
 
   // Mode automatique : déclencher fetch quand classeId change
   useEffect(() => {
-    if (classeId && appParams.userProfile) {
+    if (classeId && userProfile) {
       console.log(
         "🔄 UseEffect Matières par classe déclenché pour classe:",
         classeId,
@@ -789,7 +793,7 @@ export const useMatieresData = (
     refreshTrigger,
     fetchMatieres,
     clearMatieres,
-    appParams.userProfile,
+    userProfile,
   ]);
 
   return {

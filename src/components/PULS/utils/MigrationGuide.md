@@ -38,7 +38,7 @@ useEffect(() => {
     const fetchClasses = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${getFullUrl()}/api/classes/list-by-ecole-sorted?ecole=38`);
+            const response = await axios.get(`${getFullUrl()}classes/list-by-ecole-sorted?ecole=38`);
             setClasses(response.data);
         } catch (err) {
             setError(err.message);
@@ -69,7 +69,7 @@ const [loading, setLoading] = useState(true);
 useEffect(() => {
     const fetchNiveaux = async () => {
         try {
-            const response = await axios.get(`${getFullUrl()}/api/niveau-enseignement/get-visible-by-branche?ecole=38`);
+            const response = await axios.get(`${getFullUrl()}niveau-enseignement/get-visible-by-branche?ecole=38`);
             setNiveaux(response.data);
         } catch (err) {
             setError(err.message);
@@ -98,7 +98,7 @@ const [loading, setLoading] = useState(true);
 useEffect(() => {
     const fetchBranches = async () => {
         try {
-            const response = await axios.get(`${getFullUrl()}/api/branche/get-by-niveau-enseignement?ecole=38`);
+            const response = await axios.get(`${getFullUrl()}branche/get-by-niveau-enseignement?ecole=38`);
             setBranches(response.data);
         } catch (err) {
             setError(err.message);
@@ -129,7 +129,7 @@ const fetchMatieres = useCallback(async (classeId) => {
     
     try {
         setLoading(true);
-        const response = await axios.get(`${getFullUrl()}/api/imprimer-matrice-classe/matieres-ecole-web/38/${classeId}`);
+        const response = await axios.get(`${getFullUrl()}imprimer-matrice-classe/matieres-ecole-web/38/${classeId}`);
         setMatieres(response.data);
     } catch (err) {
         setError(err.message);
@@ -162,7 +162,7 @@ const [loading, setLoading] = useState(true);
 useEffect(() => {
     const fetchPeriodes = async () => {
         try {
-            const response = await axios.get(`${getFullUrl()}/api/periodes/list-by-periodicite?id=2`);
+            const response = await axios.get(`${getFullUrl()}periodes/list-by-periodicite?id=2`);
             setPeriodes(response.data);
         } catch (err) {
             setError(err.message);
@@ -193,7 +193,7 @@ const fetchEleves = useCallback(async (classeId, anneeId = 226) => {
     
     try {
         setLoading(true);
-        const response = await axios.get(`${getFullUrl()}/api/classe-eleve/retrieve-by-classe/${classeId}/${anneeId}`);
+        const response = await axios.get(`${getFullUrl()}classe-eleve/retrieve-by-classe/${classeId}/${anneeId}`);
         setEleves(response.data);
     } catch (err) {
         setError(err.message);
@@ -226,7 +226,7 @@ const [loading, setLoading] = useState(true);
 useEffect(() => {
     const fetchFonctions = async () => {
         try {
-            const response = await axios.get(`${getFullUrl()}/api/fonction/list-by-ecole?ecole=38`);
+            const response = await axios.get(`${getFullUrl()}fonction/list-by-ecole?ecole=38`);
             setFonctions(response.data);
         } catch (err) {
             setError(err.message);

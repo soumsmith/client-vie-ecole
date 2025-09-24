@@ -42,6 +42,7 @@ import {
 } from './ProfesseurMatiereService';
 import { useMatieresEcoleData } from "../utils/CommonDataService";
 import { useAllApiUrls } from '../utils/apiConfig';
+import { getUserProfile } from "../../hooks/userUtils";
 
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE MODERNE
@@ -55,6 +56,7 @@ const ProfesseurMatiereFilters = ({
     onMatiereChange
 }) => {
     const [formError, setFormError] = useState(null);
+    const userProfile = getUserProfile();
 
     const { matieres, matieresLoading, matieresError, refetch } = useMatieresEcoleData();
 
@@ -188,12 +190,13 @@ const ProfesseurMatiereFilters = ({
                                 disabled={isDataLoading || loading || !selectedMatiere}
                                 style={{ 
                                     flex: 1,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    //background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                     border: 'none',
                                     borderRadius: '8px',
                                     fontWeight: '500'
                                 }}
                                 size="lg"
+                                className={`${userProfile}-btn-search`}
                             >
                                 {loading ? 'Chargement...' : 'Afficher'}
                             </Button>

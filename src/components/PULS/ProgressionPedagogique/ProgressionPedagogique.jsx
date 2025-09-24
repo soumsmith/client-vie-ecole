@@ -133,7 +133,7 @@ const useNiveauxEnseignement = () => {
                 return;
             }
 
-            const response = await axios.get(`${getFullUrl()}/api/niveau-enseignement/list`);
+            const response = await axios.get(`${getFullUrl()}niveau-enseignement/list`);
 
             const formattedData = response.data.map(niveau => ({
                 value: niveau.id,
@@ -182,7 +182,7 @@ const usePeriodes = () => {
                 return;
             }
 
-            const response = await axios.get(`${getFullUrl()}/api/periodes/list`);
+            const response = await axios.get(`${getFullUrl()}periodes/list`);
 
             const formattedData = response.data.map(periode => ({
                 value: periode.id,
@@ -244,9 +244,9 @@ const useNiveauData = (niveauId) => {
             }
 
             const [branchesResponse, matieresResponse, anneesResponse] = await Promise.all([
-                axios.get(`${getFullUrl()}/api/branche/get-by-niveau-enseignement-projection?niveau=${niveauId}`),
-                axios.get(`${getFullUrl()}/api/matiere/get-by-niveau-enseignement-projection?niveau=${niveauId}`),
-                axios.get(`${getFullUrl()}/api/annee/list-to-central-niveau-enseignement-projection?niveau=${niveauId}`)
+                axios.get(`${getFullUrl()}branche/get-by-niveau-enseignement-projection?niveau=${niveauId}`),
+                axios.get(`${getFullUrl()}matiere/get-by-niveau-enseignement-projection?niveau=${niveauId}`),
+                axios.get(`${getFullUrl()}annee/list-to-central-niveau-enseignement-projection?niveau=${niveauId}`)
             ]);
 
             const formattedBranches = branchesResponse.data.map(branche => ({
@@ -313,7 +313,7 @@ const useAnneesGlobales = () => {
                 return;
             }
 
-            const response = await axios.get(`${getFullUrl()}/api/annee/list-to-central`);
+            const response = await axios.get(`${getFullUrl()}annee/list-to-central`);
 
             const formattedData = response.data.map(annee => ({
                 value: annee.id,
@@ -353,7 +353,7 @@ const useProgressionDetails = () => {
             setLoading(true);
             setError(null);
 
-            const response = await axios.get(`${getFullUrl()}/api/detail-progression/get-by-progression/${progressionId}`);
+            const response = await axios.get(`${getFullUrl()}detail-progression/get-by-progression/${progressionId}`);
             setDetails(response.data);
         } catch (err) {
             console.error('Erreur lors de la récupération des détails:', err);
@@ -563,7 +563,7 @@ const ProgressionPedagogique = () => {
                 return;
             }
 
-            const response = await axios.get(`${getFullUrl()}/api/progression/get-by-annee/${anneeId}`);
+            const response = await axios.get(`${getFullUrl()}progression/get-by-annee/${anneeId}`);
 
             const processedData = response.data.map((item, index) => ({
                 id: item.id || `progression-${index}`,
@@ -739,7 +739,7 @@ const ProgressionPedagogique = () => {
                 }))
             };
 
-            await axios.put(`${getFullUrl()}/api/progression/${selectedProgression.id}/update-details`, dataToSave);
+            await axios.put(`${getFullUrl()}progression/${selectedProgression.id}/update-details`, dataToSave);
 
             Notification.success({
                 title: 'Succès',
@@ -793,7 +793,7 @@ const ProgressionPedagogique = () => {
                 details: fileData
             };
 
-            const response = await axios.post(`${getFullUrl()}/progression/save`, progressionData);
+            const response = await axios.post(`${getFullUrl()}progression/save`, progressionData);
 
             Notification.success({
                 title: 'Succès',

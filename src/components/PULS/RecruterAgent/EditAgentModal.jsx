@@ -90,7 +90,7 @@ const EditAgentModal = ({ open, onClose, agent, onSave }) => {
         const emailData = {
             user_name: emailJSConfig.userName,
             user_email: emailJSConfig.userEmail,
-            message: `Bonjour Monsieur ${agent.nomComplet || ''}\n\nVeuillez utiliser ces paramètres pour vous connecter à notre application`,
+            message: `Bonjour Monsieur/Madame ${agent.nomComplet || ''}\n\nVeuillez utiliser ces paramètres pour vous connecter à notre application`,
             lib_version: emailJSConfig.libVersion,
             service_id: emailJSConfig.serviceId,
             template_id: emailJSConfig.templateId,
@@ -98,14 +98,8 @@ const EditAgentModal = ({ open, onClose, agent, onSave }) => {
         };
 
         const response = await axios.post(
-            'https://api.emailjs.com/api/v1.0/email/send-form',
-            emailData,
-            {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                timeout: 10000
-            }
+            'https://api.emailjs.comv1.0/email/send-form',
+            emailData
         );
 
         return response;
@@ -118,12 +112,7 @@ const EditAgentModal = ({ open, onClose, agent, onSave }) => {
         }
 
         const url = personnelUrls.saveRecutementSouscriptionRecruter(agent.id);
-        const response = await axios.post(url, {}, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            timeout: 10000
-        });
+        const response = await axios.post(url, {});
 
         return response;
     };

@@ -121,8 +121,8 @@ const useDataByNiveau = (niveau) => {
             //const response = await axios.get(apiUrls.periodes.list());
             const [matieresRes, branchesRes, anneesRes] = await Promise.all([
                 axios.get(apiUrls.matieres.getByEcoleViaNiveauEnseignementProgection(niveau)),
-                axios.get(`http://10.3.119.232:8889/api/branche/get-by-niveau-enseignement-projection?niveau=${niveau}`),
-                axios.get(`http://10.3.119.232:8889/api/annee/list-to-central-niveau-enseignement-projection?niveau=${niveau}`)
+                axios.get(`${getFullUrl()}branche/get-by-niveau-enseignement-projection?niveau=${niveau}`),
+                axios.get(`${getFullUrl()}annee/list-to-central-niveau-enseignement-projection?niveau=${niveau}`)
             ]);
 
             const [matieresData, branchesData, anneesData] = await Promise.all([

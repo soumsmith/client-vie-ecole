@@ -318,7 +318,7 @@ const UserProfile = () => {
                 setLoading(true);
                 setError(null);
                 // Appel API réel
-                const response = await axios.get(`${getFullUrl()}/api/souscription-personnel/personnelById/255`);
+                const response = await axios.get(`${getFullUrl()}souscription-personnel/personnelById/255`);
 
                 if (response.data) {
                     setUserData(response.data);

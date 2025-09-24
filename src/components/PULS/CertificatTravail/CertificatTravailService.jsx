@@ -134,20 +134,62 @@ export const telechargerFichier = (blob, nomFichier) => {
 };
 
 // Version avec la fonction utilitaire
-export const genererCertificatTravail = async (ecoleId, personnelId, nomSignataire, fonctionSignataire, apiUrls) => {
+export const genererCertificatTravail__ = async (ecoleId, personnelId, nomSignataire, fonctionSignataire, apiUrls) => {
     try {
+        
         const apiUrl = apiUrls.personnel.imprimerCertificatTravail(ecoleId, personnelId, nomSignataire, fonctionSignataire);
         
-        const response = await axios.get(apiUrl, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            responseType: 'blob',
-            timeout: 15000
-        });
+        const response = await axios.get(apiUrl);
 
         // Utiliser la fonction utilitaire
         const filename = `certificat_travail_${personnelId}_${Date.now()}.docx`;
+        telechargerFichier(response.data, filename);
+        
+        return response;
+    } catch (error) {
+        console.error('Erreur lors de la génération du certificat:', error);
+        throw error;
+    }
+};
+
+export const useCertificatTravailGenerator = () => {
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [error, setError] = useState(null);
+
+    const generer = async (apiUrl, personnelId) => {
+        setIsGenerating(true);
+        setError(null);
+        
+        try {
+            const result = await genererCertificatTravail(apiUrl, personnelId);
+            return result;
+        } catch (err) {
+            setError(err);
+            throw err;
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    return {
+        generer,
+        isGenerating,
+        error
+    };
+};
+
+export const genererCertificatTravail = async (apiUrl, personnelId) => {
+    try {
+        console.log('URL API utilisée:', apiUrl); // Pour debug
+        
+        const response = await axios.get(apiUrl, {
+            responseType: 'blob' // Important pour les fichiers
+        });
+
+        // Générer le nom du fichier
+        const filename = `certificat_travail_${personnelId}_${Date.now()}.docx`;
+        
+        // Télécharger le fichier
         telechargerFichier(response.data, filename);
         
         return response;

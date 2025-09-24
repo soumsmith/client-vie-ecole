@@ -261,7 +261,7 @@ const RecrutementPersonnel = () => {
       subtitle="membre(s) du personnel trouvé(s)"
       
       // Configuration API (sans transformation)
-      apiUrl="/api/panier-personnel/ecole/38/VALIDEE"
+      apiUrl="panier-personnel/ecole/38/VALIDEE"
       
       // Configuration du tableau
       columns={columns}

@@ -50,12 +50,12 @@ export const useNoteSearch = (profil, showMatiereFilter = false) => {
         
         if (showMatiereFilter) {
             if (matiereId && matiereId !== null) {
-                return `${baseUrl}/api/notes/list-classe-matiere-notes/${classeId}/${matiereId}/${academicYearId}/${periodeId}`;
+                return `${baseUrl}notes/list-classe-matiere-notes/${classeId}/${matiereId}/${academicYearId}/${periodeId}`;
             } else {
-                return `${baseUrl}/api/notes/list-classe-notes-all-matieres/${classeId}/${periodeId}`;
+                return `${baseUrl}notes/list-classe-notes-all-matieres/${classeId}/${periodeId}`;
             }
         } else {
-            return `${baseUrl}/api/notes/list-classe-notes/${classeId}/${academicYearId}/${periodeId}`;
+            return `${baseUrl}notes/list-classe-notes/${classeId}/${academicYearId}/${periodeId}`;
         }
     };
 

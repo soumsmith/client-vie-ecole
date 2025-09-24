@@ -105,38 +105,38 @@ const useClassesUrls = () => {
          * @param {number} brancheId - ID de la branche
          */
         getVisibleByBranche: (brancheId) =>
-            `${baseUrl}/api/classes/get-visible-by-branche?branche=${brancheId}&ecole=${params.ecoleId}`,
+            `${baseUrl}classes/get-visible-by-branche?branche=${brancheId}&ecole=${params.ecoleId}`,
 
         /**
          * Liste des classes par école (triées) (utilise automatiquement l'école de l'utilisateur connecté)
          */
         listByEcoleSorted: () =>
-            `${baseUrl}/api/classes/list-by-ecole-sorted?ecole=${params.ecoleId}`,
+            `${baseUrl}classes/list-by-ecole-sorted?ecole=${params.ecoleId}`,
 
         /**
          * Liste de toutes les classes populées par école (utilise automatiquement l'école de l'utilisateur connecté)
          */
         getClasseByEcole: () =>
-            `${baseUrl}/api/classes/list-all-populate-by-ecole?ecole=${params.ecoleId}`,
+            `${baseUrl}classes/list-all-populate-by-ecole?ecole=${params.ecoleId}`,
 
         /**
          * Sauvegarde une classe
          */
         saveClasse: () =>
-            `${baseUrl}/api/classes/saveAndDisplay`,
+            `${baseUrl}classes/saveAndDisplay`,
 
         /**
          * Liste des classes populées par école (utilise automatiquement l'école de l'utilisateur connecté)
          */
         listPopulateByEcole: () =>
-            `${baseUrl}/api/classes/list-populate-by-ecole?ecole=${params.ecoleId}`,
+            `${baseUrl}classes/list-populate-by-ecole?ecole=${params.ecoleId}`,
 
         /**
          * Récupère une classe spécifique par ID
          * @param {number} classeId - ID de la classe
          */
         getById: (classeId) =>
-            `${baseUrl}/api/classes/${classeId}`,
+            `${baseUrl}classes/${classeId}`,
 
     }), [params, baseUrl]);
 };
@@ -158,13 +158,13 @@ const useNiveauxUrls = () => {
          * Récupère les niveaux visibles par branche (utilise automatiquement l'école de l'utilisateur connecté)
          */
         getVisibleByBranche: () =>
-            `${baseUrl}/api/niveau-enseignement/get-visible-by-branche?ecole=${params.ecoleId}`,
+            `${baseUrl}niveau-enseignement/get-visible-by-branche?ecole=${params.ecoleId}`,
 
         /**
          * Liste de tous les niveaux d'enseignement
          */
         list: () =>
-            `${baseUrl}/api/niveau-enseignement/list`,
+            `${baseUrl}niveau-enseignement/list`,
 
     }), [params, baseUrl]);
 };
@@ -182,11 +182,11 @@ const useBranchesUrls = () => {
          * Récupère les branches par niveau d'enseignement (utilise automatiquement l'école de l'utilisateur connecté)
          */
         getByNiveauEnseignement: () =>
-            `${baseUrl}/api/branche/get-by-niveau-enseignement?ecole=${params.ecoleId}`,
+            `${baseUrl}branche/get-by-niveau-enseignement?ecole=${params.ecoleId}`,
 
         getByEcole: () =>
-            `${baseUrl}/api/branche/list-by-ecole/${params.ecoleId}`,
-        ///api/branche/get-by-niveau-enseignement?ecole=${params.ecoleId}
+            `${baseUrl}branche/list-by-ecole/${params.ecoleId}`,
+        //branche/get-by-niveau-enseignement?ecole=${params.ecoleId}
 
     }), [params, baseUrl]);
 };
@@ -208,33 +208,33 @@ const useMatieresUrls = () => {
          * Récupère les matières d'une école via niveau d'enseignement (utilise automatiquement l'école de l'utilisateur connecté)
          */
         getByEcoleViaNiveauEnseignement: () =>
-            `${baseUrl}/api/matiere-ecole/get-by-ecole-via-niveau-enseignement?id=${params.ecoleId}`,
+            `${baseUrl}matiere-ecole/get-by-ecole-via-niveau-enseignement?id=${params.ecoleId}`,
 
         getByEcoleViaNiveauEnseignementProgection: (niveau) =>
-            `${baseUrl}/api/matiere/get-by-niveau-enseignement-projection?niveau=${niveau}`,
+            `${baseUrl}matiere/get-by-niveau-enseignement-projection?niveau=${niveau}`,
 
         /**
          * Liste des matières par école (utilise automatiquement l'école de l'utilisateur connecté)
          */
         listByEcole: () =>
-            `${baseUrl}/api/matiere-ecole/list-by-ecole/${params.ecoleId}`,
+            `${baseUrl}matiere-ecole/list-by-ecole/${params.ecoleId}`,
 
         /**
          * Mettre à jour une matière (mode display)
          */
         updateDisplay: () =>
-            `${baseUrl}/api/matiere-ecole/update-display`,
+            `${baseUrl}matiere-ecole/update-display`,
 
-        getLangueListe: () => `${baseUrl}/api/langues/list`,
+        getLangueListe: () => `${baseUrl}langues/list`,
 
-        getCategoriesList: () => `${baseUrl}/api/categorie-matiere/list`,
+        getCategoriesList: () => `${baseUrl}categorie-matiere/list`,
 
         /**
          * Récupère les matières d'une classe via branche (utilise automatiquement l'école de l'utilisateur connecté)
          * @param {number} classeId - ID de la classe
          */
         getAllByBrancheViaClasse: (classeId) =>
-            `${baseUrl}/api/classe-matiere/get-all-by-branche-via-classe?branche=${classeId}&ecole=${params.ecoleId}`,
+            `${baseUrl}classe-matiere/get-all-by-branche-via-classe?branche=${classeId}&ecole=${params.ecoleId}`,
 
     }), [params, baseUrl]);
 };
@@ -256,7 +256,7 @@ const usePersonnelUrls = () => {
          * Récupère les affectations matière-classe du professeur connecté (utilise automatiquement les paramètres de l'utilisateur connecté)
          */
         getMatiereClasseByProf: () =>
-            `${baseUrl}/api/personnel-matiere-classe/get-by-prof?annee=${params.academicYearId}&prof=${params.personnelId}&ecole=${params.ecoleId}`,
+            `${baseUrl}personnel-matiere-classe/get-by-prof?annee=${params.academicYearId}&prof=${params.personnelId}&ecole=${params.ecoleId}`,
 
         /**
          * Récupère les affectations matière-classe d'un professeur spécifique
@@ -265,64 +265,64 @@ const usePersonnelUrls = () => {
          * @param {number} ecoleId - ID de l'école
          */
         getByProf: (anneeId, profId, ecoleId) =>
-            `${baseUrl}/api/personnel-matiere-classe/get-by-prof?annee=${anneeId}&prof=${profId}&ecole=${ecoleId}`,
+            `${baseUrl}personnel-matiere-classe/get-by-prof?annee=${anneeId}&prof=${profId}&ecole=${ecoleId}`,
 
         /**
          * Récupère les matières d'un professeur pour une classe spécifique
          * @param {number} classeId - ID de la classe
          */
         getMatiereClasseByProfClasse: (classeId) =>
-            `${baseUrl}/api/personnel-matiere-classe/get-by-prof-classe?prof=${params.personnelId}&classe=${classeId}&annee=${params.academicYearId}`,
+            `${baseUrl}personnel-matiere-classe/get-by-prof-classe?prof=${params.personnelId}&classe=${classeId}&annee=${params.academicYearId}`,
 
         /**
          * Récupère la liste du personnel par école et profil (utilise automatiquement l'école et le profil de l'utilisateur connecté)
          */
         getByEcoleAndProfil: (profProfilId = 8) =>
-            `${baseUrl}/api/personnels/get-by-ecole-and-profil?ecole=${params.ecoleId}&profil=${profProfilId}`,
+            `${baseUrl}personnels/get-by-ecole-and-profil?ecole=${params.ecoleId}&profil=${profProfilId}`,
 
         /**
          * Récupère les souscriptions de personnel par statut
          * @param {string} statut - Statut des souscriptions (VALIDEE, EN_ATTENTE, REFUSEE, etc.)
          */
         getSouscriptionsByStatut: (statut = 'VALIDEE') =>
-            `${baseUrl}/api/souscription-personnel/attente/${statut}`,
+            `${baseUrl}souscription-personnel/attente/${statut}`,
 
         /**
          * Récupère les souscriptions de personnel par école (utilise automatiquement l'école de l'utilisateur connecté)
          */
         getSouscriptionsByEcole: () =>
-            `${baseUrl}/api/souscription-personnel/personnel/${params.ecoleId}`,
+            `${baseUrl}souscription-personnel/personnel/${params.ecoleId}`,
 
         /**
          * Recrute un agent (utilise automatiquement l'école de l'utilisateur connecté)
          * @param {number} agent_id - ID de l'agent à recruter
          */
         saveRecutementSouscriptionRecruter: (agent_id) =>
-            `${baseUrl}/api/souscription-personnel/recruter/${params.ecoleId}/${agent_id}`,
+            `${baseUrl}souscription-personnel/recruter/${params.ecoleId}/${agent_id}`,
 
         /**
          * Ajoute un personnel au panier de recrutement
          * Méthode: POST
          * Corps de requête: { identifiant_ecole, identifiant_personnel, panier_personnel_date_creation }
          */
-        addToPanier: () => `${baseUrl}/api/panier-personnel`,
+        addToPanier: () => `${baseUrl}panier-personnel`,
 
         /**
          * Récupère le panier de personnel (utilise automatiquement l'école de l'utilisateur connecté)
          */
         getPanier: () =>
-            `${baseUrl}/api/panier-personnel/ecole/${params.ecoleId}`,
+            `${baseUrl}panier-personnel/ecole/${params.ecoleId}`,
 
         /**
          * Récupère le panier de personnel par statut (utilise automatiquement l'école de l'utilisateur connecté)
          * @param {string} statut - Statut du panier (EN_ATTENTE, VALIDE, etc.)
          */
         getPanierByStatut: (statut = 'EN_ATTENTE') =>
-            `${baseUrl}/api/panier-personnel/ecole/${params.ecoleId}/${statut}`,
+            `${baseUrl}panier-personnel/ecole/${params.ecoleId}/${statut}`,
 
 
         getAgentByStatut: (statut = 'VALIDEE') =>
-            `${baseUrl}/api/panier-personnel/ecole/${params.ecoleId}/${statut}`,
+            `${baseUrl}panier-personnel/ecole/${params.ecoleId}/${statut}`,
 
         /**
          * Met à jour le statut d'une souscription de personnel
@@ -330,20 +330,20 @@ const usePersonnelUrls = () => {
          * Méthode: PUT/PATCH
          */
         updateSouscriptionStatut: (personnelId) =>
-            `${baseUrl}/api/souscription-personnel/${personnelId}/statut`,
+            `${baseUrl}souscription-personnel/${personnelId}/statut`,
 
         /**
          * Récupère le personnel par fonction (utilise automatiquement l'école de l'utilisateur connecté)
          * @param {number} fonctionId - ID de la fonction
          */
         getByFonction: (fonctionId) =>
-            `${baseUrl}/api/personnels/get-by-fonction?fonction=${fonctionId}&ecole=${params.ecoleId}`,
+            `${baseUrl}personnels/get-by-fonction?fonction=${fonctionId}&ecole=${params.ecoleId}`,
 
         /**
          * Récupère le personnel pour les certificats de travail (utilise automatiquement l'école de l'utilisateur connecté)
          */
         getForCertificat: () =>
-            `${baseUrl}/api/souscription-personnel/personnel/${params.ecoleId}`,
+            `${baseUrl}souscription-personnel/personnel/${params.ecoleId}`,
 
         /**
          * Génère un certificat de travail
@@ -352,8 +352,8 @@ const usePersonnelUrls = () => {
          * @param {string} nomSignataire - Nom du signataire
          * @param {string} fonctionSignataire - Fonction du signataire
          */
-        genererCertificatTravail: (ecoleId, personnelId, nomSignataire, fonctionSignataire) =>
-            `${baseUrl}/api/imprimer-perspnnel/certificat-de-travail/${ecoleId}/${personnelId}/${nomSignataire}/${fonctionSignataire}`,
+        imprimerCertificatTravail: (ecoleId, personnelId, nomSignataire, fonctionSignataire) =>
+            `${baseUrl}imprimer-perspnnel/certificat-de-travail/${params.ecoleId}/${personnelId}/${nomSignataire}/${fonctionSignataire}`,
 
     }), [params, baseUrl]);
 };
@@ -375,26 +375,26 @@ const usePeriodesUrls = () => {
          * Liste des périodes par périodicité (utilise automatiquement la périodicité de l'utilisateur connecté)
          */
         listByPeriodicite: () =>
-            `${baseUrl}/api/periodes/list-by-periodicite?id=${params.periodicitieId}`,
+            `${baseUrl}periodes/list-by-periodicite?id=${params.periodicitieId}`,
 
         /**
          * Liste des périodes par périodicité spécifique
          * @param {number} periodicitieId - ID de la périodicité
          */
         listByPeriodiciteId: (periodicitieId) =>
-            `${baseUrl}/api/periodes/list-by-periodicite?id=${periodicitieId}`,
+            `${baseUrl}periodes/list-by-periodicite?id=${periodicitieId}`,
 
         /**
          * Liste de toutes les périodes
          */
         list: () =>
-            `${baseUrl}/api/periodes/list`,
+            `${baseUrl}periodes/list`,
 
         /**
          * Liste des périodicités
          */
         listPeriodicites: () =>
-            `${baseUrl}/api/periodicite/list`,
+            `${baseUrl}periodicite/list`,
 
     }), [params, baseUrl]);
 };
@@ -417,7 +417,7 @@ const useElevesUrls = () => {
          * @param {number} classeId - ID de la classe
          */
         retrieveByClasse: (classeId) =>
-            `${baseUrl}/api/classe-eleve/retrieve-by-classe/${classeId}/${params.academicYearId}`,
+            `${baseUrl}classe-eleve/retrieve-by-classe/${classeId}/${params.academicYearId}`,
 
         /**
          * Récupère les élèves d'une classe pour une année spécifique
@@ -425,13 +425,13 @@ const useElevesUrls = () => {
          * @param {number} anneeId - ID de l'année
          */
         retrieveByClasseAnnee: (classeId, anneeId) =>
-            `${baseUrl}/api/classe-eleve/retrieve-by-classe/${classeId}/${anneeId}`,
+            `${baseUrl}classe-eleve/retrieve-by-classe/${classeId}/${anneeId}`,
 
         imprimerFicheIdentification: (selectedYear, matricule) =>
-            `${baseUrl}/api/imprimer-Fiche-eleve/identification/${selectedYear}/${matricule}/${params.ecoleId}`,
+            `${baseUrl}imprimer-Fiche-eleve/identification/${selectedYear}/${matricule}/${params.ecoleId}`,
 
         imprimerFicheInscription: (selectedYear, matricule) =>
-            `${baseUrl}/api/imprimer-Fiche-eleve/inscription/${selectedYear}/${matricule}/${params.ecoleId}`,
+            `${baseUrl}imprimer-Fiche-eleve/inscription/${selectedYear}/${matricule}/${params.ecoleId}`,
 
         
 
@@ -440,14 +440,14 @@ const useElevesUrls = () => {
          * @param {number} classeId - ID de la classe
          */
         handleSave: (classeId) =>
-            `${baseUrl}/api/classe-eleve/handle-save/${classeId}`,
+            `${baseUrl}classe-eleve/handle-save/${classeId}`,
 
         /**
          * Supprime un élève d'une classe
          * @param {number} eleveId - ID de l'élève
          */
         delete: (eleveId) =>
-            `${baseUrl}/api/classe-eleve/delete/${eleveId}`,
+            `${baseUrl}classe-eleve/delete/${eleveId}`,
 
     }), [params, baseUrl]);
 };
@@ -469,13 +469,13 @@ const useMessagesUrls = () => {
          * Boîte de réception des messages (utilise automatiquement l'utilisateur connecté)
          */
         boiteReception: () =>
-            `${baseUrl}/api/message-personnel/boite-reception/${params.userId}`,
+            `${baseUrl}message-personnel/boite-reception/${params.userId}`,
 
         /**
          * Messages envoyés (utilise automatiquement l'utilisateur connecté)
          */
         boiteEnvoi: () =>
-            `${baseUrl}/api/message-personnel/boite-envoie/${params.userId}`,
+            `${baseUrl}message-personnel/boite-envoie/${params.userId}`,
 
         /**
          * Envoie un message à un personnel spécifique
@@ -484,21 +484,21 @@ const useMessagesUrls = () => {
          * Corps de requête: { message_personnel_sujet, message_personnel_message, idEmetteur, idDestinataire, ... }
          */
         sendToPersonnel: (personnelId) =>
-            `${baseUrl}/api/message-personnel/${personnelId}`,
+            `${baseUrl}message-personnel/${personnelId}`,
 
         /**
          * Créer un nouveau message
          * Méthode: POST
          */
         create: () =>
-            `${baseUrl}/api/message-personnel`,
+            `${baseUrl}message-personnel`,
 
         /**
          * Récupère un message spécifique par ID
          * @param {number} messageId - ID du message
          */
         getById: (messageId) =>
-            `${baseUrl}/api/message-personnel/${messageId}`,
+            `${baseUrl}message-personnel/${messageId}`,
 
     }), [params, baseUrl]);
 };
@@ -520,7 +520,7 @@ const useFonctionsUrls = () => {
          * Liste des fonctions par école (utilise automatiquement l'école de l'utilisateur connecté)
          */
         listByEcole: () =>
-            `${baseUrl}/api/fonction/list-by-ecole?ecole=${params.ecoleId}`,
+            `${baseUrl}fonction/list-by-ecole?ecole=${params.ecoleId}`,
 
     }), [params, baseUrl]);
 };
@@ -542,43 +542,43 @@ const useAnneesUrls = () => {
          * Liste de toutes les années scolaires
          */
         list: () =>
-            `${baseUrl}/api/annee-scolaire/list`,
+            `${baseUrl}annee-scolaire/list`,
 
         /**
          * Années ouvertes ou fermées (utilise automatiquement l'école de l'utilisateur connecté)
          */
         listOpenedOrClosedToEcole: () =>
-            `${baseUrl}/api/annee/list-opened-or-closed-to-ecole?ecole=${params.ecoleId}`,
+            `${baseUrl}annee/list-opened-or-closed-to-ecole?ecole=${params.ecoleId}`,
 
         /**
          * Années ouvertes ou fermées pour une école spécifique
          */
         listOpenedOrClosedToEcoleId: () =>
-            `${baseUrl}/api/annee/list-opened-or-closed-to-ecole?ecole=${params.ecoleId}`,
+            `${baseUrl}annee/list-opened-or-closed-to-ecole?ecole=${params.ecoleId}`,
 
         /**
          * Liste des années scolaires (utilise automatiquement l'école de l'utilisateur connecté)
          */
         listByEcole: () =>
-            `${baseUrl}/api/annee/list-to-ecole?ecole=${params.ecoleId}`,
+            `${baseUrl}annee/list-to-ecole?ecole=${params.ecoleId}`,
 
         /**
          * Récupère l'année principale (utilise automatiquement l'école de l'utilisateur connecté)
          */
         getMainByEcole: () =>
-            `${baseUrl}/api/annee/get-main-annee-by-ecole/${params.ecoleId}`,
+            `${baseUrl}annee/get-main-annee-by-ecole/${params.ecoleId}`,
 
         /**
          * Sauvegarde/met à jour une année scolaire
          */
         saveUpdate: () =>
-            `${baseUrl}/api/annee/save-update-ecole`,
+            `${baseUrl}annee/save-update-ecole`,
 
         /**
          * Liste des années scolaires centrales
          */
         listToCentral: () =>
-            `${baseUrl}/api/annee/list-to-central`,
+            `${baseUrl}annee/list-to-central`,
 
     }), [params, baseUrl]);
 };
@@ -605,7 +605,7 @@ const useEvaluationsUrls = () => {
          * @param {number} filters.periode_id - ID de la période (optionnel)
          */
         getByFilters: (filters) => {
-            const baseUrlPath = `${baseUrl}/api/evaluation/get-by-filters`;
+            const baseUrlPath = `${baseUrl}evaluation/get-by-filters`;
             const urlParams = new URLSearchParams();
 
             // Paramètre obligatoire
@@ -638,7 +638,7 @@ const useEvaluationsUrls = () => {
                     urlParams.append(key, value);
                 }
             });
-            return `${baseUrl}/api/evaluations/get-classe-matiere-periode?${urlParams.toString()}`;
+            return `${baseUrl}evaluations/get-classe-matiere-periode?${urlParams.toString()}`;
         },
 
         /**
@@ -646,21 +646,21 @@ const useEvaluationsUrls = () => {
          * @param {number} evaluationId - ID de l'évaluation
          */
         getById: (evaluationId) =>
-            `${baseUrl}/api/evaluation/${evaluationId}`,
+            `${baseUrl}evaluation/${evaluationId}`,
 
         /**
          * Récupère une évaluation par code
          * @param {string} evaluationCode - Code de l'évaluation
          */
         getByCode: (evaluationCode) =>
-            `${baseUrl}/api/evaluations/code/${evaluationCode}`,
+            `${baseUrl}evaluations/code/${evaluationCode}`,
 
         /**
          * Vérifie si une évaluation est verrouillée
          * @param {number} evaluationId - ID de l'évaluation
          */
         isLocked: (evaluationId) =>
-            `${baseUrl}/api/evaluations/is-locked/${evaluationId}`,
+            `${baseUrl}evaluations/is-locked/${evaluationId}`,
 
         /**
          * Statistiques d'évaluations pour un professeur
@@ -670,27 +670,27 @@ const useEvaluationsUrls = () => {
          * @param {number} professeurId - ID du professeur
          */
         statistiqueProf: (ecoleId, anneeId, periodeId, professeurId) =>
-            `${baseUrl}/api/evaluations/statistique-prof/${ecoleId}/${anneeId}/${periodeId}/${professeurId}`,
+            `${baseUrl}evaluations/statistique-prof/${ecoleId}/${anneeId}/${periodeId}/${professeurId}`,
 
         /**
          * Créer une nouvelle évaluation
          */
         create: () =>
-            `${baseUrl}/api/evaluation/create`,
+            `${baseUrl}evaluation/create`,
 
         /**
          * Mettre à jour une évaluation existante
          * @param {number} evaluationId - ID de l'évaluation
          */
         update: (evaluationId) =>
-            `${baseUrl}/api/evaluation/update/${evaluationId}`,
+            `${baseUrl}evaluation/update/${evaluationId}`,
 
         /**
          * Supprimer une évaluation
          * @param {number} evaluationId - ID de l'évaluation
          */
         delete: (evaluationId) =>
-            `${baseUrl}/api/evaluation/delete/${evaluationId}`,
+            `${baseUrl}evaluation/delete/${evaluationId}`,
 
     }), [params, baseUrl]);
 };
@@ -712,7 +712,7 @@ const useNotesUrls = () => {
          * @param {string} evaluationCode - Code de l'évaluation
          */
         listAboutEvaluation: (evaluationCode) =>
-            `${baseUrl}/api/notes/list-about-evaluation/${evaluationCode}`,
+            `${baseUrl}notes/list-about-evaluation/${evaluationCode}`,
 
         /**
          * Récupère les notes par classe et période
@@ -725,7 +725,7 @@ const useNotesUrls = () => {
                     urlParams.append(key, value);
                 }
             });
-            return `${baseUrl}/api/notes/get-by-classe-periode?${urlParams.toString()}`;
+            return `${baseUrl}notes/get-by-classe-periode?${urlParams.toString()}`;
         },
 
     }), [baseUrl]);
@@ -752,7 +752,7 @@ const useInscriptionsUrls = () => {
          * @param {number} ecoleId - ID de l'école
          */
         retrieveToAttribClasse: (anneeId, brancheId, statut = 'VALIDEE') =>
-            `${baseUrl}/api/inscription/retrieve-to-attrib-classe/${params.academicYearId}/?branche=${brancheId}&statut=${statut}&ecole=${params.ecoleId}`,
+            `${baseUrl}inscription/retrieve-to-attrib-classe/${params.academicYearId}/?branche=${brancheId}&statut=${statut}&ecole=${params.ecoleId}`,
 
         /**
          * Récupère les inscriptions par statut
@@ -762,7 +762,7 @@ const useInscriptionsUrls = () => {
          * @param {string} typeInscription - Type d'inscription
          */
         getByStatut: (statut, typeInscription) =>
-            `${baseUrl}/api/inscriptions/statuts/${params.ecoleId}/${params.academicYearId}/${statut}/${typeInscription}`,
+            `${baseUrl}inscriptions/statuts/${params.ecoleId}/${params.academicYearId}/${statut}/${typeInscription}`,
 
         /**
          * Récupère toutes les inscriptions
@@ -771,20 +771,20 @@ const useInscriptionsUrls = () => {
          * @param {string} typeInscription - Type d'inscription
          */
         getAllInscriptions: (ecoleId, anneeId, typeInscription) =>
-            `${baseUrl}/api/inscriptions/allInscription/${params.ecoleId}/${params.academicYearId}/${typeInscription}`,
+            `${baseUrl}inscriptions/allInscription/${params.ecoleId}/${params.academicYearId}/${typeInscription}`,
 
         /**
          * Créer une inscription
          */
         create: () =>
-            `${baseUrl}/api/inscriptions/create`,
+            `${baseUrl}inscriptions/create`,
 
         /**
          * Mettre à jour une inscription
          * @param {number} inscriptionId - ID de l'inscription
          */
         update: (inscriptionId) =>
-            `${baseUrl}/api/inscriptions/update/${inscriptionId}`,
+            `${baseUrl}inscriptions/update/${inscriptionId}`,
 
         /**
          * Liste des élèves par classe
@@ -792,7 +792,7 @@ const useInscriptionsUrls = () => {
          * @param {number} anneeId - ID de l'année
          */
         listEleveClasse: (ecoleId, anneeId) =>
-            `${baseUrl}/api/inscriptions/list-eleve-classe/${params.ecoleId}/${params.academicYearId}`,
+            `${baseUrl}inscriptions/list-eleve-classe/${params.ecoleId}/${params.academicYearId}`,
 
     }), [params, baseUrl]);
 };
@@ -824,7 +824,7 @@ const useBulletinsUrls = () => {
          * @param {number} classeId - ID de la classe
          */
         getBulletinEleveAnneePeriode: (matricule, periodeId, classeId) =>
-            `${baseUrl}/api/bulletin/get-bulletin-eleve-annee-periode?annee=${params.academicYearId}&matricule=${matricule}&periode=${periodeId}&classe=${classeId}`,
+            `${baseUrl}bulletin/get-bulletin-eleve-annee-periode?annee=${params.academicYearId}&matricule=${matricule}&periode=${periodeId}&classe=${classeId}`,
 
         /**
          * Récupère le bulletin d'un élève pour une année spécifique
@@ -834,7 +834,7 @@ const useBulletinsUrls = () => {
          * @param {number} classeId - ID de la classe
          */
         getBulletinEleveAnneePeriodeSpecific: (anneeId, matricule, periodeId, classeId) =>
-            `${baseUrl}/api/bulletin/get-bulletin-eleve-annee-periode?annee=${anneeId}&matricule=${matricule}&periode=${periodeId}&classe=${classeId}`,
+            `${baseUrl}bulletin/get-bulletin-eleve-annee-periode?annee=${anneeId}&matricule=${matricule}&periode=${periodeId}&classe=${classeId}`,
 
     }), [params, baseUrl]);
 };
@@ -857,43 +857,43 @@ const useAffectationsUrls = () => {
          * @param {number} classeId - ID de la classe
          */
         getPpAndEducDtoByClasse: (classeId) =>
-            `${baseUrl}/api/personnel-matiere-classe/get-pp-and-educ-dto-by-classe?annee=${params.academicYearId}&ecole=${params.ecoleId}&classe=${classeId}`,
+            `${baseUrl}personnel-matiere-classe/get-pp-and-educ-dto-by-classe?annee=${params.academicYearId}&ecole=${params.ecoleId}&classe=${classeId}`,
 
         /**
          * Récupère les professeurs par classe (utilise automatiquement l'année de l'utilisateur connecté)
          * @param {number} classeId - ID de la classe
          */
         getProfesseurByClasse: (classeId) =>
-            `${baseUrl}/api/personnel-matiere-classe/get-professeur-by-classe?classe=${classeId}&annee=${params.academicYearId}`,
+            `${baseUrl}personnel-matiere-classe/get-professeur-by-classe?classe=${classeId}&annee=${params.academicYearId}`,
 
         /**
          * Récupère le personnel par classe (utilise automatiquement l'année et l'école de l'utilisateur connecté)
          * @param {number} classeId - ID de la classe
          */
         getPersonnelByClasse: (classeId) =>
-            `${baseUrl}/api/personnel-matiere-classe/get-personnel-by-classe?annee=${params.academicYearId}&ecole=${params.ecoleId}&classe=${classeId}`,
+            `${baseUrl}personnel-matiere-classe/get-personnel-by-classe?annee=${params.academicYearId}&ecole=${params.ecoleId}&classe=${classeId}`,
 
         getByMatiere: (matiereId) =>
-            `${baseUrl}/api/personnel-matiere-classe/get-by-matiere?matiere=${matiereId}&ecole=${params.ecoleId}&annee=${params.academicYearId}`,
+            `${baseUrl}personnel-matiere-classe/get-by-matiere?matiere=${matiereId}&ecole=${params.ecoleId}&annee=${params.academicYearId}`,
 
         /**
          * Affecte un personnel à une classe
          */
         affecterClassePersonnel: () =>
-            `${baseUrl}/api/personnel-matiere-classe/affecter-classe-personnel`,
+            `${baseUrl}personnel-matiere-classe/affecter-classe-personnel`,
 
         /**
          * Affecte une matière à un professeur
          */
         affecterMatiereProfesseur: () =>
-            //`${baseUrl}/api/personnel-matiere-classe/affecter-matiere-professeur`,
-            `${baseUrl}/api/personnel-matiere-classe/saveAndDisplay`,
+            //`${baseUrl}personnel-matiere-classe/affecter-matiere-professeur`,
+            `${baseUrl}personnel-matiere-classe/saveAndDisplay`,
 
         getProfesseur: () =>
-            `${baseUrl}/api/fonctions/list`,
+            `${baseUrl}fonctions/list`,
 
         getByFonction: (fonctionId) =>
-            `${baseUrl}/api/personnel-matiere-classe/get-by-fonction?annee=${params.academicYearId}&ecole=${params.ecoleId}&fonctionId=${fonctionId}`,
+            `${baseUrl}personnel-matiere-classe/get-by-fonction?annee=${params.academicYearId}&ecole=${params.ecoleId}&fonctionId=${fonctionId}`,
 
     }), [params, baseUrl]);
 };
@@ -915,33 +915,32 @@ const useSallesUrls = () => {
          * Liste des salles par école (utilise automatiquement l'école de l'utilisateur connecté)
          */
         listByEcole: () =>
-            `${baseUrl}/api/salle/list-by-ecole?ecole=${params.ecoleId}`,
+            `${baseUrl}salle/list-by-ecole?ecole=${params.ecoleId}`,
 
         /**
          * Créer une nouvelle salle
          */
         create: () =>
-            `${baseUrl}/api/salles`,
+            `${baseUrl}salles`,
 
         /**
          * Mettre à jour une salle
          * @param {number} salleId - ID de la salle
          */
         update: (salleId) =>
-            `${baseUrl}/api/salles/${salleId}`,
+            `${baseUrl}salles/${salleId}`,
 
         updateDisplay: () =>
-            `${baseUrl}api/salle/update-display `,
+            `${baseUrl}salle/update-display `,
 
         saveAndDisplay: () =>
-            `${baseUrl}/api/salle/saveAndDisplay`,
+            `${baseUrl}salle/saveAndDisplay`,
 
         /**
          * Supprimer une salle
          * @param {number} salleId - ID de la salle
          */
-        delete: (salleId) =>
-            `${baseUrl}/api/salle/delete/${salleId}`,
+        delete: (salleId) => `${baseUrl}salle/delete/${salleId}`,
 
     }), [params, baseUrl]);
 };
@@ -963,39 +962,39 @@ const useOffresUrls = () => {
          * Liste des offres d'emploi par école (utilise automatiquement l'école de l'utilisateur connecté)
          */
         listByEcole: () =>
-            `${baseUrl}/api/offres-emploi/list-by-ecole?ecole=${params.ecoleId}`,
+            `${baseUrl}offres-emploi/list-by-ecole?ecole=${params.ecoleId}`,
 
         /**
          * Créer une nouvelle offre d'emploi
          */
         create: () =>
-            `${baseUrl}/api/offres-emploi`,
+            `${baseUrl}offres-emploi`,
 
         /**
          * Mettre à jour une offre d'emploi
          * @param {number} offreId - ID de l'offre
          */
         update: (offreId) =>
-            `${baseUrl}/api/offres-emploi/${offreId}`,
+            `${baseUrl}offres-emploi/${offreId}`,
 
         /**
          * Supprimer une offre d'emploi
          * @param {number} offreId - ID de l'offre
          */
         delete: (offreId) =>
-            `${baseUrl}/api/offres-emploi/${offreId}`,
+            `${baseUrl}offres-emploi/${offreId}`,
 
         /**
          * Liste des niveaux d'étude
          */
         getNiveauxEtude: () =>
-            `${baseUrl}/api/niveau_etude`,
+            `${baseUrl}niveau_etude`,
 
         /**
          * Liste des types d'offre
          */
         getTypesOffre: () =>
-            `${baseUrl}/api/type_offre`,
+            `${baseUrl}type_offre`,
 
     }), [params, baseUrl]);
 };
@@ -1018,27 +1017,27 @@ const useCoefficientsUrls = () => {
          * @param {number} brancheId - ID de la branche
          */
         listByEcoleAndBranche: (brancheId) =>
-            `${baseUrl}/api/coefficients/list-by-ecole-branche?ecole=${params.ecoleId}&branche=${brancheId}`,
+            `${baseUrl}coefficients/list-by-ecole-branche?ecole=${params.ecoleId}&branche=${brancheId}`,
 
         /**
          * Créer un nouveau coefficient
          */
         create: () =>
-            `${baseUrl}/api/coefficients`,
+            `${baseUrl}coefficients`,
 
         /**
          * Mettre à jour un coefficient
          * @param {number} coefficientId - ID du coefficient
          */
         update: (coefficientId) =>
-            `${baseUrl}/api/coefficients/${coefficientId}`,
+            `${baseUrl}coefficients/${coefficientId}`,
 
         /**
          * Supprimer un coefficient
          * @param {number} coefficientId - ID du coefficient
          */
         delete: (coefficientId) =>
-            `${baseUrl}/api/coefficients/${coefficientId}`,
+            `${baseUrl}coefficients/${coefficientId}`,
 
         /**
          * Récupère les coefficients par branche
@@ -1046,13 +1045,13 @@ const useCoefficientsUrls = () => {
          * @param {number} ecoleId - ID de l'école (optionnel, utilise params par défaut)
          */
         getByBranche: (brancheId) =>
-            `${baseUrl}/api/classe-matiere/get-by-branche?branche=${brancheId}&ecole=${params.ecoleId}`,
+            `${baseUrl}classe-matiere/get-by-branche?branche=${brancheId}&ecole=${params.ecoleId}`,
 
         /**
          * Met à jour les coefficients
          */
         majCoefficients: () =>
-            `${baseUrl}/api/classe-matiere/maj-coefficients`,
+            `${baseUrl}classe-matiere/maj-coefficients`,
 
     }), [params, baseUrl]);
 };
@@ -1081,10 +1080,10 @@ const useSeancesUrls = () => {
          * @param {string} statut - Statut des séances (MAN par défaut)
          */
         getListStatut: (statut = 'MAN') =>
-            `${baseUrl}/api/seances/get-list-statut?annee=${params.academicYearId}&statut=${statut}&ecole=${params.ecoleId}`,
+            `${baseUrl}seances/get-list-statut?annee=${params.academicYearId}&statut=${statut}&ecole=${params.ecoleId}`,
 
         getStatSceanceEcole: () =>
-            `${baseUrl}/api/seances/stat-seance-by-annee-and-ecole?annee=${params.academicYearId}&ecole=${params.ecoleId}`,
+            `${baseUrl}seances/stat-seance-by-annee-and-ecole?annee=${params.academicYearId}&ecole=${params.ecoleId}`,
 
         getSceanceEcoleByDate: (
             ecoleId,
@@ -1095,7 +1094,7 @@ const useSeancesUrls = () => {
             classeId,
             matiereId
         ) => {
-            let url = `${baseUrl}/api/seances/seances-dto-by-ecole-and-date?ecole=${ecoleId}&dateDebut=${dateDebutStr}&dateFin=${dateFinStr}&page=${page}&rows=${rows}`;
+            let url = `${baseUrl}seances/seances-dto-by-ecole-and-date?ecole=${ecoleId}&dateDebut=${dateDebutStr}&dateFin=${dateFinStr}&page=${page}&rows=${rows}`;
 
             if (classeId) url += `&classe=${classeId}`;
             if (matiereId) url += `&matiere=${matiereId}`;
@@ -1110,20 +1109,20 @@ const useSeancesUrls = () => {
          * @param {number} ecoleId - ID de l'école
          */
         getListStatutSpecific: (anneeId, statut, ecoleId) =>
-            `${baseUrl}/api/seances/get-list-statut?annee=${anneeId}&statut=${statut}&ecole=${ecoleId}`,
+            `${baseUrl}seances/get-list-statut?annee=${anneeId}&statut=${statut}&ecole=${ecoleId}`,
 
         /**
          * Sauvegarde une séance
          */
         saveAndDisplay: () =>
-            `${baseUrl}/api/seances/saveAndDisplay`,
+            `${baseUrl}seances/saveAndDisplay`,
 
         /**
          * Supprime une séance
          * @param {number} seanceId - ID de la séance
          */
         delete: (seanceId) =>
-            `${baseUrl}/api/seances/delete/${seanceId}`,
+            `${baseUrl}seances/delete/${seanceId}`,
 
         /**
          * Récupère les salles disponibles pour une séance
@@ -1136,7 +1135,7 @@ const useSeancesUrls = () => {
                     urlParams.append(key, value);
                 }
             });
-            return `${baseUrl}/api/salle/get-salles-dispo-heures?${urlParams.toString()}`;
+            return `${baseUrl}salle/get-salles-dispo-heures?${urlParams.toString()}`;
         },
 
     }), [params, baseUrl]);
@@ -1158,14 +1157,14 @@ const useEcolesUrls = () => {
          * Liste des écoles à valider
          */
         getEcolesAValider: () =>
-            `${baseUrl}/api/ecoles/a-valider`,
+            `${baseUrl}ecoles/a-valider`,
 
         /**
          * Valider une école
          * @param {number} ecoleId - ID de l'école
          */
         valider: (ecoleId) =>
-            `${baseUrl}/api/ecoles/valider/${ecoleId}`,
+            `${baseUrl}ecoles/valider/${ecoleId}`,
 
     }), [baseUrl]);
 };
@@ -1187,31 +1186,31 @@ const useRapportsUrls = () => {
          * @param {string} type - Type de rapport
          */
         generer: (type) =>
-            `${baseUrl}/api/rapports/${type}`,
+            `${baseUrl}rapports/${type}`,
 
         /**
          * Liste des rapports disponibles
          */
         liste: () =>
-            `${baseUrl}/api/rapports`,
+            `${baseUrl}rapports`,
 
         /**
          * Génère un bulletin par classe
          */
         bulletinClasse: (ecoleId, periodeLabel, anneeLabel, classe, niveauEnseignementId) =>
-            `${baseUrl}/api/imprimer-bulletin-list/spider-bulletin/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}/true/${niveauEnseignementId}/true/true/true/true/false/true/false/false/false/false`,
+            `${baseUrl}imprimer-bulletin-list/spider-bulletin/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}/true/${niveauEnseignementId}/true/true/true/true/false/true/false/false/false/false`,
 
         /**
          * Génère un bulletin par matricule
          */
         bulletinMatricule: (ecoleId, periodeLabel, anneeLabel, classe, matriculeEleves, niveauEnseignementId) =>
-            `${baseUrl}/api/imprimer-bulletin-list/spider-bulletin-matricule/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}/${matriculeEleves}/true/${niveauEnseignementId}/true/true/true/true/false/true/false/false/false/false`,
+            `${baseUrl}imprimer-bulletin-list/spider-bulletin-matricule/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}/${matriculeEleves}/true/${niveauEnseignementId}/true/true/true/true/false/true/false/false/false/false`,
 
         /**
          * Test de connexion API
          */
         testConnexion: () =>
-            `${baseUrl}/api/health`,
+            `${baseUrl}health`,
 
     }), [baseUrl]);
 };
@@ -1221,6 +1220,7 @@ const useRapportsUrls = () => {
 // ===========================
 const useEnqueteRapideUrls = () => {
     const baseUrl = getFullUrl();
+    const params = useAppParams();
 
     return useMemo(() => ({
 
@@ -1230,7 +1230,7 @@ const useEnqueteRapideUrls = () => {
          * @param {number} anneeId - ID de l'année
          */
         listeParEcoleAffNaff: (ecoleId, anneeId) =>
-            `${baseUrl}/api/enquete-rapide/liste-par-ecole-aff-naff/${ecoleId}/${anneeId}`,
+            `${baseUrl}enquete-rapide/liste-par-ecole-aff-naff/${ecoleId}/${anneeId}`,
 
         /**
          * Liste des réunions par école
@@ -1238,21 +1238,24 @@ const useEnqueteRapideUrls = () => {
          * @param {number} anneeId - ID de l'année
          */
         listeParEcole: (ecoleId, anneeId) =>
-            `${baseUrl}/api/enquete-rapide/liste-par-ecole/${ecoleId}/${anneeId}`,
+            `${baseUrl}enquete-rapide/liste-par-ecole/${ecoleId}/${anneeId}`,
 
         /**
          * Créer/modifier une réunion
          */
         reunion: () =>
-            `${baseUrl}/api/enquete-rapide/reunion`,
+            `${baseUrl}enquete-rapide/reunion`,
+
+        saveEnquetteRapide: () =>
+            `${baseUrl}enquete-rapide`,
 
         /**
          * Télécharger le rapport rapide de rentrée
          * @param {number} ecoleId - ID de l'école
          * @param {number} anneeId - ID de l'année
          */
-        downloadRapport: (ecoleId, anneeId) =>
-            `${baseUrl}/api/raport-rapide-de-rentree/imprimer/${ecoleId}/${anneeId}`,
+        downloadRapport: () =>
+            `${baseUrl}raport-rapide-de-rentree/imprimer/${params.ecoleId}/${params.academicYearId}`,
 
     }), [baseUrl]);
 };
@@ -1270,58 +1273,58 @@ const useEmploiDuTempsUrls = () => {
          * @param {number} ecoleId - ID de l'école
          */
         listActivitesByEcole: () =>
-            `${baseUrl}/api/activite/list-by-ecole/${params.ecoleId}`,
+            `${baseUrl}activite/list-by-ecole/${params.ecoleId}`,
 
         /**
          * Liste des jours
          */
         listJours: () =>
-            `${baseUrl}/api/jour/list`,
+            `${baseUrl}jour/list`,
 
         /**
          * Types d'activité par école
          * @param {number} ecoleId - ID de l'école
          */
         getTypesActiviteByEcole: () =>
-            `${baseUrl}/api/type-activite/get-by-ecole/${params.ecoleId}`,
+            `${baseUrl}type-activite/get-by-ecole/${params.ecoleId}`,
 
         /**
          * Matières par classe via branche
          * @param {number} classeId - ID de la classe
          */
         getMatieresByClasse: (classeId) =>
-            `${baseUrl}/api/classe-matiere/get-by-branche-via-classe?classe=${classeId}`,
+            `${baseUrl}classe-matiere/get-by-branche-via-classe?classe=${classeId}`,
 
         /**
          * Vérifier si une plage horaire est valide
          */
         isPlageHoraireValid: (annee, classe, jour, heureDeb, heureFin) =>
-            `${baseUrl}/api/activite/is-plage-horaire-valid?annee=${annee}&classe=${classe}&jour=${jour}&heureDeb=${heureDeb}&heureFin=${heureFin}`,
+            `${baseUrl}activite/is-plage-horaire-valid?annee=${annee}&classe=${classe}&jour=${jour}&heureDeb=${heureDeb}&heureFin=${heureFin}`,
 
         /**
          * Salles disponibles pour une plage horaire
          */
         getSallesDisponibles: (annee, classe, jour, date, heureDeb, heureFin) =>
-            `${baseUrl}/api/salle/get-salles-dispo-heures?annee=${annee}&classe=${classe}&jour=${jour}&date=${date}&heureDeb=${heureDeb}&heureFin=${heureFin}`,
+            `${baseUrl}salle/get-salles-dispo-heures?annee=${annee}&classe=${classe}&jour=${jour}&date=${date}&heureDeb=${heureDeb}&heureFin=${heureFin}`,
 
         /**
          * Activités par classe et jour
          */
         getActivitesByClasseJour: (annee, classe, jour) =>
-            `${baseUrl}/api/activite/list-by-classe-jour?annee=${annee}&classe=${classe}&jour=${jour}`,
+            `${baseUrl}activite/list-by-classe-jour?annee=${annee}&classe=${classe}&jour=${jour}`,
 
         /**
          * Sauvegarder une activité
          */
         saveActivite: () =>
-            `${baseUrl}/api/activite/saveAndDisplay`,
+            `${baseUrl}activite/saveAndDisplay`,
 
         /**
          * Supprimer une activité
          * @param {number} activiteId - ID de l'activité
          */
         deleteActivite: (activiteId) =>
-            `${baseUrl}/api/activite/${activiteId}`,
+            `${baseUrl}activite/${activiteId}`,
 
     }), [baseUrl]);
 };
@@ -1343,20 +1346,20 @@ const useImportsUrls = () => {
          * Import d'élèves
          */
         importEleves: () =>
-            `${baseUrl}/api/import/eleves`,
+            `${baseUrl}import/eleves`,
 
         /**
          * Import de notes
          */
         importNotes: () =>
-            `${baseUrl}/api/import/notes`,
+            `${baseUrl}import/notes`,
 
         /**
          * Validation d'import
          * @param {string} type - Type d'import
          */
         valider: (type) =>
-            `${baseUrl}/api/import/${type}/valider`,
+            `${baseUrl}import/${type}/valider`,
 
         /**
          * Import d'élèves avec paramètres complets
@@ -1366,13 +1369,13 @@ const useImportsUrls = () => {
          * @param {number} brancheId - ID de la branche
          */
         importElevesComplet : (typeAction, selectedBranche) =>
-            `${baseUrl}/api/eleve/importer-eleve/${params.ecoleId}/${params.academicYearId}/${typeAction}/${selectedBranche}`,
+            `${baseUrl}eleve/importer-eleve/${params.ecoleId}/${params.academicYearId}/${typeAction}/${selectedBranche}`,
 
         /**
          * Import d'évaluations par classe
          */
         importEvaluationsClasse: () =>
-            `${baseUrl}/api/import-list-evaluation-classe/`,
+            `${baseUrl}import-list-evaluation-classe/`,
 
     }), [baseUrl]);
 };
@@ -1394,14 +1397,14 @@ const useSouscriptionsUrls = () => {
          * @param {string} statut - Statut des souscriptions
          */
         getEnAttente: (statut = 'EN%20ATTENTE') =>
-            `${baseUrl}/api/souscription-personnel/attente/${statut}`,
+            `${baseUrl}souscription-personnel/attente/${statut}`,
 
         /**
          * Récupère les souscriptions d'écoles
          * @param {string} typeValidation - Type de validation
          */
         getAllSouscriptionEcoles: (typeValidation) =>
-            `${baseUrl}api/souscription-ecole/allSouscriptionEcoles/${typeValidation}`,
+            `${baseUrl}souscription-ecole/allSouscriptionEcoles/${typeValidation}`,
 
         /**
          * Récupère les fondateurs en attente
@@ -1409,7 +1412,7 @@ const useSouscriptionsUrls = () => {
          * @param {string} typeFondateur - Type de fondateur
          */
         getFondateursAttente: (typeValidation, typeFondateur = 'Fondateur') =>
-            `${baseUrl}api/souscription-personnel/attente-fondateur/${typeValidation}/${typeFondateur}`,
+            `${baseUrl}souscription-personnel/attente-fondateur/${typeValidation}/${typeFondateur}`,
 
     }), [baseUrl]);
 };
@@ -1429,7 +1432,7 @@ const useProfilsUrls = () => {
         /**
          * Récupère les profils visibles
          */
-        getProfilVisible: () => `${baseUrl}/api/profil/profil-visible`,
+        getProfilVisible: () => `${baseUrl}profil/profil-visible`,
 
     }), [baseUrl]);
 };
@@ -1452,7 +1455,7 @@ const useDashboardUrls = () => {
          * (utilise automatiquement l'école et l'année de l'utilisateur connecté)
          */
         getEleveBlock: () =>
-            `${baseUrl}/api/dashboard-fondateur/eleve-block/${params.ecoleId}/${params.academicYearId}`,
+            `${baseUrl}dashboard-fondateur/eleve-block/${params.ecoleId}/${params.academicYearId}`,
 
         /**
          * Récupère les données du bloc élèves pour des paramètres spécifiques
@@ -1460,35 +1463,35 @@ const useDashboardUrls = () => {
          * @param {number} anneeId - ID de l'année
          */
         getEleveBlockSpecific: (ecoleId, anneeId) =>
-            `${baseUrl}/api/dashboard-fondateur/eleve-block/${ecoleId}/${anneeId}`,
+            `${baseUrl}dashboard-fondateur/eleve-block/${ecoleId}/${anneeId}`,
 
         /**
          * Récupère les statistiques générales du dashboard
          * (utilise automatiquement l'école et l'année de l'utilisateur connecté)
          */
         getStatistiques: () =>
-            `${baseUrl}/api/dashboard-fondateur/statistiques/${params.ecoleId}/${params.academicYearId}`,
+            `${baseUrl}dashboard-fondateur/statistiques/${params.ecoleId}/${params.academicYearId}`,
 
         /**
          * Récupère les données du bloc personnel
          * (utilise automatiquement l'école et l'année de l'utilisateur connecté)
          */
         getPersonnelBlock: () =>
-            `${baseUrl}/api/dashboard-fondateur/personnel-block/${params.ecoleId}/${params.academicYearId}`,
+            `${baseUrl}dashboard-fondateur/personnel-block/${params.ecoleId}/${params.academicYearId}`,
 
         /**
          * Récupère les données du bloc financier
          * (utilise automatiquement l'école et l'année de l'utilisateur connecté)
          */
         getFinancierBlock: () =>
-            `${baseUrl}/api/dashboard-fondateur/financier-block/${params.ecoleId}/${params.academicYearId}`,
+            `${baseUrl}dashboard-fondateur/financier-block/${params.ecoleId}/${params.academicYearId}`,
 
         /**
          * Récupère les données du bloc académique
          * (utilise automatiquement l'école et l'année de l'utilisateur connecté)
          */
         getAcademiqueBlock: () =>
-            `${baseUrl}/api/dashboard-fondateur/academique-block/${params.ecoleId}/${params.academicYearId}`,
+            `${baseUrl}dashboard-fondateur/academique-block/${params.ecoleId}/${params.academicYearId}`,
 
 
     }), [params, baseUrl]);
@@ -1621,8 +1624,8 @@ const useAllApiUrls = () => {
  * @returns {string} URL complète avec paramètres
  * 
  * @example
- * buildUrlWithParams('/api/classes', { ecole: 38, actif: true })
- * // Résultat: '/api/classes?ecole=38&actif=true'
+ * buildUrlWithParams('classes', { ecole: 38, actif: true })
+ * // Résultat: 'classes?ecole=38&actif=true'
  */
 export const buildUrlWithParams = (baseUrl, queryParams = {}) => {
     const url = new URL(baseUrl, getFullUrl());

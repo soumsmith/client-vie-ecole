@@ -271,9 +271,9 @@ export const modalConfig = {
     icon: "fas fa-user-shield",
     color: "#f59e0b",
     apis: {
-      schools: "/api/connecte/ecole",
-      profiles: "/api/profil",
-      login: "/api/connexion/se-connecter-admin"
+      schools: "connecte/ecole",
+      profiles: "profil",
+      login: "connexion/se-connecter-admin"
     },
     redirectPath: "/dashboard/admin",
     fields: {
@@ -289,9 +289,9 @@ export const modalConfig = {
     icon: "fas fa-user-tie",
     color: "#8b5cf6",
     apis: {
-      schools: "/api/connecte/ecole",
-      profiles: "/api/profil",
-      login: "/api/connexion/se-connecter"
+      schools: "connecte/ecole",
+      profiles: "profil",
+      login: "connexion/se-connecter"
     },
     redirectPath: "/dashboard/personnel",
     fields: {
@@ -307,9 +307,9 @@ export const modalConfig = {
     icon: "fas fa-graduation-cap",
     color: "#374151",
     apis: {
-      schools: "/api/connecte/ecole",
-      profiles: "/api/profil",
-      login: "/api/connexion/se-connecter"
+      schools: "connecte/ecole",
+      profiles: "profil",
+      login: "connexion/se-connecter"
     },
     redirectPath: "/dashboard/candidat",
     fields: {
@@ -325,9 +325,9 @@ export const modalConfig = {
     icon: "fas fa-users",
     color: "#06b6d4",
     apis: {
-      schools: "/api/connecte/ecole",
-      profiles: "/api/profil",
-      login: "/api/connexion/se-connecter"
+      schools: "connecte/ecole",
+      profiles: "profil",
+      login: "connexion/se-connecter"
     },
     redirectPath: "/dashboard/parent",
     fields: {
@@ -343,9 +343,9 @@ export const modalConfig = {
     icon: "fas fa-backpack",
     color: "#dc2626",
     apis: {
-      schools: "/api/connecte/ecole",
-      profiles: "/api/profil",
-      login: "/api/connexion/se-connecter"
+      schools: "connecte/ecole",
+      profiles: "profil",
+      login: "connexion/se-connecter"
     },
     redirectPath: "/dashboard/eleve",
     fields: {
@@ -361,8 +361,8 @@ export const modalConfig = {
     icon: "fas fa-user-plus",
     color: "#10b981",
     apis: {
-      schools: "/api/connecte/ecole",
-      register: "/api/inscription/creer-compte"
+      schools: "connecte/ecole",
+      register: "inscription/creer-compte"
     },
     redirectPath: "/dashboard/nouveau-compte",
     fields: {
