@@ -18,6 +18,7 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
 }
@@ -46,9 +47,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -59,9 +62,11 @@ button:focus-visible {
     color: #213547;
     background-color: #ffffff;
   }
+
   a:hover {
     color: #747bff;
   }
+
   button {
     background-color: #f9f9f9;
   }
@@ -75,20 +80,22 @@ body {
   background-color: var(--color-background);
   color: var(--color-text);
 }
+
 .sidebar-container {
   background: var(--color-surface);
 }
+
 .brand-title {
   color: var(--color-primary);
 }
 
 
 
-.rs-sidenav-subitem-active{
+.rs-sidenav-subitem-active {
   background-color: red !important;
 }
 
-#notesEtMoyennes table thead tr th{
+#notesEtMoyennes table thead tr th {
   font-size: 12px !important;
   color: white;
   background-color: #1e293b !important;
@@ -97,83 +104,90 @@ body {
 
 /* ACCUEIL */
 .rs-panel-header {
-    font-weight: 600 !important;
-    color: var(--text-primary) !important;
-    background: transparent !important;
-    border-bottom: 0px solid var(--border-color) !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  background: transparent !important;
+  border-bottom: 0px solid var(--border-color) !important;
 }
 
 .testimonial-item.style-1 {
-    position: relative !important;
-    -webkit-transition: all 0.35s !important;
-    transition: all 0.35s !important;
-    max-width: 800px !important;
-    margin: 0 auto 75px !important;
-    background: var(--color-surface) !important;
+  position: relative !important;
+  -webkit-transition: all 0.35s !important;
+  transition: all 0.35s !important;
+  max-width: 800px !important;
+  margin: 0 auto 75px !important;
+  background: var(--color-surface) !important;
 }
 
 
 .testimonial-item.style-1 .testimonial-meta .testimonial-information span.testimonial-name {
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--paroti-heading-color);
-    margin-bottom: 2px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--paroti-heading-color);
+  margin-bottom: 2px;
 }
+
 .testimonial-item.style-1 .testimonial-meta .testimonial-information span {
-    display: block;
+  display: block;
 }
 
 .testimonial-quote {
-    font-size: 20px !important;
-    line-height: 38px !important;
-    font-weight: bold !important;
-    margin-bottom: 18px !important;
-    line-height: 1.4 !important;
+  font-size: 20px !important;
+  line-height: 38px !important;
+  font-weight: bold !important;
+  margin-bottom: 18px !important;
+  line-height: 1.4 !important;
 }
 
 
 .testimonial-item.style-1 .testimonial-content:after {
-    content: '';
-    background: url(assets/images/bg-arrow.png) no-repeat bottom center transparent;
-    width: 166px;
-    height: 110px;
-    position: absolute;
-    top: 100%;
-    left: 30px;
-    z-index: 11;
+  content: '';
+  background: url(assets/images/bg-arrow.png) no-repeat bottom center transparent;
+  width: 166px;
+  height: 110px;
+  position: absolute;
+  top: 100%;
+  left: 30px;
+  z-index: 11;
 }
 
-#TestimonialsSection .splide__slide{
+#TestimonialsSection .splide__slide {
   height: 250px !important;
 }
 
-#Niveau .splide__slide{
+#Niveau .splide__slide {
   height: 350px !important;
 }
 
 
 .text-limit-2 {
   display: -webkit-box;
-  -webkit-line-clamp: 2;   /* Limite à 2 lignes */
+  -webkit-line-clamp: 2;
+  /* Limite à 2 lignes */
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis; /* Ajoute "..." si le texte dépasse */
+  text-overflow: ellipsis;
+  /* Ajoute "..." si le texte dépasse */
 }
 
 .text-limit-3 {
   display: -webkit-box;
-  -webkit-line-clamp: 3;   /* Limite à 2 lignes */
+  -webkit-line-clamp: 3;
+  /* Limite à 2 lignes */
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis; /* Ajoute "..." si le texte dépasse */
+  text-overflow: ellipsis;
+  /* Ajoute "..." si le texte dépasse */
 }
 
 .text-limit-4 {
   display: -webkit-box;
-  -webkit-line-clamp: 4;   /* Limite à 2 lignes */
+  -webkit-line-clamp: 4;
+  /* Limite à 2 lignes */
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis; /* Ajoute "..." si le texte dépasse */
+  text-overflow: ellipsis;
+  /* Ajoute "..." si le texte dépasse */
 }
 
 
@@ -185,4 +199,9 @@ body {
 
 .card-selected {
   border: 2px solid #007bff !important;
+}
+
+.modalContainer {
+  border-radius: '16px' !important;
+  overflow: 'hidden' !important;
 }

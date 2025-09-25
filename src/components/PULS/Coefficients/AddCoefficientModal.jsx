@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Modal, 
-    Button, 
-    Form, 
-    Panel, 
-    Grid, 
-    Row, 
+import {
+    Modal,
+    Button,
+    Form,
+    Panel,
+    Grid,
+    Row,
     Col,
     SelectPicker,
     Input,
@@ -13,7 +13,7 @@ import {
     Badge,
     Avatar
 } from 'rsuite';
-import { 
+import {
     FiBookOpen,
     FiSave,
     FiX,
@@ -26,6 +26,9 @@ import Swal from 'sweetalert2';
 import { useAllApiUrls } from '../utils/apiConfig';
 import { usePulsParams } from '../../hooks/useDynamicParams';
 import { useMatieresEcoleData } from '../utils/CommonDataService';
+import IconBox from "../Composant/IconBox";
+import { getUserProfile } from "../../hooks/userUtils";
+
 
 const AddCoefficientModal = ({ show, selectedBranche, onClose, onSave }) => {
     const [formData, setFormData] = useState({
@@ -35,13 +38,15 @@ const AddCoefficientModal = ({ show, selectedBranche, onClose, onSave }) => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const apiUrls = useAllApiUrls();
+    const userProfile = getUserProfile();
+
 
     const { ecoleId: dynamicEcoleId } = usePulsParams();
 
-    const { 
-        matieres: toutesLesMatieres, 
-        loading: matieresLoading, 
-        error: matieresError 
+    const {
+        matieres: toutesLesMatieres,
+        loading: matieresLoading,
+        error: matieresError
     } = useMatieresEcoleData();
 
     // Réinitialiser le formulaire quand le modal s'ouvre
@@ -163,7 +168,7 @@ const AddCoefficientModal = ({ show, selectedBranche, onClose, onSave }) => {
             console.error('Erreur lors de l\'ajout du coefficient:', error);
 
             let errorMessage = 'Une erreur inattendue est survenue lors de l\'ajout.';
-            
+
             if (error.response) {
                 if (error.response.status === 400) {
                     errorMessage = 'Données invalides. Vérifiez les informations saisies.';
@@ -201,8 +206,8 @@ const AddCoefficientModal = ({ show, selectedBranche, onClose, onSave }) => {
     const hasAvailableMatieres = toutesLesMatieres && Array.isArray(toutesLesMatieres) && toutesLesMatieres.length > 0;
 
     return (
-        <Modal 
-            open={show} 
+        <Modal
+            open={show}
             onClose={onClose}
             size="md"
             backdrop="static"
@@ -212,12 +217,7 @@ const AddCoefficientModal = ({ show, selectedBranche, onClose, onSave }) => {
             }}
         >
             {/* Header */}
-            <Modal.Header style={{
-                background: '#ffffff',
-                borderBottom: '1px solid #f1f5f9',
-                padding: '24px',
-                borderRadius: '16px 16px 0 0'
-            }}>
+            <Modal.Header >
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -238,8 +238,8 @@ const AddCoefficientModal = ({ show, selectedBranche, onClose, onSave }) => {
                         <Text size="lg" weight="semibold" style={{ color: '#0f172a', marginBottom: '4px' }}>
                             Ajouter une Matière
                         </Text>
-                        <Badge style={{ 
-                            background: '#f1f5f9', 
+                        <Badge style={{
+                            background: '#f1f5f9',
                             color: '#475569',
                             fontWeight: '500',
                             border: '1px solid #e2e8f0'
@@ -249,11 +249,8 @@ const AddCoefficientModal = ({ show, selectedBranche, onClose, onSave }) => {
                     </div>
                 </div>
             </Modal.Header>
-            
-            <Modal.Body style={{ 
-                padding: '32px 24px', 
-                background: '#fafafa'
-            }}>
+
+            <Modal.Body >
                 {/* Informations de la branche sélectionnée */}
                 <Panel
                     header={
@@ -279,16 +276,7 @@ const AddCoefficientModal = ({ show, selectedBranche, onClose, onSave }) => {
                         alignItems: 'center',
                         gap: '12px'
                     }}>
-                        <div style={{
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            borderRadius: '8px',
-                            padding: '8px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}>
-                            <FiBookOpen size={16} color="white" />
-                        </div>
+                        <IconBox icon={FiBookOpen} />
                         <div>
                             <Text weight="semibold" style={{ color: '#0f172a', marginBottom: '2px' }}>
                                 {selectedBranche.label || selectedBranche.libelle}
@@ -337,15 +325,15 @@ const AddCoefficientModal = ({ show, selectedBranche, onClose, onSave }) => {
                             <Row gutter={16}>
                                 <Col xs={24}>
                                     <Form.Group style={{ marginBottom: '20px' }}>
-                                        <Form.ControlLabel style={{ 
+                                        <Form.ControlLabel style={{
                                             fontWeight: '500',
                                             color: '#374151',
                                             marginBottom: '8px'
                                         }}>
                                             <FiBookOpen size={14} style={{ marginRight: '6px' }} />
-                                            Matière <span style={{color: '#ef4444'}}>*</span>
+                                            Matière <span style={{ color: '#ef4444' }}>*</span>
                                         </Form.ControlLabel>
-                                        <SelectPicker 
+                                        <SelectPicker
                                             data={toutesLesMatieres || []}
                                             value={formData.matiereId}
                                             onChange={(value) => handleInputChange('matiereId', value)}
@@ -389,15 +377,15 @@ const AddCoefficientModal = ({ show, selectedBranche, onClose, onSave }) => {
                             <Row gutter={16}>
                                 <Col xs={24}>
                                     <Form.Group style={{ marginBottom: '20px' }}>
-                                        <Form.ControlLabel style={{ 
+                                        <Form.ControlLabel style={{
                                             fontWeight: '500',
                                             color: '#374151',
                                             marginBottom: '8px'
                                         }}>
                                             <FiHash size={14} style={{ marginRight: '6px' }} />
-                                            Coefficient <span style={{color: '#ef4444'}}>*</span>
+                                            Coefficient <span style={{ color: '#ef4444' }}>*</span>
                                         </Form.ControlLabel>
-                                        <Input 
+                                        <Input
                                             type="number"
                                             value={formData.coefficient}
                                             onChange={(value) => handleInputChange('coefficient', value)}
@@ -425,14 +413,12 @@ const AddCoefficientModal = ({ show, selectedBranche, onClose, onSave }) => {
             </Modal.Body>
 
             <Modal.Footer style={{
-                padding: '20px 24px',
-                borderTop: '1px solid #f1f5f9',
-                background: 'white',
+                padding: '10px 0px',
                 borderRadius: '0 0 16px 16px'
             }}>
                 <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                    <Button 
-                        appearance="subtle" 
+                    <Button
+                        appearance="subtle"
                         onClick={onClose}
                         startIcon={<FiX />}
                         disabled={isSubmitting}
@@ -445,19 +431,14 @@ const AddCoefficientModal = ({ show, selectedBranche, onClose, onSave }) => {
                     >
                         Annuler
                     </Button>
-                    <Button 
-                        appearance="primary" 
+                    <Button
+                        className={`${userProfile}-btn-search`}
+                        appearance="primary"
                         onClick={handleSave}
                         startIcon={<FiSave />}
                         loading={isSubmitting}
                         disabled={isSubmitting || matieresLoading || !formData.matiereId || !hasAvailableMatieres}
-                        style={{
-                            background: isSubmitting ? '#94a3b8' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            border: 'none',
-                            borderRadius: '8px',
-                            padding: '8px 20px',
-                            fontWeight: '600'
-                        }}
+
                     >
                         {isSubmitting ? 'Ajout en cours...' : 'Ajouter'}
                     </Button>

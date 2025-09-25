@@ -78,7 +78,8 @@
     color: var(--active-color) !important;
 }
 
-.sidebar-nav .rs-sidenav-item:hover svg, .sidebar-nav .rs-sidenav-item-active svg {
+.sidebar-nav .rs-sidenav-item:hover svg,
+.sidebar-nav .rs-sidenav-item-active svg {
     color: var(--text-color) !important;
 }
 
@@ -113,28 +114,48 @@
 /* === Styles spécifiques aux thèmes === */
 /* Boutons recherche par profil */
 .Fondateur-btn-search {
-    background-color: rgb(44, 179, 97) !important; /* couleur primaire Fondateur */
+    background-color: rgb(44, 179, 97) !important;
+    /* couleur primaire Fondateur */
     border: none;
     color: white !important;
 }
 
 .Admin-btn-search {
-    background-color: #2563eb !important; /* couleur primaire Admin */
+    background-color: #2563eb !important;
+    /* couleur primaire Admin */
     border: none;
     color: #f1f5f9 !important;
 }
 
 .Professeur-btn-search {
-    background-color: #667eea !important; /* couleur primaire Professeur */
+    background-color: #667eea !important;
+    /* couleur primaire Professeur */
     border: none;
     color: #f1f5f9 !important;
 }
 
 .Candidat-btn-search {
-    background-color: #0ca5e9 !important; /* couleur primaire Candidat */
+    background-color: #0ca5e9 !important;
+    /* couleur primaire Candidat */
     border: none;
     color: #f1f5f9 !important;
 }
+
+.rs-dropdown-expand {
+    background: linear-gradient(0deg, var(--bg-color) 0%, var(--primary-color) 100%) !important;
+    border-radius: 7px !important;
+}
+
+.rs-dropdown-expand svg {
+    color: #f1f5f9 !important;
+}
+
+#AppPage-Fondateur .rs-table-row-header {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+}
+
+
 
 
 /* PROFESSEUR */

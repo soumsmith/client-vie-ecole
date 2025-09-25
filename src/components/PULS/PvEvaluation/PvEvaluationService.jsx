@@ -129,6 +129,7 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
     const [error, setError] = useState(null);
     const [searchPerformed, setSearchPerformed] = useState(false);
     const apiUrls = useAllApiUrls();
+    
 
     const searchEvaluations = useCallback(async (classeId, matiereId, periodeId, anneeId = DEFAULT_ANNEE_ID) => {
         if (!classeId) {

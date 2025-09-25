@@ -83,6 +83,9 @@ import ProgressionPedagogique from './PULS/ProgressionPedagogique/ProgressionPed
 
 import ProfilUtilisateur from './PULS/Profile/ ProfilUtilisateur';
 import CahierDeTexte from './PULS/CahierDeTexte/CahierDeTexte'
+import ModifierMotDePasse from './PULS/GestionMoTdePasse/ModifierMotDePasse';
+import ModifierInfoPersonnelles from './PULS/GestionUserInfos/ModifierInfoPersonnelles';
+
 
 const Layout = ({ onLogout }) => {
   const navigate = useNavigate();
@@ -236,6 +239,9 @@ const Layout = ({ onLogout }) => {
       'ConsultationDesSeances': '/ConsultationDesSeances',
       'progressionPedagogique': '/progressionPedagogique',
       'profileUtilisateur': '/profileUtilisateur',
+      'loginMotDePasse': '/loginMotDePasse',
+      'miseAJoursInfo': '/miseAJoursInfo',
+
       'cahierDeTexte': '/cahierDeTexte',
 
     };
@@ -289,6 +295,9 @@ const Layout = ({ onLogout }) => {
       '/activity': 'Activité',
       '/profile': 'Mon Profil',
       '/profileUtilisateur': 'Mon Profil',
+      '/loginMotDePasse': 'Modifier le mot de Passe',
+      '/miseAJoursInfo': 'Modifier mes informations',
+
       '/settings': 'Paramètres',
       '/teams': 'Équipes',
       '/roles': 'Rôles',
@@ -545,6 +554,18 @@ const Layout = ({ onLogout }) => {
       items.push({ label: "Profile Utilisateur", active: true });
     }
 
+    else if (path.includes('/loginMotDePasse')) {
+      items.push({ label: "PULS", href: "#" });
+      items.push({ label: "Modifier le mot dee Passe", active: true });
+    }
+
+    else if (path.includes('/miseAJoursInfo')) {
+      items.push({ label: "PULS", href: "#" });
+      items.push({ label: "Modifier mes informations", active: true });
+    }
+
+    
+
     else if (path.includes('/cahierDeTexte')) {
       items.push({ label: "PULS", href: "#" });
       items.push({ label: "Cahier de texte", active: true });
@@ -727,13 +748,17 @@ const Layout = ({ onLogout }) => {
               {/* ===========================
                    ENQUETE RAPIDE
                    =========================== */}
-              <Route path="/enqueteRapideRentree" element={<EnqueteRapideRentree AcademicYearId ={dynamicAcademicYearId} />} />
+              <Route path="/enqueteRapideRentree" element={<EnqueteRapideRentree AcademicYearId={dynamicAcademicYearId} />} />
               <Route path="/rapport" element={<EcranRapports />} />
 
               {/* ===========================
                    ESPACE CANDIDAT
                    =========================== */}
               <Route path="/profileUtilisateur" element={< ProfilUtilisateur />} />
+              <Route path="/loginMotDePasse" element={< ModifierMotDePasse />} />
+              <Route path="/miseAJoursInfo" element={< ModifierInfoPersonnelles />} />
+              
+
 
 
 

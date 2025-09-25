@@ -31,6 +31,8 @@ import {
 } from './CoefficientsMatieresService';
 import CoefficientsFilters from './CoefficientsFilters'; // Import du composant mis à jour
 import AddCoefficientModal from './AddCoefficientModal'; // Import du modal mis à jour avec useMatieresEcoleData
+import IconBox from "../Composant/IconBox";
+
 
 // ===========================
 // COMPOSANT D'EN-TÊTE AVEC STATISTIQUES ET ACTIONS AMÉLIORÉ
@@ -99,16 +101,7 @@ const CoefficientsStatsHeader = ({
                 borderBottom: '1px solid #f1f5f9'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        borderRadius: '10px',
-                        padding: '8px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}>
-                        <FiBookOpen size={18} color="white" />
-                    </div>
+                    <IconBox icon={FiBookOpen} />
                     <div>
                         <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                             Coefficients des Matières

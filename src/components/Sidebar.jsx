@@ -31,7 +31,7 @@ const sidebarStyles = {
     top: 0,
     zIndex: 10,
     backgroundColor: '#fff',
-    padding: '16px 20px',
+    padding: '8px 20px',
     borderBottom: '1px solid #e5e5e7',
     flexShrink: 0,
   },
@@ -471,7 +471,7 @@ const allMenuSections = [
         eventKey: "postulerOffre",
         icon: "TableIcon",
         title: "Postuler a une offre",
-        profiles: ["Candidat"],
+        profiles: [""],
       },
 
       {
@@ -479,7 +479,7 @@ const allMenuSections = [
         eventKey: "demandeOffre",
         icon: "TableIcon",
         title: "Mes demandes d'offres",
-        profiles: ["Candidat"],
+        profiles: [""],
       },
 
       {
@@ -495,7 +495,7 @@ const allMenuSections = [
         eventKey: "mesDocuments",
         icon: "TableIcon",
         title: "Mes documents",
-        profiles: ["Candidat"],
+        profiles: [""],
       },
 
       // Professeur - Matiere
@@ -951,36 +951,6 @@ const getEventKeyFromPath = (pathname) => {
     '/dashboard': 'dashboard',
     '/': 'dashboard',
 
-    // Exercices
-    '/exercises': 'listExercice',
-    '/exercises/create': 'saveExercice',
-    '/exercises/edit': 'saveExercice', // Pour les routes avec paramètres
-
-    // Leçons
-    '/lesson': 'listLesson',
-    '/lesson/create': 'saveLesson',
-    '/lesson/edit': 'saveLesson',
-
-    // Domaines
-    '/levelDomaine': 'listLevelDomaine',
-    '/listSubDomaine': 'listSubDomaine',
-    '/domaine': 'listDomaine',
-
-    // Questions
-    '/questions': 'listQuestionnaire',
-    '/questions/create': 'saveQuestionnaire',
-    '/questions/edit': 'saveQuestionnaire',
-
-    // Quiz
-    '/quiz': 'listQuizz',
-    '/quiz/create': 'saveQuizz',
-    '/quiz/edit': 'saveQuizz',
-
-    // Cours
-    '/courses': 'listCours',
-    '/courses/create': 'saveCours',
-    '/courses/edit': 'saveCours',
-
     // Autres
     '/datatable': 'users',
     '/recrutement': 'RecrutementPersonnel',
@@ -1018,6 +988,19 @@ const getEventKeyFromPath = (pathname) => {
     '/OvertureCloture': 'OvertureCloture',
     '/professeur-matiere': 'professeur-matiere',
     '/personnel-classe': 'personnel-classe',
+
+    // CANDIDAT
+    '/postulerOffre': 'postulerOffre',
+    '/demandeOffre': 'demandeOffre',
+
+    '/loginMotDePasse': 'loginMotDePasse',
+    '/mesDocuments': 'mesDocuments',
+    '/profileUtilisateur': 'profileUtilisateur',
+    '/miseAJoursInfo': 'miseAJoursInfo',
+
+    // EMPLOI DU TEMPS
+    '/ConsultationDesSeances': 'ConsultationDesSeances',
+
 
     // ENQUETE RAPIDE
     '/enqueteRapideRentree': 'enqueteRapideRentree',
@@ -1280,10 +1263,6 @@ const Sidebar = ({
             style={{ width: "60px", height: "60px" }}
           />
           <h4 className="brand-title m-0 ms-2 fs-5">Pouls Scolaire</h4>
-        </div>
-
-        <div style={sidebarStyles.profileIndicator} className="profile-indicator">
-          <small>Profil: {getProfileDisplayName(userProfile)}</small>
         </div>
       </div>
 

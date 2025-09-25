@@ -239,6 +239,30 @@ const useMatieresUrls = () => {
     }), [params, baseUrl]);
 };
 
+
+// ===========================
+// URLS - GESTION DES DOMAINES
+// ===========================
+
+/**
+ * URLs pour la gestion des domaines
+ */
+const useDomainesUrls = () => {
+    const params = useAppParams();
+    const baseUrl = getFullUrl();
+
+    return useMemo(() => ({
+
+        /**
+         * Récupère les matières d'une école via niveau d'enseignement (utilise automatiquement l'école de l'utilisateur connecté)
+         */
+        getDomaineFormation: () =>
+            `${baseUrl}Domaine_formation`,
+
+    }), [params, baseUrl]);
+};
+
+
 // ===========================
 // URLS - GESTION DU PERSONNEL
 // ===========================
@@ -344,6 +368,9 @@ const usePersonnelUrls = () => {
          */
         getForCertificat: () =>
             `${baseUrl}souscription-personnel/personnel/${params.ecoleId}`,
+
+        getUserInfos: (userId) =>
+            `${baseUrl}souscription-personnel/personnelById/${userId}`,
 
         /**
          * Génère un certificat de travail
@@ -522,8 +549,24 @@ const useFonctionsUrls = () => {
         listByEcole: () =>
             `${baseUrl}fonction/list-by-ecole?ecole=${params.ecoleId}`,
 
+        getFondateur: () =>
+            `${baseUrl}fonction/sans-fondateur/fondateur`,
+
     }), [params, baseUrl]);
 };
+
+const useAutorsationUrls = () => {
+    const params = useAppParams();
+    const baseUrl = getFullUrl();
+
+    return useMemo(() => ({
+
+        getAutorsation: () =>
+            `${baseUrl}typeAutorisation`,
+
+    }), [params, baseUrl]);
+};
+
 
 // ===========================
 // URLS - GESTION DES ANNÉES SCOLAIRES
@@ -1399,6 +1442,10 @@ const useSouscriptionsUrls = () => {
         getEnAttente: (statut = 'EN%20ATTENTE') =>
             `${baseUrl}souscription-personnel/attente/${statut}`,
 
+        souscriptionPersonnel: () =>
+            `${baseUrl}souscription-personnel`,
+
+
         /**
          * Récupère les souscriptions d'écoles
          * @param {string} typeValidation - Type de validation
@@ -1433,6 +1480,9 @@ const useProfilsUrls = () => {
          * Récupère les profils visibles
          */
         getProfilVisible: () => `${baseUrl}profil/profil-visible`,
+        editPasseWord: () => `${baseUrl}connexion/modifier-motDePasse`,
+
+        
 
     }), [baseUrl]);
 };
@@ -1520,11 +1570,13 @@ const useAllApiUrls = () => {
     const niveaux = useNiveauxUrls();
     const branches = useBranchesUrls();
     const matieres = useMatieresUrls();
+    const domaineFormation = useDomainesUrls();
     const personnel = usePersonnelUrls();
     const periodes = usePeriodesUrls();
     const eleves = useElevesUrls();
     const messages = useMessagesUrls();
     const fonctions = useFonctionsUrls();
+    const autorisation = useAutorsationUrls();
     const annees = useAnneesUrls();
     const evaluations = useEvaluationsUrls();
     const notes = useNotesUrls();
@@ -1554,6 +1606,8 @@ const useAllApiUrls = () => {
         personnel,
         periodes,
         eleves,
+        domaineFormation,
+        autorisation,
         messages,
         fonctions,
         annees,
@@ -1591,6 +1645,8 @@ const useAllApiUrls = () => {
         eleves,
         messages,
         fonctions,
+        domaineFormation,
+        autorisation,
         annees,
         evaluations,
         notes,
@@ -1687,11 +1743,13 @@ export {
     useNiveauxUrls,
     useBranchesUrls,
     useMatieresUrls,
+    useDomainesUrls,
     usePersonnelUrls,
     usePeriodesUrls,
     useElevesUrls,
     useMessagesUrls,
     useFonctionsUrls,
+    useAutorsationUrls,
     useAnneesUrls,
     useEvaluationsUrls,
     useNotesUrls,

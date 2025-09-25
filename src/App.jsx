@@ -12,6 +12,7 @@ import { usePulsParams } from './hooks/useDynamicParams';
 
 import Paroti from './components/ParotiCharity/ParotiCharity';
 import './Theme.css';
+import { getUserProfile } from "./components/hooks/userUtils";
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function AppContent() {
     isInitialized,
     isReady
   } = usePulsParams();
+  const userProfile = getUserProfile();
 
   console.log('=== DONNÉES UTILISATEUR ===');
   console.log('dynamicEcoleId', dynamicEcoleId);
@@ -59,8 +61,9 @@ function AppContent() {
   console.log('isReady', isReady);
   console.log('========================');
 
+
   const hideFilterFor = ['Fondateur', 'SuperAdmin'];
-  const showMatiereFilter = !hideFilterFor.includes(personnelInfo?.profil || '');
+  const showMatiereFilter = !hideFilterFor.includes(userProfile || '');
 
   // Afficher un loader si les données ne sont pas encore initialisées
   if (!isInitialized) {
@@ -75,7 +78,7 @@ function AppContent() {
   }
 
   return (
-    <div id={personnelInfo?.profil} className={`App ${showMatiereFilter ? 'show-filter' : 'hide-filter'}`}>
+    <div id={`AppPage-${userProfile}`} className={`App ${showMatiereFilter ? 'show-filter' : 'hide-filter'}`}>
       <Router>
         <Routes>
           <Route path="/" element={<Paroti />} />

@@ -390,7 +390,7 @@ const EditAnneeModal = ({ show, annee, onClose, onSave }) => {
     const InfoCard = ({ icon: Icon, title, value, color = '#6366f1' }) => (
         <div style={{
             background: '#ffffff',
-            border: '1px solid #f1f5f9',
+            border: `1px solid ${color}`,
             borderRadius: '12px',
             padding: '16px',
             height: '85px',
@@ -464,12 +464,7 @@ const EditAnneeModal = ({ show, annee, onClose, onSave }) => {
             }}
         >
             {/* Header */}
-            <Modal.Header style={{
-                background: '#ffffff',
-                borderBottom: '1px solid #f1f5f9',
-                padding: '24px',
-                borderRadius: '16px 16px 0 0'
-            }}>
+            <Modal.Header >
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -510,8 +505,7 @@ const EditAnneeModal = ({ show, annee, onClose, onSave }) => {
             </Modal.Header>
 
             <Modal.Body style={{
-                padding: '32px 24px',
-                background: '#fafafa'
+                
             }}>
                 {/* Informations actuelles */}
                 <Panel
@@ -528,7 +522,7 @@ const EditAnneeModal = ({ show, annee, onClose, onSave }) => {
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)'
                     }}
                     bodyStyle={{ padding: '20px' }}
-                    className='d-none'
+                    className=''
                 >
                     <Grid fluid className='mt-3'>
                         <Row gutter={16}>

@@ -15,6 +15,8 @@ import {
     FiPlus
 } from 'react-icons/fi';
 import { useNiveauxBranchesData } from "../utils/CommonDataService";
+import { getUserProfile } from "../../hooks/userUtils";
+import IconBox from "../Composant/IconBox";
 
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE MODERNE AVEC BOUTON AJOUTER
@@ -29,7 +31,7 @@ const CoefficientsFilters = ({
     onBrancheChange
 }) => {
     const [formError, setFormError] = useState(null);
-
+    const userProfile = getUserProfile();
     const { branches, branchesLoading, branchesError, refetch } = useNiveauxBranchesData();
 
     const handleSearch = useCallback(() => {
@@ -89,16 +91,7 @@ const CoefficientsFilters = ({
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    borderRadius: '10px',
-                    padding: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <FiHash size={18} color="white" />
-                </div>
+                <IconBox icon={FiHash} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Gestion des Coefficients des Matières
@@ -128,7 +121,7 @@ const CoefficientsFilters = ({
 
             {/* Formulaire de filtres */}
             <Row gutter={20}>
-                <Col xs={24} sm={12} md={10}>
+                <Col xs={24} sm={16} md={16}>
                     <div style={{ marginBottom: 20 }}>
                         <label style={{
                             display: 'block',
@@ -156,7 +149,7 @@ const CoefficientsFilters = ({
                     </div>
                 </Col>
 
-                <Col xs={24} sm={12} md={8}>
+                <Col xs={24} sm={4} md={4}>
                     <div style={{ marginBottom: 20 }}>
                         <label style={{
                             display: 'block',
@@ -175,12 +168,13 @@ const CoefficientsFilters = ({
                                 disabled={isDataLoading || loading || !selectedBranche}
                                 style={{
                                     flex: 1,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    //background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                     border: 'none',
                                     borderRadius: '8px',
                                     fontWeight: '500'
                                 }}
-                                size="lg"
+                                size="md"
+                                className={`${userProfile}-btn-search`}
                             >
                                 {loading ? 'Chargement...' : 'Afficher'}
                             </Button>
@@ -201,7 +195,7 @@ const CoefficientsFilters = ({
                     </div>
                 </Col>
 
-                <Col xs={24} sm={24} md={6}>
+                <Col xs={24} sm={4} md={4}>
                     <div style={{ marginBottom: 20 }}>
                         <label style={{
                             display: 'block',

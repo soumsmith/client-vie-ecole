@@ -27,6 +27,8 @@ import { useListeMatieresData, listematieresTableConfig } from './ListeMatieresS
 
 // Import du modal de modification
 import EditMatiereModal from './EditMatiereModal';
+import IconBox from "../Composant/IconBox";
+
 
 // ===========================
 // COMPOSANT D'EN-TÊTE AVEC STATISTIQUES
@@ -85,16 +87,8 @@ const MatieresStatsHeader = ({ matieres, loading }) => {
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    borderRadius: '10px',
-                    padding: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <FiBookOpen size={18} color="white" />
-                </div>
+                
+                <IconBox icon={FiBookOpen} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Statistiques des Matières d'École
