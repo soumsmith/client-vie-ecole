@@ -8,7 +8,8 @@ RUN apk add --no-cache git openssh python3 make g++
 WORKDIR /app
 
 # Copying package.json and yarn.lock to install dependencies
-COPY package.json yarn.lock ./
+COPY package.json ./
+COPY yarn.lock* ./
 
 # Installing ALL dependencies (including devDependencies for build)
 RUN yarn install --frozen-lockfile
@@ -18,7 +19,9 @@ COPY . .
 
 # Set NODE_ENV for production build
 ENV NODE_ENV=production
-
+# ✅ Même URL pour développement et production
+ARG VITE_API_URL=http://46.105.52.105:8889/api/
+ENV VITE_API_URL=$VITE_API_URL 
 # Building our application
 RUN yarn build
 

@@ -1,10 +1,12 @@
 // utils/urlUtils.js
 const getFullUrl = () => {
   // En développement, utiliser le proxy local
-
+  if (import.meta.env.DEV) {
+    return '/api/';
+  }
+  
   // En production, utiliser l'URL complète de l'API
-  return '/api/';
-  //return 'https://api-pro.pouls-scolaire.net/api/';
+  return 'http://46.105.52.105:8889/api/';
 };
 
 export const rootUrl = getFullUrl();
