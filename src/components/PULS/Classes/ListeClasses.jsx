@@ -95,12 +95,12 @@ const ListeClasses = () => {
         setSelectedClassForEdit(null);
 
         // Afficher une notification de succès
-        Notification.success({
-            title: 'Classe modifiée avec succès',
-            description: `La classe "${updatedClass.libelle || updatedClass.code}" a été modifiée avec succès.`,
-            placement: 'topEnd',
-            duration: 4500,
-        });
+        // Notification.success({
+        //     title: 'Classe modifiée avec succès',
+        //     description: `La classe "${updatedClass.libelle || updatedClass.code}" a été modifiée avec succès.`,
+        //     placement: 'topEnd',
+        //     duration: 4500,
+        // });
     }, []);
 
     const handleEditModalClose = useCallback(() => {
@@ -127,12 +127,12 @@ const ListeClasses = () => {
                     setRefreshTrigger(prev => prev + 1);
 
                     // Notification de succès
-                    Notification.success({
-                        title: 'Classe supprimée',
-                        description: 'La classe a été supprimée avec succès.',
-                        placement: 'topEnd',
-                        duration: 3000,
-                    });
+                    // Notification.success({
+                    //     title: 'Classe supprimée',
+                    //     description: 'La classe a été supprimée avec succès.',
+                    //     placement: 'topEnd',
+                    //     duration: 3000,
+                    // });
                     break;
 
                 case 'view':
