@@ -168,13 +168,9 @@ const useLoginData = (config) => {
 
     /**
      * Mappe les données du formulaire selon la configuration des champs de connexion
-     * @param {object} formData - Données du formulaire standardisées
-     * @param {object} loginFields - Configuration des champs de connexion
-     * @returns {object} - Données mappées selon la configuration
      */
     const mapFormDataToLoginData = (formData, loginFields) => {
         if (!loginFields) {
-            // Configuration par défaut si pas de loginFields
             return {
                 email: formData.email,
                 motdePasse: formData.password,
@@ -186,7 +182,6 @@ const useLoginData = (config) => {
 
         const mappedData = {};
 
-        // Mapper les champs selon la configuration
         Object.entries(loginFields).forEach(([formField, apiField]) => {
             let value;
             switch (formField) {
@@ -203,7 +198,7 @@ const useLoginData = (config) => {
                     value = formData.profileId;
                     break;
                 case 'login':
-                    value = formData.email; // Le login est souvent l'email
+                    value = formData.email;
                     break;
                 default:
                     console.warn(`Champ de formulaire non reconnu: ${formField}`);
@@ -225,30 +220,20 @@ const useLoginData = (config) => {
     };
 
     /**
- * Effectue la requête de connexion selon la méthode configurée
- * @param {string} url - URL de l'endpoint de connexion
- * @param {object} loginData - Données de connexion mappées
- * @param {string} method - Méthode HTTP (GET ou POST)
- * @returns {Promise} - Réponse de la requête
- */
+     * Effectue la requête de connexion selon la méthode configurée
+     */
     const performLoginRequest = async (url, loginData, method = 'POST') => {
-        // ✅ Headers simplifiés - Le proxy Vite gère CORS automatiquement
-
         try {
             if (method.toUpperCase() === 'GET') {
-                // Pour GET, ajouter les paramètres à l'URL
                 const params = new URLSearchParams(loginData);
                 const fullUrl = `${url}?${params.toString()}`;
-
                 console.log(`🔗 Requête GET vers: ${fullUrl}`);
                 return await axios.get(fullUrl);
             } else {
-                // Pour POST, les données vont dans le body
                 console.log(`🔗 Requête POST vers: ${url}`, loginData);
                 return await axios.post(url, loginData);
             }
         } catch (error) {
-            // ✅ Meilleure gestion des erreurs
             console.error('❌ Erreur lors de la requête de connexion:', {
                 message: error.message,
                 status: error.response?.status,
@@ -259,7 +244,6 @@ const useLoginData = (config) => {
                 loginData: loginData
             });
 
-            // ✅ Messages d'erreur plus spécifiques
             if (error.response?.status === 403) {
                 throw new Error('Accès refusé - Vérifiez vos identifiants');
             } else if (error.response?.status === 404) {
@@ -282,7 +266,6 @@ const useLoginData = (config) => {
 
     /**
      * Récupère toutes les données utilisateur stockées dans le localStorage
-     * @returns {object|null} - Données utilisateur complètes ou null
      */
     const getStoredUserData = () => {
         try {
@@ -326,33 +309,23 @@ const useLoginData = (config) => {
         }
 
         try {
-            // Construire les données pour le UserContext
             const contextData = {
-                // Données de base
                 email: storedData.userData?.email || storedData.completeUserData?.email,
                 userId: storedData.userId,
                 profileId: storedData.userData?.profileId || storedData.completeUserData?.profileId,
-
-                // IDs institutionnels
                 ecoleId: storedData.userData?.schoolId || storedData.completeUserData?.schoolId || 38,
                 academicYearId: storedData.academicYearMain?.anneeid || storedData.academicYearMain?.id || 226,
-                periodiciteId: 2, // Valeur par défaut
-
-                // Informations détaillées
+                periodiciteId: 2,
                 personnelInfo: storedData.userPersonnelInfo,
                 academicYearInfo: storedData.academicYearInfo,
-
-                // Métadonnées
                 loginTime: storedData.completeUserData?.loginTime || storedData.userData?.loginTime,
                 userType: storedData.completeUserData?.userType || storedData.userData?.userType || 'user'
             };
 
             console.log('📋 Données à restaurer dans le contexte:', contextData);
 
-            // Mettre à jour le contexte utilisateur
             updateFromLoginData({ userCompleteData: contextData });
 
-            // Mettre à jour les états locaux
             if (storedData.userPersonnelInfo) setUserPersonnelInfo(storedData.userPersonnelInfo);
             if (storedData.userId) setUserId(storedData.userId);
             if (storedData.academicYearMain) setAcademicYearMain(storedData.academicYearMain);
@@ -416,34 +389,120 @@ const useLoginData = (config) => {
     };
 
     // ===========================
-    // FONCTIONS POUR LES DONNÉES UTILISATEUR
+    // FONCTIONS POUR LES DONNÉES UTILISATEUR (CORRIGÉES)
     // ===========================
 
     /**
-     * Récupère les informations du personnel connecté
+     * FONCTION CORRIGÉE - Récupère les informations du personnel avec gestion d'erreur individuelle
      */
     const fetchUserPersonnelInfo = async (email, schoolId, profileId) => {
+        const results = {
+            personnelInfo: null,
+            personnelConnecteInfo: null,
+            candidatInfo: null
+        };
+
+        console.log(`🔄 Récupération des infos personnel: ${email}/${schoolId}/${profileId}`);
+
+        // Premier appel - ID utilisateur connecté
         try {
-            console.log(`Récupération des infos personnel: ${email}/${schoolId}/${profileId}`);
-            const response = await axios.get(
+            console.log('📞 Appel 1: ID utilisateur connecté...');
+            const response1 = await axios.get(
                 `${getFullUrl()}connexion/id-utilisateur-connecte/${encodeURIComponent(email)}`
             );
+            results.personnelInfo = response1.data;
+            console.log('✅ Appel 1 réussi:', results.personnelInfo);
+        } catch (error) {
+            console.error('❌ Erreur appel 1 (ID utilisateur):', error.message);
+        }
 
-            const response__2 = await axios.get(
+        // Deuxième appel - Infos personnel connecté v2
+        try {
+            console.log('📞 Appel 2: Infos personnel connecté v2...');
+            const response2 = await axios.get(
                 `${getFullUrl()}connexion/infos-personnel-connecte-v2/${email}/${schoolId}/${profileId}`
             );
-
-
-            const personnelInfo = response.data;
-            setUserPersonnelInfo(personnelInfo);
-            localStorage.setItem('userPersonnelInfo', JSON.stringify(personnelInfo));
-
-            console.log('Informations personnel récupérées:', personnelInfo);
-            return personnelInfo;
+            results.personnelConnecteInfo = response2.data;
+            console.log('✅ Appel 2 réussi:', results.personnelConnecteInfo);
         } catch (error) {
-            console.error('Erreur récupération infos personnel:', error.message);
-            throw error;
+            console.error('❌ Erreur appel 2 (Personnel connecté v2):', error.message);
         }
+
+        // Troisième appel - Infos candidat connecté (CELUI QUI T'INTÉRESSE)
+        try {
+            console.log('📞 Appel 3: Infos candidat connecté...');
+            const candidatUrl = `${getFullUrl()}connexion/infos-personnel-connecte-candidat/${encodeURIComponent(email)}`;
+            console.log('🔗 URL candidat:', candidatUrl);
+            
+            const response3 = await axios.get(candidatUrl);
+            results.candidatInfo = response3.data;
+            console.log('✅ Appel 3 réussi:', results.candidatInfo);
+        } catch (error) {
+            console.error('❌ Erreur appel 3 (Candidat):', error.message);
+            console.error('📋 Détails erreur candidat:', {
+                status: error.response?.status,
+                statusText: error.response?.statusText,
+                data: error.response?.data,
+                url: `${getFullUrl()}connexion/infos-personnel-connecte-candidat/${encodeURIComponent(email)}`
+            });
+        }
+
+        // Combinaison des résultats disponibles
+        const combinedInfo = {};
+        if (results.personnelInfo) {
+            Object.assign(combinedInfo, results.personnelInfo);
+        }
+        if (results.candidatInfo) {
+            combinedInfo.candidatDetails = results.candidatInfo;
+        }
+        if (results.personnelConnecteInfo) {
+            combinedInfo.personnelConnecteDetail = results.personnelConnecteInfo;
+        }
+
+        // Sauvegarder même avec des données partielles
+        if (Object.keys(combinedInfo).length > 0) {
+            setUserPersonnelInfo(combinedInfo);
+            localStorage.setItem('userPersonnelInfo', JSON.stringify(combinedInfo));
+            console.log('💾 Données sauvegardées:', combinedInfo);
+        }
+
+        // Logs finaux
+        console.log('📊 Résumé des appels:');
+        console.log('  - Personnel Info:', results.personnelInfo ? '✅' : '❌');
+        console.log('  - Personnel Connecté:', results.personnelConnecteInfo ? '✅' : '❌');
+        console.log('  - Candidat Info:', results.candidatInfo ? '✅' : '❌');
+
+        return combinedInfo;
+    };
+
+    /**
+     * NOUVELLE FONCTION - Détermine le profil utilisateur basé sur les données candidat
+     */
+    const determineCandidatProfile = (candidatInfo, modalType) => {
+        // Si ce n'est pas un candidat, retourner le type de modal original
+        if (modalType !== 'candidat' || !candidatInfo) {
+            return modalType;
+        }
+
+        // Vérifier si les données candidat contiennent une fonction
+        const libelleFonction = candidatInfo.libelleFonction || candidatInfo.fonction || candidatInfo.role;
+        
+        if (libelleFonction) {
+            // Normaliser le libellé de la fonction (première lettre en majuscule)
+            const fonctionNormalisee = libelleFonction.charAt(0).toUpperCase() + 
+                                     libelleFonction.slice(1).toLowerCase();
+            
+            const candidatProfile = `Candidat-${fonctionNormalisee}`;
+            
+            console.log(`👤 Profil candidat déterminé: ${candidatProfile}`);
+            console.log(`📋 Basé sur libelleFonction: ${libelleFonction}`);
+            
+            return candidatProfile;
+        }
+
+        // Si pas de fonction trouvée, retourner "Candidat" par défaut
+        console.log('👤 Profil candidat par défaut: Candidat');
+        return 'Candidat';
     };
 
     /**
@@ -550,7 +609,6 @@ const useLoginData = (config) => {
                 console.warn(`⚠️ Erreurs lors de la récupération de: ${errors.join(', ')}`);
             }
 
-            // Créer un objet complet avec toutes les données utilisateur
             const completeUserData = {
                 email,
                 schoolId,
@@ -581,31 +639,26 @@ const useLoginData = (config) => {
     };
 
     // ===========================
-    // FONCTION DE CONNEXION MISE À JOUR AVEC SUPPORT GET/POST
+    // FONCTION DE CONNEXION CORRIGÉE
     // ===========================
 
     /**
      * Soumet le formulaire de connexion et récupère les données utilisateur
-     * Supporte maintenant les méthodes GET et POST avec mapping des champs configurables
      */
     const submitLogin = async (formData) => {
         setSubmitError(null);
         setSubmitting(true);
 
         try {
-            // Récupérer la configuration de la méthode et des champs
             const method = config?.method || 'POST';
             const loginFields = config?.loginFields;
 
             console.log(`🔐 Tentative de connexion avec méthode ${method}...`);
             console.log('📋 Configuration des champs:', loginFields);
 
-            // Mapper les données du formulaire selon la configuration
             const loginData = mapFormDataToLoginData(formData, loginFields);
-
             console.log('📤 Données de connexion préparées:', loginData);
 
-            // Effectuer la requête selon la méthode configurée
             const response = await performLoginRequest(
                 `${getFullUrl()}${config.apis.login}`,
                 loginData,
@@ -615,216 +668,242 @@ const useLoginData = (config) => {
             const data = response.data;
             let userProfil = "";
 
-            const isSuccess = response.status === 200 && data && Object.keys(data).length > 0 &&
-                (data?.success === true ||
-                    data?.status === 'success' ||
-                    data?.code_statut === 1 ||
-                    data?.code_statut === '1' ||
-                    data?.token ||
-                    data?.user ||
-                    data?.utilisateur);
+            // LOGIQUE DE VALIDATION CORRIGÉE
+            const isSuccess = response.status === 200 && data && (
+                data?.success === true ||
+                data?.status === 'success' ||
+                data?.code_statut === 1 ||
+                data?.code_statut === '1' ||
+                data?.token ||
+                data?.user ||
+                data?.utilisateur ||
+                data === "Fondateur" ||
+                data === "Professeur" ||
+                data === "Admin" ||
+                data === "Mot de passe correct!"
+            );
 
-            if (isSuccess || data === "Fondateur" || data === "Professeur" || data === "Admin" || data === "Mot de passe correct!") {
-                    console.log('✅ Connexion réussie !');
+            if (isSuccess) {
+                console.log('✅ Connexion réussie !');
 
-                    // 👉 Transformation avec ternaire
-                    userProfil = data === "Mot de passe correct!" ? "Candidat" : data;
+                // Détermination du profil utilisateur de base
+                userProfil = data === "Mot de passe correct!" ? "Candidat" : data;
 
-                    const basicUserData = {
-                        email: formData.email,
-                        schoolId: formData.schoolId,
-                        profileId: formData.profileId,
-                        loginTime: new Date().toISOString(),
-                        userType: config.modalType || 'user',
-                        method: method // Stocker la méthode utilisée pour info
-                    };
+                const basicUserData = {
+                    email: formData.email,
+                    schoolId: formData.schoolId,
+                    profileId: formData.profileId,
+                    loginTime: new Date().toISOString(),
+                    userType: config.modalType || 'user',
+                    method: method
+                };
 
-                    localStorage.setItem('userProfil', userProfil);
-                    localStorage.setItem('userData', JSON.stringify(basicUserData));
-                    localStorage.setItem('isAuthenticated', 'true');
-                    localStorage.setItem('userType', config.modalType || 'user');
+                localStorage.setItem('userProfil', userProfil);
+                localStorage.setItem('userData', JSON.stringify(basicUserData));
+                localStorage.setItem('isAuthenticated', 'true');
+                localStorage.setItem('userType', config.modalType || 'user');
 
-                    try {
-                        console.log('🔄 Récupération des données utilisateur...');
-                        const completeUserData = await fetchAllUserData(
-                            formData.email,
-                            formData.schoolId,
-                            formData.profileId
+                try {
+                    console.log('🔄 Récupération des données utilisateur...');
+                    const completeUserData = await fetchAllUserData(
+                        formData.email,
+                        formData.schoolId,
+                        formData.profileId
+                    );
+
+                    // 🆕 NOUVELLE LOGIQUE - Déterminer le profil candidat spécifique
+                    let finalUserProfile = userProfil;
+                    
+                    if (config.modalType === 'candidat' && completeUserData?.personnelInfo?.candidatDetails) {
+                        finalUserProfile = determineCandidatProfile(
+                            completeUserData.personnelInfo.candidatDetails,
+                            config.modalType
                         );
-
-                        // Mettre à jour le contexte utilisateur avec les nouvelles données
-                        updateFromLoginData({ userCompleteData: completeUserData });
-
-                        return {
-                            success: true,
-                            data,
-                            userCompleteData: completeUserData,
-                            method: method
-                        };
-                    } catch (userDataError) {
-                        console.warn('⚠️ Connexion réussie mais erreur lors de la récupération des données utilisateur:', userDataError.message);
-                        return {
-                            success: true,
-                            data,
-                            userCompleteData: null,
-                            method: method,
-                            warning: 'Connexion réussie mais certaines données utilisateur n\'ont pas pu être récupérées'
-                        };
+                        
+                        console.log('👤 Profil candidat final déterminé:', finalUserProfile);
+                        
+                        // Mettre à jour le profil stocké avec le profil spécifique
+                        localStorage.setItem('userProfil', finalUserProfile);
+                        localStorage.setItem('candidatProfile', finalUserProfile);
+                        
+                        // Ajouter le profil spécifique aux données complètes
+                        completeUserData.candidatProfile = finalUserProfile;
+                        completeUserData.userProfile = finalUserProfile;
+                        
+                        // Re-sauvegarder les données complètes avec le nouveau profil
+                        localStorage.setItem('completeUserData', JSON.stringify(completeUserData));
                     }
-                } else {
-                    const errorMessage = data?.message || data?.error || 'Échec de la connexion';
-                    throw new Error(errorMessage);
+
+                    updateFromLoginData({ userCompleteData: completeUserData });
+
+                    return {
+                        success: true,
+                        data,
+                        userCompleteData: completeUserData,
+                        userProfile: finalUserProfile, // Retourner le profil final
+                        method: method
+                    };
+                } catch (userDataError) {
+                    console.warn('⚠️ Connexion réussie mais erreur lors de la récupération des données utilisateur:', userDataError.message);
+                    return {
+                        success: true,
+                        data,
+                        userCompleteData: null,
+                        userProfile: userProfil, // Profil de base en cas d'erreur
+                        method: method,
+                        warning: 'Connexion réussie mais certaines données utilisateur n\'ont pas pu être récupérées'
+                    };
                 }
-
-            } catch (error) {
-                console.error('❌ Erreur de connexion:', error.message);
-
-                if (error.message.includes('CORS') || error.code === 'ERR_NETWORK') {
-                    setSubmitError('Erreur de connexion au serveur. Vérifiez votre connexion.');
-                } else {
-                    setSubmitError(error.message || 'Erreur de connexion');
-                }
-
-                return { success: false, data: null };
-            } finally {
-                setSubmitting(false);
-            }
-        };
-
-        // ===========================
-        // FONCTIONS UTILITAIRES
-        // ===========================
-
-        /**
-         * Efface toutes les erreurs
-         */
-        const clearErrors = () => {
-            setSchoolsError(null);
-            setProfilesError(null);
-            setSubmitError(null);
-            setUserDataError(null);
-        };
-
-        /**
-         * Rafraîchit toutes les données
-         */
-        const refreshData = () => {
-            loadSchools();
-            loadProfiles();
-        };
-
-        /**
-         * Nettoie toutes les données utilisateur (déconnexion)
-         */
-        const clearUserData = () => {
-            // Nettoyer les états
-            setUserPersonnelInfo(null);
-            setUserId(null);
-            setAcademicYearMain(null);
-            setAcademicYearInfo(null);
-
-            // Nettoyer le localStorage
-            localStorage.removeItem('completeUserData');
-            localStorage.removeItem('userPersonnelInfo');
-            localStorage.removeItem('userId');
-            localStorage.removeItem('academicYearMain');
-            localStorage.removeItem('academicYearInfo');
-            localStorage.removeItem('userData');
-            localStorage.removeItem('userProfil');
-            localStorage.removeItem('isAuthenticated');
-            localStorage.removeItem('userType');
-
-            // Nettoyer le contexte utilisateur
-            clearUserParams();
-
-            console.log('🧹 Données utilisateur nettoyées');
-        };
-
-        // ===========================
-        // EFFET POUR LE CHARGEMENT INITIAL
-        // ===========================
-        useEffect(() => {
-            console.log('🚀 Initialisation du hook useLoginData...');
-
-            // Charger les données de base si config est disponible
-            if (config) {
-                console.log('📋 Configuration reçue:', {
-                    method: config.method || 'POST (default)',
-                    loginFields: config.loginFields,
-                    apis: config.apis
-                });
-
-                loadSchools();
-                loadProfiles();
+            } else {
+                const errorMessage = data?.message || data?.error || 'Échec de la connexion';
+                throw new Error(errorMessage);
             }
 
-            // Initialiser le contexte utilisateur depuis localStorage
-            if (!isInitialized && !initializingFromStorage) {
-                initializeUserContextFromStorage();
+        } catch (error) {
+            console.error('❌ Erreur de connexion:', error.message);
+
+            if (error.message.includes('CORS') || error.code === 'ERR_NETWORK') {
+                setSubmitError('Erreur de connexion au serveur. Vérifiez votre connexion.');
+            } else {
+                setSubmitError(error.message || 'Erreur de connexion');
             }
-        }, [config, isInitialized]);
 
-        // ===========================
-        // RETOUR DU HOOK
-        // ===========================
-        return {
-            // Données de base
-            schools: schools.length > 0 ? schools : [{ value: 1, label: 'École par défaut' }],
-            profiles: profiles.length > 0 ? profiles : [{ value: 1, label: 'Profil par défaut' }],
-
-            // Données utilisateur
-            userPersonnelInfo,
-            userId,
-            academicYearMain,
-            academicYearInfo,
-
-            // États de chargement
-            loadingSchools,
-            loadingProfiles,
-            submitting,
-            loadingUserData,
-            initializingFromStorage,
-
-            // États du contexte
-            isAuthenticated,
-            isInitialized,
-
-            // Erreurs
-            schoolsError,
-            profilesError,
-            submitError,
-            userDataError,
-
-            // Fonctions principales
-            submitLogin,
-            fetchAllUserData,
-            getStoredUserData,
-            clearUserData,
-            initializeUserContextFromStorage,
-
-            // Fonctions utilitaires
-            clearErrors,
-            refreshData,
-            loadSchools,
-            loadProfiles,
-
-            // Fonctions spécifiques pour récupérer les données
-            fetchUserPersonnelInfo,
-            fetchUserId,
-            fetchAcademicYearMain,
-            fetchAcademicYearInfo,
-
-            // Nouvelles fonctions utilitaires
-            mapFormDataToLoginData,
-            performLoginRequest,
-
-            // Informations sur la configuration actuelle
-            currentConfig: {
-                method: config?.method || 'POST',
-                loginFields: config?.loginFields,
-                modalType: config?.modalType
-            }
-        };
+            return { success: false, data: null };
+        } finally {
+            setSubmitting(false);
+        }
     };
 
-    export default useLoginData;
+    // ===========================
+    // FONCTIONS UTILITAIRES
+    // ===========================
+
+    const clearErrors = () => {
+        setSchoolsError(null);
+        setProfilesError(null);
+        setSubmitError(null);
+        setUserDataError(null);
+    };
+
+    const refreshData = () => {
+        loadSchools();
+        loadProfiles();
+    };
+
+    const clearUserData = () => {
+        setUserPersonnelInfo(null);
+        setUserId(null);
+        setAcademicYearMain(null);
+        setAcademicYearInfo(null);
+
+        localStorage.removeItem('completeUserData');
+        localStorage.removeItem('userPersonnelInfo');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('academicYearMain');
+        localStorage.removeItem('academicYearInfo');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('userProfil');
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('userType');
+
+        clearUserParams();
+
+        console.log('🧹 Données utilisateur nettoyées');
+    };
+
+    // ===========================
+    // EFFET POUR LE CHARGEMENT INITIAL
+    // ===========================
+    useEffect(() => {
+        console.log('🚀 Initialisation du hook useLoginData...');
+
+        if (config) {
+            console.log('📋 Configuration reçue:', {
+                method: config.method || 'POST (default)',
+                loginFields: config.loginFields,
+                apis: config.apis
+            });
+
+            loadSchools();
+            loadProfiles();
+        }
+
+        if (!isInitialized && !initializingFromStorage) {
+            initializeUserContextFromStorage();
+        }
+    }, [config, isInitialized]);
+
+    // ===========================
+    // RETOUR DU HOOK
+    // ===========================
+    return {
+        // Données de base
+        schools: schools.length > 0 ? schools : [{ value: 1, label: 'École par défaut' }],
+        profiles: profiles.length > 0 ? profiles : [{ value: 1, label: 'Profil par défaut' }],
+
+        // Données utilisateur
+        userPersonnelInfo,
+        userId,
+        academicYearMain,
+        academicYearInfo,
+
+        // États de chargement
+        loadingSchools,
+        loadingProfiles,
+        submitting,
+        loadingUserData,
+        initializingFromStorage,
+
+        // États du contexte
+        isAuthenticated,
+        isInitialized,
+
+        // Erreurs
+        schoolsError,
+        profilesError,
+        submitError,
+        userDataError,
+
+        // Fonctions principales
+        submitLogin,
+        fetchAllUserData,
+        getStoredUserData,
+        clearUserData,
+        initializeUserContextFromStorage,
+
+        // Fonctions utilitaires
+        clearErrors,
+        refreshData,
+        loadSchools,
+        loadProfiles,
+
+        // Fonctions spécifiques pour récupérer les données
+        fetchUserPersonnelInfo,
+        fetchUserId,
+        fetchAcademicYearMain,
+        fetchAcademicYearInfo,
+
+        // Nouvelle fonction pour déterminer le profil candidat
+        determineCandidatProfile,
+
+        // Nouvelles fonctions utilitaires
+        mapFormDataToLoginData,
+        performLoginRequest,
+
+        // Informations sur la configuration actuelle
+        currentConfig: {
+            method: config?.method || 'POST',
+            loginFields: config?.loginFields,
+            modalType: config?.modalType
+        },
+
+        // Nouvelle fonction utilitaire pour récupérer le profil candidat actuel
+        getCurrentCandidatProfile: () => {
+            const storedProfile = localStorage.getItem('candidatProfile');
+            const storedUserProfil = localStorage.getItem('userProfil');
+            return storedProfile || storedUserProfil || 'Candidat';
+        }
+    };
+};
+
+export default useLoginData;

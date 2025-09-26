@@ -1,15 +1,26 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Modal, Form, Input, SelectPicker, Toggle, Button, Message, Loader, Schema, Nav, Table, Panel } from 'rsuite';
+import {
+    Modal,
+    Form,
+    SelectPicker,
+    Toggle,
+    Button,
+    Loader,
+    Schema,
+    Nav,
+    Table,
+    Panel
+} from 'rsuite';
 import axios from 'axios';
-import { useNiveauxBranchesData } from "../utils/CommonDataService";
+import Swal from 'sweetalert2';
+
+
+import { useNiveauxBranchesData, useLanguesData } from "../utils/CommonDataService";
 import { useClassesUrls, useMatieresUrls, useAppParams } from '../utils/apiConfig';
 
 const { Column, HeaderCell, Cell } = Table;
 const { StringType, NumberType } = Schema.Types;
 
-/**
- * Modèle de validation pour le formulaire
- */
 const model = Schema.Model({
     code: StringType()
         .isRequired('Le code est obligatoire')
@@ -26,9 +37,12 @@ const model = Schema.Model({
         .isRequired('La langue vivante est obligatoire')
 });
 
-/**
- * Modal de modification d'une classe existante
- */
+const notifySuccess = (title = 'Succès', text = '') =>
+    Swal.fire({ icon: 'success', title, text, confirmButtonText: 'OK' });
+
+const notifyError = (title = 'Erreur', text = '') =>
+    Swal.fire({ icon: 'error', title, text, confirmButtonText: 'OK' });
+
 const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
     const [formValue, setFormValue] = useState({
         code: '',
@@ -41,56 +55,22 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
     const [formError, setFormError] = useState({});
     const [loading, setLoading] = useState(false);
     const [submitError, setSubmitError] = useState(null);
-    const [langues, setLangues] = useState([]);
+    //   const [langues, setLangues] = useState([]);
     const [languesLoading, setLanguesLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('professeurs');
-    
-    // Données mockées pour les tableaux (à remplacer par de vraies données API)
+
     const [professeursData] = useState([]);
     const [emploiTempsData] = useState([]);
-    
+
     const appParams = useAppParams();
     const classesUrls = useClassesUrls();
     const languesUrls = useMatieresUrls();
 
-    // Hook pour récupérer les branches
     const { branches, loading: branchesLoading } = useNiveauxBranchesData();
+    const { langues, loading: languesLoadingVivante } = useLanguesData();
 
-    /**
-     * Récupérer les langues une seule fois
-     */
-    const fetchLangues = useCallback(async () => {
-        if (langues.length > 0) return;
-        
-        setLanguesLoading(true);
-        try {
-            const url = languesUrls.getClasseByEcole();
-            const response = await axios.get(url);
-            const formattedLangues = (response.data || []).map(langue => ({
-                label: `${langue.libelle} (${langue.code})`,
-                value: langue.id
-            }));
-            setLangues(formattedLangues);
-        } catch (err) {
-            console.error('Erreur lors du chargement des langues:', err);
-            Message.error('Erreur lors du chargement des langues');
-        } finally {
-            setLanguesLoading(false);
-        }
-    }, [languesUrls, langues.length]);
 
-    /**
-     * Charger les langues quand le modal s'ouvre
-     */
-    useEffect(() => {
-        if (visible) {
-            fetchLangues();
-        }
-    }, [visible, fetchLangues]);
 
-    /**
-     * Pré-remplir le formulaire avec les données de la classe sélectionnée
-     */
     useEffect(() => {
         if (visible && selectedClass) {
             setFormValue({
@@ -104,11 +84,9 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
             setSubmitError(null);
             setFormError({});
         }
-    }, [visible, selectedClass?.id]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [visible, selectedClass]);
 
-    /**
-     * Réinitialiser quand le modal se ferme
-     */
     useEffect(() => {
         if (!visible) {
             setFormValue({
@@ -125,24 +103,19 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
         }
     }, [visible]);
 
-    /**
-     * Validation du formulaire
-     */
     const handleCheck = useCallback((formError) => {
         setFormError(formError);
     }, []);
 
-    /**
-     * Soumission du formulaire
-     */
     const handleSubmit = async () => {
+        // validation RSuite
         if (!model.check(formValue)) {
-            Message.error('Veuillez corriger les erreurs du formulaire');
+            notifyError('Erreur', 'Veuillez corriger les erreurs du formulaire');
             return;
         }
 
         if (!selectedClass?.id) {
-            Message.error('Aucune classe sélectionnée pour la modification');
+            notifyError('Erreur', 'Aucune classe sélectionnée pour la modification');
             return;
         }
 
@@ -166,41 +139,36 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
                 },
                 libelle: formValue.libelle,
                 profPrincipal: selectedClass.profPrincipal || null,
-                ecole: {
-                    id: appParams.ecoleId
-                },
+                ecole: { id: appParams.ecoleId },
                 visible: formValue.visible ? 1 : 0,
                 effectif: formValue.effectif || 0
             };
 
-            const url = classesUrls.saveClasse();
+            const url = classesUrls.updateClasse();
             const response = await axios.post(url, classeData);
 
-            onSuccess(response.data);
+            // prévenir le parent, fermer modal puis notifier
+            if (typeof onSuccess === 'function') {
+                onSuccess(response.data);
+            }
             onClose();
-            Message.success('Classe modifiée avec succès');
 
+            notifySuccess('Classe modifiée', 'Classe modifiée avec succès');
         } catch (error) {
             const errorMessage = error.response?.data?.message ||
                 error.message ||
                 'Erreur lors de la modification de la classe';
             setSubmitError(errorMessage);
-            Message.error(errorMessage);
+            notifyError('Erreur', errorMessage);
         } finally {
             setLoading(false);
         }
     };
 
-    /**
-     * Annulation
-     */
     const handleCancel = () => {
         onClose();
     };
 
-    /**
-     * Rendu du contenu des onglets
-     */
     const renderTabContent = () => {
         switch (activeTab) {
             case 'professeurs':
@@ -210,20 +178,16 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
                             data={professeursData}
                             height={280}
                             loading={false}
-                            locale={{
-                                emptyMessage: 'Aucune donnée trouvée'
-                            }}
+                            locale={{ emptyMessage: 'Aucune donnée trouvée' }}
                         >
                             <Column width={150} align="left" fixed>
                                 <HeaderCell>Matière</HeaderCell>
                                 <Cell dataKey="matiere" />
                             </Column>
-                            
                             <Column width={200} align="left">
                                 <HeaderCell>Professeur</HeaderCell>
                                 <Cell dataKey="professeur" />
                             </Column>
-                            
                             <Column width={80} align="center">
                                 <HeaderCell>Coef.</HeaderCell>
                                 <Cell dataKey="coefficient" />
@@ -231,7 +195,7 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
                         </Table>
                     </div>
                 );
-                
+
             case 'emploiTemps':
                 return (
                     <div style={{ height: '300px' }}>
@@ -239,25 +203,20 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
                             data={emploiTempsData}
                             height={280}
                             loading={false}
-                            locale={{
-                                emptyMessage: 'Aucune donnée trouvée'
-                            }}
+                            locale={{ emptyMessage: 'Aucune donnée trouvée' }}
                         >
                             <Column width={100} align="left" fixed>
                                 <HeaderCell>Jour</HeaderCell>
                                 <Cell dataKey="jour" />
                             </Column>
-                            
                             <Column width={100} align="center">
                                 <HeaderCell>Heure Deb</HeaderCell>
                                 <Cell dataKey="heureDebut" />
                             </Column>
-                            
                             <Column width={100} align="center">
                                 <HeaderCell>Heure Fin</HeaderCell>
                                 <Cell dataKey="heureFin" />
                             </Column>
-                            
                             <Column width={150} align="left">
                                 <HeaderCell>Matière</HeaderCell>
                                 <Cell dataKey="matiere" />
@@ -265,7 +224,7 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
                         </Table>
                     </div>
                 );
-                
+
             default:
                 return null;
         }
@@ -282,7 +241,6 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
             </Modal.Header>
 
             <Modal.Body style={{ padding: '20px' }}>
-                {/* Affichage des erreurs */}
                 {submitError && (
                     <div style={{
                         marginBottom: 16,
@@ -297,7 +255,6 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
                 )}
 
                 <div style={{ display: 'flex', gap: '20px', minHeight: '500px' }}>
-                    {/* Section Formulaire - Gauche */}
                     <div style={{ flex: '0 0 45%' }}>
                         {isDataLoading && (
                             <div style={{ textAlign: 'center', padding: 20 }}>
@@ -319,30 +276,19 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
                         >
                             <Form.Group controlId="code">
                                 <Form.ControlLabel>Code</Form.ControlLabel>
-                                <Form.Control
-                                    name="code"
-                                    placeholder="Entrez le code de la classe"
-                                />
+                                <Form.Control name="code" placeholder="Entrez le code de la classe" />
                                 <Form.HelpText>Le code unique de la classe</Form.HelpText>
                             </Form.Group>
 
                             <Form.Group controlId="libelle">
                                 <Form.ControlLabel>Libellé</Form.ControlLabel>
-                                <Form.Control
-                                    name="libelle"
-                                    placeholder="Entrez le libellé de la classe"
-                                />
+                                <Form.Control name="libelle" placeholder="Entrez le libellé de la classe" />
                                 <Form.HelpText>Le nom complet de la classe</Form.HelpText>
                             </Form.Group>
 
                             <Form.Group controlId="effectif">
                                 <Form.ControlLabel>Effectif Maximal</Form.ControlLabel>
-                                <Form.Control
-                                    name="effectif"
-                                    type="number"
-                                    min="0"
-                                    placeholder="0"
-                                />
+                                <Form.Control name="effectif" type="number" min="0" placeholder="0" />
                                 <Form.HelpText>Nombre maximum d'élèves dans la classe</Form.HelpText>
                             </Form.Group>
 
@@ -393,20 +339,10 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
                         </Form>
                     </div>
 
-                    {/* Section Onglets - Droite */}
                     <div style={{ flex: '1', borderLeft: '1px solid #e5e5ea', paddingLeft: '20px' }}>
-                        <Nav
-                            appearance="tabs"
-                            activeKey={activeTab}
-                            onSelect={setActiveTab}
-                            style={{ marginBottom: '15px' }}
-                        >
-                            <Nav.Item eventKey="professeurs">
-                                Liste des professeurs
-                            </Nav.Item>
-                            <Nav.Item eventKey="emploiTemps">
-                                Emploi du temps
-                            </Nav.Item>
+                        <Nav appearance="tabs" activeKey={activeTab} onSelect={setActiveTab} style={{ marginBottom: '15px' }}>
+                            <Nav.Item eventKey="professeurs">Liste des professeurs</Nav.Item>
+                            <Nav.Item eventKey="emploiTemps">Emploi du temps</Nav.Item>
                         </Nav>
 
                         <Panel bordered style={{ height: '320px', overflow: 'hidden' }}>
@@ -417,20 +353,10 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
             </Modal.Body>
 
             <Modal.Footer>
-                <Button
-                    onClick={handleSubmit}
-                    appearance="primary"
-                    loading={loading}
-                    disabled={isDataLoading}
-                    color="blue"
-                >
+                <Button onClick={handleSubmit} appearance="primary" loading={loading} disabled={isDataLoading} color="blue">
                     Enregistrer
                 </Button>
-                <Button
-                    onClick={handleCancel}
-                    appearance="subtle"
-                    disabled={loading}
-                >
+                <Button onClick={handleCancel} appearance="subtle" disabled={loading}>
                     Annuler
                 </Button>
             </Modal.Footer>

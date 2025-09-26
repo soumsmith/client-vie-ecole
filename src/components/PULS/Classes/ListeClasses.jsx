@@ -68,12 +68,12 @@ const ListeClasses = () => {
         setRefreshTrigger(prev => prev + 1);
 
         // Afficher une notification de succès
-        Notification.success({
-            title: 'Classe créée avec succès',
-            description: `La classe "${newClass.libelle}" a été créée avec succès.`,
-            placement: 'topEnd',
-            duration: 4500,
-        });
+        // Notification.success({
+        //     title: 'Classe créée avec succès',
+        //     description: `La classe "${newClass.libelle}" a été créée avec succès.`,
+        //     placement: 'topEnd',
+        //     duration: 4500,
+        // });
     }, []);
 
     const handleCreateModalClose = useCallback(() => {

@@ -464,7 +464,7 @@ const allMenuSections = [
   {
     type: "section",
     title: "Espace Candidat",
-    profiles: ["Candidat"],
+    profiles: ["Candidat", "Candidat-Fondateur", "Candidat-Professeur"],
     items: [
       {
         type: "item",
@@ -487,7 +487,15 @@ const allMenuSections = [
         eventKey: "loginMotDePasse",
         icon: "TableIcon",
         title: "Login & mot de passe",
-        profiles: ["Candidat"],
+        profiles: ["Candidat", "Candidat-Fondateur", "Candidat-Professeur"],
+      },
+
+      {
+        type: "item",
+        eventKey: "mesEcoles",
+        icon: "TableIcon",
+        title: "Mes écoles",
+        profiles: ["Candidat-Fondateur"],
       },
 
       {
@@ -504,7 +512,7 @@ const allMenuSections = [
         eventKey: "profileUtilisateur",
         icon: "TableIcon",
         title: "Mon profil",
-        profiles: ["Candidat"],
+        profiles: ["Candidat", "Candidat-Fondateur", "Candidat-Professeur"],
       },
       // Personnel - Classe
       {
@@ -512,7 +520,7 @@ const allMenuSections = [
         eventKey: "miseAJoursInfo",
         icon: "TableIcon",
         title: "modifier mes infos personnelles ",
-        profiles: ["Candidat"],
+        profiles: ["Candidat", "Candidat-Fondateur", "Candidat-Professeur"],
       },
     ],
   },
@@ -653,7 +661,7 @@ const allMenuSections = [
   {
     type: "section",
     title: "Admlinistration",
-    profiles: ["Admin"],
+    profiles: ["Admin", "Fondateur"],
     items: [
       {
         type: "item",

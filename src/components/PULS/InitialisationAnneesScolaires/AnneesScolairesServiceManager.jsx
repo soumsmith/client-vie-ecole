@@ -157,49 +157,7 @@ export const usePeriodicitesData = () => {
  * Hook pour récupérer la liste des niveaux d'enseignement
  * @returns {object}
  */
-export const useNiveauxEnseignementData = () => {
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const apiUrls = useAllApiUrls();
 
-    useEffect(() => {
-        const fetchNiveaux = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                
-                const response = await axios.get(apiUrls.niveaux.list());
-                
-                const processedNiveaux = response.data && Array.isArray(response.data)
-                    ? response.data.map(niveau => ({
-                        value: niveau.id,
-                        label: niveau.libelle,
-                        code: niveau.code
-                    }))
-                    : [];
-
-                setData(processedNiveaux);
-            } catch (err) {
-                setError({
-                    message: err.message || 'Erreur lors du chargement des niveaux',
-                    type: err.name || 'FetchError'
-                });
-                console.error('Erreur API niveaux:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchNiveaux();
-    }, []);
-
-    return {
-        niveaux: data,
-        loading,
-        error
-    };
-};
 
 /**
  * Hook pour récupérer les périodes selon la périodicité

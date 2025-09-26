@@ -142,15 +142,20 @@
 }
 
 .rs-dropdown-expand {
-    background: linear-gradient(0deg, var(--bg-color) 0%, var(--primary-color) 100%) !important;
-    border-radius: 7px !important;
+
+    border-radius: 9px !important;
+    border: 1px solid var(--primary-color);
+}
+
+.rs-dropdown-expand>.rs-sidenav-item {
+    background: var(--primary-color) !important;
 }
 
 .rs-dropdown-expand svg {
     color: #f1f5f9 !important;
 }
 
-#AppPage-Fondateur .rs-table-row-header {
+#AppPage-Fondateur.rs-table-row-header {
     background-color: #1e293b !important;
     color: #f1f5f9 !important;
 }

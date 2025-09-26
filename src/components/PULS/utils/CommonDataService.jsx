@@ -10,7 +10,7 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { getFromCache, setToCache } from "./cacheUtils";
 import { getUserProfile } from "../../hooks/userUtils";
-import { 
+import {
   useAllApiUrls,
   useAppParams,
   useClassesUrls,
@@ -177,13 +177,13 @@ export const useClassesData = (refreshTrigger = 0) => {
   const userProfile = getUserProfile();
 
   const fetchClasses = useCallback(
-    
+
     async (skipCache = false) => {
       try {
         setLoading(true);
         setError(null);
         const cacheKey = `common-classes-data-${appParams.ecoleId}`;
- 
+
         if (!skipCache) {
           const cachedData = getFromCache(cacheKey);
           if (cachedData) {
@@ -271,9 +271,89 @@ export const useClassesData = (refreshTrigger = 0) => {
   };
 };
 
+
+
+export const useLanguesData = () => {
+  const [langues, setLangues] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const languesUrls = useMatieresUrls();
+
+
+  const fetchLangues = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const url = languesUrls.getLangueListe();
+      const response = await axios.get(url);
+      const formattedLangues = (response.data || []).map(langue => ({
+        label: `${langue.libelle} (${langue.code})`,
+        value: langue.id
+      }));
+      setLangues(formattedLangues);
+    } catch (err) {
+      setError(err.message || 'Erreur lors du chargement des langues');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLangues();
+  }, [fetchLangues]);
+
+  return { langues, loading, error, refetch: fetchLangues };
+};
+
 // ===========================
 // HOOK POUR RÉCUPÉRER LES NIVEAUX
 // ===========================
+
+export const useNiveauxEnseignementData = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const apiUrls = useAllApiUrls();
+
+  useEffect(() => {
+    const fetchNiveaux = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await axios.get(apiUrls.niveaux.list());
+
+        const processedNiveaux = response.data && Array.isArray(response.data)
+          ? response.data.map(niveau => ({
+            value: niveau.id,
+            label: niveau.libelle,
+            code: niveau.code
+          }))
+          : [];
+
+        setData(processedNiveaux);
+      } catch (err) {
+        setError({
+          message: err.message || 'Erreur lors du chargement des niveaux',
+          type: err.name || 'FetchError'
+        });
+        console.error('Erreur API niveaux:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNiveaux();
+  }, []);
+
+  return {
+    niveaux: data,
+    loading,
+    error
+  };
+};
+
+
 export const useNiveauxData = (ecoleId = null, refreshTrigger = 0) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -301,16 +381,16 @@ export const useNiveauxData = (ecoleId = null, refreshTrigger = 0) => {
 
         const url = niveauxUrls.getVisibleByBranche(finalEcoleId);
         const response = await axios.get(url);
-        
+
         const processed =
           response.data && Array.isArray(response.data)
             ? response.data.map((niveau) => ({
-                value: niveau.id,
-                label: niveau.libelle,
-                id: niveau.id,
-                code: niveau.code || "",
-                raw_data: niveau,
-              }))
+              value: niveau.id,
+              label: niveau.libelle,
+              id: niveau.id,
+              code: niveau.code || "",
+              raw_data: niveau,
+            }))
             : [];
 
         setToCache(cacheKey, processed, CACHE_DURATION);
@@ -838,21 +918,21 @@ export const usePeriodesData = (periodicitieId = null, refreshTrigger = 0) => {
 
         const url = periodesUrls.listByPeriodicite(finalPeriodicitieId);
         const response = await axios.get(url);
-        
+
         const processed =
           response.data && Array.isArray(response.data)
             ? response.data.map((periode) => ({
-                value: periode.id,
-                label: periode.libelle,
-                id: periode.id,
-                niveau: periode.niveau || 1,
-                coef: periode.coef || 1,
-                dateDebut: periode.dateDebut || "",
-                dateFin: periode.dateFin || "",
-                debut: periode.debut,
-                fin: periode.fin,
-                raw_data: periode,
-              }))
+              value: periode.id,
+              label: periode.libelle,
+              id: periode.id,
+              niveau: periode.niveau || 1,
+              coef: periode.coef || 1,
+              dateDebut: periode.dateDebut || "",
+              dateFin: periode.dateFin || "",
+              debut: periode.debut,
+              fin: periode.fin,
+              raw_data: periode,
+            }))
             : [];
 
         setToCache(cacheKey, processed, CACHE_DURATION);
@@ -950,13 +1030,13 @@ export const useMessagesData = (
       const processedMessages =
         response.data && Array.isArray(response.data)
           ? response.data.map((message) => ({
-              id: message.message_personnel_id,
-              fullName: message.fullName,
-              sujet: message.message_personnel_sujet,
-              message: message.message_personnel_message,
-              date: message.message_personnel_date,
-              raw_data: message,
-            }))
+            id: message.message_personnel_id,
+            fullName: message.fullName,
+            sujet: message.message_personnel_sujet,
+            message: message.message_personnel_message,
+            date: message.message_personnel_date,
+            raw_data: message,
+          }))
           : [];
 
       setToCache(cacheKey, processedMessages);
@@ -1028,7 +1108,7 @@ export const useElevesData = (
 
         const url = elevesUrls.retrieveByClasse(newClasseId, newAnneeId);
         const response = await axios.get(url);
-        
+
         let processedEleves = [];
 
         if (response.data && Array.isArray(response.data)) {
@@ -1149,17 +1229,17 @@ export const useFonctionsData = (ecoleId = null, refreshTrigger = 0) => {
 
         const url = fonctionsUrls.listByEcole(finalEcoleId);
         const response = await axios.get(url);
-        
+
         const processed =
           response.data && Array.isArray(response.data)
             ? response.data.map((fonction) => ({
-                value: fonction.id,
-                label: fonction.libelle,
-                id: fonction.id,
-                code: fonction.code || "",
-                description: fonction.description || "",
-                raw_data: fonction,
-              }))
+              value: fonction.id,
+              label: fonction.libelle,
+              id: fonction.id,
+              code: fonction.code || "",
+              description: fonction.description || "",
+              raw_data: fonction,
+            }))
             : [];
 
         setToCache(cacheKey, processed, CACHE_DURATION);
@@ -1230,14 +1310,14 @@ export const useAnneesData = (refreshTrigger = 0) => {
       const processed =
         response.data && Array.isArray(response.data)
           ? response.data.map((annee) => ({
-              value: annee.id,
-              label: annee.libelle,
-              id: annee.id,
-              debut: annee.debut,
-              fin: annee.fin,
-              actif: annee.actif || false,
-              raw_data: annee,
-            }))
+            value: annee.id,
+            label: annee.libelle,
+            id: annee.id,
+            debut: annee.debut,
+            fin: annee.fin,
+            actif: annee.actif || false,
+            raw_data: annee,
+          }))
           : [];
 
       setToCache(cacheKey, processed, CACHE_DURATION);
@@ -1304,7 +1384,7 @@ export const useEnseignantsData = (profProfilId, refreshTrigger = 0) => {
         }
 
         const url = personnelUrls.getByEcoleAndProfil(
-          appParams.ecoleId, 
+          appParams.ecoleId,
           profProfilId || appParams.profileId
         );
         const response = await axios.get(url);
@@ -1313,53 +1393,47 @@ export const useEnseignantsData = (profProfilId, refreshTrigger = 0) => {
         const processedEnseignants =
           response.data && Array.isArray(response.data)
             ? response.data.map((enseignant, index) => ({
-                value: enseignant.id || `temp-${index}`,
-                label: `${enseignant.nom || "Nom"} ${
-                  enseignant.prenom || "Prénom"
+              value: enseignant.id || `temp-${index}`,
+              label: `${enseignant.nom || "Nom"} ${enseignant.prenom || "Prénom"
                 }`,
-                id: enseignant.id || `temp-${index}`,
-                nom: enseignant.nom || "",
-                prenom: enseignant.prenom || "",
-                nomComplet: `${enseignant.nom || "Nom"} ${
-                  enseignant.prenom || "Prénom"
+              id: enseignant.id || `temp-${index}`,
+              nom: enseignant.nom || "",
+              prenom: enseignant.prenom || "",
+              nomComplet: `${enseignant.nom || "Nom"} ${enseignant.prenom || "Prénom"
                 }`,
-                contact: enseignant.contact || "",
-                email: enseignant.email || "",
-                sexe: enseignant.sexe || "Non spécifié",
-                dateNaissance: enseignant.dateNaissance || "",
-                lieuNaissance: enseignant.lieuNaissance || "",
-                niveauEtude: enseignant.niveauEtude || 0,
-                diplome: enseignant.diplome || "",
-                specialite: enseignant.specialite || "",
-                fonction: enseignant.fonction?.libelle || "Professeur",
-                fonction_id: enseignant.fonction?.id || null,
-                fonction_code: enseignant.fonction?.code || "",
-                fonction_description: enseignant.fonction?.description || "",
-                ecole_id: enseignant.ecole?.id || appParams.ecoleId,
-                ecole_libelle: enseignant.ecole?.libelle || "",
-                ecole_code: enseignant.ecole?.code || "",
-                profil_id: enseignant.profil?.id || appParams.defaults.PROFIL_PROFESSEUR_ID,
-                profil_libelle: enseignant.profil?.libelle || "Professeur",
-                dateCreation: enseignant.dateCreation || "",
-                dateUpdate: enseignant.dateUpdate || "",
-                actif: enseignant.actif !== undefined ? enseignant.actif : true,
+              contact: enseignant.contact || "",
+              email: enseignant.email || "",
+              sexe: enseignant.sexe || "Non spécifié",
+              dateNaissance: enseignant.dateNaissance || "",
+              lieuNaissance: enseignant.lieuNaissance || "",
+              niveauEtude: enseignant.niveauEtude || 0,
+              diplome: enseignant.diplome || "",
+              specialite: enseignant.specialite || "",
+              fonction: enseignant.fonction?.libelle || "Professeur",
+              fonction_id: enseignant.fonction?.id || null,
+              fonction_code: enseignant.fonction?.code || "",
+              fonction_description: enseignant.fonction?.description || "",
+              ecole_id: enseignant.ecole?.id || appParams.ecoleId,
+              ecole_libelle: enseignant.ecole?.libelle || "",
+              ecole_code: enseignant.ecole?.code || "",
+              profil_id: enseignant.profil?.id || appParams.defaults.PROFIL_PROFESSEUR_ID,
+              profil_libelle: enseignant.profil?.libelle || "Professeur",
+              dateCreation: enseignant.dateCreation || "",
+              dateUpdate: enseignant.dateUpdate || "",
+              actif: enseignant.actif !== undefined ? enseignant.actif : true,
 
-                // Affichage optimisé
-                display_text: `${enseignant.nom || "Nom"} ${
-                  enseignant.prenom || "Prénom"
+              // Affichage optimisé
+              display_text: `${enseignant.nom || "Nom"} ${enseignant.prenom || "Prénom"
                 } (${enseignant.fonction?.libelle || "Professeur"})`,
-                display_short: `${enseignant.nom || "Nom"} ${
-                  enseignant.prenom || "Prénom"
+              display_short: `${enseignant.nom || "Nom"} ${enseignant.prenom || "Prénom"
                 }`,
-                display_full: `${enseignant.nom || "Nom"} ${
-                  enseignant.prenom || "Prénom"
-                } - ${enseignant.fonction?.libelle || "Professeur"} - ${
-                  enseignant.contact || "Contact non renseigné"
+              display_full: `${enseignant.nom || "Nom"} ${enseignant.prenom || "Prénom"
+                } - ${enseignant.fonction?.libelle || "Professeur"} - ${enseignant.contact || "Contact non renseigné"
                 }`,
 
-                // Données brutes
-                raw_data: enseignant,
-              }))
+              // Données brutes
+              raw_data: enseignant,
+            }))
             : [];
 
         // Tri par nom puis prénom
@@ -1569,9 +1643,8 @@ export const useEvaluationsDataByFilters = (refreshTrigger = 0) => {
         const finalAnneeId = anneeId || appParams.academicYearId;
 
         // Construction de la clé de cache
-        const cacheKey = `evaluations-filters-${classeId}-${
-          matiereId || "all"
-        }-${periodeId || "all"}-${finalAnneeId}`;
+        const cacheKey = `evaluations-filters-${classeId}-${matiereId || "all"
+          }-${periodeId || "all"}-${finalAnneeId}`;
 
         // Vérifier le cache d'abord
         const cachedData = getFromCache(cacheKey);
@@ -1679,12 +1752,10 @@ export const useEvaluationsDataByFilters = (refreshTrigger = 0) => {
               moyenneClasse: evaluation.moyenneClasse || null,
 
               // Affichage optimisé
-              display_title: `${type_display} - ${
-                evaluation.matiere?.libelle || "Matière"
-              }`,
-              display_subtitle: `${
-                evaluation.classe?.libelle || "Classe"
-              } • ${formatDate(evaluation.date)}`,
+              display_title: `${type_display} - ${evaluation.matiere?.libelle || "Matière"
+                }`,
+              display_subtitle: `${evaluation.classe?.libelle || "Classe"
+                } • ${formatDate(evaluation.date)}`,
               display_details: `/${evaluation.noteSur || 20} • ${formatDuree(
                 evaluation.duree
               )}`,

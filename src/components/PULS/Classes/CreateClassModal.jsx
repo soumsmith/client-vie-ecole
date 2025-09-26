@@ -3,7 +3,9 @@ import { Modal, Form, Input, SelectPicker, Toggle, Button, Message, Loader, Sche
 import axios from 'axios';
 import { useNiveauxBranchesData, useClassesByBrancheData } from "../utils/CommonDataService";
 import { useClassesUrls, useMatieresUrls, useAppParams } from '../utils/apiConfig';
-
+import {
+    useLanguesData
+} from '../utils/CommonDataService';
 
 const { StringType, NumberType } = Schema.Types;
 
@@ -27,42 +29,6 @@ const model = Schema.Model({
 });
 
 /**
- * Hook pour récupérer les langues (LV2)
- */
-const useLanguesData = () => {
-    const [langues, setLangues] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const languesUrls = useMatieresUrls();
-
-
-    const fetchLangues = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const url = languesUrls.getClasseByEcole();
-            const response = await axios.get(url);
-            const formattedLangues = (response.data || []).map(langue => ({
-                label: `${langue.libelle} (${langue.code})`,
-                value: langue.id
-            }));
-            setLangues(formattedLangues);
-        } catch (err) {
-            setError(err.message || 'Erreur lors du chargement des langues');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchLangues();
-    }, [fetchLangues]);
-
-    return { langues, loading, error, refetch: fetchLangues };
-};
-
-
-/**
  * Modal de création d'une nouvelle classe
  */
 const CreateClassModal = ({ visible, onClose, onSuccess }) => {
@@ -79,7 +45,6 @@ const CreateClassModal = ({ visible, onClose, onSuccess }) => {
     const [submitError, setSubmitError] = useState(null);
     const appParams = useAppParams();
     const classesUrls = useClassesUrls();
-
 
 
     // Hooks pour récupérer les données

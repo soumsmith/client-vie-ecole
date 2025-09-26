@@ -17,10 +17,13 @@ import {
 } from 'rsuite';
 import { FiCalendar, FiClock, FiRotateCcw, FiRefreshCw } from 'react-icons/fi';
 import {
-    useNiveauxEnseignementData,
     usePeriodicitesData,
     usePeriodesData
 } from './AnneesScolairesServiceManager';
+
+import { 
+    useNiveauxEnseignementData
+} from '../utils/CommonDataService';
 
 const { Column, HeaderCell, Cell } = Table;
 

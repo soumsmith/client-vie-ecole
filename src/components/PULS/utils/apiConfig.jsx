@@ -125,6 +125,9 @@ const useClassesUrls = () => {
         saveClasse: () =>
             `${baseUrl}classes/saveAndDisplay`,
 
+        updateClasse: () =>
+            `${baseUrl}classes/update-display`,
+
         /**
          * Liste des classes populées par école (utilise automatiquement l'école de l'utilisateur connecté)
          */

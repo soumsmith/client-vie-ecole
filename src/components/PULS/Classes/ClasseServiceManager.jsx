@@ -151,6 +151,13 @@ export const clearClassesCache = () => {
 export const classesTableConfig = {
     columns: [
         {
+            title: 'ID',
+            dataKey: 'id',
+            flexGrow: 1,
+            minWidth: 80,
+            sortable: true
+        },
+        {
             title: 'Libellé',
             dataKey: 'libelle',
             flexGrow: 2,
@@ -235,13 +242,7 @@ export const classesTableConfig = {
                 );
             }
         },
-        {
-            title: 'ID',
-            dataKey: 'id',
-            flexGrow: 1,
-            minWidth: 80,
-            sortable: true
-        },
+        
         {
             title: 'Actions',
             dataKey: 'actions',
