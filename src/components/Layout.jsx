@@ -86,6 +86,9 @@ import CahierDeTexte from './PULS/CahierDeTexte/CahierDeTexte'
 import ModifierMotDePasse from './PULS/GestionMoTdePasse/ModifierMotDePasse';
 import ModifierInfoPersonnelles from './PULS/GestionUserInfos/ModifierInfoPersonnelles';
 import ListeEcoles from './PULS/MesEcoles/ListeEcoles';
+import ConsultationEcoles from './PULS/MesEcoles/ConsultationEcoles';
+
+
 
 
 const Layout = ({ onLogout }) => {
@@ -242,7 +245,9 @@ const Layout = ({ onLogout }) => {
       'profileUtilisateur': '/profileUtilisateur',
       'loginMotDePasse': '/loginMotDePasse',
       'miseAJoursInfo': '/miseAJoursInfo',
-      'mesEcoles': '/mesEcoles',
+      'creerEcole': '/creerEcole',
+      'consultationEcoles': '/consultationEcoles',
+      
       'cahierDeTexte': '/cahierDeTexte',
 
     };
@@ -298,8 +303,8 @@ const Layout = ({ onLogout }) => {
       '/profileUtilisateur': 'Mon Profil',
       '/loginMotDePasse': 'Modifier le mot de Passe',
       '/miseAJoursInfo': 'Modifier mes informations',
-      '/mesEcoles': 'Mes écoles',
-
+      '/creerEcole': 'Mes écoles',
+      '/consultationEcoles': 'Consultation écoles',
       '/settings': 'Paramètres',
       '/teams': 'Équipes',
       '/roles': 'Rôles',
@@ -566,12 +571,14 @@ const Layout = ({ onLogout }) => {
       items.push({ label: "Modifier mes informations", active: true });
     }
 
-    else if (path.includes('/mesEcoles')) {
-      //items.push({ label: "PULS", href: "#" });
-      items.push({ label: "Mes écoles", active: true });
+    else if (path.includes('/creerEcole')) {
+      items.push({ label: "Ajouter écoles", active: true });
     }
 
-    
+    else if (path.includes('/consultationEcoles')) {
+      items.push({ label: "Consultation écoles", active: true });
+    }
+
 
     else if (path.includes('/cahierDeTexte')) {
       items.push({ label: "PULS", href: "#" });
@@ -764,7 +771,8 @@ const Layout = ({ onLogout }) => {
               <Route path="/profileUtilisateur" element={< ProfilUtilisateur />} />
               <Route path="/loginMotDePasse" element={< ModifierMotDePasse />} />
               <Route path="/miseAJoursInfo" element={< ModifierInfoPersonnelles />} />
-              <Route path="/mesEcoles" element={< ListeEcoles />} />
+              <Route path="/creerEcole" element={< ListeEcoles />} />
+              <Route path="/consultationEcoles" element={<ConsultationEcoles />} />
               
               
 

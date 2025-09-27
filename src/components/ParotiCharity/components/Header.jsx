@@ -12,10 +12,10 @@ const navigationUtils = {
     // Gestion des différents types de navigation
     if (item.type === 'modal' && item.modalType && openModal) {
       openModal(item.modalType);
-    } else if (item.type === 'external' || 
-               (item.link && (item.link.startsWith('http') || 
-                             item.link.startsWith('mailto:') || 
-                             item.link.startsWith('tel:')))) {
+    } else if (item.type === 'external' ||
+      (item.link && (item.link.startsWith('http') ||
+        item.link.startsWith('mailto:') ||
+        item.link.startsWith('tel:')))) {
       window.open(item.link, '_blank', 'noopener,noreferrer');
     } else if (item.link && item.link !== '#' && navigate) {
       navigate(item.link);
@@ -42,7 +42,7 @@ const Topbar = () => {
             {topbar.info.map((item) => (
               <li key={item.id}>
                 <i className={item.icon}></i>
-                <a 
+                <a
                   href={item.link}
                   onClick={(e) => {
                     if (item.type !== 'external') {
@@ -59,8 +59,8 @@ const Topbar = () => {
 
           <div className="topbar__social">
             {topbar.social.map((social) => (
-              <a 
-                key={social.id} 
+              <a
+                key={social.id}
                 href={social.link}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -73,7 +73,7 @@ const Topbar = () => {
           <ul className="list-unstyled topbar__links">
             {topbar.links.map((link) => (
               <li key={link.id}>
-                <a 
+                <a
                   href={link.type === 'external' ? link.link : '#'}
                   onClick={(e) => {
                     if (link.type !== 'external') {
@@ -104,7 +104,7 @@ const MenuItem = ({ item, onDropdownToggle, openDropdowns, onModalOpen }) => {
 
   const handleClick = (e) => {
     e.preventDefault();
-    
+
     if (hasChildren) {
       onDropdownToggle(item.id);
     } else {
@@ -114,8 +114,8 @@ const MenuItem = ({ item, onDropdownToggle, openDropdowns, onModalOpen }) => {
 
   return (
     <li className={itemClass}>
-      <a 
-        href={hasChildren ? '#' : item.link} 
+      <a
+        href={hasChildren ? '#' : item.link}
         onClick={handleClick}
         style={{
           display: 'flex',
@@ -128,20 +128,20 @@ const MenuItem = ({ item, onDropdownToggle, openDropdowns, onModalOpen }) => {
         <span style={{ flex: hasChildren ? 1 : 'none' }}>{item.text}</span>
         {hasChildren && (
           <i className={`fas fa-chevron-down dropdown-icon ${isOpen ? 'rotated' : ''}`}
-             style={{ 
-               fontSize: '10px',
-               transition: 'transform 0.3s ease',
-               flexShrink: 0
-             }}
+            style={{
+              fontSize: '10px',
+              transition: 'transform 0.3s ease',
+              flexShrink: 0
+            }}
           ></i>
         )}
       </a>
       {hasChildren && (
         <ul className={`submenu ${isOpen ? 'show' : ''}`}>
           {item.children.map((child) => (
-            <MenuItem 
-              key={child.id} 
-              item={child} 
+            <MenuItem
+              key={child.id}
+              item={child}
               onDropdownToggle={onDropdownToggle}
               openDropdowns={openDropdowns}
               onModalOpen={onModalOpen}
@@ -205,13 +205,13 @@ const LoginDropdown = ({ openModal }) => {
         }}
       >
         <span className={isOpen ? 'text-white' : 'text-white'}>Connexion</span>
-        <i className={`fas fa-chevron-down ${isOpen ? 'rotated' : ''}`} 
-           style={{ 
-             fontSize: '10px',
-             color: isOpen ? 'white' : '#667eea',
-             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-             transition: 'transform 0.3s ease'
-           }}>
+        <i className={`fas fa-chevron-down ${isOpen ? 'rotated' : ''}`}
+          style={{
+            fontSize: '10px',
+            color: isOpen ? 'white' : '#667eea',
+            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 0.3s ease'
+          }}>
         </i>
       </button>
 
@@ -240,12 +240,124 @@ const LoginDropdown = ({ openModal }) => {
             onClick={() => handleOptionClick(option.key)}
             className={`dropdown-option ${index === loginOptions.length - 1 ? 'last' : ''}`}
           >
-            <i className={option.config.icon} 
+            <i className={option.config.icon}
+              style={{
+                marginRight: '8px',
+                color: option.config.color
+              }}
+            ></i>
+            {option.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ===========================
+// COMPOSANT DROPDOWN D'INSCRIPTION
+// ===========================
+const RegistrationDropdown = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleOptionClick = (route) => {
+    navigate(route);
+    setIsOpen(false);
+  };
+
+  // Configuration des options d'inscription avec routes
+  const registrationOptions = [
+    {
+      key: 'etablissement',
+      label: 'Etablissement',
+      route: '/inscription/etablissement',
+      icon: 'fas fa-user-graduate',
+      color: '#667eea'
+    },
+    {
+      key: 'profesionel',
+      label: 'Profesionel',
+      route: '/inscription/profesionel',
+      icon: 'fas fa-users',
+      color: '#48bb78'
+    }
+  ];
+
+  return (
+    <div className="auth-dropdown" ref={dropdownRef} style={{ position: 'relative', display: 'inline-block' }}>
+      <button
+        className="thm-btn thm-btn--two mx-0"
+        onClick={toggleDropdown}
+        style={{
+          color: isOpen ? 'white' : '#667eea',
+          backgroundColor: isOpen ? '#667eea' : 'transparent',
+          transition: 'all 0.3s ease',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}
+      >
+        <span className={'text-white'}>S'inscrire</span>
+        <i className={`fas fa-chevron-down ${isOpen ? 'rotated' : ''}`}
+          style={{
+            fontSize: '10px',
+            color: isOpen ? 'white' : '#667eea',
+            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 0.3s ease'
+          }}>
+        </i>
+      </button>
+
+      <div
+        className={`auth-dropdown-content ${isOpen ? 'show' : ''}`}
+        style={{
+          position: 'absolute',
+          backgroundColor: 'white',
+          minWidth: '220px',
+          boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+          zIndex: 1001,
+          borderRadius: '8px',
+          top: '100%',
+          right: '0',
+          marginTop: '5px',
+          border: '1px solid #e5e5e5',
+          opacity: isOpen ? 1 : 0,
+          visibility: isOpen ? 'visible' : 'hidden',
+          transform: isOpen ? 'translateY(0)' : 'translateY(-10px)',
+          transition: 'all 0.3s ease'
+        }}
+      >
+        {registrationOptions.map((option, index) => (
+          <button
+            key={option.key}
+            onClick={() => handleOptionClick(option.route)}
+            className={`dropdown-option ${index === registrationOptions.length - 1 ? 'last' : ''}`}
+          >
+            {/* <i className={option.icon} 
                style={{ 
                  marginRight: '8px', 
-                 color: option.config.color 
+                 color: option.color 
                }}
-            ></i>
+            ></i> */}
             {option.label}
           </button>
         ))}
@@ -267,7 +379,7 @@ const MainMenu = ({ isSticky = false }) => {
   const [openDropdowns, setOpenDropdowns] = useState([]);
 
   const handleDropdownToggle = (itemId) => {
-    setOpenDropdowns(prev => 
+    setOpenDropdowns(prev =>
       prev.includes(itemId)
         ? prev.filter(id => id !== itemId)
         : [...prev, itemId]
@@ -295,15 +407,11 @@ const MainMenu = ({ isSticky = false }) => {
     closeModal();
   };
 
-  const handleRegistrationClick = () => {
-    openModal('registration');
-  };
-
   return (
     <>
       <nav className={menuClass}>
         <div className="container d-flex justify-content-between align-items-center">
-          <a 
+          <a
             href="/"
             onClick={(e) => {
               e.preventDefault();
@@ -316,9 +424,9 @@ const MainMenu = ({ isSticky = false }) => {
 
           <ul className="main-menu__list">
             {mainMenu.map((item) => (
-              <MenuItem 
-                key={item.id} 
-                item={item} 
+              <MenuItem
+                key={item.id}
+                item={item}
                 onDropdownToggle={handleDropdownToggle}
                 openDropdowns={openDropdowns}
                 onModalOpen={openModal}
@@ -334,25 +442,7 @@ const MainMenu = ({ isSticky = false }) => {
               marginRight: '20px'
             }}>
               <LoginDropdown openModal={openModal} />
-
-              <button
-                onClick={handleRegistrationClick}
-                className="thm-btn thm-btn--two mx-0"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-                onMouseEnter={(e) => {
-                  // e.target.style.backgroundColor = '#5a67d8';
-                }}
-                onMouseLeave={(e) => {
-                  // e.target.style.backgroundColor = '#667eea';
-                }}
-              >
-                <span className={'text-white'}>S'inscrire</span>
-                <i className="fas fa-user-plus"></i>
-              </button>
+              <RegistrationDropdown />
             </div>
 
             <a href="#" className="main-header__toggler mobile-nav__toggler">

@@ -481,7 +481,6 @@ const allMenuSections = [
         title: "Mes demandes d'offres",
         profiles: [""],
       },
-
       {
         type: "item",
         eventKey: "loginMotDePasse",
@@ -491,13 +490,28 @@ const allMenuSections = [
       },
 
       {
-        type: "item",
-        eventKey: "mesEcoles",
-        icon: "TableIcon",
-        title: "Mes écoles",
+        type: "menu",
+        eventKey: "mes-ecoles",
+        icon: "GroupIcon",
+        title: "Gérer mes écoles",
         profiles: ["Candidat-Fondateur"],
+        children: [
+          {
+            type: "item",
+            eventKey: "creerEcole",
+            icon: "TableIcon",
+            title: "Ajouter",
+            profiles: ["Candidat-Fondateur"],
+          },
+          {
+            type: "item",
+            eventKey: "consultationEcoles",
+            icon: "TableIcon",
+            title: "Consulter",
+            profiles: ["Candidat-Fondateur"],
+          },
+        ],
       },
-
       {
         type: "item",
         eventKey: "mesDocuments",

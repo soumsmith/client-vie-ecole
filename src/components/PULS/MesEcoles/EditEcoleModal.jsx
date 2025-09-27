@@ -1,7 +1,7 @@
 /**
- * Modal unifié de création/modification d'école avec onglets
- * VERSION: 2.1.0
- * DESCRIPTION: Modal complet avec sélection en cascade et système d'onglets pour créer ou modifier une école
+ * Modal de création d'école
+ * VERSION: 1.0.0
+ * DESCRIPTION: Modal complet avec sélection en cascade pour créer une nouvelle école
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -17,10 +17,10 @@ import {
     Text,
     Uploader,
     Message,
-    Notification,
-    Nav
+    Notification
 } from 'rsuite';
 import {
+    //FiSchool,
     FiSave,
     FiX,
     FiTag,
@@ -29,12 +29,7 @@ import {
     FiMail,
     FiUpload,
     FiImage,
-    FiFile,
-    FiEdit,
-    FiPlus,
-    FiInfo,
-    FiSettings,
-    FiFileText
+    FiFile
 } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 
@@ -52,28 +47,11 @@ import {
 // ===========================
 // COMPOSANT PRINCIPAL DU MODAL
 // ===========================
-const UnifiedEcoleModal = ({ 
-    show, 
-    onClose, 
-    onSave, 
-    selectedEcole = null, // Null pour création, objet pour modification
-    mode = 'create' // 'create' ou 'edit'
-}) => {
-    // ===========================
-    // DÉTERMINATION DU MODE
-    // ===========================
-    const isEditMode = mode === 'edit' || selectedEcole !== null;
-    
-    // ===========================
-    // ÉTAT POUR LES ONGLETS
-    // ===========================
-    const [activeTab, setActiveTab] = useState('etablissement');
-    
+const CreateEcoleModal = ({ show, onClose, onSave }) => {
     // ===========================
     // ÉTATS DU FORMULAIRE
     // ===========================
     const [formData, setFormData] = useState({
-        // Onglet 1 : Informations sur l'établissement
         pays: null,
         directionRegionale: null,
         ville: null,
@@ -84,22 +62,11 @@ const UnifiedEcoleModal = ({
         niveauEnseignement: null,
         telephoneEtablissement: '',
         codeEtablissement: '',
-        indicationEtablissement: '',
-        
-        // Onglet 2 : Infos supplémentaires
-        signataire: '',
-        adresse: '',
-        
-        // Onglet 3 : Paramètres des bulletins
-        logoUrl: '',
-        filigraneUrl: '',
-        piedPageUrl: ''
+        indicationEtablissement: ''
     });
 
     const [autorisationFile, setAutorisationFile] = useState(null);
     const [logoFile, setLogoFile] = useState(null);
-    const [filigraneFile, setFiligraneFile] = useState(null);
-    const [piedPageFile, setPiedPageFile] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [validationErrors, setValidationErrors] = useState({});
     const { niveaux, loading: niveauxLoading } = useNiveauxEnseignementData();
@@ -118,92 +85,20 @@ const UnifiedEcoleModal = ({
         loadVilles,
         loadCommunes,
         loadZones,
-        loadCascadeForEdit,
         resetCascade
     } = useCascadeSelection();
 
     // ===========================
-    // EFFETS - PRÉ-REMPLISSAGE EN MODE MODIFICATION
+    // EFFETS
     // ===========================
     useEffect(() => {
         if (show) {
-            if (isEditMode && selectedEcole) {
-                prePopulateForm();
-            } else {
-                resetForm();
-            }
+            resetForm();
         }
-    }, [show, selectedEcole, isEditMode]);
+    }, [show]);
 
     // ===========================
-    // PRÉ-REMPLISSAGE DU FORMULAIRE AMÉLIORÉ
-    // ===========================
-    const prePopulateForm = useCallback(async () => {
-        if (!selectedEcole) return;
-
-        console.log('Données de l\'école sélectionnée:', selectedEcole);
-
-        try {
-            // Utiliser la nouvelle fonction pour charger toutes les données en cascade
-            const extractedIds = await loadCascadeForEdit(selectedEcole);
-            
-            // Mapping des données selon la structure de votre API
-            const initialData = {
-                // IDs pour les selects (utiliser les IDs extraits)
-                pays: extractedIds.paysId,
-                directionRegionale: extractedIds.directionRegionaleId,
-                ville: extractedIds.villeId,
-                commune: extractedIds.communeId,
-                zone: extractedIds.zoneId,
-                
-                // Données texte de l'école
-                nomEtablissement: selectedEcole.nom || selectedEcole.sousc_atten_etabliss_nom || '',
-                emailEtablissement: selectedEcole.email || selectedEcole.sousc_atten_etabliss_email || '',
-                telephoneEtablissement: selectedEcole.telephone || selectedEcole.sousc_atten_etabliss_tel || '',
-                codeEtablissement: selectedEcole.code || selectedEcole.sousc_atten_etablisscode || '',
-                indicationEtablissement: selectedEcole.indication || selectedEcole.sousc_atten_etabliss_indication || '',
-                
-                // Niveau d'enseignement
-                niveauEnseignement: selectedEcole.niveauEnseignement?.id || selectedEcole.niveau_Enseignement_obj?.id || null,
-                
-                // Infos supplémentaires (onglet 2)
-                signataire: selectedEcole.signataire || '',
-                adresse: selectedEcole.adresse || '',
-                
-                // Paramètres des bulletins (onglet 3)
-                logoUrl: selectedEcole.lienLogo || selectedEcole.sousc_atten_etabliss_lien_logo || '',
-                filigraneUrl: selectedEcole.lienFiligrane || '',
-                piedPageUrl: selectedEcole.lienPiedPage || ''
-            };
-
-            console.log('Données formulaire pré-remplies:', initialData);
-            setFormData(initialData);
-
-        } catch (error) {
-            console.error('Erreur lors du pré-remplissage du formulaire:', error);
-            // En cas d'erreur, essayer un mapping basique
-            const basicData = {
-                pays: null,
-                directionRegionale: null,
-                ville: null,
-                commune: null,
-                zone: null,
-                nomEtablissement: selectedEcole.nom || selectedEcole.sousc_atten_etabliss_nom || '',
-                emailEtablissement: selectedEcole.email || selectedEcole.sousc_atten_etabliss_email || '',
-                telephoneEtablissement: selectedEcole.telephone || selectedEcole.sousc_atten_etabliss_tel || '',
-                codeEtablissement: selectedEcole.code || selectedEcole.sousc_atten_etablisscode || '',
-                indicationEtablissement: selectedEcole.indication || selectedEcole.sousc_atten_etabliss_indication || '',
-                niveauEnseignement: selectedEcole.niveauEnseignement?.id || selectedEcole.niveau_Enseignement_obj?.id || null,
-                signataire: selectedEcole.signataire || '',
-                adresse: selectedEcole.adresse || ''
-            };
-            setFormData(basicData);
-        }
-
-    }, [selectedEcole, loadCascadeForEdit]);
-
-    // ===========================
-    // GESTIONNAIRES DE FORMULAIRE (inchangés)
+    // GESTIONNAIRES DE FORMULAIRE
     // ===========================
     const handleInputChange = useCallback((name, value) => {
         setFormData(prev => ({
@@ -288,6 +183,7 @@ const UnifiedEcoleModal = ({
     const handleAutorisationFileChange = useCallback((files) => {
         const file = files[0];
         if (file) {
+            // Validation du fichier PDF
             if (file.type !== 'application/pdf') {
                 Swal.fire({
                     icon: 'warning',
@@ -297,6 +193,8 @@ const UnifiedEcoleModal = ({
                 });
                 return;
             }
+
+            // Limite de taille (5MB)
             if (file.size > 5 * 1024 * 1024) {
                 Swal.fire({
                     icon: 'warning',
@@ -312,30 +210,35 @@ const UnifiedEcoleModal = ({
 
     const handleLogoFileChange = useCallback((files) => {
         const file = files[0];
-        if (file && !['image/jpeg', 'image/jpg'].includes(file.type)) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Format de fichier invalide',
-                text: 'Veuillez sélectionner un fichier JPEG pour le logo.',
-                confirmButtonColor: '#f59e0b'
-            });
-            return;
+        if (file) {
+            // Validation du fichier image
+            const validTypes = ['image/jpeg', 'image/jpg'];
+            if (!validTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Format de fichier invalide',
+                    text: 'Veuillez sélectionner un fichier JPEG pour le logo.',
+                    confirmButtonColor: '#f59e0b'
+                });
+                return;
+            }
+
+            // Limite de taille (2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Fichier trop volumineux',
+                    text: 'Le fichier image ne doit pas dépasser 2MB.',
+                    confirmButtonColor: '#f59e0b'
+                });
+                return;
+            }
         }
         setLogoFile(file);
     }, []);
 
-    const handleFiligraneFileChange = useCallback((files) => {
-        const file = files[0];
-        setFiligraneFile(file);
-    }, []);
-
-    const handlePiedPageFileChange = useCallback((files) => {
-        const file = files[0];
-        setPiedPageFile(file);
-    }, []);
-
     // ===========================
-    // SOUMISSION DU FORMULAIRE (inchangé)
+    // SOUMISSION DU FORMULAIRE
     // ===========================
     const handleSave = useCallback(async () => {
         // Validation des données
@@ -351,30 +254,31 @@ const UnifiedEcoleModal = ({
             return;
         }
 
-        const confirmationMessage = isEditMode 
-            ? `Êtes-vous sûr de vouloir modifier l'école "${formData.nomEtablissement}" ?`
-            : `Êtes-vous sûr de vouloir créer l'école "${formData.nomEtablissement}" ?`;
-
+        // Demande de confirmation
         const result = await Swal.fire({
-            title: isEditMode ? 'Confirmer la modification' : 'Confirmer la création',
-            text: confirmationMessage,
+            title: 'Confirmer la création',
+            text: `Êtes-vous sûr de vouloir créer l'école "${formData.nomEtablissement}" ?`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#10b981',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: isEditMode ? 'Oui, modifier' : 'Oui, créer',
+            confirmButtonText: 'Oui, créer',
             cancelButtonText: 'Annuler',
             reverseButtons: true
         });
 
-        if (!result.isConfirmed) return;
+        if (!result.isConfirmed) {
+            return;
+        }
 
         setIsSubmitting(true);
 
         try {
+            // CORRECTION: Préparation des données avec IDs numériques ET libellés
             const ecoleData = {
+                // Données du formulaire (IDs numériques)
                 ...formData,
-                ...(isEditMode && selectedEcole && { id: selectedEcole.id || selectedEcole.sousc_atten_etablissid }),
+                // Ajouter les libellés pour l'affichage dans la table
                 paysLibelle: pays.find(p => p.value === formData.pays)?.label || '',
                 drLibelle: directionsRegionales.find(dr => dr.value === formData.directionRegionale)?.label || '',
                 villeLibelle: villes.find(v => v.value === formData.ville)?.label || '',
@@ -384,55 +288,60 @@ const UnifiedEcoleModal = ({
             };
 
             // Upload des fichiers si nécessaire
-            const uploads = await Promise.allSettled([
-                autorisationFile ? ecolesApiService.uploadFile(autorisationFile, 'autorisation') : null,
-                logoFile ? ecolesApiService.uploadFile(logoFile, 'logo') : null,
-                filigraneFile ? ecolesApiService.uploadFile(filigraneFile, 'filigrane') : null,
-                piedPageFile ? ecolesApiService.uploadFile(piedPageFile, 'piedpage') : null
-            ]);
+            let autorisationUrl = null;
+            let logoUrl = null;
 
-            uploads.forEach((result, index) => {
-                if (result.status === 'fulfilled' && result.value) {
-                    const fileTypes = ['autorisationUrl', 'logoUrl', 'filigraneUrl', 'piedPageUrl'];
-                    ecoleData[fileTypes[index]] = result.value.url;
+            if (autorisationFile) {
+                try {
+                    const autorisationResult = await ecolesApiService.uploadFile(autorisationFile, 'autorisation');
+                    autorisationUrl = autorisationResult.url;
+                } catch (uploadError) {
+                    console.error('Erreur lors de l\'upload de l\'autorisation:', uploadError);
                 }
-            });
-
-            let apiResult;
-            if (onSave) {
-                apiResult = isEditMode 
-                    ? await onSave(ecoleData, 'edit')
-                    : await onSave(ecoleData, 'create');
-            } else {
-                apiResult = isEditMode 
-                    ? await ecolesApiService.updateEcole(ecoleData)
-                    : await ecolesApiService.createEcole(ecoleData);
             }
 
+            if (logoFile) {
+                try {
+                    const logoResult = await ecolesApiService.uploadFile(logoFile, 'logo');
+                    logoUrl = logoResult.url;
+                } catch (uploadError) {
+                    console.error('Erreur lors de l\'upload du logo:', uploadError);
+                }
+            }
+
+            // Ajouter les URLs des fichiers
+            ecoleData.autorisationUrl = autorisationUrl;
+            ecoleData.logoUrl = logoUrl;
+
+            // Appel au callback parent
+            let newEcole;
+            if (onSave) {
+                newEcole = await onSave(ecoleData);
+            } else {
+                newEcole = await ecolesApiService.createEcole(ecoleData);
+            }
+
+            // Notification de succès
             await Swal.fire({
                 icon: 'success',
-                title: isEditMode ? 'École modifiée avec succès !' : 'École créée avec succès !',
-                text: `L'école "${formData.nomEtablissement}" a été ${isEditMode ? 'modifiée' : 'créée'} avec succès.`,
+                title: 'École créée avec succès !',
+                text: `L'école "${formData.nomEtablissement}" a été créée avec succès.`,
                 confirmButtonColor: '#10b981',
                 timer: 3000,
                 showConfirmButton: true
             });
 
+            // Fermer le modal et réinitialiser
             handleClose();
 
         } catch (error) {
-            console.error(`Erreur lors de la ${isEditMode ? 'modification' : 'création'} de l'école:`, error);
-            
-            Swal.fire({
-                icon: 'error',
-                title: `Erreur lors de la ${isEditMode ? 'modification' : 'création'}`,
-                text: error.message || `Une erreur est survenue lors de la ${isEditMode ? 'modification' : 'création'} de l'école.`,
-                confirmButtonColor: '#ef4444'
-            });
+            console.error('Erreur lors de la création de l\'école:', error);
+            // ... gestion des erreurs
         } finally {
             setIsSubmitting(false);
         }
-    }, [formData, pays, directionsRegionales, villes, communes, zones, niveauxEnseignement, autorisationFile, logoFile, filigraneFile, piedPageFile, onSave, isEditMode, selectedEcole]);
+    }, [formData, pays, directionsRegionales, villes, communes, zones, niveauxEnseignement, autorisationFile, logoFile, onSave]);
+
 
     // ===========================
     // UTILITAIRES
@@ -449,19 +358,11 @@ const UnifiedEcoleModal = ({
             niveauEnseignement: null,
             telephoneEtablissement: '',
             codeEtablissement: '',
-            indicationEtablissement: '',
-            signataire: '',
-            adresse: '',
-            logoUrl: '',
-            filigraneUrl: '',
-            piedPageUrl: ''
+            indicationEtablissement: ''
         });
         setAutorisationFile(null);
         setLogoFile(null);
-        setFiligraneFile(null);
-        setPiedPageFile(null);
         setValidationErrors({});
-        setActiveTab('etablissement');
         resetCascade();
     }, [resetCascade]);
 
@@ -475,63 +376,67 @@ const UnifiedEcoleModal = ({
     // ===========================
     // COMPOSANT UPLOAD PERSONNALISÉ
     // ===========================
-    const CustomUploader = ({ file, onFileChange, accept, placeholder, icon: Icon, existingFileUrl }) => (
-        <div>
-            <Uploader
-                fileListVisible={false}
-                listType="text"
-                accept={accept}
-                onChange={onFileChange}
-                disabled={isSubmitting}
-            >
-                <div style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '2px dashed #e2e8f0',
-                    borderRadius: '8px',
-                    backgroundColor: isSubmitting ? '#f8fafc' : '#fafafa',
-                    color: '#64748b',
-                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                    textAlign: 'center',
-                    transition: 'all 0.2s ease'
-                }}>
-                    <Icon style={{ marginRight: '8px' }} />
-                    {file ? file.name : placeholder}
-                </div>
-            </Uploader>
-            
-            {/* Affichage du fichier existant en mode modification */}
-            {isEditMode && existingFileUrl && !file && (
-                <div style={{
-                    marginTop: '8px',
-                    padding: '8px',
-                    backgroundColor: '#f0f9ff',
-                    border: '1px solid #bae6fd',
-                    borderRadius: '6px',
-                    fontSize: '0.85em',
-                    color: '#0369a1'
-                }}>
-                    📎 Fichier existant disponible
-                    <a 
-                        href={existingFileUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        style={{ marginLeft: '8px', color: '#0369a1' }}
-                    >
-                        Voir le fichier
-                    </a>
-                </div>
-            )}
-        </div>
+    const CustomUploader = ({ file, onFileChange, accept, placeholder, icon: Icon }) => (
+        <Uploader
+            fileListVisible={false}
+            listType="text"
+            accept={accept}
+            onChange={onFileChange}
+            disabled={isSubmitting}
+        >
+            <div style={{
+                width: '100%',
+                padding: '12px',
+                border: '2px dashed #e2e8f0',
+                borderRadius: '8px',
+                backgroundColor: isSubmitting ? '#f8fafc' : '#fafafa',
+                color: '#64748b',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                textAlign: 'center',
+                transition: 'all 0.2s ease',
+                '&:hover': !isSubmitting ? {
+                    borderColor: '#c7d2fe',
+                    backgroundColor: '#f0f9ff'
+                } : {}
+            }}>
+                <Icon style={{ marginRight: '8px' }} />
+                {file ? file.name : placeholder}
+            </div>
+        </Uploader>
     );
 
     // ===========================
-    // CONTENU DES ONGLETS
+    // RENDU DU COMPOSANT
     // ===========================
-    const renderTabContent = () => {
-        switch (activeTab) {
-            case 'etablissement':
-                return (
+    return (
+        <Modal
+            open={show}
+            onClose={handleClose}
+            size="lg"
+            backdrop="static"
+            style={{ borderRadius: '16px' }}
+        >
+            <Modal.Header style={{
+                background: '#ffffff',
+                borderBottom: '1px solid #f1f5f9',
+                padding: '24px',
+                borderRadius: '16px 16px 0 0'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    {/* <FiSchool size={24} color="#667eea" /> */}
+                    <Text size="lg" weight="semibold" style={{ color: '#1e293b' }}>
+                        Création d'une École
+                    </Text>
+                </div>
+            </Modal.Header>
+
+            <Modal.Body style={{
+                padding: '32px 24px',
+                background: '#fafafa',
+                maxHeight: '70vh',
+                overflow: 'auto'
+            }}>
+                <Form fluid>
                     <Grid fluid>
                         {/* Section Localisation */}
                         <div style={{
@@ -665,6 +570,7 @@ const UnifiedEcoleModal = ({
                                 marginBottom: '16px',
                                 display: 'block'
                             }}>
+                                {/* <FiSchool size={16} style={{ marginRight: '8px' }} /> */}
                                 Informations de l'École
                             </Text>
 
@@ -762,7 +668,7 @@ const UnifiedEcoleModal = ({
                             </Row>
                         </div>
 
-                        {/* Section Autorisation */}
+                        {/* Section Upload de Fichiers */}
                         <div style={{
                             background: 'white',
                             borderRadius: '12px',
@@ -776,22 +682,39 @@ const UnifiedEcoleModal = ({
                                 display: 'block'
                             }}>
                                 <FiUpload size={16} style={{ marginRight: '8px' }} />
-                                Autorisation de création
+                                Documents
                             </Text>
 
-                            <Form.Group>
-                                <Form.ControlLabel>
-                                    Charger l'autorisation de création (.pdf)
-                                </Form.ControlLabel>
-                                <CustomUploader
-                                    file={autorisationFile}
-                                    onFileChange={handleAutorisationFileChange}
-                                    accept=".pdf"
-                                    placeholder="Choisir un fichier PDF"
-                                    icon={FiFile}
-                                    existingFileUrl={selectedEcole?.lienAutorisation || selectedEcole?.sousc_atten_etabliss_lien_autorisa}
-                                />
-                            </Form.Group>
+                            <Row gutter={16}>
+                                <Col xs={12}>
+                                    <Form.Group>
+                                        <Form.ControlLabel>
+                                            Autorisation de création (.pdf)
+                                        </Form.ControlLabel>
+                                        <CustomUploader
+                                            file={autorisationFile}
+                                            onFileChange={handleAutorisationFileChange}
+                                            accept=".pdf"
+                                            placeholder="Choisir un fichier PDF"
+                                            icon={FiFile}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={12}>
+                                    <Form.Group>
+                                        <Form.ControlLabel>
+                                            Logo de l'école (.jpeg)
+                                        </Form.ControlLabel>
+                                        <CustomUploader
+                                            file={logoFile}
+                                            onFileChange={handleLogoFileChange}
+                                            accept=".jpg,.jpeg"
+                                            placeholder="Choisir un fichier JPEG"
+                                            icon={FiImage}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
                         </div>
 
                         {/* Section Description */}
@@ -819,264 +742,7 @@ const UnifiedEcoleModal = ({
                             </Form.Group>
                         </div>
                     </Grid>
-                );
-
-            case 'supplementaire':
-                return (
-                    <Grid fluid>
-                        <div style={{
-                            background: 'white',
-                            borderRadius: '12px',
-                            padding: '20px',
-                            border: '1px solid #f1f5f9'
-                        }}>
-                            <Row gutter={16}>
-                                <Col xs={12}>
-                                    <Form.Group>
-                                        <Form.ControlLabel>Signataire</Form.ControlLabel>
-                                        <Input
-                                            value={formData.signataire}
-                                            onChange={(value) => handleInputChange('signataire', value)}
-                                            placeholder="Nom du signataire"
-                                            disabled={isSubmitting}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col xs={12}>
-                                    <Form.Group>
-                                        <Form.ControlLabel>Adresse</Form.ControlLabel>
-                                        <Input
-                                            as="textarea"
-                                            rows={3}
-                                            value={formData.adresse}
-                                            onChange={(value) => handleInputChange('adresse', value)}
-                                            placeholder="Adresse complète de l'établissement"
-                                            disabled={isSubmitting}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                        </div>
-                    </Grid>
-                );
-
-            case 'bulletins':
-                return (
-                    <Grid fluid>
-                        <div style={{
-                            background: 'white',
-                            borderRadius: '12px',
-                            padding: '20px',
-                            border: '1px solid #f1f5f9'
-                        }}>
-                            <Row gutter={16} style={{ marginBottom: '24px' }}>
-                                <Col xs={12}>
-                                    <Form.Group>
-                                        <Form.ControlLabel>Charger logo pour bulletin</Form.ControlLabel>
-                                        <CustomUploader
-                                            file={logoFile}
-                                            onFileChange={handleLogoFileChange}
-                                            accept=".jpg,.jpeg"
-                                            placeholder="Choisir un fichier JPEG"
-                                            icon={FiImage}
-                                            existingFileUrl={formData.logoUrl}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col xs={12}>
-                                    <Form.Group>
-                                        <Form.ControlLabel>
-                                            Niveau d'enseignement <span style={{ color: '#ef4444' }}>*</span>
-                                        </Form.ControlLabel>
-                                        <SelectPicker
-                                            data={niveaux}
-                                            value={formData.niveauEnseignement}
-                                            onChange={(value) => handleInputChange('niveauEnseignement', value)}
-                                            placeholder="Sélectionner le niveau"
-                                            style={{ width: '100%' }}
-                                            cleanable={false}
-                                            loading={loadingReference}
-                                            disabled={isSubmitting}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-
-                            <div style={{
-                                backgroundColor: '#e0f2fe',
-                                border: '1px solid #0284c7',
-                                borderRadius: '8px',
-                                padding: '16px',
-                                marginBottom: '24px',
-                                textAlign: 'center'
-                            }}>
-                                <FiInfo size={16} style={{ marginRight: '8px', color: '#0284c7' }} />
-                                <Text style={{ color: '#0284c7', fontSize: '14px' }}>
-                                    Cliquer ici pour charger les informations
-                                </Text>
-                            </div>
-
-                            <div style={{
-                                backgroundColor: '#cffafe',
-                                border: '1px solid #06b6d4',
-                                borderRadius: '8px',
-                                padding: '12px',
-                                marginBottom: '20px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px'
-                            }}>
-                                <FiInfo size={16} style={{ color: '#0891b2' }} />
-                                <Text style={{ color: '#0891b2', fontSize: '12px' }}>
-                                    Assurez vous de charger une grande image avec un fond transparent et une opacité réduite
-                                </Text>
-                            </div>
-
-                            <Row gutter={16}>
-                                <Col xs={12}>
-                                    <Form.Group>
-                                        <Form.ControlLabel>Charger filigrane pour bulletin</Form.ControlLabel>
-                                        <CustomUploader
-                                            file={filigraneFile}
-                                            onFileChange={handleFiligraneFileChange}
-                                            accept=".jpg,.jpeg,.png"
-                                            placeholder="Choisir un fichier image"
-                                            icon={FiImage}
-                                            existingFileUrl={formData.filigraneUrl}
-                                        />
-                                        <div style={{ textAlign: 'center', marginTop: '8px' }}>
-                                            <Text style={{ color: '#3b82f6', fontSize: '12px', cursor: 'pointer' }}>
-                                                Cliquer ici pour charger le filigrane
-                                            </Text>
-                                        </div>
-                                    </Form.Group>
-                                </Col>
-                                <Col xs={12}>
-                                    <Form.Group>
-                                        <Form.ControlLabel>Charger pied de page pour bulletin</Form.ControlLabel>
-                                        <CustomUploader
-                                            file={piedPageFile}
-                                            onFileChange={handlePiedPageFileChange}
-                                            accept=".jpg,.jpeg,.png"
-                                            placeholder="Choisir un fichier image"
-                                            icon={FiImage}
-                                            existingFileUrl={formData.piedPageUrl}
-                                        />
-                                        <div style={{ textAlign: 'center', marginTop: '8px' }}>
-                                            <Text style={{ color: '#3b82f6', fontSize: '12px', cursor: 'pointer' }}>
-                                                Cliquer ici pour charger le pied de page
-                                            </Text>
-                                        </div>
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                        </div>
-                    </Grid>
-                );
-
-            default:
-                return null;
-        }
-    };
-
-    // ===========================
-    // RENDU DU COMPOSANT
-    // ===========================
-    return (
-        <Modal
-            open={show}
-            onClose={handleClose}
-            size="lg"
-            backdrop="static"
-            style={{ borderRadius: '16px' }}
-        >
-            <Modal.Header style={{
-                background: '#ffffff',
-                borderBottom: '1px solid #f1f5f9',
-                padding: '24px',
-                borderRadius: '16px 16px 0 0'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    {isEditMode ? (
-                        <FiEdit size={24} color="#f59e0b" />
-                    ) : (
-                        <FiPlus size={24} color="#667eea" />
-                    )}
-                    <Text size="lg" weight="semibold" style={{ color: '#1e293b' }}>
-                        {isEditMode ? 'Modification d\'une École' : 'Création d\'une École'}
-                    </Text>
-                    {isEditMode && selectedEcole && (
-                        <Text size="sm" style={{ color: '#64748b', marginLeft: 'auto' }}>
-                            ID: {selectedEcole.id || selectedEcole.sousc_atten_etablissid}
-                        </Text>
-                    )}
-                </div>
-            </Modal.Header>
-
-            <Modal.Body style={{
-                padding: '0',
-                background: '#fafafa',
-                maxHeight: '70vh',
-                overflow: 'hidden'
-            }}>
-                {/* Navigation par onglets - Visible seulement en mode modification */}
-                {isEditMode && (
-                    <div style={{ 
-                        backgroundColor: 'white', 
-                        borderBottom: '1px solid #f1f5f9',
-                        padding: '0 24px'
-                    }}>
-                        <Nav 
-                            appearance="tabs" 
-                            activeKey={activeTab}
-                            onSelect={setActiveTab}
-                            style={{ borderBottom: 'none' }}
-                        >
-                            <Nav.Item 
-                                eventKey="etablissement" 
-                                icon={<FiInfo />}
-                                style={{ 
-                                    color: activeTab === 'etablissement' ? '#3b82f6' : '#64748b',
-                                    borderColor: activeTab === 'etablissement' ? '#3b82f6' : 'transparent'
-                                }}
-                            >
-                                Information sur l'établissement
-                            </Nav.Item>
-                            <Nav.Item 
-                                eventKey="supplementaire" 
-                                icon={<FiFileText />}
-                                style={{ 
-                                    color: activeTab === 'supplementaire' ? '#3b82f6' : '#64748b',
-                                    borderColor: activeTab === 'supplementaire' ? '#3b82f6' : 'transparent'
-                                }}
-                            >
-                                Infos supplémentaire établissement
-                            </Nav.Item>
-                            <Nav.Item 
-                                eventKey="bulletins" 
-                                icon={<FiSettings />}
-                                style={{ 
-                                    color: activeTab === 'bulletins' ? '#3b82f6' : '#64748b',
-                                    borderColor: activeTab === 'bulletins' ? '#3b82f6' : 'transparent'
-                                }}
-                            >
-                                Paramètre des bulletins
-                            </Nav.Item>
-                        </Nav>
-                    </div>
-                )}
-
-                {/* Contenu des onglets */}
-                <div style={{
-                    padding: '32px 24px',
-                    overflow: 'auto',
-                    maxHeight: isEditMode ? 'calc(70vh - 120px)' : '70vh'
-                }}>
-                    <Form fluid>
-                        {/* En mode création, afficher seulement le contenu du premier onglet */}
-                        {!isEditMode ? renderTabContent() : renderTabContent()}
-                    </Form>
-                </div>
+                </Form>
             </Modal.Body>
 
             <Modal.Footer style={{
@@ -1107,17 +773,14 @@ const UnifiedEcoleModal = ({
                         loading={isSubmitting}
                         disabled={isSubmitting}
                         style={{
-                            background: isSubmitting ? '#94a3b8' : (isEditMode ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)'),
+                            background: isSubmitting ? '#94a3b8' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                             border: 'none',
                             borderRadius: '8px',
                             padding: '8px 20px',
                             fontWeight: '600'
                         }}
                     >
-                        {isSubmitting 
-                            ? (isEditMode ? 'Modification en cours...' : 'Création en cours...') 
-                            : (isEditMode ? 'Modifier l\'École' : 'Créer l\'École')
-                        }
+                        {isSubmitting ? 'Création en cours...' : 'Créer l\'École'}
                     </Button>
                 </div>
             </Modal.Footer>
@@ -1125,4 +788,4 @@ const UnifiedEcoleModal = ({
     );
 };
 
-export default UnifiedEcoleModal;
+export default CreateEcoleModal;
