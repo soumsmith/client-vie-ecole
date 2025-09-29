@@ -7320,9 +7320,11 @@ h6 {
       {/* Header */}
       <Header />
       <div className='container mt-5'>
-        <ModifierInfoPersonnelles mode="create" 
-                userId={null}  />
-        <ListeEcoles />
+         {typeInscription === 'etablissement' ? (
+          <ListeEcoles />
+        ) : (
+          <ModifierInfoPersonnelles mode="create" userId={null} />
+        )}
       </div>
 
       <Footer />
