@@ -1,7 +1,7 @@
 /**
- * Service pour la gestion de la modification des informations utilisateur
+ * Service pour la gestion de la création et modification des informations utilisateur
  * Contient la logique métier, les appels API et les fonctions utilitaires
- * VERSION CORRIGÉE AVEC GESTION D'UPLOAD
+ * VERSION COMPLÈTE AVEC CRÉATION ET MODIFICATION
  */
 
 import { useState, useCallback, useEffect } from 'react';
@@ -33,8 +33,23 @@ export const USER_CONFIG = {
         'identifiantdomaine_formation',
         'niveau_etudeIdentifiant',
         'fonctionidentifiant'
+    ],
+    REQUIRED_FIELDS_CREATE: [
+        'nom',
+        'prenom', 
+        'email',
+        'contact',
+        'sexe',
+        'date_naissance',
+        'identifiantdomaine_formation',
+        'niveau_etudeIdentifiant',
+        'fonctionidentifiant',
+        'login'
     ]
 };
+
+// Configuration de l'API
+const API_BASE_URL = 'http://46.105.52.105:8889/api';
 
 // ===========================
 // FONCTIONS UTILITAIRES
@@ -42,8 +57,6 @@ export const USER_CONFIG = {
 
 /**
  * Valide un email
- * @param {string} email - Email à valider
- * @returns {object} - { isValid: boolean, message: string }
  */
 export const validateEmail = (email) => {
     if (!email) {
@@ -60,8 +73,6 @@ export const validateEmail = (email) => {
 
 /**
  * Valide un numéro de téléphone
- * @param {string} phone - Numéro à valider
- * @returns {object} - { isValid: boolean, message: string }
  */
 export const validatePhone = (phone) => {
     if (!phone) {
@@ -78,8 +89,6 @@ export const validatePhone = (phone) => {
 
 /**
  * Valide une date de naissance
- * @param {string} date - Date à valider (YYYY-MM-DD)
- * @returns {object} - { isValid: boolean, message: string }
  */
 export const validateBirthDate = (date) => {
     if (!date) {
@@ -98,16 +107,13 @@ export const validateBirthDate = (date) => {
 };
 
 /**
- * Valide un fichier uploadé - VERSION CORRIGÉE
- * @param {File} file - Fichier à valider
- * @returns {object} - { isValid: boolean, message: string }
+ * Valide un fichier uploadé
  */
 export const validateFile = (file) => {
     if (!file) {
         return { isValid: true, message: '' }; // Fichiers optionnels
     }
 
-    // Vérifier que c'est bien un objet File
     if (!(file instanceof File)) {
         return { isValid: false, message: 'Format de fichier invalide' };
     }
@@ -131,79 +137,255 @@ export const validateFile = (file) => {
     return { isValid: true, message: '' };
 };
 
+// ===========================
+// FONCTIONS D'API
+// ===========================
+
 /**
- * Upload un fichier vers le serveur - VERSION AMÉLIORÉE
- * @param {File} file - Fichier à uploader
- * @param {string} endpoint - Endpoint d'upload
- * @returns {Promise<string>} - Nom du fichier uploadé
+ * Vérifie la disponibilité d'un login
  */
-export const uploadFileToServer = async (file, endpoint) => {
+export const checkLoginAvailabilityAPI = async (login) => {
     try {
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        // Ajouter des métadonnées utiles
-        formData.append('originalName', file.name);
-        formData.append('size', file.size.toString());
-        formData.append('type', file.type);
-
-        console.log('Uploading to:', endpoint);
-        console.log('File details:', { name: file.name, size: file.size, type: file.type });
-
-        const response = await axios.post(endpoint, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-            timeout: 30000, // 30 secondes timeout
-            onUploadProgress: (progressEvent) => {
-                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                console.log(`Upload progress: ${percentCompleted}%`);
-            },
-        });
-
-        console.log('Upload response:', response.data);
-
-        // Retourner le nom du fichier selon la réponse du serveur
-        return response.data.fileName || response.data.filename || response.data.name || file.name;
+        const response = await axios.get(`${API_BASE_URL}/connexion/check-pseudo/${login}`);
+        // L'API retourne "Login disponible!" si le login est disponible
+        return {
+            available: response.data.includes('disponible') || response.status === 200,
+            message: response.data
+        };
     } catch (error) {
-        console.error('Erreur upload:', error);
-        
-        if (error.code === 'ECONNABORTED') {
-            throw new Error('Timeout lors de l\'upload du fichier');
-        } else if (error.response?.status === 413) {
-            throw new Error('Fichier trop volumineux pour le serveur');
-        } else if (error.response?.status === 415) {
-            throw new Error('Type de fichier non supporté par le serveur');
-        } else {
-            throw new Error(error.response?.data?.message || 'Erreur lors de l\'upload du fichier');
-        }
+        // Si erreur 404 ou autre, considérer comme indisponible
+        return {
+            available: false,
+            message: 'Login déjà utilisé'
+        };
     }
 };
 
 /**
- * Convertit un fichier en base64 - ALTERNATIVE LOCALE
- * @param {File} file - Fichier à convertir
- * @returns {Promise<string>} - Fichier en base64
+ * Upload des fichiers vers le serveur
+ * @param {Array<File>} files - Tableau de fichiers à uploader
+ * @returns {Promise<Array<string>>} - Tableau des noms de fichiers uploadés
  */
-export const fileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
+export const uploadFilesAPI = async (files) => {
+    try {
+        const formData = new FormData();
+        
+        // Ajouter tous les fichiers au FormData
+        files.forEach((file) => {
+            formData.append('file', file);
+        });
+
+        console.log('Uploading files to:', `${API_BASE_URL}/souscription-personnel/files`);
+        
+        const response = await axios.post(
+            `${API_BASE_URL}/souscription-personnel/files`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                timeout: 60000, // 60 secondes pour l'upload de plusieurs fichiers
+                onUploadProgress: (progressEvent) => {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    console.log(`Upload progress: ${percentCompleted}%`);
+                },
+            }
+        );
+
+        console.log('Upload response:', response.data);
+
+        // L'API devrait retourner les noms des fichiers uploadés
+        // Adapter selon la structure de réponse réelle de votre API
+        return response.data.fileNames || response.data.files || [];
+    } catch (error) {
+        console.error('Erreur upload:', error);
+        throw new Error(error.response?.data?.message || 'Erreur lors de l\'upload des fichiers');
+    }
 };
 
 /**
- * Formate les données pour l'API - VERSION CORRIGÉE AVEC OBJETS PEUPLÉS
- * @param {object} formData - Données du formulaire
- * @param {number} userId - ID de l'utilisateur  
- * @param {object} uploadedFileNames - Noms des fichiers uploadés
- * @param {object} selectLists - Listes de référence (domaines, niveaux, fonctions)
- * @returns {object} - Données formatées pour l'API
+ * Envoie un email avec les identifiants de connexion
  */
-export const formatDataForAPI = (formData, userId, uploadedFileNames = {}, selectLists = {}) => {
-    // Rechercher les objets correspondants dans les listes de référence
+export const sendEmailAPI = async (email, login, password) => {
+    try {
+        const message = `Vos paramètres de connexion pour la suite du processus : Login: ${login}    Mot de passe:${password}`;
+        const objet = 'VOS PARAMETRES DE CONNEXION A POULS-SCOLAIRE';
+
+        const params = new URLSearchParams({
+            destinataire: email,
+            message: message,
+            objet: objet
+        });
+
+        console.log('Sending email to:', email);
+        
+        const response = await axios.post(
+            `${API_BASE_URL}/sendEmail?${params.toString()}`,
+            {},
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                timeout: 15000
+            }
+        );
+
+        console.log('Email sent:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur envoi email:', error);
+        throw new Error('Erreur lors de l\'envoi de l\'email');
+    }
+};
+
+/**
+ * Récupère les informations d'un utilisateur (mode modification)
+ */
+export const getUserInfoAPI = async (userId, apiUrls) => {
+    try {
+        const response = await axios.get(apiUrls.personnel.getUserInfos(userId));
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.message || 'Erreur lors de la récupération des données');
+    }
+};
+
+/**
+ * Récupère la liste des domaines de formation
+ */
+export const getDomainesAPI = async (apiUrls) => {
+    try {
+        const response = await axios.get(apiUrls.domaineFormation.getDomaineFormation());
+        return response.data;
+    } catch (error) {
+        throw new Error('Erreur lors de la récupération des domaines');
+    }
+};
+
+/**
+ * Récupère la liste des niveaux d'étude
+ */
+export const getNiveauxAPI = async (apiUrls) => {
+    try {
+        const response = await axios.get(apiUrls.offres.getNiveauxEtude());
+        return response.data;
+    } catch (error) {
+        throw new Error('Erreur lors de la récupération des niveaux d\'étude');
+    }
+};
+
+/**
+ * Récupère la liste des fonctions
+ */
+export const getFonctionsAPI = async (apiUrls) => {
+    try {
+        const response = await axios.get(apiUrls.fonctions.getFondateur());
+        return response.data;
+    } catch (error) {
+        throw new Error('Erreur lors de la récupération des fonctions');
+    }
+};
+
+/**
+ * Récupère la liste des types d'autorisation
+ */
+export const getAutorisationsAPI = async (apiUrls) => {
+    try {
+        const response = await axios.get(apiUrls.autorisation.getAutorsation());
+        return response.data;
+    } catch (error) {
+        throw new Error('Erreur lors de la récupération des autorisations');
+    }
+};
+
+/**
+ * Crée un nouveau compte utilisateur (POST)
+ */
+export const createUserAPI = async (userData) => {
+    try {
+        console.log('=== CREATE USER API CALL ===');
+        console.log('Endpoint:', `${API_BASE_URL}/souscription-personnel/`);
+        console.log('Data sent:', JSON.stringify(userData, null, 2));
+
+        const response = await axios.post(
+            `${API_BASE_URL}/souscription-personnel/`,
+            userData,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                timeout: 15000
+            }
+        );
+
+        console.log('Create API Response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Create API Error:', error);
+        throw new Error(error.response?.data?.message || 'Erreur lors de la création du compte');
+    }
+};
+
+/**
+ * Met à jour les informations utilisateur (PUT)
+ */
+export const updateUserInfoAPI = async (userData, apiUrls) => {
+    try {
+        console.log('=== UPDATE USER API CALL ===');
+        console.log('Endpoint:', apiUrls.souscriptions.souscriptionPersonnel());
+        console.log('Data sent:', JSON.stringify(userData, null, 2));
+
+        const response = await axios.put(
+            apiUrls.souscriptions.souscriptionPersonnel(),
+            userData,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                timeout: 15000
+            }
+        );
+
+        console.log('Update API Response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Update API Error:', error);
+        throw new Error(error.response?.data?.message || 'Erreur lors de la mise à jour');
+    }
+};
+
+/**
+ * Formate les données pour la création (POST)
+ */
+export const formatDataForCreate = (formData, uploadedFileNames, password) => {
+    return {
+        sous_attent_personnid: null,
+        sous_attent_personn_nom: formData.nom,
+        sous_attent_personn_prenom: formData.prenom,
+        sous_attent_personn_email: formData.email,
+        sous_attent_personn_login: formData.login,
+        sous_attent_personn_sexe: formData.sexe,
+        sous_attent_personn_diplome_recent: formData.diplome_recent || "",
+        sous_attent_personn_date_naissance: formData.date_naissance,
+        sous_attent_personn_nbre_annee_experience: parseInt(formData.nbre_annee_experience) || 0,
+        sous_attent_personn_lien_cv: uploadedFileNames[0] || "",
+        niveau_etudeIdentifiant: parseInt(formData.niveau_etudeIdentifiant) || null,
+        sous_attent_personncode: "",
+        identifiantdomaine_formation: parseInt(formData.identifiantdomaine_formation) || null,
+        fonctionidentifiant: parseInt(formData.fonctionidentifiant) || null,
+        type_autorisation_idtype_autorisationid: formData.type_autorisation_id ? parseInt(formData.type_autorisation_id) : null,
+        sous_attent_personn_password: password,
+        sous_attent_personn_donnee: null,
+        sous_attent_personn_contact: formData.contact,
+        sous_attent_personn_lien_piece: uploadedFileNames[1] || "",
+        sous_attent_personn_lien_autorisation: uploadedFileNames[2] || ""
+    };
+};
+
+/**
+ * Formate les données pour la modification (PUT)
+ */
+export const formatDataForUpdate = (formData, userId, uploadedFileNames, selectLists) => {
     const selectedDomaine = selectLists.domaines?.find(d => d.domaine_formationid == formData.identifiantdomaine_formation);
     const selectedNiveau = selectLists.niveaux?.find(n => n.niveau_etudeid == formData.niveau_etudeIdentifiant);
     const selectedFonction = selectLists.fonctions?.find(f => f.fonctionid == formData.fonctionidentifiant);
@@ -219,18 +401,15 @@ export const formatDataForAPI = (formData, userId, uploadedFileNames = {}, selec
         sous_attent_personn_nbre_annee_experience: parseInt(formData.nbre_annee_experience) || 0,
         sous_attent_personn_contact: formData.contact,
         
-        // CORRECTION: Seulement les noms des fichiers, pas les données base64
-        sous_attent_personn_lien_cv: uploadedFileNames.lien_cv || "",
-        sous_attent_personn_lien_piece: uploadedFileNames.lien_piece || "",  
-        sous_attent_personn_lien_autorisation: uploadedFileNames.lien_autorisation || "",
+        sous_attent_personn_lien_cv: uploadedFileNames[0] || formData.lien_cv || "",
+        sous_attent_personn_lien_piece: uploadedFileNames[1] || formData.lien_piece || "",
+        sous_attent_personn_lien_autorisation: uploadedFileNames[2] || formData.lien_autorisation || "",
         
-        // CORRECTION: Valeurs numériques uniquement
         niveau_etudeIdentifiant: parseInt(formData.niveau_etudeIdentifiant) || null,
         identifiantdomaine_formation: parseInt(formData.identifiantdomaine_formation) || null,
         fonctionidentifiant: parseInt(formData.fonctionidentifiant) || null,
         type_autorisation_idtype_autorisationid: formData.type_autorisation_id ? parseInt(formData.type_autorisation_id) : null,
 
-        // CORRECTION: Objets peuplés avec les vraies données des sélections
         sous_attent_personncode: "",
         domaine_formation: {
             domaine_formationid: selectedDomaine?.domaine_formationid || null,
@@ -254,139 +433,17 @@ export const formatDataForAPI = (formData, userId, uploadedFileNames = {}, selec
 };
 
 // ===========================
-// FONCTIONS D'API
-// ===========================
-
-/**
- * Récupère les informations d'un utilisateur
- * @param {number} userId - ID de l'utilisateur
- * @param {object} apiUrls - URLs d'API
- * @returns {Promise<object>} - Données utilisateur
- */
-export const getUserInfoAPI = async (userId, apiUrls) => {
-    try {
-        const response = await axios.get(apiUrls.personnel.getUserInfos(userId));
-        return response.data;
-    } catch (error) {
-        throw new Error(error.response?.data?.message || 'Erreur lors de la récupération des données');
-    }
-};
-
-/**
- * Récupère la liste des domaines de formation
- * @param {object} apiUrls - URLs d'API
- * @returns {Promise<Array>} - Liste des domaines
- */
-export const getDomainesAPI = async (apiUrls) => {
-    try {
-        const response = await axios.get(apiUrls.domaineFormation.getDomaineFormation());
-        return response.data;
-    } catch (error) {
-        throw new Error('Erreur lors de la récupération des domaines');
-    }
-};
-
-/**
- * Récupère la liste des niveaux d'étude
- * @param {object} apiUrls - URLs d'API
- * @returns {Promise<Array>} - Liste des niveaux
- */
-export const getNiveauxAPI = async (apiUrls) => {
-    try {
-        const response = await axios.get(`${apiUrls.offres.getNiveauxEtude()}`);
-        return response.data;
-    } catch (error) {
-        throw new Error('Erreur lors de la récupération des niveaux d\'étude');
-    }
-};
-
-/**
- * Récupère la liste des fonctions
- * @param {object} apiUrls - URLs d'API
- * @returns {Promise<Array>} - Liste des fonctions
- */
-export const getFonctionsAPI = async (apiUrls) => {
-    try {
-        const response = await axios.get(`${apiUrls.fonctions.getFondateur()}`);
-        return response.data;
-    } catch (error) {
-        throw new Error('Erreur lors de la récupération des fonctions');
-    }
-};
-
-/**
- * Récupère la liste des types d'autorisation
- * @param {object} apiUrls - URLs d'API
- * @returns {Promise<Array>} - Liste des autorisations
- */
-export const getAutorisationsAPI = async (apiUrls) => {
-    try {
-        const response = await axios.get(apiUrls.autorisation.getAutorsation());
-        return response.data;
-    } catch (error) {
-        throw new Error('Erreur lors de la récupération des autorisations');
-    }
-};
-
-/**
- * Met à jour les informations utilisateur - AVEC DEBUG
- * @param {object} userData - Données utilisateur formatées
- * @param {object} apiUrls - URLs d'API
- * @returns {Promise<object>} - Réponse API
- */
-export const updateUserInfoAPI = async (userData, apiUrls) => {
-    try {
-        // DEBUG: Afficher les données exactes envoyées
-        console.log('=== DEBUG API CALL ===');
-        console.log('Endpoint:', `${apiUrls.souscriptions.souscriptionPersonnel()}`);
-        console.log('Data sent:', JSON.stringify(userData, null, 2));
-        console.log('Data size:', JSON.stringify(userData).length, 'characters');
-        console.log('====================');
-
-        const response = await axios.put(`${apiUrls.souscriptions.souscriptionPersonnel()}`, userData, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            timeout: 15000 // 15 secondes
-        });
-
-        console.log('API Response:', response.data);
-        return response.data;
-    } catch (error) {
-        console.error('API Error Details:', {
-            status: error.response?.status,
-            statusText: error.response?.statusText,
-            data: error.response?.data,
-            message: error.message
-        });
-
-        // Messages d'erreur plus précis
-        if (error.response?.status === 400) {
-            const errorMessage = error.response?.data?.message || 
-                               error.response?.data?.error || 
-                               'Données invalides';
-            throw new Error(`Erreur 400: ${errorMessage}`);
-        } else if (error.response?.status === 422) {
-            throw new Error('Erreur de validation des données');
-        } else if (error.response?.status === 500) {
-            throw new Error('Erreur serveur interne');
-        } else {
-            throw new Error(error.response?.data?.message || 'Erreur lors de la mise à jour');
-        }
-    }
-};
-
-// ===========================
-// HOOK PERSONNALISÉ - VERSION CORRIGÉE
+// HOOK PERSONNALISÉ
 // ===========================
 
 /**
  * Hook personnalisé pour gérer les informations utilisateur
- * @param {number} userId - ID de l'utilisateur
- * @returns {object} - État et fonctions de gestion
+ * @param {number} userId - ID de l'utilisateur (null en mode création)
+ * @param {string} mode - 'create' ou 'edit'
  */
-export const useUserInfoForm = (userId) => {
+export const useUserInfoForm = (userId, mode = 'edit') => {
     const apiUrls = useAllApiUrls();
+    const isCreateMode = mode === 'create';
 
     // États du formulaire
     const [formData, setFormData] = useState({
@@ -404,7 +461,8 @@ export const useUserInfoForm = (userId) => {
         type_autorisation_id: '',
         lien_piece: '',
         lien_cv: '',
-        lien_autorisation: ''
+        lien_autorisation: '',
+        login: '' // Uniquement pour la création
     });
 
     // États de validation
@@ -418,70 +476,78 @@ export const useUserInfoForm = (userId) => {
         autorisations: []
     });
 
-    // États des fichiers - NOUVEAU
+    // États des fichiers
     const [uploadedFiles, setUploadedFiles] = useState({
         lien_piece: null,
         lien_cv: null,
         lien_autorisation: null
     });
 
-    // États des URLs des fichiers uploadés - NOUVEAU
-    const [uploadedFileUrls, setUploadedFileUrls] = useState({
-        lien_piece: '',
-        lien_cv: '',
-        lien_autorisation: ''
+    // État pour la vérification du login (mode création)
+    const [loginCheckStatus, setLoginCheckStatus] = useState({
+        checked: false,
+        available: false
     });
 
     // États d'interface
     const [loading, setLoading] = useState(false);
-    const [initialLoading, setInitialLoading] = useState(true);
+    const [initialLoading, setInitialLoading] = useState(!isCreateMode);
 
     // Chargement initial des données
     useEffect(() => {
         const loadInitialData = async () => {
             try {
-                const [userData, domaines, niveaux, fonctions, autorisations] = await Promise.all([
-                    getUserInfoAPI(userId, apiUrls),
-                    getDomainesAPI(apiUrls),
-                    getNiveauxAPI(apiUrls),
-                    getFonctionsAPI(apiUrls),
-                    getAutorisationsAPI(apiUrls)
-                ]);
+                if (isCreateMode) {
+                    // Mode création : charger uniquement les listes de référence
+                    const [domaines, niveaux, fonctions, autorisations] = await Promise.all([
+                        getDomainesAPI(apiUrls),
+                        getNiveauxAPI(apiUrls),
+                        getFonctionsAPI(apiUrls),
+                        getAutorisationsAPI(apiUrls)
+                    ]);
 
-                // Mise à jour des données du formulaire
-                setFormData({
-                    nom: userData.sous_attent_personn_nom || '',
-                    prenom: userData.sous_attent_personn_prenom || '',
-                    email: userData.sous_attent_personn_email || '',
-                    contact: userData.sous_attent_personn_contact || '',
-                    sexe: userData.sous_attent_personn_sexe || 'MASCULIN',
-                    date_naissance: userData.sous_attent_personn_date_naissance?.split('T')[0] || '',
-                    diplome_recent: userData.sous_attent_personn_diplome_recent || '',
-                    nbre_annee_experience: userData.sous_attent_personn_nbre_annee_experience || 0,
-                    identifiantdomaine_formation: userData.domaine_formation?.domaine_formationid || '',
-                    niveau_etudeIdentifiant: userData.niveau_etude?.niveau_etudeid || '',
-                    fonctionidentifiant: userData.fonction?.fonctionid || '',
-                    type_autorisation_id: '',
-                    lien_piece: userData.sous_attent_personn_lien_piece || '',
-                    lien_cv: userData.sous_attent_personn_lien_cv || '',
-                    lien_autorisation: userData.sous_attent_personn_lien_autorisation || ''
-                });
+                    setSelectLists({
+                        domaines,
+                        niveaux,
+                        fonctions,
+                        autorisations
+                    });
+                } else {
+                    // Mode modification : charger les données utilisateur et les listes
+                    const [userData, domaines, niveaux, fonctions, autorisations] = await Promise.all([
+                        getUserInfoAPI(userId, apiUrls),
+                        getDomainesAPI(apiUrls),
+                        getNiveauxAPI(apiUrls),
+                        getFonctionsAPI(apiUrls),
+                        getAutorisationsAPI(apiUrls)
+                    ]);
 
-                // Initialiser les URLs des fichiers existants
-                setUploadedFileUrls({
-                    lien_piece: userData.sous_attent_personn_lien_piece || '',
-                    lien_cv: userData.sous_attent_personn_lien_cv || '',
-                    lien_autorisation: userData.sous_attent_personn_lien_autorisation || ''
-                });
+                    setFormData({
+                        nom: userData.sous_attent_personn_nom || '',
+                        prenom: userData.sous_attent_personn_prenom || '',
+                        email: userData.sous_attent_personn_email || '',
+                        contact: userData.sous_attent_personn_contact || '',
+                        sexe: userData.sous_attent_personn_sexe || 'MASCULIN',
+                        date_naissance: userData.sous_attent_personn_date_naissance?.split('T')[0] || '',
+                        diplome_recent: userData.sous_attent_personn_diplome_recent || '',
+                        nbre_annee_experience: userData.sous_attent_personn_nbre_annee_experience || 0,
+                        identifiantdomaine_formation: userData.domaine_formation?.domaine_formationid || '',
+                        niveau_etudeIdentifiant: userData.niveau_etude?.niveau_etudeid || '',
+                        fonctionidentifiant: userData.fonction?.fonctionid || '',
+                        type_autorisation_id: '',
+                        lien_piece: userData.sous_attent_personn_lien_piece || '',
+                        lien_cv: userData.sous_attent_personn_lien_cv || '',
+                        lien_autorisation: userData.sous_attent_personn_lien_autorisation || '',
+                        login: ''
+                    });
 
-                // Mise à jour des listes de sélection
-                setSelectLists({
-                    domaines,
-                    niveaux,
-                    fonctions,
-                    autorisations
-                });
-
+                    setSelectLists({
+                        domaines,
+                        niveaux,
+                        fonctions,
+                        autorisations
+                    });
+                }
             } catch (error) {
                 console.error('Erreur lors du chargement initial:', error);
             } finally {
@@ -489,10 +555,26 @@ export const useUserInfoForm = (userId) => {
             }
         };
 
-        if (userId) {
-            loadInitialData();
+        loadInitialData();
+    }, [userId, apiUrls, isCreateMode]);
+
+    // Vérifier la disponibilité du login
+    const checkLoginAvailability = useCallback(async (login) => {
+        try {
+            const result = await checkLoginAvailabilityAPI(login);
+            setLoginCheckStatus({
+                checked: true,
+                available: result.available
+            });
+            return result;
+        } catch (error) {
+            setLoginCheckStatus({
+                checked: true,
+                available: false
+            });
+            return { available: false, message: 'Erreur lors de la vérification' };
         }
-    }, [userId, apiUrls]);
+    }, []);
 
     // Gestion des changements de champs
     const handleInputChange = useCallback((field, value) => {
@@ -500,6 +582,14 @@ export const useUserInfoForm = (userId) => {
             ...prev,
             [field]: value
         }));
+
+        // Réinitialiser le statut de vérification du login si le login change
+        if (field === 'login' && isCreateMode) {
+            setLoginCheckStatus({
+                checked: false,
+                available: false
+            });
+        }
 
         // Validation en temps réel
         let fieldValidation = { isValid: true, message: '' };
@@ -514,8 +604,14 @@ export const useUserInfoForm = (userId) => {
             case 'date_naissance':
                 fieldValidation = validateBirthDate(value);
                 break;
+            case 'login':
+                if (isCreateMode && (!value || value.trim().length < 3)) {
+                    fieldValidation = { isValid: false, message: 'Le login doit contenir au moins 3 caractères' };
+                }
+                break;
             default:
-                if (USER_CONFIG.REQUIRED_FIELDS.includes(field) && !value) {
+                const requiredFields = isCreateMode ? USER_CONFIG.REQUIRED_FIELDS_CREATE : USER_CONFIG.REQUIRED_FIELDS;
+                if (requiredFields.includes(field) && !value) {
                     fieldValidation = { isValid: false, message: 'Ce champ est requis' };
                 }
         }
@@ -524,39 +620,23 @@ export const useUserInfoForm = (userId) => {
             ...prev,
             [field]: fieldValidation
         }));
-    }, []);
+    }, [isCreateMode]);
 
-    // Gestion des fichiers - VERSION CORRIGÉE
+    // Gestion des fichiers
     const handleFileChange = useCallback((field, file) => {
-        console.log('handleFileChange called:', { field, file });
-
         const fileValidation = validateFile(file);
 
         if (fileValidation.isValid && file) {
-            // Stocker le fichier pour upload ultérieur
             setUploadedFiles(prev => ({
                 ...prev,
                 [field]: {
                     name: file.name,
                     size: file.size,
                     type: file.type,
-                    file: file, // Garder référence au fichier original
+                    file: file,
                     lastModified: file.lastModified
                 }
             }));
-
-            // Créer une URL temporaire pour prévisualisation si c'est une image
-            if (file.type.startsWith('image/')) {
-                const previewUrl = URL.createObjectURL(file);
-                setUploadedFileUrls(prev => ({
-                    ...prev,
-                    [field]: previewUrl
-                }));
-            }
-
-            console.log('File stored successfully:', file.name);
-        } else {
-            console.error('File validation failed:', fileValidation);
         }
 
         setValidation(prev => ({
@@ -565,63 +645,44 @@ export const useUserInfoForm = (userId) => {
         }));
     }, []);
 
-    // Fonction pour supprimer un fichier - NOUVEAU
+    // Supprimer un fichier
     const removeFile = useCallback((field) => {
         setUploadedFiles(prev => ({
             ...prev,
             [field]: null
         }));
 
-        // Nettoyer l'URL temporaire si elle existe
-        if (uploadedFileUrls[field] && uploadedFileUrls[field].startsWith('blob:')) {
-            URL.revokeObjectURL(uploadedFileUrls[field]);
-        }
-
-        setUploadedFileUrls(prev => ({
-            ...prev,
-            [field]: ''
-        }));
-
-        // Nettoyer la validation
         setValidation(prev => {
             const newValidation = { ...prev };
             delete newValidation[field];
             return newValidation;
         });
-    }, [uploadedFileUrls]);
+    }, []);
 
-    // Fonction pour uploader tous les fichiers - VERSION CORRIGÉE
-    const uploadAllFiles = useCallback(async (apiUrls) => {
-        const uploadedFileNames = {};
+    // Upload de tous les fichiers
+    const uploadAllFiles = useCallback(async () => {
+        const filesToUpload = [];
+        const fileFields = ['lien_cv', 'lien_piece', 'lien_autorisation'];
 
-        for (const [field, fileData] of Object.entries(uploadedFiles)) {
-            if (fileData && fileData.file) {
-                console.log(`Uploading ${field}:`, fileData.name);
-                
-                try {
-                    // OPTION 1: Upload réel vers serveur (recommandé)
-                    if (apiUrls.upload) {
-                        const uploadEndpoint = `${apiUrls.upload}/files`;
-                        const serverFileName = await uploadFileToServer(fileData.file, uploadEndpoint);
-                        uploadedFileNames[field] = serverFileName;
-                    } else {
-                        // OPTION 2: Simulation - utiliser le nom original du fichier
-                        // En attendant la configuration de l'endpoint d'upload
-                        uploadedFileNames[field] = fileData.name;
-                        
-                        // Vous devrez implémenter l'upload réel ici
-                        console.warn(`Upload simulation pour ${field}. Configurez apiUrls.upload pour un upload réel.`);
-                    }
-                    
-                    console.log(`${field} uploaded successfully:`, uploadedFileNames[field]);
-                } catch (error) {
-                    console.error(`Erreur upload ${field}:`, error);
-                    throw new Error(`Erreur lors de l'upload du fichier ${field}: ${error.message}`);
-                }
+        // Collecter tous les fichiers à uploader dans l'ordre
+        fileFields.forEach(field => {
+            if (uploadedFiles[field] && uploadedFiles[field].file) {
+                filesToUpload.push(uploadedFiles[field].file);
             }
+        });
+
+        if (filesToUpload.length === 0) {
+            return [];
         }
 
-        return uploadedFileNames;
+        try {
+            const uploadedFileNames = await uploadFilesAPI(filesToUpload);
+            console.log('Files uploaded successfully:', uploadedFileNames);
+            return uploadedFileNames;
+        } catch (error) {
+            console.error('Error uploading files:', error);
+            throw new Error('Erreur lors de l\'upload des fichiers');
+        }
     }, [uploadedFiles]);
 
     // Validation complète du formulaire
@@ -629,7 +690,9 @@ export const useUserInfoForm = (userId) => {
         const newValidation = {};
         let isValid = true;
 
-        USER_CONFIG.REQUIRED_FIELDS.forEach(field => {
+        const requiredFields = isCreateMode ? USER_CONFIG.REQUIRED_FIELDS_CREATE : USER_CONFIG.REQUIRED_FIELDS;
+
+        requiredFields.forEach(field => {
             const value = formData[field];
             if (!value || (typeof value === 'string' && value.trim() === '')) {
                 newValidation[field] = { isValid: false, message: 'Ce champ est requis' };
@@ -655,23 +718,12 @@ export const useUserInfoForm = (userId) => {
             isValid = false;
         }
 
-        // Validation des fichiers
-        Object.entries(uploadedFiles).forEach(([field, fileData]) => {
-            if (fileData) {
-                const fileValidation = validateFile(fileData.file);
-                if (!fileValidation.isValid) {
-                    newValidation[field] = fileValidation;
-                    isValid = false;
-                }
-            }
-        });
-
         setValidation(newValidation);
         return isValid;
-    }, [formData, uploadedFiles]);
+    }, [formData, isCreateMode]);
 
-    // Soumission du formulaire - VERSION CORRIGÉE
-    const handleSubmit = useCallback(async () => {
+    // Soumission du formulaire
+    const handleSubmit = useCallback(async (password = null) => {
         if (!validateForm()) {
             return { success: false, error: 'Veuillez corriger les erreurs dans le formulaire' };
         }
@@ -679,41 +731,53 @@ export const useUserInfoForm = (userId) => {
         setLoading(true);
 
         try {
-            // 1. Uploader tous les fichiers en premier (si il y en a)
-            console.log('Processing file uploads...');
-            const uploadedFileNames = await uploadAllFiles(apiUrls);
-            console.log('Files processed:', uploadedFileNames);
+            // 1. Uploader les fichiers
+            console.log('Uploading files...');
+            const uploadedFileNames = await uploadAllFiles();
+            console.log('Files uploaded:', uploadedFileNames);
 
-            // 2. Formater les données avec les noms des fichiers
-            const formattedData = formatDataForAPI(formData, userId, uploadedFileNames);
-            console.log('Formatted data for API:', formattedData);
+            let result;
 
-            // 3. Envoyer les données à l'API
-            const result = await updateUserInfoAPI(formattedData, apiUrls);
-            console.log('API Response:', result);
+            if (isCreateMode) {
+                // MODE CRÉATION
+                // 2. Formater les données pour la création
+                const formattedData = formatDataForCreate(formData, uploadedFileNames, password);
+                console.log('Creating user with data:', formattedData);
+
+                // 3. Créer le compte
+                result = await createUserAPI(formattedData);
+                console.log('User created:', result);
+
+                // 4. Envoyer l'email avec les identifiants
+                try {
+                    await sendEmailAPI(formData.email, formData.login, password);
+                    console.log('Email sent successfully');
+                } catch (emailError) {
+                    console.error('Error sending email:', emailError);
+                    // Ne pas bloquer si l'email échoue
+                }
+            } else {
+                // MODE MODIFICATION
+                // 2. Formater les données pour la modification
+                const formattedData = formatDataForUpdate(formData, userId, uploadedFileNames, selectLists);
+                console.log('Updating user with data:', formattedData);
+
+                // 3. Mettre à jour le compte
+                result = await updateUserInfoAPI(formattedData, apiUrls);
+                console.log('User updated:', result);
+            }
 
             return { success: true };
         } catch (error) {
-            console.error('Erreur lors de la soumission:', error);
+            console.error('Error during submission:', error);
             return {
                 success: false,
-                error: error.message || 'Erreur lors de la mise à jour'
+                error: error.message || (isCreateMode ? 'Erreur lors de la création' : 'Erreur lors de la mise à jour')
             };
         } finally {
             setLoading(false);
         }
-    }, [formData, userId, validateForm, apiUrls, uploadAllFiles]);
-
-    // Nettoyage des URLs temporaires lors du démontage du composant
-    useEffect(() => {
-        return () => {
-            Object.values(uploadedFileUrls).forEach(url => {
-                if (url && url.startsWith('blob:')) {
-                    URL.revokeObjectURL(url);
-                }
-            });
-        };
-    }, []);
+    }, [formData, userId, validateForm, uploadAllFiles, isCreateMode, selectLists, apiUrls]);
 
     return {
         formData,
@@ -722,11 +786,12 @@ export const useUserInfoForm = (userId) => {
         loading,
         initialLoading,
         uploadedFiles,
-        uploadedFileUrls,
+        loginCheckStatus,
         handleInputChange,
         handleFileChange,
         handleSubmit,
-        removeFile
+        removeFile,
+        checkLoginAvailability
     };
 };
 
@@ -745,7 +810,7 @@ export const UI_CONFIG = {
         EXPERIENCE: 'Nombre d\'année d\'expérience*',
         DOMAINE: 'Domaine de formation*',
         NIVEAU: 'Niveau d\'étude*',
-        FONCTION: 'Fonction *',
+        FONCTION: 'Fonction*',
         AUTORISATION: 'Type autorisation',
         PIECE: 'Charger votre pièce*',
         CV: 'Charger votre cv*',

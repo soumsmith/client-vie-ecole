@@ -42,7 +42,7 @@ import {
     useUserInfoForm,
     UI_CONFIG,
     USER_CONFIG
-} from './UserInfoService';
+} from '../GestionUserInfos/UserInfoService';
 import { getUserProfile } from "../../hooks/userUtils";
 
 /**

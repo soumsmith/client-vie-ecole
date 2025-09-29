@@ -770,7 +770,8 @@ const Layout = ({ onLogout }) => {
                    =========================== */}
               <Route path="/profileUtilisateur" element={< ProfilUtilisateur />} />
               <Route path="/loginMotDePasse" element={< ModifierMotDePasse />} />
-              <Route path="/miseAJoursInfo" element={< ModifierInfoPersonnelles />} />
+              <Route path="/miseAJoursInfo" element={< ModifierInfoPersonnelles  mode="edit" 
+                userId={null} />} />
               <Route path="/creerEcole" element={< ListeEcoles />} />
               <Route path="/consultationEcoles" element={<ConsultationEcoles />} />
               
