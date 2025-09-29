@@ -18,10 +18,13 @@ import Newsletter from './components/Newsletter';
 import MobileNav from './components/MobileNav';
 import TestimonialsSection from './components/TestimonialsSection';
 import Footer from './components/Footer';
+import ListeEcoles from '../PULS/MesEcoles/ListeEcoles';
+import ModifierInfoPersonnelles from '../PULS/GestionUserInfos/ModifierInfoPersonnelles';
 
-
-// Import direct des styles CSS existants (SANS FontAwesome local)
-
+// IMPORTS CSS - À AJOUTER SELON VOS FICHIERS
+// import './assets/css/bootstrap.min.css';
+// import './assets/css/style.css';
+// import './assets/css/responsive.css';
 
 // ===========================
 // COMPOSANT SEARCH POPUP
@@ -52,7 +55,6 @@ const Preloader = ({ isLoading }) => {
   return (
     <div className="preloader">
       <div className="preloader__image" style={{ backgroundImage: 'url(assets/images/loader.png)' }}>
-        {/* Fallback spinner si l'image ne charge pas */}
         <div className="spinner-border text-primary" role="status">
           <span className="sr-only">Loading...</span>
         </div>
@@ -64,14 +66,15 @@ const Preloader = ({ isLoading }) => {
 // ===========================
 // COMPOSANT PAROTI CHARITY PRINCIPAL
 // ===========================
-const ParotiCharity = () => {
+const ParotiCharity = ({ typeInscription = 'home' }) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [stylesLoaded, setStylesLoaded] = useState(false);
 
   const volunteersData = [
     {
       name: "Yoni Albert",
       job: "Volunteers",
-      color: "#E85A2B", // Orange
+      color: "#E85A2B",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
       socialLinks: {
         facebook: "#",
@@ -83,7 +86,7 @@ const ParotiCharity = () => {
     {
       name: "Christine Eve",
       job: "Volunteers",
-      color: "#F4A621", // Jaune
+      color: "#F4A621",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
       socialLinks: {
         facebook: "#",
@@ -95,7 +98,7 @@ const ParotiCharity = () => {
     {
       name: "David Hardson",
       job: "Volunteers",
-      color: "#8B5CF6", // Violet
+      color: "#8B5CF6",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
       socialLinks: {
         facebook: "#",
@@ -107,7 +110,7 @@ const ParotiCharity = () => {
     {
       name: "Jessica Brown",
       job: "Volunteers",
-      color: "#14B8A6", // Bleu-vert
+      color: "#14B8A6",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=800",
       socialLinks: {
         facebook: "#",
@@ -118,18 +121,31 @@ const ParotiCharity = () => {
     }
   ];
 
-  // Charger FontAwesome depuis CDN et gérer le preloader
+  // Charger FontAwesome et styles
   useEffect(() => {
-    // Ajouter FontAwesome CDN
-    const fontAwesomeLink = document.createElement('link');
-    fontAwesomeLink.rel = 'stylesheet';
-    fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
-    fontAwesomeLink.integrity = 'sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==';
-    fontAwesomeLink.crossOrigin = 'anonymous';
-    document.head.appendChild(fontAwesomeLink);
+    // Vérifier si FontAwesome est déjà chargé
+    const existingFontAwesome = document.querySelector('link[href*="font-awesome"]');
+    
+    if (!existingFontAwesome) {
+      const fontAwesomeLink = document.createElement('link');
+      fontAwesomeLink.rel = 'stylesheet';
+      fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+      fontAwesomeLink.integrity = 'sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==';
+      fontAwesomeLink.crossOrigin = 'anonymous';
+      
+      // Attendre que FontAwesome soit chargé
+      fontAwesomeLink.onload = () => {
+        setStylesLoaded(true);
+      };
+      
+      document.head.appendChild(fontAwesomeLink);
+    } else {
+      setStylesLoaded(true);
+    }
 
     // Ajouter styles personnalisés
     const customStyles = document.createElement('style');
+    customStyles.id = 'paroti-custom-styles';
     customStyles.textContent = `
       /* Styles personnalisés pour Paroti */
       .page-wrapper {
@@ -7432,22 +7448,29 @@ h6 {
     `;
     document.head.appendChild(customStyles);
 
-    // Simuler le chargement et masquer le preloader après 2 secondes
+    // Masquer le preloader une fois que tout est chargé
     const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+      if (stylesLoaded) {
+        setIsLoading(false);
+      }
+    }, 1000);
 
-    // Cleanup function
+    // Cleanup - NE PAS RETIRER LES STYLES
     return () => {
       clearTimeout(timer);
-      if (document.head.contains(fontAwesomeLink)) {
-        document.head.removeChild(fontAwesomeLink);
-      }
-      if (document.head.contains(customStyles)) {
-        document.head.removeChild(customStyles);
-      }
+      // Ne pas retirer FontAwesome et les styles pour éviter les problèmes de rendu
     };
-  }, []);
+  }, [stylesLoaded]);
+
+  // Effect séparé pour gérer le preloader
+  useEffect(() => {
+    if (stylesLoaded) {
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [stylesLoaded]);
 
   return (
     <div className="page-wrapper">
@@ -7456,60 +7479,71 @@ h6 {
 
       {/* Header */}
       <Header />
+      
+      <div id='inscription-page' className='container'>
+        {typeInscription === 'etablissement' ? (
+          <ListeEcoles mode="inscription" userId={null} />
+        ) : typeInscription === 'professionel' ? (
+          <ModifierInfoPersonnelles mode="create" userId={null} />
+        ) : null}
+      </div>
 
-      {/* Slider */}
-      <Slider />
+      {typeInscription === 'home' && (
+        <>
+          {/* Slider */}
+          <Slider />
 
-      {/* About Section */}
-      <About />
-      <AboutSection />
-      <FaqSection />
-      <TestimonialsSection />
+          {/* About Section */}
+          <About />
+          <AboutSection />
+          <FaqSection />
+          <TestimonialsSection />
 
-      {/* Donation Section */}
-      <Donation />
+          {/* Donation Section */}
+          <Donation />
 
-      {/* CTA Section */}
-      {/* <CTA /> */}
+          {/* CTA Section */}
+          {/* <CTA /> */}
 
-      {/* Causes Section */}
-      <Causes />
+          {/* Causes Section */}
+          <Causes />
 
-      {/* Testimonials Section */}
-      {/* <Testimonials /> */}
+          {/* Testimonials Section */}
+          {/* <Testimonials /> */}
 
-      {/* Gallery Section */}
-      {/* <Gallery /> */}
+          {/* Gallery Section */}
+          {/* <Gallery /> */}
 
-      {/* Video Section */}
-      {/* <Video /> */}
+          {/* Video Section */}
+          {/* <Video /> */}
 
+          {/* Funfact/Statistics Section */}
+          <Funfact />
 
+          {/* Blog Section */}
+          <Blog />
 
+          <VolunteersCarousel
+            volunteers={volunteersData}
+            title="Notre équipe de bénévoles"
+            subtitle="Ils font la différence"
+          />
 
-      {/* Funfact/Statistics Section */}
-      <Funfact />
+          {/* Sponsors Section */}
+          <Sponsors />
 
-      {/* Blog Section */}
-      <Blog />
+          {/* Newsletter Section */}
+          <Newsletter />
 
-      <VolunteersCarousel
-        volunteers={volunteersData}
-        title="Notre équipe de bénévoles"
-        subtitle="Ils font la différence"
-      />
+          {/* Mobile Navigation */}
+          <MobileNav />
 
-      {/* Sponsors Section */}
-      <Sponsors />
+          {/* Search Popup */}
+          <SearchPopup />
+        </>
+      )}
 
-      {/* Newsletter Section */}
-      <Newsletter />
-
-      {/* Mobile Navigation */}
-      <MobileNav />
-
-      {/* Search Popup */}
-      <SearchPopup />
+      {/* Footer */}
       <Footer />
     </div>
   );

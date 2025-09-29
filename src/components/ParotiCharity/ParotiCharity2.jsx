@@ -1,15 +1,125 @@
 import React, { useEffect, useState } from 'react';
-import Footer from '../../ParotiCharity/components/Footer';
-import ListeEcoles from '../MesEcoles/ListeEcoles';
-import ModifierInfoPersonnelles from '../GestionUserInfos/ModifierInfoPersonnelles';
-import Header from '../../ParotiCharity/components/Header';
+import Header from './components/Header';
+import Slider from './components/Slider';
+import About from './components/About';
+import AboutSection from './components/AboutSection';
+import Donation from './components/Donation';
+import FaqSection from './components/FaqSection';
+import CTA from './components/CTA';
+import Causes from './components/Causes';
+import Testimonials from './components/Testimonials';
+import VolunteersCarousel from './components/VolunteersCarousel';
+import Gallery from './components/Gallery';
+import Video from './components/Video';
+import Sponsors from './components/Sponsors';
+import Funfact from './components/Funfact';
+import Blog from './components/Blog';
+import Newsletter from './components/Newsletter';
+import MobileNav from './components/MobileNav';
+import TestimonialsSection from './components/TestimonialsSection';
+import Footer from './components/Footer';
+import ListeEcoles from '../PULS/MesEcoles/ListeEcoles';
+import ModifierInfoPersonnelles from '../PULS/GestionUserInfos/ModifierInfoPersonnelles';
 
+
+
+// Import direct des styles CSS existants (SANS FontAwesome local)
+
+
+// ===========================
+// COMPOSANT SEARCH POPUP
+// ===========================
+const SearchPopup = () => {
+  return (
+    <div className="search-popup">
+      <div className="search-popup__overlay search-toggler"></div>
+      <div className="search-popup__content">
+        <form action="#">
+          <label htmlFor="search" className="sr-only">search here</label>
+          <input type="text" id="search" placeholder="Search Here..." />
+          <button type="submit" aria-label="search submit" className="thm-btn">
+            <i className="fa fa-search"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// ===========================
+// COMPOSANT PRELOADER
+// ===========================
+const Preloader = ({ isLoading }) => {
+  if (!isLoading) return null;
+
+  return (
+    <div className="preloader">
+      <div className="preloader__image" style={{ backgroundImage: 'url(assets/images/loader.png)' }}>
+        {/* Fallback spinner si l'image ne charge pas */}
+        <div className="spinner-border text-primary" role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // ===========================
 // COMPOSANT PAROTI CHARITY PRINCIPAL
 // ===========================
-const Inscription = ({typeInscription = 'etablissement'}) => {
+const ParotiCharity = ({ typeInscription = 'home' }) => {
+  const [isLoading, setIsLoading] = useState(true);
 
+  const volunteersData = [
+    {
+      name: "Yoni Albert",
+      job: "Volunteers",
+      color: "#E85A2B", // Orange
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+      socialLinks: {
+        facebook: "#",
+        twitter: "#",
+        instagram: "#",
+        pinterest: "#"
+      }
+    },
+    {
+      name: "Christine Eve",
+      job: "Volunteers",
+      color: "#F4A621", // Jaune
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+      socialLinks: {
+        facebook: "#",
+        twitter: "#",
+        instagram: "#",
+        pinterest: "#"
+      }
+    },
+    {
+      name: "David Hardson",
+      job: "Volunteers",
+      color: "#8B5CF6", // Violet
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+      socialLinks: {
+        facebook: "#",
+        twitter: "#",
+        instagram: "#",
+        pinterest: "#"
+      }
+    },
+    {
+      name: "Jessica Brown",
+      job: "Volunteers",
+      color: "#14B8A6", // Bleu-vert
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=800",
+      socialLinks: {
+        facebook: "#",
+        twitter: "#",
+        instagram: "#",
+        pinterest: "#"
+      }
+    }
+  ];
 
   // Charger FontAwesome depuis CDN et gérer le preloader
   useEffect(() => {
@@ -63,6 +173,34 @@ const Inscription = ({typeInscription = 'etablissement'}) => {
         .main-header__toggler {
           display: none !important;
         }
+      }
+
+      /* Preloader */
+      .preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .preloader__image {
+        width: 100px;
+        height: 100px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
       }
 
       /* Mobile Navigation */
@@ -7316,20 +7454,78 @@ h6 {
 
   return (
     <div className="page-wrapper">
+      {/* Preloader */}
+      {/* <Preloader isLoading={isLoading} /> */}
 
       {/* Header */}
       <Header />
-      <div className='container mt-5'>
-         {typeInscription === 'etablissement' ? (
-          <ListeEcoles />
-        ) : (
+      <div id='inscription-page' className='container'>
+        {typeInscription === 'etablissement' ? (
+          <ListeEcoles mode="inscription" userId={null} />
+        ) : typeInscription === 'professionel' ? (
           <ModifierInfoPersonnelles mode="create" userId={null} />
-        )}
+        ) : null}
       </div>
+
+
+      {typeInscription === 'home' && (
+        <>
+          {/* Slider */}
+          <Slider />
+
+          {/* About Section */}
+          <About />
+          <AboutSection />
+          <FaqSection />
+          <TestimonialsSection />
+
+          {/* Donation Section */}
+          <Donation />
+
+          {/* CTA Section */}
+          {/* <CTA /> */}
+
+          {/* Causes Section */}
+          <Causes />
+
+          {/* Testimonials Section */}
+          {/* <Testimonials /> */}
+
+          {/* Gallery Section */}
+          {/* <Gallery /> */}
+
+          {/* Video Section */}
+          {/* <Video /> */}
+
+          {/* Funfact/Statistics Section */}
+          <Funfact />
+
+          {/* Blog Section */}
+          <Blog />
+
+          <VolunteersCarousel
+            volunteers={volunteersData}
+            title="Notre équipe de bénévoles"
+            subtitle="Ils font la différence"
+          />
+
+          {/* Sponsors Section */}
+          <Sponsors />
+
+          {/* Newsletter Section */}
+          <Newsletter />
+
+          {/* Mobile Navigation */}
+          <MobileNav />
+
+          {/* Search Popup */}
+          <SearchPopup />
+        </>
+      )}
 
       <Footer />
     </div>
   );
 };
 
-export default Inscription;
+export default ParotiCharity;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     Button,
     Avatar,
@@ -22,10 +22,11 @@ import {
     FiFileText,
     FiCheck,
     FiMapPin,
-    FiClock
+    FiClock,
+    FiRefreshCw
 } from 'react-icons/fi';
-import getFullUrl from "../../hooks/urlUtils";
-import axios from 'axios';
+import { useUserProfile, userProfileUtils } from './ProfileServiceManager';
+import { usePulsParams } from '../../hooks/useDynamicParams';
 
 // ===========================
 // SYSTÈME DE DESIGN MODERNE
@@ -120,14 +121,6 @@ const Card = ({ children, className = '', hover = false, ...props }) => {
         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
         ...props.style
     };
-
-    const hoverStyle = hover ? {
-        ':hover': {
-            transform: 'translateY(-2px)',
-            boxShadow: designSystem.shadows.md,
-            borderColor: designSystem.colors.neutral[300]
-        }
-    } : {};
 
     return (
         <div
@@ -299,7 +292,7 @@ const InfoItem = ({ icon, label, value, highlight = false }) => (
             color: designSystem.colors.neutral[900],
             lineHeight: '1.4'
         }}>
-            {value}
+            {value || 'Non renseigné'}
         </div>
     </div>
 );
@@ -307,64 +300,27 @@ const InfoItem = ({ icon, label, value, highlight = false }) => (
 // ===========================
 // COMPOSANT PRINCIPAL
 // ===========================
-const UserProfile = () => {
-    const [userData, setUserData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const ProfilUtilisateur = ({ userId }) => {
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                // Appel API réel
-                const response = await axios.get(`${getFullUrl()}souscription-personnel/personnelById/255`);
-
-                if (response.data) {
-                    setUserData(response.data);
-                } else {
-                    throw new Error('Aucune donnée reçue de l\'API');
-                }
-
-                setLoading(false);
-
-            } catch (err) {
-                console.error('Erreur lors du chargement du profil:', err);
-
-                let errorMessage = 'Impossible de charger les informations du profil';
-
-                if (err.code === 'ECONNABORTED') {
-                    errorMessage = 'La requête a expiré. Veuillez réessayer.';
-                } else if (err.response) {
-                    // Erreur de réponse du serveur
-                    switch (err.response.status) {
-                        case 404:
-                            errorMessage = 'Profil utilisateur introuvable.';
-                            break;
-                        case 401:
-                            errorMessage = 'Accès non autorisé. Veuillez vous reconnecter.';
-                            break;
-                        case 403:
-                            errorMessage = 'Accès interdit à ces informations.';
-                            break;
-                        case 500:
-                            errorMessage = 'Erreur serveur. Veuillez réessayer plus tard.';
-                            break;
-                        default:
-                            errorMessage = `Erreur ${err.response.status}: ${err.response.data?.message || 'Erreur inconnue'}`;
-                    }
-                } else if (err.request) {
-                    // Erreur de réseau
-                    errorMessage = 'Erreur de connexion. Vérifiez votre connexion internet.';
-                }
-
-                setError(errorMessage);
-                setLoading(false);
-            }
-        };
-
-        fetchUserData();
-    }, []);
+    // Utilisation du hook personnalisé pour récupérer les données
+    const {
+        userData,
+        loading,
+        error,
+        refetch,
+        clearCache,
+        performance
+    } = useUserProfile(userId, refreshTrigger, {
+        useCache: true,
+        cacheTimeout: 300000, // 5 minutes
+        onSuccess: (data) => {
+            console.log('Profil chargé avec succès:', data);
+        },
+        onError: (err) => {
+            console.error('Erreur de chargement:', err);
+        }
+    });
 
     const handleEditProfile = () => {
         Notification.info({
@@ -380,45 +336,21 @@ const UserProfile = () => {
         });
     };
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('fr-FR', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
+    const handleRefresh = () => {
+        refetch();
+        Notification.info({
+            title: 'Actualisation',
+            description: 'Actualisation des données en cours...'
         });
     };
 
-    const getStatusConfig = (status) => {
-        switch (status) {
-            case 'VALIDEE':
-                return {
-                    color: 'green',
-                    label: 'Profil validé',
-                    bgColor: designSystem.colors.success[50],
-                    textColor: designSystem.colors.success[700]
-                };
-            case 'EN_ATTENTE':
-                return {
-                    color: 'orange',
-                    label: 'En attente de validation',
-                    bgColor: designSystem.colors.warning[50],
-                    textColor: designSystem.colors.warning[700]
-                };
-            case 'REFUSEE':
-                return {
-                    color: 'red',
-                    label: 'Profil refusé',
-                    bgColor: designSystem.colors.danger[50],
-                    textColor: designSystem.colors.danger[700]
-                };
-            default:
-                return {
-                    color: 'blue',
-                    label: status,
-                    bgColor: designSystem.colors.primary[50],
-                    textColor: designSystem.colors.primary[700]
-                };
-        }
+    const handleClearCache = () => {
+        clearCache();
+        setRefreshTrigger(prev => prev + 1);
+        Notification.success({
+            title: 'Cache vidé',
+            description: 'Le cache a été vidé avec succès'
+        });
     };
 
     if (loading) {
@@ -454,14 +386,26 @@ const UserProfile = () => {
             }}>
                 <div style={{ maxWidth: '600px', margin: '0 auto', paddingTop: designSystem.spacing[16] }}>
                     <Message type="error" showIcon>
-                        {error}
+                        <div>
+                            <strong>{error.message}</strong>
+                            {error.code && <div style={{ fontSize: '12px', marginTop: '8px' }}>Code: {error.code}</div>}
+                        </div>
                     </Message>
+                    <div style={{ marginTop: designSystem.spacing[4], textAlign: 'center' }}>
+                        <ModernButton onClick={handleRefresh} icon={<FiRefreshCw />}>
+                            Réessayer
+                        </ModernButton>
+                    </div>
                 </div>
             </div>
         );
     }
 
-    const statusConfig = getStatusConfig(userData?.sous_attent_personn_statut);
+    const statusConfig = userProfileUtils.getStatusConfig(userData?.sous_attent_personn_statut);
+    const userInitials = userProfileUtils.getUserInitials(
+        userData?.sous_attent_personn_prenom,
+        userData?.sous_attent_personn_nom
+    );
 
     return (
         <div style={{
@@ -470,6 +414,33 @@ const UserProfile = () => {
             padding: designSystem.spacing[6]
         }}>
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+
+                {/* Barre d'information de performance (dev) */}
+                {performance && (
+                    <div style={{
+                        backgroundColor: designSystem.colors.neutral[100],
+                        padding: designSystem.spacing[2],
+                        borderRadius: designSystem.borderRadius.md,
+                        marginBottom: designSystem.spacing[4],
+                        fontSize: designSystem.typography.xs,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                    }}>
+                        <span>
+                            ⚡ Chargé depuis: <strong>{performance.source}</strong> |
+                            Temps: <strong>{performance.duration}ms</strong>
+                        </span>
+                        <ModernButton
+                            size="sm"
+                            variant="ghost"
+                            onClick={handleClearCache}
+                            icon={<FiRefreshCw size={12} />}
+                        >
+                            Vider le cache
+                        </ModernButton>
+                    </div>
+                )}
 
                 {/* En-tête du profil */}
                 <Card style={{
@@ -493,7 +464,7 @@ const UserProfile = () => {
                                             border: `4px solid ${designSystem.colors.primary[100]}`
                                         }}
                                     >
-                                        {userData?.sous_attent_personn_prenom?.[0]}{userData?.sous_attent_personn_nom?.[0]}
+                                        {userInitials}
                                     </Avatar>
                                     <div style={{
                                         position: 'absolute',
@@ -590,7 +561,7 @@ const UserProfile = () => {
                     <Col xs={24} sm={8}>
                         <StatCard
                             icon={<FiAward size={20} />}
-                            value={`${userData?.sous_attent_personn_nbre_annee_experience} ans`}
+                            value={`${userData?.sous_attent_personn_nbre_annee_experience || 0} ans`}
                             label="Expérience professionnelle"
                             trend="+2 ans cette année"
                         />
@@ -598,7 +569,7 @@ const UserProfile = () => {
                     <Col xs={24} sm={8}>
                         <StatCard
                             icon={<FiBookOpen size={20} />}
-                            value={userData?.niveau_etude?.niveau_etude_libelle}
+                            value={userData?.niveau_etude?.niveau_etude_libelle || 'Non renseigné'}
                             label="Niveau d'études"
                         />
                     </Col>
@@ -665,7 +636,7 @@ const UserProfile = () => {
                                 <InfoItem
                                     icon={<FiCalendar size={16} />}
                                     label="Date de naissance"
-                                    value={formatDate(userData?.sous_attent_personn_date_naissance)}
+                                    value={userProfileUtils.formatDate(userData?.sous_attent_personn_date_naissance)}
                                 />
                                 <InfoItem
                                     icon={<FiUser size={16} />}
@@ -733,7 +704,7 @@ const UserProfile = () => {
                                 <InfoItem
                                     icon={<FiClock size={16} />}
                                     label="Années d'expérience"
-                                    value={`${userData?.sous_attent_personn_nbre_annee_experience} années`}
+                                    value={`${userData?.sous_attent_personn_nbre_annee_experience || 0} années`}
                                 />
                             </div>
                         </Card>
@@ -879,11 +850,11 @@ const UserProfile = () => {
                 }
                 
                 .rs-avatar {
-                    transition: all 0.3s ease;@
+                    transition: all 0.3s ease;
                 }
             `}</style>
         </div>
     );
 };
 
-export default UserProfile;
+export default ProfilUtilisateur;

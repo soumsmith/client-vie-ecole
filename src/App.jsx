@@ -13,7 +13,7 @@ import { usePulsParams } from './hooks/useDynamicParams';
 import Paroti from './components/ParotiCharity/ParotiCharity';
 import './Theme.css';
 import { getUserProfile } from "./components/hooks/userUtils";
-import Inscription from './components/PULS/InscriptionEtablissement/Inscription';
+
 
 function App() {
   return (
@@ -82,9 +82,9 @@ function AppContent() {
     <div id={`AppPage-${userProfile}`} className={`App ${showMatiereFilter ? 'show-filter' : 'hide-filter'}`}>
       <Router>
         <Routes>
-          <Route path="/" element={<Paroti />} />
-          <Route path="/inscription/etablissement" element={<Inscription typeInscription={'etablissement'} />} />
-          <Route path="/inscription/profesionel" element={<Inscription typeInscription={'professionel'} />} />
+          <Route path="/" element={<Paroti typeInscription={'home'} />} />
+          <Route path="/inscription/etablissement" element={<Paroti typeInscription={'etablissement'} />} />
+          <Route path="/inscription/profesionel" element={<Paroti typeInscription={'professionel'} />} />
 
           {/* <Route path="/" element={<LandingWrapper />} />*/}
           <Route path="/*" element={

@@ -7,6 +7,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import { useAllApiUrls } from '../utils/apiConfig';
+import getFullUrl from "../../hooks/urlUtils";
 
 // ===========================
 // CONSTANTES ET CONFIGURATION
@@ -25,7 +26,7 @@ export const USER_CONFIG = {
     MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
     REQUIRED_FIELDS: [
         'nom',
-        'prenom', 
+        'prenom',
         'email',
         'contact',
         'sexe',
@@ -36,7 +37,7 @@ export const USER_CONFIG = {
     ],
     REQUIRED_FIELDS_CREATE: [
         'nom',
-        'prenom', 
+        'prenom',
         'email',
         'contact',
         'sexe',
@@ -47,9 +48,6 @@ export const USER_CONFIG = {
         'login'
     ]
 };
-
-// Configuration de l'API
-const API_BASE_URL = 'http://46.105.52.105:8889/api';
 
 // ===========================
 // FONCTIONS UTILITAIRES
@@ -146,7 +144,7 @@ export const validateFile = (file) => {
  */
 export const checkLoginAvailabilityAPI = async (login) => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/connexion/check-pseudo/${login}`);
+        const response = await axios.get(`${getFullUrl()}/connexion/check-pseudo/${login}`);
         // L'API retourne "Login disponible!" si le login est disponible
         return {
             available: response.data.includes('disponible') || response.status === 200,
@@ -169,16 +167,16 @@ export const checkLoginAvailabilityAPI = async (login) => {
 export const uploadFilesAPI = async (files) => {
     try {
         const formData = new FormData();
-        
+
         // Ajouter tous les fichiers au FormData
         files.forEach((file) => {
             formData.append('file', file);
         });
 
-        console.log('Uploading files to:', `${API_BASE_URL}/souscription-personnel/files`);
-        
+        console.log('Uploading files to:', `${getFullUrl()}/souscription-personnel/files`);
+
         const response = await axios.post(
-            `${API_BASE_URL}/souscription-personnel/files`,
+            `${getFullUrl()}/souscription-personnel/files`,
             formData,
             {
                 headers: {
@@ -218,9 +216,9 @@ export const sendEmailAPI = async (email, login, password) => {
         });
 
         console.log('Sending email to:', email);
-        
+
         const response = await axios.post(
-            `${API_BASE_URL}/sendEmail?${params.toString()}`,
+            `${getFullUrl()}/sendEmail?${params.toString()}`,
             {},
             {
                 headers: {
@@ -304,11 +302,11 @@ export const getAutorisationsAPI = async (apiUrls) => {
 export const createUserAPI = async (userData) => {
     try {
         console.log('=== CREATE USER API CALL ===');
-        console.log('Endpoint:', `${API_BASE_URL}/souscription-personnel/`);
+        console.log('Endpoint:', `${getFullUrl()}/souscription-personnel/`);
         console.log('Data sent:', JSON.stringify(userData, null, 2));
 
         const response = await axios.post(
-            `${API_BASE_URL}/souscription-personnel/`,
+            `${getFullUrl()}/souscription-personnel/`,
             userData,
             {
                 headers: {
@@ -400,11 +398,11 @@ export const formatDataForUpdate = (formData, userId, uploadedFileNames, selectL
         sous_attent_personn_date_naissance: formData.date_naissance,
         sous_attent_personn_nbre_annee_experience: parseInt(formData.nbre_annee_experience) || 0,
         sous_attent_personn_contact: formData.contact,
-        
+
         sous_attent_personn_lien_cv: uploadedFileNames[0] || formData.lien_cv || "",
         sous_attent_personn_lien_piece: uploadedFileNames[1] || formData.lien_piece || "",
         sous_attent_personn_lien_autorisation: uploadedFileNames[2] || formData.lien_autorisation || "",
-        
+
         niveau_etudeIdentifiant: parseInt(formData.niveau_etudeIdentifiant) || null,
         identifiantdomaine_formation: parseInt(formData.identifiantdomaine_formation) || null,
         fonctionidentifiant: parseInt(formData.fonctionidentifiant) || null,

@@ -74,6 +74,12 @@ export const navigationData = {
     ]
   },
   mainMenu: [
+    {
+      id: 1,
+      text: "Accueil",
+      link: routeConfig.home,
+      type: "route"
+    },
     // {
     //   id: 1,
     //   text: "Accueil",
@@ -238,6 +244,7 @@ export const navigationData = {
     //     }
     //   ]
     // },
+
     // {
     //   id: 6,
     //   text: "Contact",
@@ -264,7 +271,7 @@ export const navigationData = {
 // CONFIGURATION DES MODALS DE CONNEXION
 // ===========================
 
-export const modalConfig = {
+export const modalConfi_asuprimer = {
   admin: {
     title: "Connexion Administrateur",
     description: "Connectez-vous à votre espace administrateur",
@@ -374,7 +381,27 @@ export const modalConfig = {
       showFirstName: true,
       showLastName: true
     }
-  }
+  },
+  obtenirMotdePasse: {
+    title: "Récupére mot de passe",
+    description: "Créez votre compte pour accéder à la plateforme",
+    icon: "fas fa-user-plus",
+    color: "#10b981",
+    apis: {
+      schools: "connecte/ecole",
+      register: "inscription/creer-compte"
+    },
+    redirectPath: "/dashboard/nouveau-compte",
+    fields: {
+      showSchoolSelector: true,
+      showProfileSelector: true,
+      emailLabel: "Email",
+      showConfirmPassword: true,
+      showFirstName: true,
+      showLastName: true
+    }
+  },
+  
 };
 
 // ===========================
@@ -539,26 +566,26 @@ export const navigationUtils = {
    */
   handleNavigation: (item, navigate, openModal) => {
     const type = navigationUtils.getNavigationType(item);
-    
+
     switch (type) {
       case navigationTypes.ROUTE:
         if (item.link && item.link !== '#') {
           navigate(item.link);
         }
         break;
-        
+
       case navigationTypes.EXTERNAL:
         if (item.link) {
           window.open(item.link, '_blank', 'noopener,noreferrer');
         }
         break;
-        
+
       case navigationTypes.MODAL:
         if (item.modalType && openModal) {
           openModal(item.modalType);
         }
         break;
-        
+
       case navigationTypes.ANCHOR:
         if (item.link) {
           const element = document.querySelector(item.link);
@@ -567,7 +594,7 @@ export const navigationUtils = {
           }
         }
         break;
-        
+
       default:
         console.warn(`Type de navigation non géré: ${type}`);
     }

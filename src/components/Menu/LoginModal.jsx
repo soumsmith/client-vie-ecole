@@ -9,12 +9,13 @@ import {
   Panel,
   Stack,
   IconButton,
-  Loader
+  Loader,
+  InputGroup
 } from 'rsuite';
-//import EyeIcon from '@rsuite/icons/Eye';
-//import EyeSlashIcon from '@rsuite/icons/EyeSlash';
 import useLoginData from './useLoginData';
 import { useNavigate } from 'react-router-dom';
+import { Visible, Unvisible } from '@rsuite/icons';
+
 
 /**
  * Composant Modal de connexion réutilisable
@@ -34,10 +35,10 @@ const LoginModal = ({ open, onClose, config, onSuccess }) => {
     schoolId: null,
     profileId: null
   });
-  
+
   // État pour l'affichage du mot de passe
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate(); // ajoute tout en haut si ce n’est pas déjà fait
+  const navigate = useNavigate();
 
   // État de validation du formulaire
   const [formErrors, setFormErrors] = useState({});
@@ -55,6 +56,14 @@ const LoginModal = ({ open, onClose, config, onSuccess }) => {
     submitLogin,
     clearErrors
   } = useLoginData(config);
+
+  /**
+   * Vérifie si un champ est défini dans la configuration
+   */
+  const isFieldDefined = (fieldName) => {
+    if (!config?.loginFields) return false;
+    return config.loginFields.hasOwnProperty(fieldName);
+  };
 
   /**
    * Réinitialise le formulaire et les erreurs
@@ -78,28 +87,34 @@ const LoginModal = ({ open, onClose, config, onSuccess }) => {
   const validateForm = () => {
     const errors = {};
 
-    // Validation de l'email
-    // if (!formData.email) {
-    //   errors.email = 'L\'email est requis';
-    // } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-    //   errors.email = 'Format d\'email invalide';
-    // }
+    // Validation de l'email (si défini)
+    if (isFieldDefined('email') || isFieldDefined('login')) {
+      if (!formData.email) {
+        errors.email = 'Ce champ est requis';
+      }
+    }
 
-    // Validation du mot de passe
-    if (!formData.password) {
-      errors.password = 'Le mot de passe est requis';
-    } else if (formData.password.length < 3) {
-      errors.password = 'Le mot de passe doit contenir au moins 6 caractères';
+    // Validation du mot de passe (si défini)
+    if (isFieldDefined('password') || isFieldDefined('motdePasse') || isFieldDefined('motDepasse')) {
+      if (!formData.password) {
+        errors.password = 'Le mot de passe est requis';
+      } else if (formData.password.length < 3) {
+        errors.password = 'Le mot de passe doit contenir au moins 3 caractères';
+      }
     }
 
     // Validation de l'école (si requise)
-    if (config?.fields?.showSchoolSelector && !formData.schoolId) {
-      errors.schoolId = 'Veuillez sélectionner une école';
+    if (config?.fields?.showSchoolSelector && isFieldDefined('schoolId')) {
+      if (!formData.schoolId) {
+        errors.schoolId = 'Veuillez sélectionner une école';
+      }
     }
 
     // Validation du profil (si requis)
-    if (config?.fields?.showProfileSelector && !formData.profileId) {
-      errors.profileId = 'Veuillez sélectionner un profil';
+    if (config?.fields?.showProfileSelector && isFieldDefined('profileId')) {
+      if (!formData.profileId) {
+        errors.profileId = 'Veuillez sélectionner un profil';
+      }
     }
 
     setFormErrors(errors);
@@ -128,22 +143,22 @@ const LoginModal = ({ open, onClose, config, onSuccess }) => {
    * Gère la soumission du formulaire
    */
   const handleSubmit = async () => {
-  if (!validateForm()) return;
+    if (!validateForm()) return;
 
-  const { success, data } = await submitLogin(formData);
+    const { success, data } = await submitLogin(formData);
 
-  if (success && data) {
-    resetForm();
-    onClose();
+    if (success && data) {
+      resetForm();
+      onClose();
 
-    if (onSuccess) {
-      onSuccess(data); // envoie les données brutes si besoin
+      if (onSuccess) {
+        onSuccess(data);
+      }
+
+      // Redirection forcée si config.redirectPath non défini
+      navigate(config.redirectPath || '/dashboard');
     }
-
-    // Redirection forcée si config.redirectPath non défini
-    navigate('/dashboard');
-  }
-};
+  };
 
   /**
    * Gère la fermeture du modal
@@ -166,16 +181,16 @@ const LoginModal = ({ open, onClose, config, onSuccess }) => {
   }
 
   return (
-    <Modal 
-      open={open} 
+    <Modal
+      open={open}
       onClose={handleClose}
       size="md"
       backdrop="static"
     >
       <Modal.Header>
-        <Modal.Title style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
+        <Modal.Title style={{
+          display: 'flex',
+          alignItems: 'center',
           gap: '12px',
           fontSize: '24px',
           fontWeight: '600'
@@ -193,62 +208,58 @@ const LoginModal = ({ open, onClose, config, onSuccess }) => {
         </Panel>
 
         <Form fluid>
-          {/* Champ Email */}
-          <Form.Group>
-            <Form.ControlLabel>
-              {config.fields?.emailLabel || 'Email'} <span style={{ color: 'red' }}>*</span>
-            </Form.ControlLabel>
-            <Form.Control
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={(value) => handleInputChange(value, 'email')}
-              placeholder="Entrez votre email"
-              style={{ marginBottom: '5px' }}
-            />
-            {formErrors.email && (
-              <Form.HelpText style={{ color: 'red' }}>
-                {formErrors.email}
-              </Form.HelpText>
-            )}
-          </Form.Group>
-
-          {/* Champ Mot de passe */}
-          <Form.Group>
-            <Form.ControlLabel>
-              {config.fields?.passwordLabel || 'Mot de passe'} <span style={{ color: 'red' }}>*</span>
-            </Form.ControlLabel>
-            <Stack spacing={0} style={{ position: 'relative' }}>
-              <Input
-                type={showPassword ? 'text' : 'password'}
-                value={formData.password}
-                onChange={(value) => handleInputChange(value, 'password')}
-                placeholder="Entrez votre mot de passe"
-                style={{ paddingRight: '45px' }}
-                className='w-100'
+          {/* Champ Email - Affiché seulement si défini dans loginFields */}
+          {(isFieldDefined('email') || isFieldDefined('login') || isFieldDefined('parent_email') || isFieldDefined('student_email')) && (
+            <Form.Group>
+              <Form.ControlLabel>
+                {config.fields?.emailLabel || 'Email'} <span style={{ color: 'red' }}>*</span>
+              </Form.ControlLabel>
+              <Form.Control
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={(value) => handleInputChange(value, 'email')}
+                placeholder="Entrez votre email"
+                style={{ marginBottom: '5px' }}
               />
-              <IconButton
-                //icon={showPassword ? <EyeSlashIcon /> : <EyeIcon />}
-                onClick={() => setShowPassword(!showPassword)}
-                appearance="subtle"
-                style={{
-                  position: 'absolute',
-                  right: '5px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  zIndex: 1
-                }}
-              />
-            </Stack>
-            {formErrors.password && (
-              <Form.HelpText style={{ color: 'red', marginTop: '5px' }}>
-                {formErrors.password}
-              </Form.HelpText>
-            )}
-          </Form.Group>
+              {formErrors.email && (
+                <Form.HelpText style={{ color: 'red' }}>
+                  {formErrors.email}
+                </Form.HelpText>
+              )}
+            </Form.Group>
+          )}
 
-          {/* Sélecteur d'école */}
-          {config.fields?.showSchoolSelector && (
+          {/* Champ Mot de passe - Affiché seulement si défini dans loginFields */}
+          {(isFieldDefined('password') || isFieldDefined('motdePasse') || isFieldDefined('motDepasse') || isFieldDefined('parent_password') || isFieldDefined('student_password')) && (
+            <Form.Group>
+              <Form.ControlLabel>
+                {config.fields?.passwordLabel || 'Mot de passe'} <span style={{ color: 'red' }}>*</span>
+              </Form.ControlLabel>
+
+              <InputGroup inside>
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={(value) => handleInputChange(value, 'password')}
+                  placeholder="Entrez votre mot de passe"
+                  block
+                />
+                <InputGroup.Button onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <Visible /> : <Unvisible />}
+                </InputGroup.Button>
+              </InputGroup>
+
+              {formErrors.password && (
+                <Form.HelpText style={{ color: 'red', marginTop: '5px' }}>
+                  {formErrors.password}
+                </Form.HelpText>
+              )}
+            </Form.Group>
+          )}
+
+          {/* Sélecteur d'école - Affiché seulement si showSchoolSelector est true ET schoolId est défini */}
+          {config.fields?.showSchoolSelector && isFieldDefined('schoolId') && (
             <Form.Group>
               <Form.ControlLabel>
                 École <span style={{ color: 'red' }}>*</span>
@@ -277,8 +288,8 @@ const LoginModal = ({ open, onClose, config, onSuccess }) => {
             </Form.Group>
           )}
 
-          {/* Sélecteur de profil */}
-          {config.fields?.showProfileSelector && (
+          {/* Sélecteur de profil - Affiché seulement si showProfileSelector est true ET profileId est défini */}
+          {config.fields?.showProfileSelector && isFieldDefined('profileId') && (
             <Form.Group>
               <Form.ControlLabel>
                 Profil <span style={{ color: 'red' }}>*</span>
@@ -317,19 +328,19 @@ const LoginModal = ({ open, onClose, config, onSuccess }) => {
       </Modal.Body>
 
       <Modal.Footer>
-        <Button 
-          onClick={handleClose} 
+        <Button
+          onClick={handleClose}
           appearance="subtle"
           disabled={submitting}
         >
-          Annuler
+          {config.buttons?.cancelText || 'Annuler'}
         </Button>
-        <Button 
+        <Button
           onClick={handleSubmit}
           appearance="primary"
           disabled={submitting}
-          style={{ 
-            backgroundColor: '#667eea', 
+          style={{
+            backgroundColor: config.buttons?.submitColor || '#667eea',
             border: 'none',
             minWidth: '120px'
           }}
@@ -337,10 +348,10 @@ const LoginModal = ({ open, onClose, config, onSuccess }) => {
           {submitting ? (
             <>
               <Loader size="sm" style={{ marginRight: '8px' }} />
-              Connexion...
+              {config.buttons?.loadingText || 'Connexion...'}
             </>
           ) : (
-            'Se connecter'
+            config.buttons?.submitText || 'Se connecter'
           )}
         </Button>
       </Modal.Footer>

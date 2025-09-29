@@ -177,6 +177,7 @@ const EleveFilters = ({
 
                         <SelectPicker
                             data={branchesData}
+                            autoFocus
                             value={selectedBranche}
                             onChange={(value) => {
                                 console.log('🌿 Branche sélectionnée:', value);

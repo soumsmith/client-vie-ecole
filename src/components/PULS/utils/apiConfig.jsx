@@ -277,6 +277,9 @@ const usePersonnelUrls = () => {
     const params = useAppParams();
     const baseUrl = getFullUrl();
 
+    console.log("params=====");
+    console.log(params);
+
     return useMemo(() => ({
 
         /**

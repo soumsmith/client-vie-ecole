@@ -768,17 +768,11 @@ const Layout = ({ onLogout }) => {
               {/* ===========================
                    ESPACE CANDIDAT
                    =========================== */}
-              <Route path="/profileUtilisateur" element={< ProfilUtilisateur />} />
+              <Route path="/profileUtilisateur" element={< ProfilUtilisateur userId={personnelInfo?.candidatDetails.candidatid} />} />
               <Route path="/loginMotDePasse" element={< ModifierMotDePasse />} />
-              <Route path="/miseAJoursInfo" element={< ModifierInfoPersonnelles  mode="edit" 
-                userId={null} />} />
-              <Route path="/creerEcole" element={< ListeEcoles />} />
+              <Route path="/miseAJoursInfo" element={< ModifierInfoPersonnelles  mode="edit"  userId={personnelInfo?.candidatDetails.candidatid} />} />
+              <Route path="/creerEcole" element={< ListeEcoles mode={"candidatEcoleInscription"} />} />
               <Route path="/consultationEcoles" element={<ConsultationEcoles />} />
-              
-              
-
-
-
 
               {/* ===========================
                    ADMIN

@@ -7,8 +7,8 @@ export const menuItems = [
   {
     label: "Accueil",
     key: "home",
-    type: "redirect", // redirect ou modal
-    path: "/", // pour les redirections
+    type: "redirect",
+    path: "/",
     icon: "🏠"
   },
   {
@@ -21,7 +21,7 @@ export const menuItems = [
   {
     label: "Se connecter",
     key: "login",
-    type: "dropdown", // type spécial pour menu déroulant
+    type: "dropdown",
     icon: "👤",
     children: [
       {
@@ -58,6 +58,13 @@ export const menuItems = [
         type: "modal",
         modalType: "eleve",
         icon: "🎒"
+      },
+      {
+        label: "Récupérer mot de passe",
+        key: "obtenirMotdePasse",
+        type: "modal",
+        modalType: "obtenir-mot-de-passe",
+        icon: "🔑"
       }
     ]
   },
@@ -97,22 +104,26 @@ export const modalConfig = {
       profiles: "/profil",
       login: "connexion/se-connecter-admin"
     },
-    // Nouvelle configuration pour la méthode HTTP
-    method: "POST", // ou "GET"
-    // Configuration des champs de connexion
+    method: "POST",
     loginFields: {
-      email: "email",      // formData.email -> username
-      login: "login", 
-      password: "motdePasse", // formData.password -> motdePasse
-      schoolId: "ecoleid",    // formData.schoolId -> ecoleid
-      profileId: "profilid"   // formData.profileId -> profilid
+      email: "email",
+      login: "login",
+      password: "motdePasse",
+      schoolId: "ecoleid",
+      profileId: "profilid"
     },
-    redirectPath: "/dashboard/personnel",
+    redirectPath: "/dashboard/",
     fields: {
       showSchoolSelector: false,
       showProfileSelector: false,
       emailLabel: "Nom d'utilisateur",
       passwordLabel: "Mot de passe"
+    },
+    buttons: {
+      submitText: "Se connecter",
+      loadingText: "Connexion...",
+      cancelText: "Annuler",
+      submitColor: "#667eea"
     }
   },
   personnel: {
@@ -130,15 +141,20 @@ export const modalConfig = {
       password: "motdePasse",
       schoolId: "ecoleid",
       profileId: "profilid",
-      // Champ supplémentaire pour certains cas
-      login: "login" // sera mappé avec formData.email
+      login: "login"
     },
-    redirectPath: "/dashboard/personnel",
+    redirectPath: "/dashboard/",
     fields: {
       showSchoolSelector: true,
       showProfileSelector: true,
       emailLabel: "Nom d'utilisateur",
       passwordLabel: "Mot de passe"
+    },
+    buttons: {
+      submitText: "Se connecter",
+      loadingText: "Connexion...",
+      cancelText: "Annuler",
+      submitColor: "#667eea"
     }
   },
   candidat: {
@@ -150,19 +166,23 @@ export const modalConfig = {
       profiles: "/profil",
       login: "connexion/checkPassword"
     },
-    method: "GET", // Exemple d'utilisation de GET
+    method: "GET",
     loginFields: {
       email: "login",
-      password: "motDepasse", // Nom différent pour les candidats
-      //schoolId: "school_id", // Nom différent
-      //profileId: "profile_id"
+      password: "motDepasse"
     },
-    redirectPath: "/dashboard/candidat",
+    redirectPath: "/dashboard/",
     fields: {
       showSchoolSelector: false,
       showProfileSelector: false,
       emailLabel: "Email",
       passwordLabel: "Mot de passe"
+    },
+    buttons: {
+      submitText: "Se connecter",
+      loadingText: "Vérification...",
+      cancelText: "Annuler",
+      submitColor: "#667eea"
     }
   },
   parent: {
@@ -181,12 +201,18 @@ export const modalConfig = {
       schoolId: "ecoleid",
       profileId: "profilid"
     },
-    redirectPath: "/dashboard/parent",
+    redirectPath: "/dashboard/",
     fields: {
       showSchoolSelector: true,
       showProfileSelector: false,
       emailLabel: "Email",
       passwordLabel: "Mot de passe"
+    },
+    buttons: {
+      submitText: "Se connecter",
+      loadingText: "Connexion...",
+      cancelText: "Annuler",
+      submitColor: "#667eea"
     }
   },
   eleve: {
@@ -205,12 +231,43 @@ export const modalConfig = {
       schoolId: "ecoleid",
       profileId: "profilid"
     },
-    redirectPath: "/dashboard/eleve",
+    redirectPath: "/dashboard/",
     fields: {
       showSchoolSelector: true,
       showProfileSelector: false,
       emailLabel: "Email",
       passwordLabel: "Mot de passe"
+    },
+    buttons: {
+      submitText: "Se connecter",
+      loadingText: "Connexion...",
+      cancelText: "Annuler",
+      submitColor: "#667eea"
+    }
+  },
+  obtenirMotdePasse: {
+    title: "Récupérer mot de passe",
+    description: "Entrez votre email pour recevoir un lien de réinitialisation",
+    icon: "🔑",
+    apis: {
+      login: "connexion/parametreLogin",
+      sendMail: "connexion/send-email"
+    },
+    method: "GET",
+    loginFields: {
+      email: "student_email"
+    },
+    redirectPath: "/",
+    fields: {
+      showSchoolSelector: false,
+      showProfileSelector: false,
+      emailLabel: "Email"
+    },
+    buttons: {
+      submitText: "Envoyer le lien",
+      loadingText: "Envoi en cours...",
+      cancelText: "Retour",
+      submitColor: "#28a745" // Couleur verte pour différencier
     }
   }
 };

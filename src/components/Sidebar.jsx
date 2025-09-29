@@ -482,14 +482,6 @@ const allMenuSections = [
         profiles: [""],
       },
       {
-        type: "item",
-        eventKey: "loginMotDePasse",
-        icon: "TableIcon",
-        title: "Login & mot de passe",
-        profiles: ["Candidat", "Candidat-Fondateur", "Candidat-Professeur"],
-      },
-
-      {
         type: "menu",
         eventKey: "mes-ecoles",
         icon: "GroupIcon",
@@ -528,6 +520,14 @@ const allMenuSections = [
         title: "Mon profil",
         profiles: ["Candidat", "Candidat-Fondateur", "Candidat-Professeur"],
       },
+      {
+        type: "item",
+        eventKey: "loginMotDePasse",
+        icon: "TableIcon",
+        title: "Login & mot de passe",
+        profiles: ["Candidat-Fondateur", "Candidat-Professeur"],
+      },
+
       // Personnel - Classe
       {
         type: "item",
@@ -535,6 +535,27 @@ const allMenuSections = [
         icon: "TableIcon",
         title: "modifier mes infos personnelles ",
         profiles: ["Candidat", "Candidat-Fondateur", "Candidat-Professeur"],
+      },
+      {
+        type: "menu",
+        eventKey: "general",
+        icon: "GroupIcon",
+        title: "Ma Messagerie",
+        profiles: ["Candidat-Fondateur", "Candidat-Professeur"],
+        children: [
+          {
+            type: "item",
+            eventKey: "messagesRecus",
+            icon: "MessageIcon",
+            title: "Messages reçus",
+            profiles: ["Candidat-Fondateur", "Candidat-Professeur"],
+          },
+          {
+            eventKey: "messagesEnvoye",
+            title: "Messages envoyés",
+            profiles: ["Candidat-Fondateur", "Candidat-Professeur"],
+          },
+        ],
       },
     ],
   },
@@ -725,27 +746,6 @@ const allMenuSections = [
         icon: "DocPassIcon",
         title: "Informations de connexion",
         profiles: ["Admin", "Fondateur"],
-      },
-      {
-        type: "menu",
-        eventKey: "general",
-        icon: "GroupIcon",
-        title: "Ma Messagerie",
-        profiles: ["Admin", "Professeur", "Fondateur"],
-        children: [
-          {
-            type: "item",
-            eventKey: "messagesRecus",
-            icon: "MessageIcon",
-            title: "Messages reçus",
-            profiles: ["Admin", "Professeur", "Fondateur"],
-          },
-          {
-            eventKey: "messagesEnvoye",
-            title: "Messages envoyés",
-            profiles: ["Admin", "Fondateur", "Professeur"],
-          },
-        ],
       },
 
       {
@@ -981,63 +981,82 @@ const getEventKeyFromPath = (pathname) => {
     '/listeAjouterPanier': 'listeAjouterPanier',
     '/listeProfils': 'listeProfils',
     '/RecrutementAgent': 'RecrutementAgent',
-    '/noteEtMoyenne': 'noteEtMoyenne',
-    '/evaluation': 'evaluation',
-    '/importEvaluations': 'importEvaluations',
-    '/listeSalles': 'listeSalles',
-    '/listeClasses': 'listeClasses',
+    '/MonPanier': 'MonPanier',
+    '/HeureAbsences': 'HeureAbsences',
+    '/monPersonel': 'monPersonel',
+    '/affectationProfilPersonel': 'affectationProfilPersonel',
     '/emploiDuTemps': 'emploiDuTemps',
     '/messagesRecus': 'messagesRecus',
     '/messagesEnvoye': 'messagesEnvoye',
     '/OffreEmploi': 'OffreEmploi',
-    '/bulletinScolaire': 'bulletinScolaire',
-    '/classe-eleves': 'classe-eleves',
-    '/pv-evaluation': 'pv-evaluation',
+
+    // GESTION DES CLASSES
+    '/listeClasses': 'listeClasses',
+    '/listeSeances': 'listeSeances',
+    '/saisirSeances': 'saisirSeances',
+    '/ouvertureSeances': 'ouvertureSeances',
+    '/cahierDeTexte': 'cahierDeTexte',
+    '/journalPointage': 'journalPointage',
+    '/enrollementBadgeuse': 'enrollementBadgeuse',
+
+    // EVALUATION
+    '/evaluation': 'evaluation',
     '/evaluation-professeur': 'evaluation-professeur',
-    '/MonPanier': 'MonPanier',
-    '/monPersonel': 'monPersonel',
-    '/affectationProfilPersonel': 'affectationProfilPersonel',
+    '/definirPeriodeEvaluation': 'definirPeriodeEvaluation',
+    '/pv-evaluation': 'pv-evaluation',
 
-    // INSCRIPTION
-    '/importerEleves': 'importerEleves',
-    '/inscriptionAValider': 'inscriptionAValider',
-    '/listeElevesParClasse': 'listeElevesParClasse',
-    '/identificationEleves': 'identificationEleves',
+    // NOTE ET MOYENNE
+    '/noteEtMoyenne': 'noteEtMoyenne',
+    '/importEvaluations': 'importEvaluations',
+    '/bulletinScolaire': 'bulletinScolaire',
 
-    // PARAMETRAGE
-    '/listeMatieres': 'listeMatieres',
-    '/listeCoefficients': 'listeCoefficients',
-    '/OvertureCloture': 'OvertureCloture',
+    // AFFECTATIONS
+    '/classe-eleves': 'classe-eleves',
     '/professeur-matiere': 'professeur-matiere',
     '/personnel-classe': 'personnel-classe',
 
     // CANDIDAT
     '/postulerOffre': 'postulerOffre',
     '/demandeOffre': 'demandeOffre',
-
-    '/loginMotDePasse': 'loginMotDePasse',
+    '/creerEcole': 'creerEcole',
+    '/consultationEcoles': 'consultationEcoles',
     '/mesDocuments': 'mesDocuments',
     '/profileUtilisateur': 'profileUtilisateur',
+    '/loginMotDePasse': 'loginMotDePasse',
     '/miseAJoursInfo': 'miseAJoursInfo',
 
-    // EMPLOI DU TEMPS
+    // INSCRIPTION
+    '/importerEleves': 'importerEleves',
+    '/identificationEleves': 'identificationEleves',
+    '/inscriptionAValider': 'inscriptionAValider',
+    '/listeElevesParClasse': 'listeElevesParClasse',
+
+    // PARAMETRAGE
+    '/OvertureCloture': 'OvertureCloture',
+    '/listeSalles': 'listeSalles',
+    '/listeCoefficients': 'listeCoefficients',
+    '/listeMatieres': 'listeMatieres',
+
+    // GESTION DES COURS
     '/ConsultationDesSeances': 'ConsultationDesSeances',
 
-
-    // ENQUETE RAPIDE
-    '/enqueteRapideRentree': 'enqueteRapideRentree',
+    // RAPPORT
     '/rapport': 'rapport',
+    '/enqueteRapideRentree': 'enqueteRapideRentree',
+    '/cartificatTravail': 'cartificatTravail',
 
-    // ADMIN
-    '/desctiveUtilisaterur': 'desctiveUtilisaterur',
-    '/InitialiserAnnee': 'initialiserAnnee',
+    // ADMINISTRATION
+    '/listeEcolesAValidee': 'listeEcolesAValidee',
+    '/listeEcolesValidee': 'listeEcolesValidee',
+    '/initialiserAnnee': 'initialiserAnnee',
+    '/InitialiserAnnee': 'initialiserAnnee', // Garde les deux versions pour compatibilité
     '/validerPersonnels': 'validerPersonnels',
     '/validerFondateur': 'validerFondateur',
     '/listeFondateurvalider': 'listeFondateurvalider',
-    '/listeEcolesValidee': 'listeEcolesValidee',
-    '/listeEcolesAValidee': 'listeEcolesAValidee',
     '/infosConnexion': 'infosConnexion',
-    '/listeMatiere': 'listeMatiere'
+    '/desctiveUtilisaterur': 'desctiveUtilisaterur',
+    '/listeMatiere': 'listeMatiere',
+    '/progressionPedagogique': 'progressionPedagogique',
   };
 
   // Recherche exacte d'abord
@@ -1141,7 +1160,9 @@ const Sidebar = ({
   // Fonction pour gérer l'ouverture/fermeture des menus déroulants
   const handleToggle = (openKeys) => {
     console.log("🔸 Toggle menus:", openKeys);
-    setOpenKeys(openKeys);
+    // Ne garder que le dernier menu ouvert (le plus récent)
+    const latestOpenKey = openKeys.length > 0 ? [openKeys[openKeys.length - 1]] : [];
+    setOpenKeys(latestOpenKey);
   };
 
   const getProfileDisplayName = (profile) => {

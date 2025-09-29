@@ -205,3 +205,7 @@ body {
   border-radius: '16px' !important;
   overflow: 'hidden' !important;
 }
+
+#inscription-page{
+  margin-top: 90px !important;
+}

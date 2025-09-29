@@ -187,7 +187,10 @@ const LoginDropdown = ({ openModal }) => {
     { key: 'personnel', label: 'Personnel', config: modalConfig.personnel },
     { key: 'candidat', label: 'Candidat', config: modalConfig.candidat },
     { key: 'parent', label: 'Parent', config: modalConfig.parent },
-    { key: 'eleve', label: 'Élève', config: modalConfig.eleve }
+    { key: 'eleve', label: 'Élève', config: modalConfig.eleve },
+    { key: 'obtenirMotdePasse', label: 'Récupérer mot de passe', config: modalConfig.obtenirMotdePasse }
+
+    
   ];
 
   return (
@@ -240,12 +243,12 @@ const LoginDropdown = ({ openModal }) => {
             onClick={() => handleOptionClick(option.key)}
             className={`dropdown-option ${index === loginOptions.length - 1 ? 'last' : ''}`}
           >
-            <i className={option.config.icon}
+            {/* <i className={option.config.icon}
               style={{
                 marginRight: '8px',
                 color: option.config.color
               }}
-            ></i>
+            ></i> */}
             {option.label}
           </button>
         ))}
@@ -592,7 +595,7 @@ const MainMenu = ({ isSticky = false }) => {
 const Header = () => {
   return (
     <header className="main-header container">
-      <Topbar />
+      {/* <Topbar /> */}
       <MainMenu />
       <MainMenu isSticky={true} />
     </header>

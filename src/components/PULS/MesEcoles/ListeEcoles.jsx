@@ -14,6 +14,9 @@ import {
     Loader,
     Badge,
     Avatar,
+    Form,
+    Input,
+    InputGroup,
     Notification
 } from 'rsuite';
 import {
@@ -96,78 +99,230 @@ const transformEcoleForAPI = (ecole) => {
 };
 
 // ===========================
-// COMPOSANT SECTION PROFIL
+// COMPOSANT FORMULAIRE PROFIL
 // ===========================
-const ProfileSection = ({ userInfo }) => {
-    const defaultUser = {
-        name: 'Administrateur Système',
-        email: 'admin@education.ci',
-        role: 'Gestionnaire des Écoles',
-        avatar: null
+const ProfileFormSection = ({ mode, userData, loading }) => {
+    const [formData, setFormData] = useState({
+        fonction: '',
+        nom: '',
+        prenom: '',
+        telephone: '',
+        telephone2: '',
+        email: ''
+    });
+
+    useEffect(() => {
+        if (mode === "candidatEcoleInscription" && userData) {
+            setFormData({
+                fonction: userData.fonction?.fonctionlibelle || '',
+                nom: userData.sous_attent_personn_nom || '',
+                prenom: userData.sous_attent_personn_prenom || '',
+                telephone: userData.sous_attent_personn_contact || '',
+                telephone2: userData.sous_attent_personn_contact2 || '',
+                email: userData.sous_attent_personn_email || ''
+            });
+        }
+    }, [mode, userData]);
+
+    const handleChange = (value, field) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    const user = userInfo || defaultUser;
+    if (loading) {
+        return (
+            <div style={{
+                background: 'white',
+                borderRadius: '15px',
+                padding: '40px',
+                marginBottom: '25px',
+                textAlign: 'center',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+            }}>
+                <Loader size="md" content="Chargement des informations..." />
+            </div>
+        );
+    }
+
+    const isReadOnly = mode === "candidatEcoleInscription";
 
     return (
         <div style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'white',
             borderRadius: '15px',
-            padding: '25px',
+            padding: '30px',
             marginBottom: '25px',
-            color: 'white',
-            boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)'
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+            border: '1px solid rgba(102, 126, 234, 0.1)'
         }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                <Avatar
-                    size="lg"
-                    style={{
-                        background: 'rgba(255, 255, 255, 0.2)',
-                        color: 'white',
-                        fontSize: '24px',
-                        fontWeight: '600',
-                        backdropFilter: 'blur(10px)'
-                    }}
-                    src={user.avatar}
-                >
-                    {user.name.split(' ').map(n => n[0]).join('')}
-                </Avatar>
-                <div style={{ flex: 1 }}>
-                    <h4 style={{ margin: 0, fontSize: '22px', fontWeight: '600' }}>
-                        {user.name}
-                    </h4>
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '15px',
-                        marginTop: '8px',
-                        fontSize: '14px',
-                        opacity: 0.9
-                    }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <FiMail size={14} />
-                            {user.email}
-                        </span>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <FiUser size={14} />
-                            {user.role}
-                        </span>
-                    </div>
-                </div>
-                <div style={{
-                    padding: '12px 20px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                    borderRadius: '10px',
-                    backdropFilter: 'blur(10px)',
-                    textAlign: 'center'
-                }}>
-                    <div style={{ fontSize: '20px', fontWeight: '700' }}>
-                        {new Date().toLocaleDateString('fr-FR')}
-                    </div>
-                    <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '2px' }}>
-                        Aujourd'hui
-                    </div>
-                </div>
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                marginBottom: '25px',
+                paddingBottom: '15px',
+                borderBottom: '2px solid #f1f5f9'
+            }}>
+                <IconBox icon={FiUser} />
+                <h5 style={{ margin: 0, color: '#334155', fontWeight: '600', fontSize: '18px' }}>
+                    Informations du Fondateur
+                </h5>
             </div>
+
+            <Form fluid>
+                <Row gutter={16}>
+                    {/* Fonction */}
+                    <Col xs={24} sm={12} md={8}>
+                        <Form.Group style={{ marginBottom: '20px' }}>
+                            <Form.ControlLabel style={{
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                color: '#475569',
+                                marginBottom: '8px'
+                            }}>
+                                Fonction
+                            </Form.ControlLabel>
+                            <Input
+                                value={formData.fonction}
+                                //readOnly
+                                style={{
+                                    backgroundColor: '#f8fafc',
+                                    borderColor: '#e2e8f0'
+                                }}
+                            />
+                        </Form.Group>
+                    </Col>
+
+                    {/* Nom */}
+                    <Col xs={24} sm={12} md={8}>
+                        <Form.Group style={{ marginBottom: '20px' }}>
+                            <Form.ControlLabel style={{
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                color: '#475569',
+                                marginBottom: '8px'
+                            }}>
+                                Nom du fondateur <span style={{ color: '#ef4444' }}>*</span>
+                            </Form.ControlLabel>
+                            <Input
+                                value={formData.nom}
+                                onChange={(value) => handleChange(value, 'nom')}
+                                readOnly={isReadOnly}
+                                placeholder="Entrez le nom"
+                                style={{
+                                    backgroundColor: isReadOnly ? '#f8fafc' : 'white',
+                                    borderColor: '#e2e8f0'
+                                }}
+                            />
+                        </Form.Group>
+                    </Col>
+
+                    {/* Prénom */}
+                    <Col xs={24} sm={12} md={8}>
+                        <Form.Group style={{ marginBottom: '20px' }}>
+                            <Form.ControlLabel style={{
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                color: '#475569',
+                                marginBottom: '8px'
+                            }}>
+                                Prénom du fondateur <span style={{ color: '#ef4444' }}>*</span>
+                            </Form.ControlLabel>
+                            <Input
+                                value={formData.prenom}
+                                onChange={(value) => handleChange(value, 'prenom')}
+                                readOnly={isReadOnly}
+                                placeholder="Entrez le prénom"
+                                style={{
+                                    backgroundColor: isReadOnly ? '#f8fafc' : 'white',
+                                    borderColor: '#e2e8f0'
+                                }}
+                            />
+                        </Form.Group>
+                    </Col>
+
+                    {/* Téléphone */}
+                    <Col xs={24} sm={12} md={8}>
+                        <Form.Group style={{ marginBottom: '20px' }}>
+                            <Form.ControlLabel style={{
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                color: '#475569',
+                                marginBottom: '8px'
+                            }}>
+                                Téléphone du fondateur <span style={{ color: '#ef4444' }}>*</span>
+                            </Form.ControlLabel>
+                            <InputGroup>
+                                <InputGroup.Addon>📞</InputGroup.Addon>
+                                <Input
+                                    value={formData.telephone}
+                                    onChange={(value) => handleChange(value, 'telephone')}
+                                    readOnly={isReadOnly}
+                                    placeholder="Ex: 0544581486"
+                                    style={{
+                                        backgroundColor: isReadOnly ? '#f8fafc' : 'white',
+                                        borderColor: '#e2e8f0'
+                                    }}
+                                />
+                            </InputGroup>
+                        </Form.Group>
+                    </Col>
+
+                    {/* Deuxième Téléphone */}
+                    <Col xs={24} sm={12} md={8}>
+                        <Form.Group style={{ marginBottom: '20px' }}>
+                            <Form.ControlLabel style={{
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                color: '#475569',
+                                marginBottom: '8px'
+                            }}>
+                                Deuxième Téléphone du fondateur
+                            </Form.ControlLabel>
+                            <InputGroup>
+                                <InputGroup.Addon>📱</InputGroup.Addon>
+                                <Input
+                                    value={formData.telephone2}
+                                    onChange={(value) => handleChange(value, 'telephone2')}
+                                    readOnly={isReadOnly}
+                                    placeholder="Ex: 0544581486"
+                                    style={{
+                                        backgroundColor: isReadOnly ? '#f8fafc' : 'white',
+                                        borderColor: '#e2e8f0'
+                                    }}
+                                />
+                            </InputGroup>
+                        </Form.Group>
+                    </Col>
+
+                    {/* Email */}
+                    <Col xs={24} sm={12} md={8}>
+                        <Form.Group style={{ marginBottom: '20px' }}>
+                            <Form.ControlLabel style={{
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                color: '#475569',
+                                marginBottom: '8px'
+                            }}>
+                                Email personnel <span style={{ color: '#ef4444' }}>*</span>
+                            </Form.ControlLabel>
+                            <InputGroup>
+                                <InputGroup.Addon>✉️</InputGroup.Addon>
+                                <Input
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={(value) => handleChange(value, 'email')}
+                                    readOnly={isReadOnly}
+                                    placeholder="exemple@email.com"
+                                    style={{
+                                        backgroundColor: isReadOnly ? '#f8fafc' : 'white',
+                                        borderColor: '#e2e8f0'
+                                    }}
+                                />
+                            </InputGroup>
+                        </Form.Group>
+                    </Col>
+                </Row>
+            </Form>
         </div>
     );
 };
@@ -283,8 +438,10 @@ const EcolesStatsHeader = ({ ecoles, selectedCount }) => {
 // ===========================
 // COMPOSANT PRINCIPAL
 // ===========================
-const ListeEcoles = () => {
+const ListeEcoles = ({ mode = "candidatEcoleInscription" }) => {
     const navigate = useNavigate();
+    const [userData, setUserData] = useState(null);
+    const [loadingUserData, setLoadingUserData] = useState(false);
 
     // États locaux pour la gestion des écoles
     const [ecoles, setEcoles] = useState([]);
@@ -302,6 +459,34 @@ const ListeEcoles = () => {
             console.log(`École ${index + 1}:`, ecole);
         });
     }, [ecoles]);
+
+    // Charger les données utilisateur si mode candidat
+    useEffect(() => {
+        if (mode === "candidatEcoleInscription") {
+            loadUserData();
+        }
+    }, [mode]);
+
+    const loadUserData = async () => {
+        setLoadingUserData(true);
+        try {
+            const response = await axios.get(
+                `${getFullUrl()}souscription-personnel/personnelById/${SOUSCRIPTION_ID}`,
+                { timeout: 10000 }
+            );
+            console.log('✅ Données utilisateur chargées:', response.data);
+            setUserData(response.data);
+        } catch (error) {
+            console.error('❌ Erreur lors du chargement des données utilisateur:', error);
+            Notification.error({
+                title: 'Erreur',
+                description: 'Impossible de charger les informations du fondateur.',
+                duration: 3000
+            });
+        } finally {
+            setLoadingUserData(false);
+        }
+    };
 
     // ===========================
     // GESTIONNAIRES D'ÉVÉNEMENTS
@@ -456,13 +641,6 @@ const ListeEcoles = () => {
             });
 
             setShowCreateModal(false);
-
-            // Notification de succès
-            Notification.success({
-                title: 'École ajoutée',
-                description: `L'école "${ecoleData.nomEtablissement}" a été ajoutée à la liste.`,
-                duration: 3000
-            });
 
             return newEcole;
         } catch (error) {
@@ -641,53 +819,6 @@ const ListeEcoles = () => {
         link.click();
     }, [ecoles]);
 
-    // ===========================
-    // COMPOSANTS DE RENDU
-    // ===========================
-    const EmptyState = () => (
-        <div className="row">
-            <div className="col-lg-12">
-                <div style={{
-                    background: 'white',
-                    borderRadius: '15px',
-                    padding: '40px',
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                    border: '1px solid rgba(245, 158, 11, 0.15)',
-                    textAlign: 'center'
-                }}>
-                    <div style={{
-                        background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                        borderRadius: '20px',
-                        padding: '20px',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: 20
-                    }}>
-                        <FiBookOpen size={40} color="white" />
-                    </div>
-                    <h5 style={{ margin: '0 0 10px 0', color: '#1e293b', fontWeight: '600' }}>
-                        Aucune école ajoutée
-                    </h5>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
-                        Commencez par ajouter des écoles à votre liste d'attente.
-                    </p>
-                    <Button
-                        appearance="primary"
-                        style={{
-                            marginTop: 15,
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            border: 'none'
-                        }}
-                        startIcon={<FiPlus />}
-                        onClick={handleCreateEcole}
-                    >
-                        Ajouter une école
-                    </Button>
-                </div>
-            </div>
-        </div>
-    );
 
     // ===========================
     // RENDU PRINCIPAL
@@ -702,167 +833,169 @@ const ListeEcoles = () => {
                 {/* Section Profil */}
                 <div className="row">
                     <div className="col-lg-12">
-                        <ProfileSection />
+                        <ProfileFormSection
+                            mode={mode}
+                            userData={userData}
+                            loading={loadingUserData}
+                        />
                     </div>
                 </div>
 
                 {/* En-tête avec statistiques */}
-                <div className="row">
-                    <div className="col-lg-12">
-                        <EcolesStatsHeader ecoles={ecoles} selectedCount={selectedEcoles.length} />
-                    </div>
-                </div>
-
-                {/* Table principale ou état vide */}
-                {ecoles.length === 0 ? (
-                    <EmptyState />
-                ) : (
+                {ecoles.length > 0 && (
                     <div className="row">
                         <div className="col-lg-12">
-                            {/* DEBUG: Information sur l'état */}
-                            <div style={{
-                                background: '#f0f9ff',
-                                border: '1px solid #0ea5e9',
-                                borderRadius: '8px',
-                                padding: '12px',
-                                marginBottom: '16px',
-                                fontSize: '14px',
-                                color: '#0c4a6e'
-                            }}>
-                                🔍 DEBUG: {ecoles.length} école(s) en mémoire, {selectedEcoles.length} sélectionnée(s)
-                                {ecoles.length > 0 && (
-                                    <div style={{ marginTop: '4px', fontSize: '12px' }}>
-                                        Dernière école: {ecoles[ecoles.length - 1]?.nomEtablissement}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Barre d'actions de sélection */}
-                            {ecoles.length > 0 && (
-                                <div style={{
-                                    background: 'white',
-                                    borderRadius: '12px',
-                                    padding: '16px 20px',
-                                    marginBottom: '16px',
-                                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-                                    border: '1px solid rgba(102, 126, 234, 0.1)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    flexWrap: 'wrap',
-                                    gap: '12px'
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <Button
-                                            appearance="subtle"
-                                            size="sm"
-                                            onClick={handleSelectAll}
-                                            startIcon={selectedEcoles.length === ecoles.length ? <FiX /> : <FiCheck />}
-                                            style={{
-                                                color: selectedEcoles.length === ecoles.length ? '#ef4444' : '#10b981',
-                                                border: `1px solid ${selectedEcoles.length === ecoles.length ? '#fecaca' : '#bbf7d0'}`,
-                                                backgroundColor: selectedEcoles.length === ecoles.length ? '#fef2f2' : '#f0fdf4'
-                                            }}
-                                        >
-                                            {selectedEcoles.length === ecoles.length ? 'Tout désélectionner' : 'Tout sélectionner'}
-                                        </Button>
-
-                                        <div style={{
-                                            fontSize: '14px',
-                                            color: '#64748b',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '8px'
-                                        }}>
-                                            <span>{selectedEcoles.length} / {ecoles.length} sélectionnée(s)</span>
-                                            {selectedEcoles.length > 0 && (
-                                                <Badge color="green" style={{ fontSize: '11px' }}>
-                                                    Prêt à enregistrer
-                                                </Badge>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div style={{ display: 'flex', gap: '8px' }}>
-                                        {selectedEcoles.length > 0 && (
-                                            <Button
-                                                appearance="primary"
-                                                color="green"
-                                                size="sm"
-                                                loading={isSaving}
-                                                disabled={isSaving}
-                                                onClick={handleSaveSelected}
-                                                startIcon={<FiSave />}
-                                                style={{
-                                                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                                                    border: 'none',
-                                                    fontWeight: '600'
-                                                }}
-                                            >
-                                                {isSaving ? 'Enregistrement...' : `Enregistrer ${selectedEcoles.length} école(s)`}
-                                            </Button>
-                                        )}
-
-                                        <Button
-                                            appearance="subtle"
-                                            size="sm"
-                                            disabled={ecoles.length === 0}
-                                            onClick={handleExportAll}
-                                            startIcon={<FiDownload />}
-                                            style={{
-                                                color: '#3b82f6',
-                                                border: '1px solid #dbeafe',
-                                                backgroundColor: '#f0f9ff'
-                                            }}
-                                        >
-                                            Exporter CSV
-                                        </Button>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div style={{
-                                background: 'white',
-                                borderRadius: '15px',
-                                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                                border: '1px solid rgba(102, 126, 234, 0.1)',
-                                overflow: 'hidden'
-                            }}>
-                                <DataTable
-                                    title="Écoles en Attente d'Enregistrement"
-                                    subtitle={` école(s) • ${selectedEcoles.length} sélectionnée(s)`}
-                                    data={ecoles}
-                                    loading={false}
-                                    error={null}
-                                    columns={listeEcolesAAjouterTableConfig.columns}
-                                    searchableFields={listeEcolesAAjouterTableConfig.searchableFields}
-                                    filterConfigs={listeEcolesAAjouterTableConfig.filterConfigs}
-                                    actions={listeEcolesAAjouterTableConfig.actions}
-                                    onAction={handleTableActionLocal}
-                                    onRefresh={handleRefresh}
-                                    onCreateNew={handleCreateEcole}
-                                    defaultPageSize={15}
-                                    pageSizeOptions={[10, 15, 25, 50]}
-                                    tableHeight={650}
-                                    enableRefresh={true}
-                                    enableCreate={true}
-                                    createButtonText="Ajouter une École"
-                                    selectable={true}
-                                    selectedKeys={selectedEcoles}
-                                    onSelectionChange={handleSelectionChange}
-                                    rowKey="id"
-                                    checkable={true}
-                                    defaultCheckedKeys={[]}
-                                    onCheck={handleSelectionChange}
-                                    customStyles={{
-                                        container: { backgroundColor: "transparent" },
-                                        panel: { minHeight: "650px", border: "none", boxShadow: "none" },
-                                    }}
-                                />
-                            </div>
+                            <EcolesStatsHeader ecoles={ecoles} selectedCount={selectedEcoles.length} />
                         </div>
                     </div>
                 )}
+
+                {/* Table principale ou état vide */}
+                <div className="row">
+                    <div className="col-lg-12">
+                        {/* DEBUG: Information sur l'état */}
+                        <div style={{
+                            background: '#f0f9ff',
+                            border: '1px solid #0ea5e9',
+                            borderRadius: '8px',
+                            padding: '12px',
+                            marginBottom: '16px',
+                            fontSize: '14px',
+                            color: '#0c4a6e'
+                        }}>
+                            🔍 DEBUG: {ecoles.length} école(s) en mémoire, {selectedEcoles.length} sélectionnée(s)
+                            {ecoles.length > 0 && (
+                                <div style={{ marginTop: '4px', fontSize: '12px' }}>
+                                    Dernière école: {ecoles[ecoles.length - 1]?.nomEtablissement}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Barre d'actions de sélection */}
+                        {ecoles.length > 0 && (
+                            <div style={{
+                                background: 'white',
+                                borderRadius: '12px',
+                                padding: '16px 20px',
+                                marginBottom: '16px',
+                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+                                border: '1px solid rgba(102, 126, 234, 0.1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                flexWrap: 'wrap',
+                                gap: '12px'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <Button
+                                        appearance="subtle"
+                                        size="sm"
+                                        onClick={handleSelectAll}
+                                        startIcon={selectedEcoles.length === ecoles.length ? <FiX /> : <FiCheck />}
+                                        style={{
+                                            color: selectedEcoles.length === ecoles.length ? '#ef4444' : '#10b981',
+                                            border: `1px solid ${selectedEcoles.length === ecoles.length ? '#fecaca' : '#bbf7d0'}`,
+                                            backgroundColor: selectedEcoles.length === ecoles.length ? '#fef2f2' : '#f0fdf4'
+                                        }}
+                                    >
+                                        {selectedEcoles.length === ecoles.length ? 'Tout désélectionner' : 'Tout sélectionner'}
+                                    </Button>
+
+                                    <div style={{
+                                        fontSize: '14px',
+                                        color: '#64748b',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px'
+                                    }}>
+                                        <span>{selectedEcoles.length} / {ecoles.length} sélectionnée(s)</span>
+                                        {selectedEcoles.length > 0 && (
+                                            <Badge color="green" style={{ fontSize: '11px' }}>
+                                                Prêt à enregistrer
+                                            </Badge>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    {selectedEcoles.length > 0 && (
+                                        <Button
+                                            appearance="primary"
+                                            color="green"
+                                            size="sm"
+                                            loading={isSaving}
+                                            disabled={isSaving}
+                                            onClick={handleSaveSelected}
+                                            startIcon={<FiSave />}
+                                            style={{
+                                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                                                border: 'none',
+                                                fontWeight: '600'
+                                            }}
+                                        >
+                                            {isSaving ? 'Enregistrement...' : `Enregistrer ${selectedEcoles.length} école(s)`}
+                                        </Button>
+                                    )}
+
+                                    <Button
+                                        appearance="subtle"
+                                        size="sm"
+                                        disabled={ecoles.length === 0}
+                                        onClick={handleExportAll}
+                                        startIcon={<FiDownload />}
+                                        style={{
+                                            color: '#3b82f6',
+                                            border: '1px solid #dbeafe',
+                                            backgroundColor: '#f0f9ff'
+                                        }}
+                                    >
+                                        Exporter CSV
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
+                        <div style={{
+                            background: 'white',
+                            borderRadius: '15px',
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+                            border: '1px solid rgba(102, 126, 234, 0.1)',
+                            overflow: 'hidden'
+                        }}>
+                            <DataTable
+                                title="Écoles en Attente d'Enregistrement"
+                                subtitle={` école(s) • ${selectedEcoles.length} sélectionnée(s)`}
+                                data={ecoles}
+                                loading={false}
+                                error={null}
+                                columns={listeEcolesAAjouterTableConfig.columns}
+                                searchableFields={listeEcolesAAjouterTableConfig.searchableFields}
+                                filterConfigs={listeEcolesAAjouterTableConfig.filterConfigs}
+                                actions={listeEcolesAAjouterTableConfig.actions}
+                                onAction={handleTableActionLocal}
+                                onRefresh={handleRefresh}
+                                onCreateNew={handleCreateEcole}
+                                defaultPageSize={15}
+                                pageSizeOptions={[10, 15, 25, 50]}
+                                tableHeight={650}
+                                enableRefresh={true}
+                                enableCreate={true}
+                                createButtonText="Ajouter une École"
+                                selectable={true}
+                                selectedKeys={selectedEcoles}
+                                onSelectionChange={handleSelectionChange}
+                                rowKey="id"
+                                checkable={true}
+                                defaultCheckedKeys={[]}
+                                onCheck={handleSelectionChange}
+                                customStyles={{
+                                    container: { backgroundColor: "transparent" },
+                                    panel: { minHeight: "650px", border: "none", boxShadow: "none" },
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Modal de création */}
