@@ -268,7 +268,7 @@ const allMenuSections = [
           {
             eventKey: "cahierDeTexte",
             title: "Cahier de texte",
-            profiles: ["admin", "manager", "Fondateur"],
+            profiles: ["admin", "Professeur", "Fondateur"],
           },
           // Journal pointage Badgeuse
           {
@@ -1103,18 +1103,43 @@ const Sidebar = ({
   // État local pour l'activeKey avec synchronisation avec l'URL
   const [activeKey, setActiveKey] = useState(currentActiveKey);
 
-  // Synchroniser l'activeKey avec les changements d'URL
-  useEffect(() => {
-    const newActiveKey = getEventKeyFromPath(location.pathname);
-    setActiveKey(newActiveKey);
-    console.log('🔄 URL changée:', location.pathname, '-> activeKey:', newActiveKey);
-  }, [location.pathname]);
+   // Fonction pour trouver le menu parent d'un eventKey
+  const findParentMenuKey = (eventKey, sections) => {
+    for (const section of sections) {
+      for (const item of section.items) {
+        if (item.type === 'menu' && item.children) {
+          const hasChild = item.children.some(child => child.eventKey === eventKey);
+          if (hasChild) {
+            return item.eventKey;
+          }
+        }
+      }
+    }
+    return null;
+  };
 
+  
   const userProfile = getUserProfile();
   const menuSections = useMemo(() => {
     const sectionsClone = JSON.parse(JSON.stringify(allMenuSections));
     return filterSectionsByProfile(sectionsClone, userProfile);
   }, [userProfile]);
+
+  // Synchroniser l'activeKey avec les changements d'URL
+  useEffect(() => {
+    const newActiveKey = getEventKeyFromPath(location.pathname);
+    setActiveKey(newActiveKey);
+    
+    // Trouver et ouvrir automatiquement le menu parent si l'activeKey est un sous-menu
+    const parentKey = findParentMenuKey(newActiveKey, menuSections);
+    if (parentKey) {
+      setOpenKeys([parentKey]);
+      console.log('🔄 Ouverture automatique du menu parent:', parentKey);
+    }
+    
+    console.log('🔄 URL changée:', location.pathname, '-> activeKey:', newActiveKey);
+  }, [location.pathname, menuSections]);
+
 
   console.log("Profil utilisateur:", userProfile);
   console.log("URL actuelle:", location.pathname);

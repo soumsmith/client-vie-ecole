@@ -24,7 +24,7 @@ const MatiereCard = ({
     const sizeConfig = {
         small: {
             padding: '14px',
-            titleSize: '14px',
+            titleSize: '12px',
             metaSize: '11px',
             iconSize: 12,
             buttonHeight: '30px',

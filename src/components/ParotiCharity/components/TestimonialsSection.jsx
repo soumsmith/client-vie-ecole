@@ -11,7 +11,7 @@ const sectionData = {
   description:
     "L’éducation transforme des vies. Découvrez les retours d’enseignants, parents et élèves qui bénéficient de notre accompagnement scolaire.",
   buttonText: "Voir tous les témoignages",
-  buttonLink: "/temoignages",
+  buttonLink: "/",
 };
 
 const testimonialsData = [

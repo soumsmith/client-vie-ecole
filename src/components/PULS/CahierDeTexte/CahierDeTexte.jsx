@@ -327,7 +327,7 @@ const CahierDeTexteRouter = ({
                         <Grid fluid>
                             <Row gutter={16}>
                                 {filteredMatieres.map((matiere) => (
-                                    <Col key={matiere.id} xs={24} sm={12} md={8}>
+                                    <Col key={matiere.id} xs={24} sm={12} md={6}>
                                         <MatiereCard 
                                             matiere={matiere}
                                             onOuvrirCahier={handleOuvrirCahier}

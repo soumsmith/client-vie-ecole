@@ -14,25 +14,46 @@ export const siteConfig = {
 
 export const routeConfig = {
   home: "/",
-  homeSecondary: "/accueil-secondaire",
-  homePrimary: "/accueil-primaire",
-  headerStyleOne: "/header-style-1",
-  headerStyleTwo: "/header-style-2",
-  headerStyleThree: "/header-style-3",
-  about: "/a-propos",
-  team: "/notre-equipe",
-  programs: "/programmes",
-  programDetails: "/programmes/:id",
-  events: "/evenements",
-  eventDetails: "/evenements/:id",
-  news: "/actualites",
-  newsDetails: "/actualites/:id",
-  contact: "/contact",
-  donations: "/dons",
-  donationDetails: "/dons/:id",
-  volunteers: "/benevoles"
+  homeSecondary: "/",
+  homePrimary: "/",
+  headerStyleOne: "/",
+  headerStyleTwo: "/",
+  headerStyleThree: "/",
+  about: "/",
+  team: "/",
+  programs: "/",
+  programDetails: "/",
+  events: "/",
+  eventDetails: "/",
+  news: "/",
+  newsDetails: "/",
+  contact: "/",
+  donations: "/",
+  donationDetails: "/",
+  volunteers: "/"
 };
 
+
+// export const routeConfig = {
+//   home: "/",
+//   homeSecondary: "/accueil-secondaire",
+//   homePrimary: "/accueil-primaire",
+//   headerStyleOne: "/header-style-1",
+//   headerStyleTwo: "/header-style-2",
+//   headerStyleThree: "/header-style-3",
+//   about: "/a-propos",
+//   team: "/notre-equipe",
+//   programs: "/programmes",
+//   programDetails: "/programmes/:id",
+//   events: "/evenements",
+//   eventDetails: "/evenements/:id",
+//   news: "/actualites",
+//   newsDetails: "/actualites/:id",
+//   contact: "/contact",
+//   donations: "/dons",
+//   donationDetails: "/dons/:id",
+//   volunteers: "/benevoles"
+// };
 // ===========================
 // DONNÉES DE NAVIGATION AVEC ROUTES REACT
 // ===========================
