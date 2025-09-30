@@ -1093,7 +1093,7 @@ const Sidebar = ({
   activeKey: externalActiveKey, // Si fourni depuis le parent
 }) => {
   const location = useLocation();
-  const [openKeys, setOpenKeys] = useState(["general"]);
+  const [openKeys, setOpenKeys] = useState([]);
 
   // Déterminer l'activeKey basé sur l'URL actuelle
   const currentActiveKey = useMemo(() => {
