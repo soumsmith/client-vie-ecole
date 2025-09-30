@@ -7,6 +7,8 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useAllApiUrls } from '../utils/apiConfig';
 import { usePulsParams } from '../../hooks/useDynamicParams';
+import getFullUrl from '../../hooks/urlUtils';
+import { getUserProfile } from "../../hooks/userUtils";
 
 // ===========================
 // HOOK POUR LA RECHERCHE DES NOTES (VERSION CORRIGÉE)
@@ -47,6 +49,7 @@ export const useNoteSearch = (profil, showMatiereFilter = false) => {
      */
     const buildApiUrl = (classeId, periodeId, academicYearId, matiereId = null) => {
         const baseUrl = getFullUrl();
+        console.log('🎓 getUserProfile===', getUserProfile());
         
         if (showMatiereFilter) {
             if (matiereId && matiereId !== null) {
@@ -102,12 +105,14 @@ export const useNoteSearch = (profil, showMatiereFilter = false) => {
             let selectedMatiereInfo = null;
             const rawData = notesResponse.data;
 
+
+
             // ===========================
             // TRAITEMENT DIRECT SELON LE PROFIL
             // ===========================
             
             if (profil === 'Professeur') {
-                console.log('🎓 Traitement Professeur');
+                
                 
                 const dataArray = Array.isArray(rawData) ? rawData : [rawData];
                 

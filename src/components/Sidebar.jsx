@@ -575,7 +575,7 @@ const allMenuSections = [
         eventKey: "importerEleves",
         icon: "DocPassIcon",
         title: "Importer des Elèves",
-        profiles: ["admin", "manager", "user", "Fondateur"],
+        profiles: ["admin", "manager", "user", ""],
       },
       // Identification Elèves
       {
@@ -583,7 +583,7 @@ const allMenuSections = [
         eventKey: "identificationEleves",
         icon: "DocPassIcon",
         title: "Identification Elèves",
-        profiles: ["admin", "manager", "user", "Fondateur"],
+        profiles: ["admin", "manager", "user", ""],
       },
       // Inscription à Valider
       {
@@ -1093,7 +1093,7 @@ const Sidebar = ({
   activeKey: externalActiveKey, // Si fourni depuis le parent
 }) => {
   const location = useLocation();
-  const [openKeys, setOpenKeys] = useState(["general"]);
+  const [openKeys, setOpenKeys] = useState([]);
 
   // Déterminer l'activeKey basé sur l'URL actuelle
   const currentActiveKey = useMemo(() => {

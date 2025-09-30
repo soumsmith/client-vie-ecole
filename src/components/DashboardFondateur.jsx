@@ -215,7 +215,7 @@ const ComparisonBar = ({
 /**
  * Composant principal du tableau de bord
  */
-const Dashboard = ({ ecoleId = 38, anneeId = 226 }) => {
+const DashboardFondateur = ({ ecoleId = 38, anneeId = 226 }) => {
     const { data, loading, error, refetch } = useDashboardData(ecoleId, anneeId);
 
     if (loading) {
@@ -725,4 +725,4 @@ const Dashboard = ({ ecoleId = 38, anneeId = 226 }) => {
     );
 };
 
-export default Dashboard;
+export default DashboardFondateur;

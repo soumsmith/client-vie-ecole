@@ -14,40 +14,42 @@ import {
     Breadcrumb,
     Button,
     FlexboxGrid,
-    Card,
     Loader,
     Message,
-    ButtonGroup
+    Notification,
+    toaster
 } from 'rsuite';
 import {
     FiSearch,
     FiUsers,
     FiBook,
-    FiUser,
     FiArrowLeft,
     FiGrid,
-    FiBookOpen,
-    FiLock,
-    FiUnlock,
-    FiExternalLink
+    FiBookOpen
 } from 'react-icons/fi';
 import {
     useClassesListData,
     useMatieresByClasseData
 } from './CahierDeTexteServiceManager';
 import CahierDeTexteConsultation from './CahierDeTexteConsultation';
-import ClassCard from '../card/ClassCard'; // Import du nouveau composant
-import MatiereCard from '../card/MatiereCard'; // Import du nouveau composant MatiereCard
+import ClassCard from '../card/ClassCard';
+import MatiereCard from '../card/MatiereCard';
+import { usePulsParams } from '../../hooks/useDynamicParams';
+import getFullUrl from "../../hooks/urlUtils";
 
 const CahierDeTexteRouter = ({ 
-    primaryColor = '#3b82f6' // Couleur principale configurable
+    primaryColor = '#3b82f6',
+    apiBaseUrl = 'http://46.105.52.105:8889/api'
 }) => {
-    const [currentView, setCurrentView] = useState('list'); // 'list', 'detail', 'cahier'
+    // Récupérer l'ID de l'utilisateur connecté dynamiquement
+    const { userId } = usePulsParams();
+    const [currentView, setCurrentView] = useState('list');
     const [selectedClasse, setSelectedClasse] = useState(null);
     const [selectedMatiere, setSelectedMatiere] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [matieresSearchTerm, setMatieresSearchTerm] = useState('');
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [lockStates, setLockStates] = useState({}); // Stocker les états de verrouillage
 
     // Chargement des données
     const { classes, loading: classesLoading, error: classesError, refetch: refetchClasses } = useClassesListData(refreshTrigger);
@@ -55,6 +57,96 @@ const CahierDeTexteRouter = ({
         selectedClasse?.id,
         refreshTrigger
     );
+
+    // Fonction pour verrouiller/déverrouiller un cahier via l'API
+    const handleVerrouillerCahier = async (matiere, shouldLock) => {
+        // Vérifier que userId est disponible
+        if (!userId) {
+            toaster.push(
+                <Notification type="error" header="Erreur" closable>
+                    Impossible d'identifier l'utilisateur connecté
+                </Notification>,
+                { placement: 'topEnd', duration: 5000 }
+            );
+            return false;
+        }
+
+        try {
+            // Déterminer l'endpoint selon l'action
+            const action = shouldLock ? 'lock' : 'unlock';
+            const matiereId = matiere.id;
+            
+            // Construire l'URL de l'API avec l'userId dynamique
+            const url = `${getFullUrl()}/locks/TEXTBOOK/${matiereId}/${action}?actor=${userId}`;
+            
+            console.log('🔒 API Call:', {
+                url,
+                matiereId,
+                action,
+                shouldLock,
+                userId
+            }); // Debug amélioré
+            
+            // Mettre à jour l'état local de manière optimiste
+            setLockStates(prev => ({
+                ...prev,
+                [matiereId]: shouldLock
+            }));
+
+            // Appel API
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                // Annuler la mise à jour optimiste en cas d'erreur
+                setLockStates(prev => ({
+                    ...prev,
+                    [matiereId]: !shouldLock
+                }));
+                throw new Error(`Erreur HTTP: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('✅ API Response:', data); // Debug
+
+            // Confirmer l'état avec la réponse du serveur
+            setLockStates(prev => ({
+                ...prev,
+                [matiereId]: data.isLocked
+            }));
+
+            // Afficher une notification de succès
+            toaster.push(
+                <Notification type="success" header="Succès" closable>
+                    {data.message || `Cahier ${data.isLocked ? 'verrouillé' : 'déverrouillé'} avec succès`}
+                </Notification>,
+                { placement: 'topEnd', duration: 3000 }
+            );
+
+            // Forcer le rafraîchissement des matières pour synchroniser avec le serveur
+            setTimeout(() => {
+                refetchMatieres();
+            }, 500);
+
+            return true; // Succès
+        } catch (error) {
+            console.error('❌ Erreur lors du verrouillage/déverrouillage:', error);
+            
+            // Afficher une notification d'erreur
+            toaster.push(
+                <Notification type="error" header="Erreur" closable>
+                    Une erreur est survenue lors de l'opération. Veuillez réessayer.
+                </Notification>,
+                { placement: 'topEnd', duration: 5000 }
+            );
+
+            return false; // Échec
+        }
+    };
 
     // Navigation
     const handleClasseClick = (classe) => {
@@ -66,6 +158,7 @@ const CahierDeTexteRouter = ({
         setCurrentView('list');
         setSelectedClasse(null);
         setSelectedMatiere(null);
+        setLockStates({}); // Réinitialiser les états de verrouillage
     };
 
     const handleBackToDetail = () => {
@@ -79,11 +172,6 @@ const CahierDeTexteRouter = ({
         setCurrentView('cahier');
     };
 
-    const handleVerrouillerCahier = (matiere) => {
-        // TODO: Implémenter le verrouillage
-        console.log('Verrouiller cahier:', matiere);
-    };
-
     // Filtrage des classes
     const filteredClasses = classes.filter(classe =>
         classe.libelle.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -95,9 +183,6 @@ const CahierDeTexteRouter = ({
         matiere.matiereLibelle.toLowerCase().includes(matieresSearchTerm.toLowerCase()) ||
         matiere.professorLibelle.toLowerCase().includes(matieresSearchTerm.toLowerCase())
     );
-
-    // Composant Card pour les matières - Utilisation du nouveau composant externalisé
-    // (Supprimé car maintenant externalisé dans MatiereCard.jsx)
 
     // Vue liste des classes
     if (currentView === 'list') {
@@ -169,11 +254,11 @@ const CahierDeTexteRouter = ({
                         </Message>
                     )}
 
-                    {/* Grille des classes avec couleur unique */}
+                    {/* Grille des classes */}
                     {!classesLoading && !classesError && (
                         <Grid fluid>
                             <Row gutter={16}>
-                                {filteredClasses.map((classe, index) => (
+                                {filteredClasses.map((classe) => (
                                     <Col key={classe.id} xs={24} sm={12} md={8} lg={6}>
                                         <ClassCard 
                                             classe={classe} 
@@ -322,23 +407,31 @@ const CahierDeTexteRouter = ({
                         </Message>
                     )}
 
-                    {/* Grille des matières avec le nouveau composant */}
+                    {/* Grille des matières */}
                     {!matieresLoading && !matieresError && filteredMatieres.length > 0 && (
                         <Grid fluid>
                             <Row gutter={16}>
-                                {filteredMatieres.map((matiere) => (
-                                    <Col key={matiere.id} xs={24} sm={12} md={6}>
-                                        <MatiereCard 
-                                            matiere={matiere}
-                                            onOuvrirCahier={handleOuvrirCahier}
-                                            onVerrouillerCahier={handleVerrouillerCahier}
-                                            borderColor="#e2e8f0"
-                                            accentColor={primaryColor}
-                                            size="medium"
-                                            hoverable={true}
-                                        />
-                                    </Col>
-                                ))}
+                                {filteredMatieres.map((matiere) => {
+                                    // Utiliser l'état local en priorité, sinon la valeur du serveur
+                                    const currentLockState = lockStates.hasOwnProperty(matiere.id) 
+                                        ? lockStates[matiere.id] 
+                                        : (matiere.isLocked ?? false);
+                                    
+                                    return (
+                                        <Col key={matiere.id} xs={24} sm={12} md={6}>
+                                            <MatiereCard 
+                                                matiere={matiere}
+                                                onOuvrirCahier={handleOuvrirCahier}
+                                                onVerrouillerCahier={handleVerrouillerCahier}
+                                                isLocked={currentLockState}
+                                                borderColor="#e2e8f0"
+                                                accentColor={primaryColor}
+                                                size="medium"
+                                                hoverable={true}
+                                            />
+                                        </Col>
+                                    );
+                                })}
                             </Row>
                         </Grid>
                     )}

@@ -3,7 +3,7 @@
  * Même style que ClassCard mais adapté pour les matières
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, FlexboxGrid, Button } from 'rsuite';
 import { FiBook, FiUser, FiExternalLink, FiLock, FiUnlock } from 'react-icons/fi';
 
@@ -15,10 +15,18 @@ const MatiereCard = ({
     accentColor = '#3b82f6',
     size = 'medium',
     customStyle = {},
-    hoverable = true 
+    hoverable = true,
+    isLocked = false
 }) => {
-    const [estVerrouille, setEstVerrouille] = useState(Math.random() > 0.7);
+    const [estVerrouille, setEstVerrouille] = useState(isLocked);
     const [animateIcon, setAnimateIcon] = useState(false);
+
+    // Synchroniser l'état local avec la prop isLocked
+    useEffect(() => {
+        setEstVerrouille(isLocked);
+    }, [isLocked]);
+
+    console.log('isLocked', isLocked);
 
     // Configuration des tailles
     const sizeConfig = {
@@ -28,7 +36,7 @@ const MatiereCard = ({
             metaSize: '11px',
             iconSize: 12,
             buttonHeight: '30px',
-            buttonFontSize: '10px'
+            buttonFontSize: '9px'
         },
         medium: {
             padding: '18px',
@@ -36,7 +44,7 @@ const MatiereCard = ({
             metaSize: '12px',
             iconSize: 14,
             buttonHeight: '34px',
-            buttonFontSize: '12px'
+            buttonFontSize: '9px'
         },
         large: {
             padding: '22px',
@@ -44,7 +52,7 @@ const MatiereCard = ({
             metaSize: '13px',
             iconSize: 16,
             buttonHeight: '38px',
-            buttonFontSize: '13px'
+            buttonFontSize: '9px'
         }
     };
 
@@ -212,7 +220,7 @@ const MatiereCard = ({
                     }}>
                         {estVerrouille ? <FiLock size={10} /> : <FiUnlock size={10} />}
                     </div>
-                    <span>{estVerrouille ? 'Verrouillé' : 'Libre'}</span>
+                    <span>{estVerrouille ? 'Verrouillé' : 'Déverrouillé'}</span>
                 </div>
             </div>
 
@@ -225,7 +233,7 @@ const MatiereCard = ({
                     <Button
                         size="sm"
                         appearance="subtle"
-                        startIcon={<FiExternalLink size={13} />}
+                        startIcon={<FiExternalLink size={10} />}
                         onClick={() => onOuvrirCahier && onOuvrirCahier(matiere)}
                         style={{
                             flex: 2,
@@ -269,15 +277,17 @@ const MatiereCard = ({
                         onClick={handleVerrouillerCahier}
                         style={{
                             flex: 1,
+                            minWidth: '120px', // Largeur minimale pour garder la même taille
                             borderRadius: '10px',
                             height: config.buttonHeight,
                             fontSize: config.buttonFontSize,
                             fontWeight: '600',
                             color: estVerrouille ? '#059669' : '#dc2626',
-                            background: estVerrouille ? '#f0fdf4' : '#fef2f2',
+                            background: estVerrouille ? '#f0fdf4' : '#fff',
                             border: `1px solid ${estVerrouille ? '#bbf7d0' : '#fecaca'}`,
                             transition: 'all 0.2s ease',
-                            letterSpacing: '0.025em'
+                            letterSpacing: '0.025em',
+                            whiteSpace: 'nowrap' // Empêche le retour à la ligne
                         }}
                         onMouseEnter={(e) => {
                             e.target.style.transform = 'scale(1.05)';
@@ -288,7 +298,7 @@ const MatiereCard = ({
                             e.target.style.boxShadow = 'none';
                         }}
                     >
-                        {estVerrouille ? 'LIBRE' : 'VERROU'}
+                        {estVerrouille ? 'DÉVERROUILLER' : 'VERROUILLER'}
                     </Button>
                 </div>
             </div>

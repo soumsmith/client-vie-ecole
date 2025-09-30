@@ -277,16 +277,13 @@ const usePersonnelUrls = () => {
     const params = useAppParams();
     const baseUrl = getFullUrl();
 
-    console.log("params=====");
-    console.log(params);
-
     return useMemo(() => ({
 
         /**
          * Récupère les affectations matière-classe du professeur connecté (utilise automatiquement les paramètres de l'utilisateur connecté)
          */
         getMatiereClasseByProf: () =>
-            `${baseUrl}personnel-matiere-classe/get-by-prof?annee=${params.academicYearId}&prof=${params.personnelId}&ecole=${params.ecoleId}`,
+            `${baseUrl}personnel-matiere-classe/get-by-prof?annee=${params.academicYearId}&prof=${params.personnelInfo.personnelConnecteDetail.personnelid}&ecole=${params.ecoleId}`,
 
         /**
          * Récupère les affectations matière-classe d'un professeur spécifique
@@ -302,7 +299,7 @@ const usePersonnelUrls = () => {
          * @param {number} classeId - ID de la classe
          */
         getMatiereClasseByProfClasse: (classeId) =>
-            `${baseUrl}personnel-matiere-classe/get-by-prof-classe?prof=${params.personnelId}&classe=${classeId}&annee=${params.academicYearId}`,
+            `${baseUrl}personnel-matiere-classe/get-by-prof-classe?prof=${params.personnelInfo.personnelConnecteDetail.personnelid}&classe=${classeId}&annee=${params.academicYearId}`,
 
         /**
          * Récupère la liste du personnel par école et profil (utilise automatiquement l'école et le profil de l'utilisateur connecté)

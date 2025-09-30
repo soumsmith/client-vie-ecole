@@ -26,89 +26,48 @@ import {
     FiHome,
     FiStar
 } from 'react-icons/fi';
+import getFullUrl from "./hooks/urlUtils";
 
-// Données simulées basées sur vos APIs
-const mockProfessorData = {
-    professor: {
-        id: 440,
-        nom: "Bamba",
-        prenom: "Soumaila",
-        contact: "0555631540"
-    },
-    seances: [
-        {
-            id: "6b33e746-625f-444c-ad3b-441b3df4c177",
-            heureDeb: "09:10",
-            heureFin: "10:00",
-            matiere: { libelle: "ANGLAIS" },
-            classe: { libelle: "6EME F" },
-            salle: { libelle: "Salle A6" },
-            isEnded: true
-        },
-        {
-            id: "another-id",
-            heureDeb: "11:05",
-            heureFin: "11:55",
-            matiere: { libelle: "ANGLAIS" },
-            classe: { libelle: "6EME J" },
-            salle: { libelle: "Salle A8" },
-            isEnded: false
-        },
-        {
-            id: "third-id",
-            heureDeb: "15:00",
-            heureFin: "15:50",
-            matiere: { libelle: "ANGLAIS" },
-            classe: { libelle: "4EME B" },
-            salle: { libelle: "Salle A5" },
-            isEnded: false
-        }
-    ],
-    classes: [
-        {
-            id: 15318,
-            libelle: "6EME L",
-            effectif: 39,
-            matiere: { libelle: "ANGLAIS" },
-            evaluationsCount: 21
-        },
-        {
-            id: 25341,
-            libelle: "6EME F",
-            effectif: 45,
-            matiere: { libelle: "ANGLAIS" },
-            evaluationsCount: 18
-        },
-        {
-            id: 25342,
-            libelle: "6EME J",
-            effectif: 42,
-            matiere: { libelle: "ANGLAIS" },
-            evaluationsCount: 15
-        },
-        {
-            id: 25343,
-            libelle: "4EME B",
-            effectif: 38,
-            matiere: { libelle: "ANGLAIS" },
-            evaluationsCount: 22
-        },
-        {
-            id: 25344,
-            libelle: "3EME D",
-            effectif: 35,
-            matiere: { libelle: "ANGLAIS" },
-            evaluationsCount: 25
-        },
-        {
-            id: 25345,
-            libelle: "4EME G",
-            effectif: 40,
-            matiere: { libelle: "ANGLAIS" },
-            evaluationsCount: 19
-        }
-    ]
+
+// Configuration de l'API
+const API_CONFIG = {
+    params: {
+        annee: 226,
+        prof: 158,
+        ecole: 38
+    }
 };
+
+// Données simulées pour les séances
+const mockSeances = [
+    {
+        id: "6b33e746-625f-444c-ad3b-441b3df4c177",
+        heureDeb: "09:10",
+        heureFin: "10:00",
+        matiere: { libelle: "ANGLAIS" },
+        classe: { libelle: "6EME F" },
+        salle: { libelle: "Salle A6" },
+        isEnded: true
+    },
+    {
+        id: "another-id",
+        heureDeb: "11:05",
+        heureFin: "11:55",
+        matiere: { libelle: "ANGLAIS" },
+        classe: { libelle: "6EME J" },
+        salle: { libelle: "Salle A8" },
+        isEnded: false
+    },
+    {
+        id: "third-id",
+        heureDeb: "15:00",
+        heureFin: "15:50",
+        matiere: { libelle: "ANGLAIS" },
+        classe: { libelle: "4EME B" },
+        salle: { libelle: "Salle A5" },
+        isEnded: false
+    }
+];
 
 /**
  * Composant de carte d'activité (séance)
@@ -288,7 +247,7 @@ const ClassCard = ({ classe, onSelectClass, isSelected }) => {
                 }}>
                     <FiEdit3 size={16} style={{ marginRight: '8px' }} />
                     <span style={{ fontSize: '14px' }}>
-                        Évaluations: {classe.evaluationsCount}
+                        Évaluations: {classe.evaluationsCount || 0}
                     </span>
                 </div>
 
@@ -306,12 +265,6 @@ const ClassCard = ({ classe, onSelectClass, isSelected }) => {
                             {Math.round(progressValue)}%
                         </span>
                     </div>
-                    {/* <Progress.Line 
-                        percent={progressValue} 
-                        strokeColor="#007bff"
-                        trailColor="#e9ecef"
-                        strokeWidth={6}
-                    /> */}
                 </div>
             </div>
         </Panel>
@@ -374,7 +327,7 @@ const ClassDetails = ({ classe }) => {
                                 color: '#28a745',
                                 marginBottom: '8px'
                             }}>
-                                {classe.evaluationsCount}
+                                {classe.evaluationsCount || 0}
                             </div>
                             <div style={{ fontSize: '14px', color: '#6c757d' }}>
                                 Évaluations effectuées
@@ -594,8 +547,64 @@ const TeacherDashboard = () => {
     const [showCahierModal, setShowCahierModal] = useState(false);
     const [selectedSeance, setSelectedSeance] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [classes, setClasses] = useState([]);
+    const [professor, setProfessor] = useState({
+        nom: "Professeur",
+        prenom: "Utilisateur"
+    });
 
-    const { professor, seances, classes } = mockProfessorData;
+    // Fonction pour charger les données de l'API
+    const fetchClasses = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const url = `${getFullUrl()}/personnel-matiere-classe/get-by-prof?annee=${API_CONFIG.params.annee}&prof=${API_CONFIG.params.prof}&ecole=${API_CONFIG.params.ecole}`;
+            
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            // Mapper les données de l'API vers le format attendu
+            const mappedClasses = data.map(item => ({
+                id: item.classe.id,
+                libelle: item.classe.libelle,
+                effectif: item.classe.effectif,
+                matiere: {
+                    libelle: item.matiere.libelle
+                },
+                evaluationsCount: 0, // Cette donnée n'est pas fournie par l'API
+                branche: item.classe.branche?.libelle || 'N/A',
+                ecole: item.classe.ecole?.libelle || 'N/A'
+            }));
+            
+            setClasses(mappedClasses);
+            
+            // Extraire les informations du professeur
+            if (data.length > 0 && data[0].personnel) {
+                setProfessor({
+                    nom: data[0].personnel.nom,
+                    prenom: data[0].personnel.prenom,
+                    contact: data[0].personnel.contact
+                });
+            }
+        } catch (err) {
+            console.error('Erreur lors du chargement des classes:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // Charger les données au montage du composant
+    useEffect(() => {
+        fetchClasses();
+    }, [fetchClasses]);
 
     const handleOpenCahier = (seance) => {
         setSelectedSeance(seance);
@@ -604,6 +613,10 @@ const TeacherDashboard = () => {
 
     const handleSelectClass = (classe) => {
         setSelectedClass(classe);
+    };
+
+    const handleRefresh = () => {
+        fetchClasses();
     };
 
     const today = new Date().toLocaleDateString('fr-FR', {
@@ -616,7 +629,8 @@ const TeacherDashboard = () => {
     return (
         <div style={{
             minHeight: '100vh',
-            padding: '20px'
+            padding: '20px',
+            background: '#f5f5f5'
         }}>
             <div className="container-fluid">
                 {/* En-tête */}
@@ -649,6 +663,8 @@ const TeacherDashboard = () => {
                     <Button
                         appearance="primary"
                         startIcon={<FiRefreshCw />}
+                        onClick={handleRefresh}
+                        loading={loading}
                         style={{
                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                             border: 'none',
@@ -658,6 +674,13 @@ const TeacherDashboard = () => {
                         Actualiser
                     </Button>
                 </div>
+
+                {/* Message d'erreur */}
+                {error && (
+                    <Message type="error" showIcon style={{ marginBottom: '20px' }}>
+                        Erreur lors du chargement des données: {error}
+                    </Message>
+                )}
 
                 {/* Navigation */}
                 <Nav
@@ -692,14 +715,14 @@ const TeacherDashboard = () => {
                             Mon emploi du temps du jour - {today}
                         </h3>
 
-                        {seances.length === 0 ? (
+                        {mockSeances.length === 0 ? (
                             <Panel bordered style={{ borderRadius: '12px', textAlign: 'center', padding: '40px' }}>
                                 <div style={{ color: '#6c757d' }}>
                                     Aucune activité prévue pour aujourd'hui
                                 </div>
                             </Panel>
                         ) : (
-                            seances.map((seance) => (
+                            mockSeances.map((seance) => (
                                 <ActivityCard
                                     key={seance.id}
                                     seance={seance}
@@ -712,39 +735,53 @@ const TeacherDashboard = () => {
 
                 {activeTab === 'classes' && (
                     <div>
-                        <Row gutter={20}>
-                            {/* Liste des classes */}
-                            <Col xs={24} lg={selectedClass ? 14 : 24}>
-                                <h3 style={{
-                                    color: '#2c3e50',
-                                    marginBottom: '20px',
-                                    display: 'flex',
-                                    alignItems: 'center'
-                                }}>
-                                    <FiBookOpen style={{ marginRight: '8px' }} />
-                                    Mes classes ({classes.length})
-                                </h3>
+                        {loading ? (
+                            <div style={{ textAlign: 'center', padding: '40px' }}>
+                                <Loader size="lg" content="Chargement des classes..." />
+                            </div>
+                        ) : (
+                            <Row gutter={20}>
+                                {/* Liste des classes */}
+                                <Col xs={24} lg={selectedClass ? 14 : 24}>
+                                    <h3 style={{
+                                        color: '#2c3e50',
+                                        marginBottom: '20px',
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }}>
+                                        <FiBookOpen style={{ marginRight: '8px' }} />
+                                        Mes classes ({classes.length})
+                                    </h3>
 
-                                <Row gutter={16}>
-                                    {classes.map((classe) => (
-                                        <Col xs={24} sm={12} md={8} lg={selectedClass ? 12 : 8} key={classe.id}>
-                                            <ClassCard
-                                                classe={classe}
-                                                onSelectClass={handleSelectClass}
-                                                isSelected={selectedClass?.id === classe.id}
-                                            />
-                                        </Col>
-                                    ))}
-                                </Row>
-                            </Col>
-
-                            {/* Détails de la classe sélectionnée */}
-                            {selectedClass && (
-                                <Col xs={24} lg={10}>
-                                    <ClassDetails classe={selectedClass} />
+                                    {classes.length === 0 ? (
+                                        <Panel bordered style={{ borderRadius: '12px', textAlign: 'center', padding: '40px' }}>
+                                            <div style={{ color: '#6c757d' }}>
+                                                Aucune classe trouvée
+                                            </div>
+                                        </Panel>
+                                    ) : (
+                                        <Row gutter={16}>
+                                            {classes.map((classe) => (
+                                                <Col xs={24} sm={12} md={8} lg={selectedClass ? 12 : 8} key={classe.id}>
+                                                    <ClassCard
+                                                        classe={classe}
+                                                        onSelectClass={handleSelectClass}
+                                                        isSelected={selectedClass?.id === classe.id}
+                                                    />
+                                                </Col>
+                                            ))}
+                                        </Row>
+                                    )}
                                 </Col>
-                            )}
-                        </Row>
+
+                                {/* Détails de la classe sélectionnée */}
+                                {selectedClass && (
+                                    <Col xs={24} lg={10}>
+                                        <ClassDetails classe={selectedClass} />
+                                    </Col>
+                                )}
+                            </Row>
+                        )}
                     </div>
                 )}
             </div>

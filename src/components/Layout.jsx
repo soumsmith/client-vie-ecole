@@ -10,7 +10,7 @@ import LightTopBar from './LightTopBar';
 
 import Sidebar from './Sidebar';
 import Dashboard from './Dashboard';
-import Dashboard2 from './Dashboard2';
+import DashboardFondateur from './DashboardFondateur';
 import DataTable from './DataTable';
 import RecrutementPersonnel from './RecrutementPersonnel';
 import ThemeToggle from '../contrexts/ThemeToggle';
@@ -88,6 +88,9 @@ import ModifierInfoPersonnelles from './PULS/GestionUserInfos/ModifierInfoPerson
 import ListeEcoles from './PULS/MesEcoles/ListeEcoles';
 import ConsultationEcoles from './PULS/MesEcoles/ConsultationEcoles';
 
+import { getUserProfile } from "./hooks/userUtils";
+
+
 
 
 
@@ -113,7 +116,7 @@ const Layout = ({ onLogout }) => {
 
 
   const hideFilterFor = ["Professeur", "SuperAdmin"];
-  const showMatiereFilter = hideFilterFor.includes(personnelInfo?.profil); // true si Fondateur ou SuperAdmin
+  const showMatiereFilter = hideFilterFor.includes(getUserProfile()); // true si Fondateur ou SuperAdmin
   console.log('showMatiereFilter', showMatiereFilter);
 
   // Détecter la taille de l'écran
@@ -699,7 +702,7 @@ const Layout = ({ onLogout }) => {
               {/* <Route path="/" element={<Dashboard />} /> */}
 
               {userProfil === "Fondateur" && (
-                <Route path="/dashboard" element={<Dashboard2 />} />
+                <Route path="/dashboard" element={<DashboardFondateur />} />
               )}
               {userProfil === "Professeur" && (
                 <Route path="/dashboard" element={<Dashboard />} />
@@ -715,7 +718,7 @@ const Layout = ({ onLogout }) => {
               <Route path="/listeAjouterPanier" element={<AjouterPanier />} />
               <Route path="/listeProfils" element={<ListeProfils />} />
               <Route path="/RecrutementAgent" element={<RecruterAgent />} />
-              <Route path="/noteEtMoyenne" element={<NoteEtMoyenne profil={personnelInfo?.profil} showMatiereFilter={showMatiereFilter} />} />
+              <Route path="/noteEtMoyenne" element={<NoteEtMoyenne profil={getUserProfile()} showMatiereFilter={showMatiereFilter} />} />
               <Route path="/evaluation" element={<Evaluation />} />
               <Route path="/importEvaluations/" element={<ImportNotes />} />
               <Route path="/listeSalles" element={<ListeSalles />} />

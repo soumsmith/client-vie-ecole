@@ -1,23 +1,23 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { 
-    SelectPicker, 
-    Button, 
-    Panel, 
-    Row, 
-    Col, 
-    Message, 
-    Loader, 
+import {
+    SelectPicker,
+    Button,
+    Panel,
+    Row,
+    Col,
+    Message,
+    Loader,
     Badge,
     Steps,
     useToaster
 } from 'rsuite';
-import { 
-    FiSearch, 
-    FiRotateCcw, 
-    FiBook, 
-    FiUsers, 
+import {
+    FiSearch,
+    FiRotateCcw,
+    FiBook,
+    FiUsers,
     FiBarChart
 } from 'react-icons/fi';
 import axios from 'axios';
@@ -25,8 +25,8 @@ import getFullUrl from "../../hooks/urlUtils";
 
 // Import des fonctions externalisées
 import DataTable from "../../DataTable"; // Utilisation de la DataTable étendue
-import DataTableExtended from "../../DataTable2"; 
-import {  
+import DataTableExtended from "../../DataTable2";
+import {
     useNoteSearch,
     getNoteColor,
     getAppreciationColor
@@ -42,7 +42,7 @@ const saveAbsenceToAPI = async (etudiantData, classeInfo, periodeId, academicYea
     try {
         const baseUrl = getFullUrl();
         const apiUrl = `${baseUrl}absence-eleve/save-list-process`;
-        
+
         // Construction du payload selon le format demandé
         const payload = [{
             eleve: {
@@ -94,8 +94,8 @@ const saveAbsenceToAPI = async (etudiantData, classeInfo, periodeId, academicYea
 
     } catch (error) {
         console.error('❌ Erreur sauvegarde absence:', error);
-        return { 
-            success: false, 
+        return {
+            success: false,
             error: error.response?.data?.message || error.message || 'Erreur lors de la sauvegarde'
         };
     }
@@ -104,10 +104,10 @@ const saveAbsenceToAPI = async (etudiantData, classeInfo, periodeId, academicYea
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE AMÉLIORÉ (INCHANGÉ)
 // ===========================
-const SearchForm = ({ 
-    onSearch, 
-    onClear, 
-    loading = false, 
+const SearchForm = ({
+    onSearch,
+    onClear,
+    loading = false,
     error = null,
     showMatiereFilter = false
 }) => {
@@ -115,17 +115,17 @@ const SearchForm = ({
     const [selectedPeriode, setSelectedPeriode] = useState(null);
     const [selectedMatiere, setSelectedMatiere] = useState(null);
     const [formError, setFormError] = useState(null);
-    
+
     const {
         classes,
         loading: classesLoading,
         error: classesError
     } = useClassesData();
 
-    const { 
-        periodes, 
-        loading: periodesLoading, 
-        error: periodesError 
+    const {
+        periodes,
+        loading: periodesLoading,
+        error: periodesError
     } = usePeriodesData();
 
     // Hook conditionnel pour les matières
@@ -136,8 +136,8 @@ const SearchForm = ({
         fetchMatieres,
         clearMatieres
     } = useMatieresData(); // Mode manuel
-    
-    
+
+
     useEffect(() => {
         if (showMatiereFilter && selectedClasse && fetchMatieres) {
             console.log('📚 Chargement des matières pour classe ID:', selectedClasse);
@@ -162,16 +162,16 @@ const SearchForm = ({
         setFormError(null);
         if (onSearch) {
             // Construction des paramètres de recherche
-            const searchParams = { 
-                classeId: selectedClasse, 
-                periodeId: selectedPeriode 
+            const searchParams = {
+                classeId: selectedClasse,
+                periodeId: selectedPeriode
             };
-            
+
             // Ajout conditionnel de la matière si le filtre est activé
             if (showMatiereFilter) {
                 searchParams.matiereId = selectedMatiere; // null si rien n'est sélectionné
             }
-            
+
             console.log('🔍 Paramètres de recherche:', searchParams);
             onSearch(searchParams);
         }
@@ -189,7 +189,7 @@ const SearchForm = ({
     const hasDataError = classesError || periodesError || (showMatiereFilter && matieresError);
 
     return (
-        <div style={{ 
+        <div style={{
             background: 'white',
             borderRadius: '15px',
             padding: '25px',
@@ -198,9 +198,9 @@ const SearchForm = ({
             marginBottom: '20px'
         }}>
             {/* En-tête moderne */}
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: 12,
                 marginBottom: 25,
                 paddingBottom: 15,
@@ -226,7 +226,7 @@ const SearchForm = ({
                         )}
                     </h5>
                     <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
-                        {showMatiereFilter 
+                        {showMatiereFilter
                             ? 'Sélectionnez une classe, période et optionnellement une matière'
                             : 'Sélectionnez une classe et une période pour afficher les résultats'
                         }
@@ -255,10 +255,10 @@ const SearchForm = ({
             <Row gutter={20}>
                 <Col xs={24} sm={12} md={showMatiereFilter ? 8 : 10}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: '#475569',
                             fontSize: '14px'
                         }}>
@@ -291,16 +291,16 @@ const SearchForm = ({
                 {showMatiereFilter && (
                     <Col xs={24} sm={12} md={8}>
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569',
                                 fontSize: '14px'
                             }}>
                                 Matière {!selectedMatiere && '(toutes les matières)'}
-                                <Badge 
-                                    color="orange" 
+                                <Badge
+                                    color="orange"
                                     style={{ marginLeft: '8px', fontSize: '10px' }}
                                 >
                                     Optionnel
@@ -318,9 +318,9 @@ const SearchForm = ({
                                     setSelectedMatiere(value);
                                 }}
                                 placeholder={
-                                    matieresLoading ? "Chargement..." : 
-                                    matieres.length === 0 ? "Sélectionnez d'abord une classe" : 
-                                    "Toutes les matières"
+                                    matieresLoading ? "Chargement..." :
+                                        matieres.length === 0 ? "Sélectionnez d'abord une classe" :
+                                            "Toutes les matières"
                                 }
                                 searchable
                                 style={{ width: '100%' }}
@@ -345,10 +345,10 @@ const SearchForm = ({
 
                 <Col xs={24} sm={12} md={showMatiereFilter ? 8 : 10}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: '#475569',
                             fontSize: '14px'
                         }}>
@@ -374,10 +374,10 @@ const SearchForm = ({
 
                 <Col xs={24} sm={24} md={4}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: 'transparent',
                             fontSize: '14px'
                         }}>
@@ -389,7 +389,7 @@ const SearchForm = ({
                                 onClick={handleSearch}
                                 loading={loading}
                                 disabled={isDataLoading || loading}
-                                style={{ 
+                                style={{
                                     flex: 1,
                                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                     border: 'none',
@@ -400,11 +400,11 @@ const SearchForm = ({
                             >
                                 {loading ? 'Recherche...' : 'Rechercher'}
                             </Button>
-                            
+
                             <Button
                                 onClick={handleClear}
                                 disabled={loading}
-                                style={{ 
+                                style={{
                                     minWidth: '45px',
                                     borderRadius: '8px',
                                     border: '1px solid #e2e8f0'
@@ -420,15 +420,15 @@ const SearchForm = ({
 
             {/* Indicateur de progression adaptatif */}
             <div style={{ marginTop: 15 }}>
-                <Steps 
+                <Steps
                     current={
-                        selectedClasse ? 
-                            (selectedPeriode ? 
-                                (showMatiereFilter ? 3 : 2) : 
+                        selectedClasse ?
+                            (selectedPeriode ?
+                                (showMatiereFilter ? 3 : 2) :
                                 1
-                            ) : 
+                            ) :
                             0
-                    } 
+                    }
                     size="small"
                     style={{ background: '#f8fafc', padding: '15px', borderRadius: '8px' }}
                 >
@@ -441,7 +441,7 @@ const SearchForm = ({
 
             {/* Indicateur de contexte */}
             {showMatiereFilter && selectedClasse && (
-                <div style={{ 
+                <div style={{
                     marginTop: 15,
                     padding: '12px 16px',
                     background: selectedMatiere ? '#f0f9ff' : '#fffbeb',
@@ -454,12 +454,12 @@ const SearchForm = ({
                     <span style={{ fontSize: '16px' }}>
                         {selectedMatiere ? '🎯' : '📚'}
                     </span>
-                    <span style={{ 
-                        fontSize: '13px', 
+                    <span style={{
+                        fontSize: '13px',
                         color: selectedMatiere ? '#0369a1' : '#92400e',
                         fontWeight: '500'
                     }}>
-                        {selectedMatiere 
+                        {selectedMatiere
                             ? `Recherche ciblée sur une matière spécifique`
                             : `Recherche sur toutes les matières de la classe`
                         }
@@ -469,10 +469,10 @@ const SearchForm = ({
 
             {/* Loading indicator discret */}
             {isDataLoading && (
-                <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 10, 
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
                     marginTop: 15,
                     padding: '10px 15px',
                     background: '#f0f9ff',
@@ -541,7 +541,7 @@ const StatsPanel = ({ stats, classeInfo, searchContext }) => {
     ];
 
     return (
-        <div style={{ 
+        <div style={{
             background: 'white',
             borderRadius: '15px',
             padding: '25px',
@@ -550,9 +550,9 @@ const StatsPanel = ({ stats, classeInfo, searchContext }) => {
             marginBottom: '20px'
         }}>
             {/* En-tête enrichi */}
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: 12,
                 marginBottom: 20,
                 paddingBottom: 15,
@@ -572,8 +572,8 @@ const StatsPanel = ({ stats, classeInfo, searchContext }) => {
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Statistiques de la Classe
                         {searchContext?.showMatiereFilter && (
-                            <Badge 
-                                color={searchContext.matiereId ? "blue" : "orange"} 
+                            <Badge
+                                color={searchContext.matiereId ? "blue" : "orange"}
                                 style={{ marginLeft: '8px', fontSize: '10px' }}
                             >
                                 {searchContext.matiereId ? "Matière spécifique" : "Toutes matières"}
@@ -592,13 +592,13 @@ const StatsPanel = ({ stats, classeInfo, searchContext }) => {
             </div>
 
             {/* Grille des statistiques */}
-            <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', 
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
                 gap: '15px'
             }}>
                 {statsData.map((stat, index) => (
-                    <div 
+                    <div
                         key={index}
                         style={{
                             background: stat.bg,
@@ -617,15 +617,15 @@ const StatsPanel = ({ stats, classeInfo, searchContext }) => {
                             e.target.style.boxShadow = 'none';
                         }}
                     >
-                        <div style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
                             gap: 10,
                             marginBottom: 8
                         }}>
                             <span style={{ fontSize: '20px' }}>{stat.icon}</span>
-                            <span style={{ 
-                                fontSize: '13px', 
+                            <span style={{
+                                fontSize: '13px',
                                 fontWeight: '500',
                                 color: '#64748b',
                                 textTransform: 'uppercase',
@@ -634,8 +634,8 @@ const StatsPanel = ({ stats, classeInfo, searchContext }) => {
                                 {stat.label}
                             </span>
                         </div>
-                        <div style={{ 
-                            fontSize: '18px', 
+                        <div style={{
+                            fontSize: '18px',
                             fontWeight: '700',
                             color: stat.color
                         }}>
@@ -646,16 +646,16 @@ const StatsPanel = ({ stats, classeInfo, searchContext }) => {
             </div>
 
             {/* Barre de progression pour les admis */}
-            <div style={{ 
+            <div style={{
                 marginTop: 20,
                 padding: '15px',
                 background: '#f8fafc',
                 borderRadius: '10px',
                 border: '1px solid #e2e8f0'
             }}>
-                <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
                     marginBottom: 8
                 }}>
@@ -676,7 +676,7 @@ const StatsPanel = ({ stats, classeInfo, searchContext }) => {
                     <div style={{
                         width: `${(stats.etudiantsAdmis / stats.totalEtudiants) * 100}%`,
                         height: '100%',
-                        background: stats.etudiantsAdmis > stats.totalEtudiants / 2 
+                        background: stats.etudiantsAdmis > stats.totalEtudiants / 2
                             ? 'linear-gradient(90deg, #10b981 0%, #059669 100%)'
                             : 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)',
                         borderRadius: '4px',
@@ -693,10 +693,10 @@ const StatsPanel = ({ stats, classeInfo, searchContext }) => {
 // ===========================
 const getStudentTableColumns = (profil) => {
     const columns = [];
-    
+
     if (profil === 'Professeur') {
         // ORDRE DEMANDÉ : Matricule, Photo, Matière, Note, Coefficient, Moyenne générale, Rang, Appréciation, Classé
-        
+
         // 1. MATRICULE
         columns.push({
             title: 'Matricule',
@@ -706,9 +706,9 @@ const getStudentTableColumns = (profil) => {
             minWidth: 120,
             sortable: true,
             customRenderer: (rowData, value) => (
-                <div style={{ 
-                    fontFamily: 'monospace', 
-                    fontSize: '13px', 
+                <div style={{
+                    fontFamily: 'monospace',
+                    fontSize: '13px',
                     fontWeight: 'bold',
                     color: '#495057',
                     textAlign: 'center'
@@ -728,10 +728,10 @@ const getStudentTableColumns = (profil) => {
             width: 100,
             sortable: false,
             customRenderer: (rowData, value) => (
-                <div style={{ 
-                    width: '45px', 
-                    height: '45px', 
-                    borderRadius: '50%', 
+                <div style={{
+                    width: '45px',
+                    height: '45px',
+                    borderRadius: '50%',
                     overflow: 'hidden',
                     display: 'flex',
                     alignItems: 'center',
@@ -740,13 +740,13 @@ const getStudentTableColumns = (profil) => {
                     margin: '0 auto'
                 }}>
                     {value ? (
-                        <img 
-                            src={value} 
-                            alt="Photo profil" 
-                            style={{ 
-                                width: '100%', 
-                                height: '100%', 
-                                objectFit: 'cover' 
+                        <img
+                            src={value}
+                            alt="Photo profil"
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover'
                             }}
                             onError={(e) => {
                                 e.target.style.display = 'none';
@@ -769,20 +769,20 @@ const getStudentTableColumns = (profil) => {
             minWidth: 280,
             sortable: true,
             customRenderer: (rowData, value) => (
-                <div style={{ 
-                    display: 'flex', 
+                <div style={{
+                    display: 'flex',
                     flexDirection: 'column',
                     gap: '2px'
                 }}>
-                    <div style={{ 
-                        fontWeight: '600', 
+                    <div style={{
+                        fontWeight: '600',
                         color: '#1e293b',
                         fontSize: '14px'
                     }}>
                         {rowData.nom || ''}
                     </div>
-                    <div style={{ 
-                        fontSize: '13px', 
+                    <div style={{
+                        fontSize: '13px',
                         color: '#64748b',
                         fontWeight: '500'
                     }}>
@@ -803,7 +803,7 @@ const getStudentTableColumns = (profil) => {
             customRenderer: (rowData, value) => {
                 if (!value || !Array.isArray(value) || value.length === 0) {
                     return (
-                        <div style={{ 
+                        <div style={{
                             padding: '8px',
                             background: '#f8fafc',
                             borderRadius: '6px',
@@ -817,9 +817,9 @@ const getStudentTableColumns = (profil) => {
                 }
 
                 return (
-                    <div style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
                         gap: '4px',
                         maxHeight: '100px',
                         overflowY: 'auto'
@@ -831,9 +831,9 @@ const getStudentTableColumns = (profil) => {
                                 padding: '6px 8px',
                                 border: '1px solid #e2e8f0'
                             }}>
-                                <div style={{ 
-                                    fontWeight: '600', 
-                                    color: '#475569', 
+                                <div style={{
+                                    fontWeight: '600',
+                                    color: '#475569',
                                     fontSize: '12px'
                                 }}>
                                     {matiere.libelle}
@@ -856,7 +856,7 @@ const getStudentTableColumns = (profil) => {
             customRenderer: (rowData, value) => {
                 if (!value || !Array.isArray(value) || value.length === 0) {
                     return (
-                        <div style={{ 
+                        <div style={{
                             padding: '8px',
                             background: '#f8fafc',
                             borderRadius: '6px',
@@ -870,9 +870,9 @@ const getStudentTableColumns = (profil) => {
                 }
 
                 return (
-                    <div style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
                         gap: '4px',
                         maxHeight: '100px',
                         overflowY: 'auto'
@@ -885,26 +885,26 @@ const getStudentTableColumns = (profil) => {
                                 border: '1px solid #e2e8f0'
                             }}>
                                 {matiere.notes && matiere.notes.length > 0 ? (
-                                    <div style={{ 
-                                        display: 'flex', 
-                                        flexWrap: 'wrap', 
-                                        gap: '3px' 
+                                    <div style={{
+                                        display: 'flex',
+                                        flexWrap: 'wrap',
+                                        gap: '3px'
                                     }}>
                                         {matiere.notes.map((note, noteIndex) => (
-                                            <span 
+                                            <span
                                                 key={noteIndex}
                                                 color={getNoteColor(note.note, note.noteSur)}
-                                                style={{ fontSize: '12px', marginRight:'5px' }}
+                                                style={{ fontSize: '12px', marginRight: '5px' }}
                                             >
                                                 {note.note}/{note.noteSur}
                                             </span>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div style={{ 
-                                        fontSize: '10px', 
+                                    <div style={{
+                                        fontSize: '10px',
                                         color: '#94a3b8',
-                                        fontStyle: 'italic' 
+                                        fontStyle: 'italic'
                                     }}>
                                         Pas de notes
                                     </div>
@@ -927,7 +927,7 @@ const getStudentTableColumns = (profil) => {
             customRenderer: (rowData, value) => {
                 if (!value || !Array.isArray(value) || value.length === 0) {
                     return (
-                        <div style={{ 
+                        <div style={{
                             padding: '8px',
                             background: '#f8fafc',
                             borderRadius: '6px',
@@ -941,9 +941,9 @@ const getStudentTableColumns = (profil) => {
                 }
 
                 return (
-                    <div style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
                         gap: '4px',
                         maxHeight: '100px',
                         overflowY: 'auto'
@@ -956,7 +956,7 @@ const getStudentTableColumns = (profil) => {
                                 border: '1px solid #fbbf24',
                                 textAlign: 'center'
                             }}>
-                                
+
                                 <Badge color="yellow" style={{ fontSize: '10px' }}>
                                     Coef: {matiere.coefficient || 1}
                                 </Badge>
@@ -977,7 +977,7 @@ const getStudentTableColumns = (profil) => {
             cellType: 'custom',
             customRenderer: (rowData, value) => (
                 <div style={{ textAlign: 'center' }}>
-                    <Badge 
+                    <Badge
                         color={getNoteColor(value, 20)}
                         style={{ fontSize: '12px', fontWeight: 'bold' }}
                     >
@@ -1002,7 +1002,7 @@ const getStudentTableColumns = (profil) => {
                     if (parseInt(rang) <= 10) return 'cyan';
                     return 'gray';
                 };
-                
+
                 return (
                     <div style={{ textAlign: 'center' }}>
                         <Badge color={getRangBadgeColor(value)}>
@@ -1022,15 +1022,15 @@ const getStudentTableColumns = (profil) => {
             sortable: true,
             cellType: 'custom',
             customRenderer: (rowData, value) => (
-                <div style={{ 
+                <div style={{
                     // maxWidth: '80px',
                     // overflow: 'hidden',
                     // textOverflow: 'ellipsis',
                     // whiteSpace: 'nowrap'
                 }}>
-                    <Badge 
+                    <Badge
                         color={getAppreciationColor(value)}
-                        style={{ 
+                        style={{
                             fontSize: '12px',
                             // overflow: 'hidden',
                             // textOverflow: 'ellipsis'
@@ -1071,7 +1071,7 @@ const getStudentTableColumns = (profil) => {
             width: 50,
             sortable: false
         });
-        
+
         columns.push({
             title: 'Nom',
             dataKey: 'nom',
@@ -1091,9 +1091,9 @@ const getStudentTableColumns = (profil) => {
                 minWidth: 150,
                 sortable: true,
                 customRenderer: (rowData, value) => (
-                    <div style={{ 
-                        fontFamily: 'monospace', 
-                        fontSize: '14px', 
+                    <div style={{
+                        fontFamily: 'monospace',
+                        fontSize: '14px',
                         fontWeight: 'bold',
                         color: '#495057'
                     }}>
@@ -1124,7 +1124,7 @@ const getStudentTableColumns = (profil) => {
                         if (parseInt(rang) <= 10) return 'cyan';
                         return 'gray';
                     };
-                    
+
                     return (
                         <Badge color={getRangBadgeColor(value)}>
                             {value}{value === '1' || value === 1 ? 'er' : 'ème'}
@@ -1142,7 +1142,7 @@ const getStudentTableColumns = (profil) => {
                 badgeColorMap: (value) => getAppreciationColor(value)
             }
         );
-        
+
         // Ajout conditionnel des colonnes d'absence
         columns.push(
             {
@@ -1178,7 +1178,7 @@ const getStudentTableColumns = (profil) => {
             )
         });
     }
-    
+
     return columns;
 };
 
@@ -1190,18 +1190,18 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
     const navigate = useNavigate();
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [savingAbsences, setSavingAbsences] = useState(new Set()); // Pour tracking des sauvegardes en cours
-    
+
     // Hook pour les notifications rsuite
     const toaster = useToaster();
-    
-    const TableComponent = profil === 'Fondateur' ?  DataTableExtended : DataTable; // Changer de datatable en fonction du profil
+
+    const TableComponent = profil === 'Fondateur' ? DataTableExtended : DataTable; // Changer de datatable en fonction du profil
 
     // Récupération des paramètres dynamiques
-    const { 
-        periodicitieId: dynamicPeriodicitieId, 
-        personnelInfo: personnelInfo, 
-        academicYearId: dynamicAcademicYearId, 
-        ecoleId: dynamicEcoleId 
+    const {
+        periodicitieId: dynamicPeriodicitieId,
+        personnelInfo: personnelInfo,
+        academicYearId: dynamicAcademicYearId,
+        ecoleId: dynamicEcoleId
     } = usePulsParams();
 
     // Hook modifié pour prendre en compte showMatiereFilter
@@ -1230,14 +1230,14 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
             showMatiereFilter,
             context: 'NoteEtMoyenne'
         });
-        
+
         // Stockage des paramètres pour les appels d'absence
         setCurrentSearchParams(params);
-        
+
         // Appel modifié pour inclure le matiereId
         await searchNotes(
-            params.classeId, 
-            params.periodeId, 
+            params.classeId,
+            params.periodeId,
             showMatiereFilter ? params.matiereId : null
         );
     }, [searchNotes, showMatiereFilter]);
@@ -1253,7 +1253,7 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
     // ===========================
     const handleAbsenceChange = useCallback(async (etudiantId, field, value) => {
         console.log('📝 Changement d\'absence pour étudiant:', etudiantId, field, value);
-        
+
         // Vérification des prérequis
         if (!currentSearchParams || !classeInfo || !dynamicAcademicYearId) {
             toaster.push(
@@ -1328,10 +1328,10 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
             } else {
                 // Échec - annuler la mise à jour optimiste
                 console.error('❌ Échec sauvegarde absence:', result.error);
-                
+
                 // Restaurer l'ancienne valeur
                 updateStudentData(etudiantId, { [field]: etudiant[field] });
-                
+
                 toaster.push(
                     <Message type="error" showIcon closable>
                         <strong>Erreur de sauvegarde</strong><br />
@@ -1343,10 +1343,10 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
 
         } catch (error) {
             console.error('❌ Erreur inattendue lors de la sauvegarde:', error);
-            
+
             // Restaurer l'ancienne valeur en cas d'erreur
             updateStudentData(etudiantId, { [field]: etudiant[field] });
-            
+
             toaster.push(
                 <Message type="error" showIcon closable>
                     <strong>Erreur inattendue</strong><br />
@@ -1377,7 +1377,7 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
         if (!etudiants || etudiants.length === 0) return null;
 
         const moyennes = etudiants.map(e => parseFloat(e.moyenneGenerale) || 0);
-        
+
         return {
             totalEtudiants: etudiants.length,
             moyenneClasse: (moyennes.reduce((a, b) => a + b, 0) / moyennes.length).toFixed(2),
@@ -1421,8 +1421,8 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
     const searchableFields = ['nom', 'prenom', 'matricule', 'sexe'];
 
     return (
-        <div style={{ 
-             
+        <div style={{
+
             minHeight: '100vh',
             padding: '20px 0'
         }}>
@@ -1444,7 +1444,7 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                 {searchPerformed && globalStats && classeInfo && (
                     <div className="row">
                         <div className="col-lg-12">
-                            <StatsPanel 
+                            <StatsPanel
                                 stats={globalStats}
                                 classeInfo={classeInfo}
                                 searchContext={classeInfo.searchContext}
@@ -1487,7 +1487,7 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                                         )}
                                     </h6>
                                     <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
-                                        {showMatiereFilter 
+                                        {showMatiereFilter
                                             ? 'Sélectionnez une classe, période et optionnellement une matière dans le formulaire ci-dessus'
                                             : 'Sélectionnez une classe et une période dans le formulaire ci-dessus pour démarrer'
                                         }
@@ -1529,7 +1529,7 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                                         </p>
                                     </div>
                                 </div>
-                                
+
                                 {/* Informations de debug si disponibles */}
                                 {searchError.context && (
                                     <div style={{
@@ -1563,45 +1563,45 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                                     // Configuration de base
                                     title={`Notes et Moyennes par Étudiant${showMatiereFilter ? ' (Mode Filtré)' : ''}`}
                                     subtitle="étudiant(s)"
-                                    
+
                                     // Mode étudiant
                                     displayMode="student"
-                                    
+
                                     // Données
                                     data={etudiants}
                                     loading={searchLoading}
                                     error={null}
-                                    
+
                                     // Configuration des colonnes
                                     columns={getStudentTableColumns(profil)}
-                                    
+
                                     // Configuration des filtres
                                     searchableFields={searchableFields}
                                     filterConfigs={filterConfigs}
-                                    
+
                                     // Pagination
                                     defaultPageSize={20}
                                     pageSizeOptions={[10, 20, 50]}
                                     tableHeight={700}
-                                    
+
                                     // Actions et callbacks
                                     onRefresh={handleRefresh}
                                     onAbsenceChange={handleAbsenceChange}
                                     onNoteChange={handleNoteChange}
-                                    
+
                                     // Configuration additionnelle
                                     enableRefresh={false}
                                     enableCreate={false}
                                     selectable={false}
                                     rowKey="id"
-                                    
+
                                     // Largeur minimale pour scroll horizontal
                                     minTableWidth={1300}
-                                    
+
                                     // Rendu personnalisé pour les badges de notes
                                     cellRenderer={{
                                         note: (value, rowData) => (
-                                            <Badge 
+                                            <Badge
                                                 color={getNoteColor(value, rowData.note_sur || 20)}
                                                 style={{ fontSize: '0.9em' }}
                                             >
@@ -1609,7 +1609,7 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                                             </Badge>
                                         ),
                                         moyenne: (value) => (
-                                            <Badge 
+                                            <Badge
                                                 color={getNoteColor(value, 20)}
                                                 style={{ fontSize: '0.9em' }}
                                             >
@@ -1617,7 +1617,7 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                                             </Badge>
                                         )
                                     }}
-                                    
+
                                     // Styles personnalisés
                                     customStyles={{
                                         container: { backgroundColor: "transparent" },
@@ -1656,7 +1656,7 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                                     Aucun étudiant trouvé
                                 </h5>
                                 <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
-                                    Aucun résultat pour cette classe et période{showMatiereFilter ? ' avec la matière sélectionnée' : ''}. 
+                                    Aucun résultat pour cette classe et période{showMatiereFilter ? ' avec la matière sélectionnée' : ''}.
                                     Vérifiez vos critères de recherche.
                                 </p>
                             </div>
