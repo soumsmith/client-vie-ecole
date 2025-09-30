@@ -10,7 +10,7 @@ import LightTopBar from './LightTopBar';
 
 import Sidebar from './Sidebar';
 import Dashboard from './Dashboard';
-import Dashboard2 from './Dashboard2';
+import DashboardFondateur from './DashboardFondateur';
 import DataTable from './DataTable';
 import RecrutementPersonnel from './RecrutementPersonnel';
 import ThemeToggle from '../contrexts/ThemeToggle';
@@ -702,7 +702,7 @@ const Layout = ({ onLogout }) => {
               {/* <Route path="/" element={<Dashboard />} /> */}
 
               {userProfil === "Fondateur" && (
-                <Route path="/dashboard" element={<Dashboard2 />} />
+                <Route path="/dashboard" element={<DashboardFondateur />} />
               )}
               {userProfil === "Professeur" && (
                 <Route path="/dashboard" element={<Dashboard />} />

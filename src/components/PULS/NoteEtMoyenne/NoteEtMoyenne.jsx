@@ -1188,7 +1188,6 @@ const getStudentTableColumns = (profil) => {
 // ===========================
 const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
     const navigate = useNavigate();
-    alert(profil)
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [savingAbsences, setSavingAbsences] = useState(new Set()); // Pour tracking des sauvegardes en cours
 

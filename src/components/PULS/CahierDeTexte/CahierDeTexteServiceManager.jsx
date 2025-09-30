@@ -123,6 +123,7 @@ export const useMatieresByClasseData = (classeId, refreshTrigger = 0) => {
                     classe: item.classe,
                     matiere: item.matiere,
                     personel: item.personel,
+                    isLocked: item.isLocked || false, // 🔥 Nouvelle propriété depuis l'API
                     // Propriétés calculées pour l'affichage
                     matiereLibelle: item.matiere?.libelle || 'Non définie',
                     professorLibelle: item.personel?.libelle || 'Non défini',
