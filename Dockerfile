@@ -11,8 +11,8 @@ WORKDIR /app
 COPY package.json ./
 COPY yarn.lock* ./
 
-# Installing ALL dependencies (including devDependencies for build)
-RUN yarn install --frozen-lockfile
+# Clear yarn cache and install dependencies
+RUN yarn cache clean && yarn install --frozen-lockfile
 
 # Copying all the files in our project
 COPY . .
@@ -22,8 +22,9 @@ ENV NODE_ENV=production
 # ✅ Même URL pour développement et production
 ARG VITE_API_URL=http://46.105.52.105:8889/api/
 ENV VITE_API_URL=$VITE_API_URL 
-# Building our application
-RUN yarn build
+
+# Clear any potential esbuild cache and build
+RUN rm -rf node_modules/.vite && yarn build
 
 
 

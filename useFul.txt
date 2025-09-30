@@ -1,0 +1,92 @@
+
+docker build -f Dockerfile.dev -t vie-ecole:202211011302 .
+docker run -d -p 3000:3001 vie-ecole:202211011302
+#problème avec eslint dans doker
+rm -rf node_modules/eslint
+docker build -f Dockerfile.dev  -t devsakaimaster202211291611 .
+
+docker run docker.io/library/devsakaimaster202211281935
+sakai-react
+
+docker run -i -t docker.io/library/devsakaimaster202211282137
+docker run  docker.io/library/devsakaimaster202211282137
+
+premiere maniere de creer l'image sans dockerFile
+docker run -it --rm -d -p 8082:80/tcp --name sakai301120221638 -v D:\soum21Juin2022\MyProject\sakai-react\build:/usr/share/nginx/html vie-ecole202211301821
+
+npm audit fix --force
+
+Deuxieme maniere de creer l'image avec  dockerFile
+
+docker build . -t europe-west1-docker.pkg.dev/fair-splice-361010/vie-ecole-docker-repo/vie-ecole:202506182121
+
+docker build . -t soumsmith/pouls-pro:202509232130
+
+docker build . -t soumsmith/pouls-emploi:202509241759
+
+Modifier le tag de l'image dans gcloud:
+1.ls : pour lister le contenu du dossier
+kubectl delete deployment vie-ecole-api
+2. vi vie-ecole-api-deployment.yaml : pour editer le contenu du dossier
+vi vie-ecole-deployment.yaml
+ kubectl delete deployment vie-ecole-api
+   -la touche "i" pour supprimer l'ancien tag
+   - la touche "echap" pour arreter l'insertion
+   - la touche ":" pour et les touches "wq" pour enregistrer
+3.kubectl apply -f vie-ecole-deployment.yaml ou kubectl apply -f vie-ecole-api-deployment.yaml
+4. kubectl get po: pour lister les conteneurs disponible
+kubectl delete  po (code du pode Adminer)
+----------------------------------------------------------------------------------
+
+ve_details_infos_bulletins_spider
+
+
+
+
+No cluster named 'fair-splice-361010' in fair-splice-361010.
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ gcloud container clusters get-credentials vie-ecole --region europe-west1 --project fair-splice-361010
+apiVersion: apps/v1
+Fetching cluster endpoint and auth data.
+kubeconfig entry generated for vie-ecole.
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ LS
+-bash: LS: command not found
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ ls
+backend-config.yaml                      service-account.yaml               vie-ecole-api-hpa.yaml      vie-ecole-backend-config.yaml  vie-ecole-ingress-all.yaml
+frontend-config.yaml                     vie-ecole-api-backend-config.yaml  vie-ecole-api-pvc.yaml      vie-ecole-deployment.yaml      vie-ecole-service.yaml
+pouls-scolaire-managed-certificate.yaml  vie-ecole-api-deployment.yaml      vie-ecole-api-service.yaml  vie-ecole-hpa.yaml
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ vi vie-ecole-api-deployment.yaml
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ kubectl apply -f ^C
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ kubectl apply -f vie-ecole-api-deployment.yaml
+Warning: Autopilot increased resource requests for Deployment default/vie-ecole-api to meet requirements. See http://g.co/gke/autopilot-resources.
+deployment.apps/vie-ecole-api created
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ kubectl get po
+NAME                             READY   STATUS              RESTARTS   AGE
+adminer-57cf94f85f-84s6c         2/2     Running             0          10d
+vie-ecole-api-7d5c75dc6c-6bdsl   0/2     ContainerCreating   0          15s
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ kubectl get po
+NAME                             READY   STATUS    RESTARTS   AGE
+adminer-57cf94f85f-84s6c         2/2     Running   0          10d
+vie-ecole-api-7d5c75dc6c-6bdsl   2/2     Running   0          76s
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ kubectl delete deployment vie-ecole-api
+deployment.apps "vie-ecole-api" deleted
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ kubectl get po
+NAME                       READY   STATUS    RESTARTS   AGE
+adminer-57cf94f85f-84s6c   2/2     Running   0          10d
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ kubectl apply -f vie-ecole-api-deployment.yaml
+Warning: Autopilot increased resource requests for Deployment default/vie-ecole-api to meet requirements. See http://g.co/gke/autopilot-resources.
+deployment.apps/vie-ecole-api created
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ ls
+backend-config.yaml                      service-account.yaml               vie-ecole-api-hpa.yaml      vie-ecole-backend-config.yaml  vie-ecole-ingress-all.yaml
+frontend-config.yaml                     vie-ecole-api-backend-config.yaml  vie-ecole-api-pvc.yaml      vie-ecole-deployment.yaml      vie-ecole-service.yaml
+pouls-scolaire-managed-certificate.yaml  vie-ecole-api-deployment.yaml      vie-ecole-api-service.yaml  vie-ecole-hpa.yaml
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ vi vie-ecole-deployment.yaml
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ nano vie-ecole-deployment.yaml
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ kubectl apply -f vie-ecole-deployment.yaml
+Warning: Autopilot increased resource requests for Deployment default/vie-ecole to meet requirements. See http://g.co/gke/autopilot-resources.
+deployment.apps/vie-ecole created
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$ kubectl get po
+NAME                             READY   STATUS    RESTARTS   AGE
+adminer-57cf94f85f-84s6c         2/2     Running   0          10d
+vie-ecole-6cb98fd997-zfqvb       1/1     Running   0          17s
+vie-ecole-api-7d5c75dc6c-r64nw   2/2     Running   0          3m42s
+soumsmith1@cloudshell:~/vie-ecole (fair-splice-361010)$
