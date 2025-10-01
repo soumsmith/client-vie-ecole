@@ -56,7 +56,7 @@
 
 .sidebar-nav .rs-sidenav-item-active {
     /* background-color: var(--active-color) !important; */
-    background: linear-gradient(90deg, var(--bg-color) 0%, var(--primary-color) 100%) !important;
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--bg-color) 100%) !important;
     color: var(--text-color) !important;
     border-radius: 8px !important;
 }

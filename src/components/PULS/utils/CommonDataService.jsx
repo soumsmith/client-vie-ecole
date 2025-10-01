@@ -429,6 +429,31 @@ export const useNiveauxData = (ecoleId = null, refreshTrigger = 0) => {
   };
 };
 
+export const useTypesActiviteData = () => {
+    const [typesActivite, setTypesActivite] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const apiUrls = useAllApiUrls();
+
+    const fetchTypesActivite = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get(apiUrls.emploiDuTemps.getTypesActiviteByEcole());
+            setTypesActivite(response.data || []);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTypesActivite();
+    }, []);
+
+    return { typesActivite, loading, error, refetch: fetchTypesActivite };
+};
+
 // ===========================
 // HOOK POUR RÉCUPÉRER LES BRANCHES (VERSION AVANCÉE)
 // ===========================
@@ -786,10 +811,7 @@ export const useMatieresData = (
         let url;
 
         if (userProfile === "Professeur") {
-          url = personnelUrls.getMatiereClasseByProfClasse(
-            appParams.personnelId,
-            targetClasseId
-          );
+          url = personnelUrls.getMatiereClasseByProfClasse(targetClasseId);
           response = await axios.get(url);
         } else if (userProfile === "Fondateur") {
           url = matieresUrls.getAllByBrancheViaClasse(targetClasseId, targetEcoleId);
@@ -1365,6 +1387,7 @@ export const useEnseignantsData = (profProfilId, refreshTrigger = 0) => {
 
   const appParams = useAppParams();
   const personnelUrls = usePersonnelUrls();
+  const apiUrls = useAllApiUrls();
 
   const fetchEnseignants = useCallback(
     async (skipCache = false) => {
@@ -1383,9 +1406,9 @@ export const useEnseignantsData = (profProfilId, refreshTrigger = 0) => {
           }
         }
 
-        const url = personnelUrls.getByEcoleAndProfil(
-          appParams.ecoleId,
-          profProfilId || appParams.profileId
+
+
+        const url = apiUrls.personnel.getByEcoleAndProfil(profProfilId || appParams.profileId
         );
         const response = await axios.get(url);
 

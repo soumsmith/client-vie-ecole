@@ -89,7 +89,7 @@ const AnneeEnCoursHeader = ({ anneeEnCours, loading, onCloturer, onNouvelle }) =
                         </p>
                     </div>
                 </div>
-                <Button
+                {/* <Button
                     appearance="primary"
                     style={{ 
                         background: 'rgba(255, 255, 255, 0.15)',
@@ -100,7 +100,7 @@ const AnneeEnCoursHeader = ({ anneeEnCours, loading, onCloturer, onNouvelle }) =
                     onClick={onNouvelle}
                 >
                     Nouvelle Année
-                </Button>
+                </Button> */}
             </div>
         );
     }

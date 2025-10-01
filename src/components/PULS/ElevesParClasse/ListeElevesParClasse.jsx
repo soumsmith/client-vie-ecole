@@ -653,51 +653,6 @@ const ListeElevesClasse = () => {
                     </div>
                 )}
 
-                {/* Aucun élève - cas improbable mais à gérer */}
-                {!loading && !error && eleves?.length === 0 && (
-                    <div className="row">
-                        <div className="col-lg-12">
-                            <div style={{
-                                background: 'white',
-                                borderRadius: '15px',
-                                padding: '40px',
-                                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                                border: '1px solid rgba(245, 158, 11, 0.15)',
-                                textAlign: 'center'
-                            }}>
-                                <div style={{
-                                    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                                    borderRadius: '20px',
-                                    padding: '20px',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    marginBottom: 20
-                                }}>
-                                    <FiUsers size={40} color="white" />
-                                </div>
-                                <h5 style={{ margin: '0 0 10px 0', color: '#1e293b', fontWeight: '600' }}>
-                                    Aucun élève inscrit
-                                </h5>
-                                <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
-                                    Il n'y a actuellement aucun élève inscrit pour cette année scolaire.
-                                </p>
-                                <Button
-                                    appearance="primary"
-                                    style={{
-                                        marginTop: 15,
-                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                        border: 'none'
-                                    }}
-                                    startIcon={<FiPlus />}
-                                    onClick={handleCreateEleve}
-                                >
-                                    Inscrire un nouvel élève
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
 
             {/* ===========================

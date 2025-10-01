@@ -313,7 +313,7 @@ const allMenuSections = [
           },
           {
             eventKey: "definirPeriodeEvaluation",
-            title: "Définir période d'évaluation",
+            title: "Période d'évaluation",
             profiles: ["admin", "manager", "Fondateur"],
           },
           // PV Evaluation
@@ -696,7 +696,7 @@ const allMenuSections = [
   {
     type: "section",
     title: "Admlinistration",
-    profiles: ["Admin", "Fondateur"],
+    profiles: ["Admin"],
     items: [
       {
         type: "item",

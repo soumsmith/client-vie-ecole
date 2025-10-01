@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-    Modal, 
-    Button, 
-    SelectPicker, 
-    Row, 
+import {
+    Modal,
+    Button,
+    SelectPicker,
+    Row,
     Col,
     Loader,
     DatePicker,
@@ -11,23 +11,18 @@ import {
     Message,
     useToaster
 } from 'rsuite';
-import { 
-    FiCheckCircle, 
-    FiXCircle, 
-    FiEdit, 
+import {
+    FiCheckCircle,
+    FiXCircle,
+    FiEdit,
     FiUser,
     FiUpload,
     FiTrash2
 } from 'react-icons/fi';
 import axios from 'axios';
 import { useAllApiUrls } from '../utils/apiConfig';
-import { Input, Radio, Checkbox} from 'rsuite';
+import { Input, Radio, Checkbox } from 'rsuite';
 
-
-
-// ===========================
-// MODAL DE DÉTAILS DE L'ÉLÈVE
-// ===========================
 const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
     const [activeTab, setActiveTab] = useState('validation');
     const [formData, setFormData] = useState({});
@@ -46,17 +41,82 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
     const toaster = useToaster();
     const apiUrls = useAllApiUrls();
 
-
-
     // Charger les données au montage du modal
     useEffect(() => {
         if (show && inscription) {
             setFormData(inscription);
-            setPhotoPreview(inscription.urlPhoto || null);
+            setPhotoPreview(null); // Reset
+            setSelectedPhoto(null); // Reset
             loadNiveaux();
             loadClassesPrecedentes();
+            
+            // Charger la photo après un court délai pour s'assurer que formData est à jour
+            setTimeout(() => {
+                loadStudentPhoto();
+            }, 100);
         }
     }, [show, inscription]);
+
+    // Nettoyage des URLs blob
+    useEffect(() => {
+        return () => {
+            if (photoPreview && photoPreview.startsWith('blob:')) {
+                URL.revokeObjectURL(photoPreview);
+            }
+        };
+    }, [photoPreview]);
+
+    const loadStudentPhoto = async () => {
+        // Utiliser eleve_id en priorité, sinon inscription_id
+        const eleveId = inscription?.eleve_id || inscription?.inscription_id;
+        
+        console.log('Chargement photo pour ID:', eleveId);
+        
+        if (!eleveId) {
+            console.warn('Aucun ID disponible pour charger la photo');
+            return;
+        }
+
+        try {
+            const response = await axios.get(
+                `${apiUrls.inscriptions.getStudentPhoto(eleveId)}`,
+                { 
+                    responseType: 'blob',
+                    timeout: 10000 // Timeout de 10 secondes
+                }
+            );
+
+            if (response.data && response.data.size > 0) {
+                // Créer une URL pour l'image blob
+                const imageUrl = URL.createObjectURL(response.data);
+                console.log('Photo chargée avec succès');
+                setPhotoPreview(imageUrl);
+                setFormData(prev => ({
+                    ...prev,
+                    urlPhoto: imageUrl,
+                    hasPhoto: true
+                }));
+            } else {
+                console.log('Aucune photo disponible (blob vide)');
+                setPhotoPreview(null);
+                setFormData(prev => ({
+                    ...prev,
+                    hasPhoto: false
+                }));
+            }
+        } catch (error) {
+            console.error('Erreur lors du chargement de la photo:', error);
+            // Ne pas afficher d'erreur si la photo n'existe simplement pas (404)
+            if (error.response?.status !== 404) {
+                console.error('Erreur inattendue:', error.message);
+            }
+            setPhotoPreview(null);
+            setFormData(prev => ({
+                ...prev,
+                hasPhoto: false
+            }));
+        }
+    };
 
     // Charger les niveaux d'enseignement
     const loadNiveaux = async () => {
@@ -65,7 +125,7 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
             const response = await axios.get(
                 apiUrls.branches.getByNiveauEnseignement()
             );
-            
+
             const niveauxOptions = response.data.map(item => ({
                 label: item.libelle,
                 value: item.id,
@@ -73,7 +133,7 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                 filiere: item.filiere,
                 serie: item.serie
             }));
-            
+
             setNiveaux(niveauxOptions);
         } catch (error) {
             console.error('Erreur lors du chargement des niveaux:', error);
@@ -87,15 +147,15 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
         setLoading(prev => ({ ...prev, classes: true }));
         try {
             const response = await axios.get(
-                apiUrls.niveaux.getByEcole()
+                apiUrls.niveaux.getNiveauEcole()
             );
-            
+
             const classesOptions = response.data.map(item => ({
                 label: item.niveaulibelle,
                 value: item.niveauid,
                 code: item.niveaucode
             }));
-            
+
             setClassesPrecedentes(classesOptions);
         } catch (error) {
             console.error('Erreur lors du chargement des classes précédentes:', error);
@@ -121,7 +181,8 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                 toaster.push(
                     <Message type="error">
                         Veuillez sélectionner un fichier image (JPG, PNG, etc.)
-                    </Message>
+                    </Message>,
+                    { placement: 'topEnd', duration: 3000 }
                 );
                 return;
             }
@@ -131,16 +192,21 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                 toaster.push(
                     <Message type="error">
                         La taille du fichier ne doit pas dépasser 2MB
-                    </Message>
+                    </Message>,
+                    { placement: 'topEnd', duration: 3000 }
                 );
                 return;
             }
 
             setSelectedPhoto(file);
-            
+
             // Créer un aperçu
             const reader = new FileReader();
             reader.onload = (e) => {
+                // Révoquer l'ancien blob si nécessaire
+                if (photoPreview && photoPreview.startsWith('blob:')) {
+                    URL.revokeObjectURL(photoPreview);
+                }
                 setPhotoPreview(e.target.result);
             };
             reader.readAsDataURL(file);
@@ -153,7 +219,20 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
             toaster.push(
                 <Message type="warning">
                     Veuillez d'abord sélectionner une photo
-                </Message>
+                </Message>,
+                { placement: 'topEnd', duration: 3000 }
+            );
+            return;
+        }
+
+        const eleveId = formData.eleve_id || inscription?.eleve_id;
+        
+        if (!eleveId) {
+            toaster.push(
+                <Message type="error">
+                    ID de l'élève manquant
+                </Message>,
+                { placement: 'topEnd', duration: 3000 }
             );
             return;
         }
@@ -161,11 +240,11 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
         setLoading(prev => ({ ...prev, photoUpload: true }));
         try {
             const uploadFormData = new FormData();
-            uploadFormData.append('photo', selectedPhoto);
-            uploadFormData.append('eleveId', formData.eleve_id);
+            uploadFormData.append('file', selectedPhoto);
 
-            const response = await axios.post(
-                apiUrls.eleves.uploadPhoto(),
+            // Correction de la faute de frappe : uploadStudentPhoto au lieu de upploadStudentPhoto
+            const response = await axios.put(
+                `${apiUrls.inscriptions.uploadStudentPhoto(eleveId)}`,
                 uploadFormData,
                 {
                     headers: {
@@ -174,27 +253,26 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                 }
             );
 
-            if (response.data.success) {
-                setFormData(prev => ({
-                    ...prev,
-                    urlPhoto: response.data.photoUrl,
-                    hasPhoto: true
-                }));
-                
+            if (response.status === 200) {
                 toaster.push(
                     <Message type="success">
                         Photo uploadée avec succès
-                    </Message>
+                    </Message>,
+                    { placement: 'topEnd', duration: 3000 }
                 );
-                
+
                 setSelectedPhoto(null);
+
+                // Recharger la photo depuis l'API
+                await loadStudentPhoto();
             }
         } catch (error) {
             console.error('Erreur upload photo:', error);
             toaster.push(
                 <Message type="error">
-                    Erreur lors de l'upload de la photo
-                </Message>
+                    Erreur lors de l'upload de la photo: {error.response?.data?.message || error.message}
+                </Message>,
+                { placement: 'topEnd', duration: 5000 }
             );
         } finally {
             setLoading(prev => ({ ...prev, photoUpload: false }));
@@ -203,9 +281,26 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
 
     // Supprimer la photo
     const handlePhotoDelete = async () => {
+        const eleveId = formData.eleve_id || inscription?.eleve_id;
+        
+        if (!eleveId) {
+            toaster.push(
+                <Message type="error">
+                    ID de l'élève manquant
+                </Message>,
+                { placement: 'topEnd', duration: 3000 }
+            );
+            return;
+        }
+
         try {
-            await axios.delete(apiUrls.eleves.deletePhoto(formData.eleve_id));
-            
+            await axios.delete(apiUrls.eleves.deletePhoto(eleveId));
+
+            // Révoquer l'URL blob
+            if (photoPreview && photoPreview.startsWith('blob:')) {
+                URL.revokeObjectURL(photoPreview);
+            }
+
             setFormData(prev => ({
                 ...prev,
                 urlPhoto: '',
@@ -213,18 +308,20 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
             }));
             setPhotoPreview(null);
             setSelectedPhoto(null);
-            
+
             toaster.push(
                 <Message type="success">
                     Photo supprimée avec succès
-                </Message>
+                </Message>,
+                { placement: 'topEnd', duration: 3000 }
             );
         } catch (error) {
             console.error('Erreur suppression photo:', error);
             toaster.push(
                 <Message type="error">
                     Erreur lors de la suppression de la photo
-                </Message>
+                </Message>,
+                { placement: 'topEnd', duration: 3000 }
             );
         }
     };
@@ -261,7 +358,6 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
             etranger_africain: data.etranger_africain || false,
             etranger_non_africain: data.etranger_non_africain || false,
             brancheid: data.branche_id || null,
-            // Champs supplémentaires pour les informations complémentaires
             nationalite: data.nationalite || "",
             lieuNaissance: data.lieuNaissance || "",
             ecole_origine: data.ecole_origine || "",
@@ -275,7 +371,8 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
             tel_mere: data.tel_mere || "",
             nom_prenom_pers_en_charge: data.nom_prenom_pers_en_charge || "",
             profession_pers_en_charge: data.profession_pers_en_charge || "",
-            tel_pers_en_charge: data.tel_pers_en_charge || ""
+            tel_pers_en_charge: data.tel_pers_en_charge || "",
+            profession_mere: data.profession_mere || ""
         };
     };
 
@@ -283,49 +380,44 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
     const handleSave = async () => {
         setLoading(prev => ({ ...prev, save: true }));
         try {
-            // Mapper les données au format attendu par l'API
             const apiData = mapDataForAPI(formData);
-            
+
             console.log('Données envoyées à l\'API:', apiData);
-            
-            // Appel à l'API PUT
+
             const response = await axios.put(
-                apiUrls.inscriptions.infosComplementaires(),
+                apiUrls.inscriptions.infosComplementairesEleve(),
                 apiData,
-                {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                }
             );
 
             if (response.status === 200 || response.status === 201) {
                 toaster.push(
                     <Message type="success">
                         Informations mises à jour avec succès
-                    </Message>
+                    </Message>,
+                    { placement: 'topEnd', duration: 3000 }
                 );
-                
+
                 if (onSave) {
                     await onSave(formData);
                 }
-                
+
                 onClose();
             }
         } catch (error) {
             console.error('Erreur lors de la sauvegarde:', error);
-            
+
             let errorMessage = 'Erreur lors de la sauvegarde';
             if (error.response?.data?.message) {
                 errorMessage = error.response.data.message;
             } else if (error.response?.data?.error) {
                 errorMessage = error.response.data.error;
             }
-            
+
             toaster.push(
                 <Message type="error">
                     {errorMessage}
-                </Message>
+                </Message>,
+                { placement: 'topEnd', duration: 5000 }
             );
         } finally {
             setLoading(prev => ({ ...prev, save: false }));
@@ -344,9 +436,9 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
     return (
         <Modal open={show} onClose={onClose} size="lg">
             <Modal.Header>
-                <Modal.Title style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                <Modal.Title style={{
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: 12,
                     fontSize: '18px',
                     fontWeight: '600'
@@ -364,11 +456,11 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                     Détails de l'élève - {inscription.nomComplet}
                 </Modal.Title>
             </Modal.Header>
-            
+
             <Modal.Body style={{ padding: 0, maxHeight: '70vh', overflowY: 'auto' }}>
                 {/* Navigation des onglets */}
-                <div style={{ 
-                    display: 'flex', 
+                <div style={{
+                    display: 'flex',
                     borderBottom: '1px solid #e5e7eb',
                     backgroundColor: '#f8fafc',
                     flexWrap: 'wrap'
@@ -410,7 +502,41 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                 border: '1px solid #bae6fd'
                             }}>
                                 <Row gutter={16}>
-                                    <Col md={8}>
+                                    <Col md={2}>
+                                        {/* PHOTO DE L'ÉTUDIANT */}
+                                        <div style={{
+                                            width: '60px',
+                                            height: '60px',
+                                            borderRadius: '8px',
+                                            overflow: 'hidden',
+                                            border: '2px solid #0369a1',
+                                            backgroundColor: '#f1f5f9'
+                                        }}>
+                                            {photoPreview ? (
+                                                <img
+                                                    src={photoPreview}
+                                                    alt="Photo élève"
+                                                    style={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        objectFit: 'cover'
+                                                    }}
+                                                />
+                                            ) : (
+                                                <div style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    color: '#64748b'
+                                                }}>
+                                                    <FiUser size={28} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </Col>
+                                    <Col md={10}>
                                         <div style={{ fontSize: '14px', color: '#0369a1', marginBottom: '4px' }}>
                                             Matricule : <strong>{formData.matricule}</strong>
                                         </div>
@@ -418,12 +544,12 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                             {formData.nom} {formData.prenom}
                                         </div>
                                     </Col>
-                                    <Col md={4}>
+                                    <Col md={12}>
                                         <div style={{ fontSize: '14px', color: '#0369a1' }}>
                                             Type processus
                                         </div>
-                                        <div style={{ 
-                                            fontSize: '14px', 
+                                        <div style={{
+                                            fontSize: '14px',
                                             fontWeight: '600',
                                             color: '#1e293b',
                                             padding: '4px 8px',
@@ -565,37 +691,6 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                     </div>
                                 </Col>
                             </Row>
-
-                            {/* Photo si disponible */}
-                            {formData.hasPhoto && (
-                                <div style={{ 
-                                    textAlign: 'center', 
-                                    marginTop: 20,
-                                    padding: '16px',
-                                    backgroundColor: '#f8fafc',
-                                    borderRadius: '8px',
-                                    border: '1px solid #e2e8f0'
-                                }}>
-                                    <img 
-                                        src={formData.urlPhoto} 
-                                        alt="Photo élève"
-                                        style={{
-                                            width: '120px',
-                                            height: '120px',
-                                            objectFit: 'cover',
-                                            borderRadius: '8px',
-                                            border: '2px solid #e5e7eb'
-                                        }}
-                                    />
-                                    <div style={{ 
-                                        marginTop: '8px',
-                                        fontSize: '12px',
-                                        color: '#64748b'
-                                    }}>
-                                        Photo de profil
-                                    </div>
-                                </div>
-                            )}
                         </div>
                     )}
 
@@ -609,8 +704,8 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                             }}>
                                 {photoPreview ? (
                                     <div>
-                                        <img 
-                                            src={photoPreview} 
+                                        <img
+                                            src={photoPreview}
                                             alt="Aperçu photo élève"
                                             style={{
                                                 width: '200px',
@@ -623,16 +718,16 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                             }}
                                         />
                                         <div style={{ marginBottom: '20px' }}>
-                                            <input 
+                                            <input
                                                 type="file"
                                                 ref={fileInputRef}
                                                 accept="image/*"
                                                 onChange={handlePhotoSelect}
                                                 style={{ display: 'none' }}
                                             />
-                                            <Button 
-                                                appearance="ghost" 
-                                                style={{ 
+                                            <Button
+                                                appearance="ghost"
+                                                style={{
                                                     border: '1px solid #d1d5db',
                                                     marginRight: '10px'
                                                 }}
@@ -646,8 +741,8 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                         </div>
                                         <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
                                             {selectedPhoto && (
-                                                <Button 
-                                                    appearance="primary" 
+                                                <Button
+                                                    appearance="primary"
                                                     startIcon={<FiUpload />}
                                                     loading={loading.photoUpload}
                                                     onClick={handlePhotoUpload}
@@ -659,8 +754,8 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                                     Charger la photo
                                                 </Button>
                                             )}
-                                            <Button 
-                                                appearance="ghost" 
+                                            <Button
+                                                appearance="ghost"
                                                 color="red"
                                                 startIcon={<FiTrash2 />}
                                                 onClick={handlePhotoDelete}
@@ -684,7 +779,7 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                             backgroundColor: 'white',
                                             cursor: 'pointer'
                                         }}
-                                        onClick={() => fileInputRef.current?.click()}
+                                            onClick={() => fileInputRef.current?.click()}
                                         >
                                             <FiUser size={48} color="#22c55e" />
                                         </div>
@@ -694,14 +789,14 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                         <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '20px' }}>
                                             Formats acceptés: JPG, PNG (max 2MB)
                                         </p>
-                                        <input 
+                                        <input
                                             type="file"
                                             ref={fileInputRef}
                                             accept="image/*"
                                             onChange={handlePhotoSelect}
                                             style={{ display: 'none' }}
                                         />
-                                        <Button 
+                                        <Button
                                             appearance="primary"
                                             startIcon={<FiUpload />}
                                             onClick={() => fileInputRef.current?.click()}
@@ -717,8 +812,8 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                                 <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>
                                                     Fichier sélectionné: {selectedPhoto.name}
                                                 </div>
-                                                <Button 
-                                                    appearance="primary" 
+                                                <Button
+                                                    appearance="primary"
                                                     startIcon={<FiUpload />}
                                                     loading={loading.photoUpload}
                                                     onClick={handlePhotoUpload}
@@ -747,9 +842,9 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                 borderRadius: '8px',
                                 border: '1px solid #fde047'
                             }}>
-                                <h6 style={{ 
-                                    color: '#ca8a04', 
-                                    marginBottom: 16, 
+                                <h6 style={{
+                                    color: '#ca8a04',
+                                    marginBottom: 16,
                                     fontWeight: '600',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -777,7 +872,7 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                         </label>
                                     </Col>
                                 </Row>
-                                
+
                                 <div style={{ marginTop: 16 }}>
                                     <label style={{ display: 'block', marginBottom: 8, fontWeight: '500' }}>
                                         Autre Handicap
@@ -803,9 +898,9 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                 borderRadius: '8px',
                                 border: '1px solid #bfdbfe'
                             }}>
-                                <h6 style={{ 
-                                    color: '#2563eb', 
-                                    marginBottom: 16, 
+                                <h6 style={{
+                                    color: '#2563eb',
+                                    marginBottom: 16,
                                     fontWeight: '600',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -856,8 +951,8 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                         </h6>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                             <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                <Radio 
-                                                    name="regime" 
+                                                <Radio
+                                                    name="regime"
                                                     checked={formData.internes}
                                                     onChange={() => {
                                                         handleChange('internes', true);
@@ -868,8 +963,8 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                                 <span style={{ fontSize: '14px' }}>Internes</span>
                                             </label>
                                             <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                <Radio 
-                                                    name="regime" 
+                                                <Radio
+                                                    name="regime"
                                                     checked={formData.demi_pension}
                                                     onChange={() => {
                                                         handleChange('internes', false);
@@ -880,8 +975,8 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                                 <span style={{ fontSize: '14px' }}>Demi pension</span>
                                             </label>
                                             <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                <Radio 
-                                                    name="regime" 
+                                                <Radio
+                                                    name="regime"
                                                     checked={formData.externes}
                                                     onChange={() => {
                                                         handleChange('internes', false);
@@ -908,8 +1003,8 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                         </h6>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                             <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                <Radio 
-                                                    name="nationalite_type" 
+                                                <Radio
+                                                    name="nationalite_type"
                                                     checked={formData.ivoirien}
                                                     onChange={() => {
                                                         handleChange('ivoirien', true);
@@ -920,8 +1015,8 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                                 <span style={{ fontSize: '14px' }}>Ivoirien</span>
                                             </label>
                                             <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                <Radio 
-                                                    name="nationalite_type" 
+                                                <Radio
+                                                    name="nationalite_type"
                                                     checked={formData.etranger_africain}
                                                     onChange={() => {
                                                         handleChange('ivoirien', false);
@@ -932,8 +1027,8 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                                 <span style={{ fontSize: '14px' }}>Etranger africain</span>
                                             </label>
                                             <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                <Radio 
-                                                    name="nationalite_type" 
+                                                <Radio
+                                                    name="nationalite_type"
                                                     checked={formData.etranger_non_africain}
                                                     onChange={() => {
                                                         handleChange('ivoirien', false);
@@ -1050,7 +1145,7 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                 <Col md={8}>
                                     <div style={{ marginBottom: 20 }}>
                                         <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                            <Checkbox 
+                                            <Checkbox
                                                 checked={formData.prise_en_charge}
                                                 onChange={(checked) => handleChange('prise_en_charge', checked)}
                                             />
@@ -1072,9 +1167,9 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                 borderRadius: '8px',
                                 border: '1px solid #bae6fd'
                             }}>
-                                <h6 style={{ 
-                                    color: '#2563eb', 
-                                    marginBottom: 16, 
+                                <h6 style={{
+                                    color: '#2563eb',
+                                    marginBottom: 16,
                                     fontWeight: '600',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -1151,9 +1246,9 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                 borderRadius: '8px',
                                 border: '1px solid #fbcfe8'
                             }}>
-                                <h6 style={{ 
-                                    color: '#be185d', 
-                                    marginBottom: 16, 
+                                <h6 style={{
+                                    color: '#be185d',
+                                    marginBottom: 16,
                                     fontWeight: '600',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -1229,9 +1324,9 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                                 borderRadius: '8px',
                                 border: '1px solid #d8b4fe'
                             }}>
-                                <h6 style={{ 
-                                    color: '#7c3aed', 
-                                    marginBottom: 16, 
+                                <h6 style={{
+                                    color: '#7c3aed',
+                                    marginBottom: 16,
                                     fontWeight: '600',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -1303,20 +1398,20 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                     )}
                 </div>
             </Modal.Body>
-            
+
             <Modal.Footer>
                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                    <Button 
-                        onClick={onClose} 
-                        appearance="subtle" 
+                    <Button
+                        onClick={onClose}
+                        appearance="subtle"
                         startIcon={<FiXCircle />}
                         style={{ color: '#6b7280' }}
                     >
                         Annuler
                     </Button>
                     <div style={{ display: 'flex', gap: '8px' }}>
-                        <Button 
-                            appearance="primary" 
+                        <Button
+                            appearance="primary"
                             startIcon={<FiCheckCircle />}
                             loading={loading.save}
                             onClick={handleSave}
@@ -1327,10 +1422,12 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                         >
                             Valider
                         </Button>
-                        <Button 
-                            appearance="ghost" 
+                        <Button
+                            appearance="ghost"
                             startIcon={<FiEdit />}
-                            style={{ 
+                            onClick={handleSave}
+                            disabled={loading.save}
+                            style={{
                                 border: '1px solid #3b82f6',
                                 color: '#3b82f6'
                             }}
