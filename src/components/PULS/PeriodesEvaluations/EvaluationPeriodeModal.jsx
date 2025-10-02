@@ -37,6 +37,7 @@ const EvaluationPeriodeModal = ({
     const { branches: rawBranches, loading: branchesLoading, error: branchesError } = useNiveauxBranchesData();
     const { periodes: rawPeriodes, loading: periodesLoading, error: periodesError } = usePeriodesData();
     const { typesActivite: rawTypesActivite, loading: typesActiviteLoading, error: typesActiviteError } = useTypesActiviteData();
+    const apiUrls = useAllApiUrls();
 
     // Transformation des données pour s'assurer du bon format (label/value)
     const branches = React.useMemo(() => {
@@ -91,8 +92,6 @@ const EvaluationPeriodeModal = ({
     // CHARGEMENT DES ÉVALUATIONS ENREGISTRÉES
     // ===========================
     const loadEvaluationsEnregistrees = useCallback(async () => {
-        const apiUrls = useAllApiUrls();
-
         if (!formData.periode || !formData.niveau) {
             setEvaluationsEnregistrees([]);
             return;
@@ -101,7 +100,6 @@ const EvaluationPeriodeModal = ({
         setLoadingEvaluations(true);
         try {
             const response = await axios.get(apiUrls.notes.getEvalutionsByPeriodeEtBrnche(formData.periode, formData.niveau));
-
             setEvaluationsEnregistrees(response.data || []);
         } catch (error) {
             console.error('Erreur lors du chargement des évaluations:', error);
@@ -109,7 +107,7 @@ const EvaluationPeriodeModal = ({
         } finally {
             setLoadingEvaluations(false);
         }
-    }, [anneeId, ecoleId, formData.periode, formData.niveau]);
+    }, [apiUrls, anneeId, ecoleId, formData.periode, formData.niveau]);
 
     // ===========================
     // EFFETS

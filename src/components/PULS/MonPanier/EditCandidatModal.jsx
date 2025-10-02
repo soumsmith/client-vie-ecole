@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
     Modal, 
     Button, 
@@ -7,8 +7,7 @@ import {
     Panel, 
     Grid, 
     Row, 
-    Col, 
-    ButtonToolbar,
+    Col,
     IconButton,
     Tooltip,
     Whisper,
@@ -18,10 +17,12 @@ import {
 } from 'rsuite';
 import { 
     FiCopy, 
-    FiBold, 
-    FiItalic, 
-    FiUnderline, 
-    FiList, 
+    FiBold,
+    FiItalic,
+    FiUnderline,
+    FiList,
+    FiAlignLeft,
+    FiAlignCenter,
     FiMail, 
     FiPhone, 
     FiCalendar, 
@@ -33,27 +34,30 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useMessagesUrls, useAppParams } from '../utils/apiConfig';
 
-
 const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
     const [formData, setFormData] = useState({
         objet: '',
         message: ''
     });
 
-    const [textareaRef, setTextareaRef] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const editorRef = useRef(null);
 
-    // Utilisation des configurations centralisées
     const appParams = useAppParams();
     const messagesUrls = useMessagesUrls();
 
-    // Réinitialiser le formulaire quand le modal s'ouvre avec un nouveau candidat
     useEffect(() => {
         if (show && candidat) {
+            const defaultMessage = `<p>Bonjour cher candidat!</p><p><br></p><p>Nous avons bien reçu vos informations concernant votre candidature.</p><p><br></p><p>Cordialement,<br>L'équipe RH</p>`;
+            
             setFormData({
                 objet: `Candidature - ${candidat.nomComplet}`,
-                message: `Bonjour cher candidat!\n\nNous avons bien reçu vos informations concernant votre candidature.\n\nCordialement,\nL'équipe RH`
+                message: defaultMessage
             });
+
+            if (editorRef.current) {
+                editorRef.current.innerHTML = defaultMessage;
+            }
         }
     }, [show, candidat]);
 
@@ -64,8 +68,29 @@ const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
         }));
     };
 
+    const handleEditorChange = () => {
+        if (editorRef.current) {
+            const htmlContent = editorRef.current.innerHTML;
+            setFormData(prev => ({ ...prev, message: htmlContent }));
+        }
+    };
+
+    const execCommand = (command, value = null) => {
+        document.execCommand(command, false, value);
+        editorRef.current?.focus();
+        handleEditorChange();
+    };
+
+    const handleBold = () => execCommand('bold');
+    const handleItalic = () => execCommand('italic');
+    const handleUnderline = () => execCommand('underline');
+    const handleUnorderedList = () => execCommand('insertUnorderedList');
+    const handleOrderedList = () => execCommand('insertOrderedList');
+    const handleAlignLeft = () => execCommand('justifyLeft');
+    const handleAlignCenter = () => execCommand('justifyCenter');
+    const handleAlignRight = () => execCommand('justifyRight');
+
     const handleSave = async () => {
-        // Vérification des données nécessaires
         if (!candidat || !candidat.id) {
             Swal.fire({
                 icon: 'error',
@@ -76,7 +101,11 @@ const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
             return;
         }
 
-        if (!formData.objet.trim() || !formData.message.trim()) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = formData.message;
+        const textContent = tempDiv.textContent || tempDiv.innerText || '';
+
+        if (!formData.objet.trim() || !textContent.trim()) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Champs requis',
@@ -86,7 +115,6 @@ const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
             return;
         }
 
-        // Demande de confirmation avec SweetAlert
         const result = await Swal.fire({
             title: 'Confirmer l\'envoi du message',
             text: `Êtes-vous sûr de vouloir envoyer ce message à ${candidat.nomComplet} ?`,
@@ -106,23 +134,13 @@ const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
         setIsSubmitting(true);
 
         try {
-            // Conversion du message en HTML (basique)
-            const htmlMessage = formData.message
-                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') // Gras
-                .replace(/\*(.*?)\*/g, '<i>$1</i>') // Italique
-                .replace(/<u>(.*?)<\/u>/g, '<u>$1</u>') // Souligné (garde tel quel)
-                .replace(/\n/g, '</div><div>') // Nouvelle ligne
-                .replace(/^/, '<div>') // Début
-                .replace(/$/, '</div>'); // Fin
-
-            // Préparation des données pour l'API
             const apiData = {
                 administrateur_gain_idadministrateur_gai: null,
                 ecole_ecoleid: appParams.ecoleId,
                 identifiant_personnel: candidat.id,
                 message_personnel_emetteur: appParams.personnelInfo?.nom || "",
                 message_personnel_id: null,
-                message_personnel_message: htmlMessage,
+                message_personnel_message: formData.message,
                 message_personnel_sujet: formData.objet,
                 idEmetteur: appParams.userId || appParams.personnelId,
                 idDestinataire: candidat.id
@@ -130,7 +148,6 @@ const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
 
             console.log('📤 Envoi du message vers le candidat:', apiData);
 
-            // Utilisation de l'URL centralisée
             const url = messagesUrls.sendToPersonnel(candidat.id);
             console.log('🔗 URL d\'envoi:', url);
 
@@ -167,7 +184,6 @@ const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
             let errorMessage = 'Une erreur inattendue est survenue lors de l\'envoi du message.';
             
             if (error.response) {
-                // Erreurs HTTP avec réponse du serveur
                 const status = error.response.status;
                 const serverMessage = error.response.data?.message || '';
                 
@@ -200,13 +216,10 @@ const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
                         errorMessage = `Erreur serveur (${status}): ${serverMessage || 'Erreur inconnue'}`;
                 }
             } else if (error.request) {
-                // Erreur réseau - pas de réponse du serveur
                 errorMessage = 'Impossible de contacter le serveur. Vérifiez votre connexion internet.';
             } else if (error.code === 'ECONNABORTED') {
-                // Timeout
                 errorMessage = 'La requête a expiré. Le serveur met trop de temps à répondre.';
             } else {
-                // Autres erreurs
                 errorMessage = `Erreur technique: ${error.message}`;
             }
 
@@ -235,39 +248,8 @@ const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
         });
     };
 
-    // Fonctions de formatage de texte
-    const insertFormatting = (before, after = '') => {
-        if (!textareaRef) return;
-
-        const start = textareaRef.selectionStart;
-        const end = textareaRef.selectionEnd;
-        const selectedText = textareaRef.value.substring(start, end);
-        const newText = before + selectedText + after;
-        
-        const newValue = 
-            textareaRef.value.substring(0, start) + 
-            newText + 
-            textareaRef.value.substring(end);
-        
-        setFormData(prev => ({ ...prev, message: newValue }));
-        
-        setTimeout(() => {
-            textareaRef.focus();
-            textareaRef.setSelectionRange(
-                start + before.length,
-                start + before.length + selectedText.length
-            );
-        }, 0);
-    };
-
-    const handleBold = () => insertFormatting('**', '**');
-    const handleItalic = () => insertFormatting('*', '*');
-    const handleUnderline = () => insertFormatting('<u>', '</u>');
-    const handleList = () => insertFormatting('\n- ', '');
-
     if (!candidat) return null;
 
-    // Extraction du prénom et nom pour l'avatar
     const getInitials = (name) => {
         if (!name) return 'CD';
         const names = name.split(' ');
@@ -337,7 +319,6 @@ const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
                 overflow: 'hidden'
             }}
         >
-            {/* Header épuré */}
             <Modal.Header style={{
                 background: '#ffffff',
                 borderBottom: '1px solid #f1f5f9',
@@ -392,7 +373,6 @@ const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
                 padding: '32px 24px', 
                 background: '#fafafa'
             }}>
-                {/* Informations du candidat */}
                 <Panel
                     header={
                         <Text size="md" weight="semibold" style={{ color: '#1e293b' }}>
@@ -406,42 +386,42 @@ const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
                         marginBottom: '24px',
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)'
                     }}
-                    bodyStyle={{ padding: '20px' }}
                 >
-                    <Grid fluid className='mt-3'>
-                        <Row gutter={16}>
-                            <Col xs={8}>
-                                <InfoCard
-                                    icon={FiAward}
-                                    title="Diplôme récent"
-                                    value={candidat?.diplome || 'Non renseigné'}
-                                    color="#f59e0b"
-                                    onCopy={handleCopyInfo}
-                                />
-                            </Col>
-                            <Col xs={8}>
-                                <InfoCard
-                                    icon={FiCalendar}
-                                    title="Date de naissance"
-                                    value={candidat?.dateNaissance || 'Non renseignée'}
-                                    color="#ef4444"
-                                    onCopy={handleCopyInfo}
-                                />
-                            </Col>
-                            <Col xs={8}>
-                                <InfoCard
-                                    icon={FiPhone}
-                                    title="Contact"
-                                    value={candidat?.contact || 'Non renseigné'}
-                                    color="#10b981"
-                                    onCopy={handleCopyInfo}
-                                />
-                            </Col>
-                        </Row>
-                    </Grid>
+                    <div style={{ padding: '20px' }}>
+                        <Grid fluid className='mt-3'>
+                            <Row gutter={16}>
+                                <Col xs={8}>
+                                    <InfoCard
+                                        icon={FiAward}
+                                        title="Diplôme récent"
+                                        value={candidat?.diplome || 'Non renseigné'}
+                                        color="#f59e0b"
+                                        onCopy={handleCopyInfo}
+                                    />
+                                </Col>
+                                <Col xs={8}>
+                                    <InfoCard
+                                        icon={FiCalendar}
+                                        title="Date de naissance"
+                                        value={candidat?.dateNaissance || 'Non renseignée'}
+                                        color="#ef4444"
+                                        onCopy={handleCopyInfo}
+                                    />
+                                </Col>
+                                <Col xs={8}>
+                                    <InfoCard
+                                        icon={FiPhone}
+                                        title="Contact"
+                                        value={candidat?.contact || 'Non renseigné'}
+                                        color="#10b981"
+                                        onCopy={handleCopyInfo}
+                                    />
+                                </Col>
+                            </Row>
+                        </Grid>
+                    </div>
                 </Panel>
 
-                {/* Formulaire d'email */}
                 <Panel
                     header={
                         <Text size="md" weight="semibold" style={{ color: '#1e293b' }}>
@@ -454,158 +434,204 @@ const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
                         border: '1px solid #f1f5f9',
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)'
                     }}
-                    bodyStyle={{ padding: '20px' }}
                 >
-                    <Form fluid>
-                        <Form.Group style={{ marginBottom: '24px' }}>
-                            <Form.ControlLabel style={{ 
-                                fontWeight: '500',
-                                color: '#374151',
-                                marginBottom: '8px'
-                            }}>
-                                Objet du message <span style={{color: '#ef4444'}}>*</span>
-                            </Form.ControlLabel>
-                            <Input 
-                                value={formData.objet}
-                                onChange={(value) => handleInputChange('objet', value)}
-                                placeholder="Saisissez l'objet du message"
-                                disabled={isSubmitting}
-                                style={{
-                                    borderRadius: '8px',
-                                    border: '1px solid #e2e8f0',
-                                    padding: '12px',
-                                    fontSize: '14px'
-                                }}
-                            />
-                        </Form.Group>
+                    <div style={{ padding: '20px' }}>
+                        <Form fluid>
+                            <Form.Group style={{ marginBottom: '24px' }}>
+                                <Form.ControlLabel style={{ 
+                                    fontWeight: '500',
+                                    color: '#374151',
+                                    marginBottom: '8px'
+                                }}>
+                                    Objet du message <span style={{color: '#ef4444'}}>*</span>
+                                </Form.ControlLabel>
+                                <Input 
+                                    value={formData.objet}
+                                    onChange={(value) => handleInputChange('objet', value)}
+                                    placeholder="Saisissez l'objet du message"
+                                    disabled={isSubmitting}
+                                    style={{
+                                        borderRadius: '8px',
+                                        border: '1px solid #e2e8f0',
+                                        padding: '12px',
+                                        fontSize: '14px'
+                                    }}
+                                />
+                            </Form.Group>
 
-                        <Form.Group>
-                            <Form.ControlLabel style={{ 
-                                fontWeight: '500',
-                                color: '#374151',
-                                marginBottom: '8px'
-                            }}>
-                                Message <span style={{color: '#ef4444'}}>*</span>
-                            </Form.ControlLabel>
-                            
-                            {/* Barre d'outils de formatage */}
-                            <div style={{
-                                background: '#f8fafc',
-                                border: '1px solid #e2e8f0',
-                                borderBottom: 'none',
-                                borderRadius: '8px 8px 0 0',
-                                padding: '12px 16px',
-                                display: 'flex',
-                                gap: '8px'
-                            }}>
-                                <Whisper speaker={<Tooltip>Gras (**texte**)</Tooltip>}>
-                                    <IconButton 
-                                        icon={<FiBold />} 
-                                        size="sm" 
-                                        appearance="subtle"
-                                        onClick={handleBold}
-                                        disabled={isSubmitting}
-                                        style={{
-                                            borderRadius: '6px',
-                                            background: 'white',
-                                            border: '1px solid #e2e8f0'
-                                        }}
-                                    />
-                                </Whisper>
-                                <Whisper speaker={<Tooltip>Italique (*texte*)</Tooltip>}>
-                                    <IconButton 
-                                        icon={<FiItalic />} 
-                                        size="sm" 
-                                        appearance="subtle"
-                                        onClick={handleItalic}
-                                        disabled={isSubmitting}
-                                        style={{
-                                            borderRadius: '6px',
-                                            background: 'white',
-                                            border: '1px solid #e2e8f0'
-                                        }}
-                                    />
-                                </Whisper>
-                                <Whisper speaker={<Tooltip>Souligné</Tooltip>}>
-                                    <IconButton 
-                                        icon={<FiUnderline />} 
-                                        size="sm" 
-                                        appearance="subtle"
-                                        onClick={handleUnderline}
-                                        disabled={isSubmitting}
-                                        style={{
-                                            borderRadius: '6px',
-                                            background: 'white',
-                                            border: '1px solid #e2e8f0'
-                                        }}
-                                    />
-                                </Whisper>
-                                <Whisper speaker={<Tooltip>Liste</Tooltip>}>
-                                    <IconButton 
-                                        icon={<FiList />} 
-                                        size="sm" 
-                                        appearance="subtle"
-                                        onClick={handleList}
-                                        disabled={isSubmitting}
-                                        style={{
-                                            borderRadius: '6px',
-                                            background: 'white',
-                                            border: '1px solid #e2e8f0'
-                                        }}
-                                    />
-                                </Whisper>
-                            </div>
-
-                            <Input
-                                as="textarea"
-                                rows={8}
-                                ref={setTextareaRef}
-                                value={formData.message}
-                                onChange={(value) => handleInputChange('message', value)}
-                                placeholder="Composez votre message..."
-                                disabled={isSubmitting}
-                                style={{
-                                    borderRadius: '0 0 8px 8px',
-                                    borderTop: 'none',
-                                    border: '1px solid #e2e8f0',
-                                    minHeight: '200px',
-                                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                                    fontSize: '14px',
-                                    lineHeight: '1.6',
-                                    resize: 'vertical',
-                                    padding: '16px'
-                                }}
-                            />
-                            
-                            {/* Aide au formatage */}
-                            <div style={{
-                                background: '#f0f9ff',
-                                border: '1px solid #bae6fd',
-                                borderRadius: '6px',
-                                padding: '12px',
-                                marginTop: '12px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px'
-                            }}>
+                            <Form.Group>
+                                <Form.ControlLabel style={{ 
+                                    fontWeight: '500',
+                                    color: '#374151',
+                                    marginBottom: '8px'
+                                }}>
+                                    Message <span style={{color: '#ef4444'}}>*</span>
+                                </Form.ControlLabel>
+                                
                                 <div style={{
-                                    width: '16px',
-                                    height: '16px',
-                                    background: '#0ea5e9',
-                                    borderRadius: '50%',
+                                    border: '1px solid #e2e8f0',
+                                    borderRadius: '8px',
+                                    overflow: 'hidden',
+                                    background: 'white'
+                                }}>
+                                    {/* Barre d'outils */}
+                                    <div style={{
+                                        background: '#f8fafc',
+                                        borderBottom: '1px solid #e2e8f0',
+                                        padding: '8px 12px',
+                                        display: 'flex',
+                                        gap: '4px',
+                                        flexWrap: 'wrap'
+                                    }}>
+                                        <Whisper speaker={<Tooltip>Gras</Tooltip>}>
+                                            <IconButton 
+                                                icon={<FiBold />} 
+                                                size="sm" 
+                                                appearance="subtle"
+                                                onClick={handleBold}
+                                                disabled={isSubmitting}
+                                                style={{
+                                                    background: 'white',
+                                                    border: '1px solid #e2e8f0',
+                                                    borderRadius: '4px'
+                                                }}
+                                            />
+                                        </Whisper>
+                                        <Whisper speaker={<Tooltip>Italique</Tooltip>}>
+                                            <IconButton 
+                                                icon={<FiItalic />} 
+                                                size="sm" 
+                                                appearance="subtle"
+                                                onClick={handleItalic}
+                                                disabled={isSubmitting}
+                                                style={{
+                                                    background: 'white',
+                                                    border: '1px solid #e2e8f0',
+                                                    borderRadius: '4px'
+                                                }}
+                                            />
+                                        </Whisper>
+                                        <Whisper speaker={<Tooltip>Souligné</Tooltip>}>
+                                            <IconButton 
+                                                icon={<FiUnderline />} 
+                                                size="sm" 
+                                                appearance="subtle"
+                                                onClick={handleUnderline}
+                                                disabled={isSubmitting}
+                                                style={{
+                                                    background: 'white',
+                                                    border: '1px solid #e2e8f0',
+                                                    borderRadius: '4px'
+                                                }}
+                                            />
+                                        </Whisper>
+                                        <div style={{ width: '1px', background: '#e2e8f0', margin: '0 4px' }} />
+                                        <Whisper speaker={<Tooltip>Liste à puces</Tooltip>}>
+                                            <IconButton 
+                                                icon={<FiList />} 
+                                                size="sm" 
+                                                appearance="subtle"
+                                                onClick={handleUnorderedList}
+                                                disabled={isSubmitting}
+                                                style={{
+                                                    background: 'white',
+                                                    border: '1px solid #e2e8f0',
+                                                    borderRadius: '4px'
+                                                }}
+                                            />
+                                        </Whisper>
+                                        <Whisper speaker={<Tooltip>Liste numérotée</Tooltip>}>
+                                            <IconButton 
+                                                icon={<FiList />} 
+                                                size="sm" 
+                                                appearance="subtle"
+                                                onClick={handleOrderedList}
+                                                disabled={isSubmitting}
+                                                style={{
+                                                    background: 'white',
+                                                    border: '1px solid #e2e8f0',
+                                                    borderRadius: '4px'
+                                                }}
+                                            />
+                                        </Whisper>
+                                        <div style={{ width: '1px', background: '#e2e8f0', margin: '0 4px' }} />
+                                        <Whisper speaker={<Tooltip>Aligner à gauche</Tooltip>}>
+                                            <IconButton 
+                                                icon={<FiAlignLeft />} 
+                                                size="sm" 
+                                                appearance="subtle"
+                                                onClick={handleAlignLeft}
+                                                disabled={isSubmitting}
+                                                style={{
+                                                    background: 'white',
+                                                    border: '1px solid #e2e8f0',
+                                                    borderRadius: '4px'
+                                                }}
+                                            />
+                                        </Whisper>
+                                        <Whisper speaker={<Tooltip>Centrer</Tooltip>}>
+                                            <IconButton 
+                                                icon={<FiAlignCenter />} 
+                                                size="sm" 
+                                                appearance="subtle"
+                                                onClick={handleAlignCenter}
+                                                disabled={isSubmitting}
+                                                style={{
+                                                    background: 'white',
+                                                    border: '1px solid #e2e8f0',
+                                                    borderRadius: '4px'
+                                                }}
+                                            />
+                                        </Whisper>
+                                    </div>
+
+                                    {/* Zone d'édition */}
+                                    <div
+                                        ref={editorRef}
+                                        contentEditable={!isSubmitting}
+                                        onInput={handleEditorChange}
+                                        style={{
+                                            minHeight: '250px',
+                                            padding: '16px',
+                                            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                                            fontSize: '14px',
+                                            lineHeight: '1.6',
+                                            outline: 'none',
+                                            color: '#1e293b',
+                                            cursor: isSubmitting ? 'not-allowed' : 'text'
+                                        }}
+                                    />
+                                </div>
+                                
+                                <div style={{
+                                    background: '#f0f9ff',
+                                    border: '1px solid #bae6fd',
+                                    borderRadius: '6px',
+                                    padding: '12px',
+                                    marginTop: '12px',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    justifyContent: 'center',
-                                    flexShrink: 0
+                                    gap: '8px'
                                 }}>
-                                    <Text style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>i</Text>
+                                    <div style={{
+                                        width: '16px',
+                                        height: '16px',
+                                        background: '#0ea5e9',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexShrink: 0
+                                    }}>
+                                        <Text style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>i</Text>
+                                    </div>
+                                    <Text size="sm" style={{ color: '#0c4a6e' }}>
+                                        Utilisez la barre d'outils pour formater votre texte. Sélectionnez le texte puis cliquez sur un bouton de formatage.
+                                    </Text>
                                 </div>
-                                <Text size="sm" style={{ color: '#0c4a6e' }}>
-                                    Utilisez **gras**, *italique*, &lt;u&gt;souligné&lt;/u&gt; pour formater le texte
-                                </Text>
-                            </div>
-                        </Form.Group>
-                    </Form>
+                            </Form.Group>
+                        </Form>
+                    </div>
                 </Panel>
             </Modal.Body>
 

@@ -31,6 +31,8 @@ import {
     useEvaluationsPeriodesData,
     evaluationsPeriodesTableConfig
 } from './EvaluationsPeriodesService';
+import getFullUrl from "../../hooks/urlUtils";
+import axios from 'axios';
 
 // ===========================
 // EN-TÊTE AVEC STATISTIQUES
@@ -233,7 +235,7 @@ const EvaluationsPeriodes = () => {
                 console.log('Données à enregistrer:', data);
 
                 // Simuler l'appel API
-                // await axios.post('http://46.105.52.105:8889/api/evaluation-periode/save-handle', data.payload);
+                await axios.post(`${getFullUrl()}evaluation-periode/save-handle`, data.payload);
 
                 // Afficher le succès
                 await Swal.fire({

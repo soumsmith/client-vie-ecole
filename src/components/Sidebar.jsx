@@ -10,6 +10,8 @@ import CalendarIcon from "@rsuite/icons/Calendar";
 import MessageIcon from "@rsuite/icons/Message";
 import ExitIcon from "@rsuite/icons/Exit";
 import TableIcon from "@rsuite/icons/Table";
+import { usePulsParams } from './hooks/useDynamicParams';
+
 
 
 
@@ -1125,6 +1127,14 @@ const Sidebar = ({
     return filterSectionsByProfile(sectionsClone, userProfile);
   }, [userProfile]);
 
+  const { ecoleId: dynamicEcoleId, academicYearId: dynamicAcademicYearId, personnelInfo: personnelInfo } = usePulsParams();
+    console.log('dynamicEcoleId', dynamicEcoleId);
+    console.log('dynamicAcademicYearId', dynamicAcademicYearId);
+    console.log('personnelInfo==>Sidebar', personnelInfo?.personnelConnecteDetail?.personnelnom);
+
+    
+    
+
   // Synchroniser l'activeKey avec les changements d'URL
   useEffect(() => {
     const newActiveKey = getEventKeyFromPath(location.pathname);
@@ -1312,6 +1322,8 @@ const Sidebar = ({
   };
 
   const userInfo = getUserInfo();
+  console.log("localStorage.getItem('userData'):", userInfo);
+
 
   const dividerStyle = {
     margin: "16px 20px",
@@ -1378,8 +1390,10 @@ const Sidebar = ({
             <span>{userInfo.initials}</span>
           </div>
           <div className="user-details">
-            <div style={sidebarStyles.userName} className="user-name">{userInfo.name}</div>
-            <div style={sidebarStyles.userRole} className="user-role">{userInfo.role}</div>
+            {/* personnelInfo.personnelConnecteDetail.profil */}
+            {/* <div style={sidebarStyles.userName} className="user-name text-white">{userInfo.name}</div> */}
+            <div style={sidebarStyles.userName} className="user-name text-white">{`${personnelInfo?.personnelConnecteDetail?.personnelnom || personnelInfo?.candidatDetails?.candidat_prenom}  ${personnelInfo?.personnelConnecteDetail?.personnelprenom || ''}  `}</div>
+            <div style={sidebarStyles.userRole} className="user-role text-white">{userInfo.role}</div>
           </div>
         </div>
       </div>
@@ -1388,3 +1402,4 @@ const Sidebar = ({
 };
 
 export default Sidebar;
+

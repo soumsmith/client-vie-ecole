@@ -765,7 +765,7 @@ const useNotesUrls = () => {
             `${baseUrl}notes/list-about-evaluation/${evaluationCode}`,
 
         getEvalutionsByPeriodeEtBrnche: (periode, niveau) =>
-            `${baseUrl}evaluation-periode/get-by-annee-ecole-periode-niveau/${params.ecoleId}/${params.ecoleId}/${periode}/${niveau}`,
+            `${baseUrl}evaluation-periode/get-by-annee-ecole-periode-niveau/${params.academicYearId}/${params.ecoleId}/${periode}/${niveau}`,
 
 
         /**
