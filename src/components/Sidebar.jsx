@@ -100,14 +100,14 @@ const allMenuSections = [
   {
     type: "section",
     title: "Tableau de Bord",
-    profiles: ["Admin", "Professeur", "user", "Fondateur"],
+    profiles: ["Admin", "Professeur", "Educateur", "Fondateur"],
     items: [
       {
         type: "item",
         eventKey: "dashboard",
         icon: "DashboardIcon",
         title: "Tableau de bord",
-        profiles: ["Admin", "Professeur", "user", "Fondateur"],
+        profiles: ["Admin", "Professeur", "Educateur", "Fondateur"],
       },
     ],
   },
@@ -430,14 +430,14 @@ const allMenuSections = [
   {
     type: "section",
     title: "Affectations",
-    profiles: ["admin", "manager", "user", "Fondateur"],
+    profiles: ["admin", "manager", "Educateur", "Fondateur"],
     items: [
       {
         type: "item",
         eventKey: "classe-eleves",
         icon: "TableIcon",
         title: "Classe Elèves",
-        profiles: ["admin", "manager", "Fondateur"],
+        profiles: ["admin", "Educateur", "Fondateur"],
       },
 
       // Professeur - Matiere
@@ -446,7 +446,7 @@ const allMenuSections = [
         eventKey: "professeur-matiere",
         icon: "TableIcon",
         title: "Professeur - Matiere",
-        profiles: ["admin", "manager", "Fondateur"],
+        profiles: ["admin", "Educateur", "Fondateur"],
       },
       // Personnel - Classe
       {
@@ -569,7 +569,7 @@ const allMenuSections = [
   {
     type: "section",
     title: "Inscription",
-    profiles: ["admin", "manager", "user", "Fondateur"],
+    profiles: ["admin", "manager", "Educateur", "Fondateur"],
     items: [
       // Importer des Elèves
       {
@@ -601,7 +601,7 @@ const allMenuSections = [
         eventKey: "listeElevesParClasse",
         icon: "DocPassIcon",
         title: "Liste des Elèves",
-        profiles: ["admin", "manager", "user", "Fondateur"],
+        profiles: ["admin", "manager", "Educateur", "Fondateur"],
       },
     ],
   },
@@ -884,6 +884,7 @@ const normalizeUserProfile = (profile) => {
     admin: "admin",
     administrator: "admin",
     manager: "manager",
+    educateur: "Educateur",
     gestionnaire: "manager",
     user: "user",
     utilisateur: "user",
@@ -1206,6 +1207,7 @@ const Sidebar = ({
       manager: "Manager",
       user: "Utilisateur",
       Fondateur: "Fondateur",
+      Educateur : "Educateur",
     };
     return profileNames[profile] || profile;
   };

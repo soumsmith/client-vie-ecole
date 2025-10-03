@@ -25,6 +25,15 @@
     --hover-color: #667eea;
 }
 
+#Educateur {
+    --primary-color: #ff9c00;
+    /* bleu */
+    --bg-color: #0f172a;
+    --text-color: #f1f5f9;
+    --active-color: #ff9c00;
+    --hover-color: #ff9c00;
+}
+
 #Candidat-Fondateur {
     --primary-color: #0ca5e9;
     /* bleu */

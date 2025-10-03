@@ -781,6 +781,7 @@ const useLoginData = (config) => {
                 data === "Fondateur" ||
                 data === "Professeur" ||
                 data === "Admin" ||
+                data === "Educateur" ||
                 data === "Mot de passe correct!"
             );
 
