@@ -782,13 +782,19 @@ const useLoginData = (config) => {
                 data === "Professeur" ||
                 data === "Admin" ||
                 data === "Educateur" ||
+                data === "Directeur des études(DE)" || 
                 data === "Mot de passe correct!"
             );
 
             if (isSuccess) {
                 console.log('✅ Connexion réussie !');
+                const profils = {
+                    "Mot de passe correct!": "Candidat",
+                    "Directeur des études(DE)": "DE"
+                };
 
-                userProfil = data === "Mot de passe correct!" ? "Candidat" : data;
+                //userProfil = data === "Mot de passe correct!" ? "Candidat" : data;
+                userProfil = profils[data] || data;
 
                 const basicUserData = {
                     email: formData.email,

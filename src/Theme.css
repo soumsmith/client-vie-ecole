@@ -43,6 +43,15 @@
     --hover-color: #0ca5e9;
 }
 
+#DE {
+    --primary-color: #2ac7d5;
+    /* bleu */
+    --bg-color: #000;
+    --text-color: #f1f5f9;
+    --active-color: #2ac7d5;
+    --hover-color: #2ac7d5;
+}
+
 
 
 
