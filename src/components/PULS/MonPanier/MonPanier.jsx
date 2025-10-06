@@ -213,7 +213,7 @@ const MonPanier = () => {
                 <div className="col-lg-12">
                     <DataTable
                         title="Agents en Attente"
-                        subtitle={`${panierItems.length} agent(s) dans votre panier`}
+                        subtitle={`Agent(s) dans votre panier`}
                         data={panierItems}
                         loading={loading}
                         error={error}

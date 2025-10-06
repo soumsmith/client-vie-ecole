@@ -33,12 +33,14 @@ import Eleves from './PULS/Eleves/Eleves';
 import PvEvaluations from './PULS/PvEvaluation/PvEvaluations';
 import EvaluationProfesseur from './PULS/EvaluationProfesseur/EvaluationsProfesseur';
 import MonPanier from './PULS/MonPanier/MonPanier';
+import EvaluationsPeriodes from './PULS/PeriodesEvaluations/EvaluationsPeriodes';
 import ListeOffresEmploi from './PULS/OffreEmploi/ListeOffresEmploi';
 
 import ListePersonnel from './PULS/MonPersonnelAffectation/ListePersonnel';
 import ListeSeancesSaisies from './PULS/SeancesSaisies/ListeSeancesSaisies';
 
 import CertificatTravail from './PULS/CertificatTravail/CertificatTravail';
+import SeanceManagement from './PULS/SeancesSaisies/OuvertureSeance/SeanceManagement';
 
 // ===========================
 // INSCRIPTION
@@ -207,6 +209,8 @@ const Layout = ({ onLogout }) => {
       'evaluation-professeur': '/evaluation-professeur',
       'RecrutementAgent': '/RecrutementAgent',
       'MonPanier': '/MonPanier',
+      'definirPeriodeEvaluation': '/definirPeriodeEvaluation',
+      'ouvertureSeances': '/ouvertureSeances',
       'OffreEmploi': '/OffreEmploi',
       'enqueteRapideRentree': '/enqueteRapideRentree',
       'rapport': '/rapport',
@@ -321,6 +325,8 @@ const Layout = ({ onLogout }) => {
       '/evaluation-professeur': 'Evaluation Professeur',
       '/RecrutementAgent': 'Recrutement Agent',
       '/MonPanier': 'Mon Panier',
+      '/definirPeriodeEvaluation': 'Définir une période d\'évaluation',
+      '/ouvertureSeances': 'Ouverture de Seances',
       '/OffreEmploi': 'Offre Emploi',
       '/enqueteRapideRentree': 'Enquête Rapide Rentrée',
       '/rapport': 'Rapport',
@@ -442,6 +448,14 @@ const Layout = ({ onLogout }) => {
       items.push({ label: "Liste Séances", active: true });
     }
 
+    else if (path.includes('/definirPeriodeEvaluation')) {
+      items.push({ label: "Définir une période d\'évaluation", active: true });
+    }
+
+    else if (path.includes('/ouvertureSeances')) {
+      items.push({ label: "Ouverture de Seances", active: true });
+    }
+    
 
 
     // PULS - Section Inscription
@@ -736,6 +750,11 @@ const Layout = ({ onLogout }) => {
               <Route path="/pv-evaluation" element={<PvEvaluations />} />
               <Route path="/evaluation-professeur" element={<EvaluationProfesseur profProfilId={8} />} />
               <Route path="/MonPanier" element={<MonPanier />} />
+
+              <Route path="/definirPeriodeEvaluation" element={<EvaluationsPeriodes />} />
+              <Route path="/ouvertureSeances" element={<SeanceManagement />} />
+
+              
 
               <Route path="/monPersonel" element={<ListePersonnel typeDeListe="listePersonnel" />} />
               <Route path="/affectationProfilPersonel" element={<ListePersonnel typeDeListe="affectationPersonel" />} />

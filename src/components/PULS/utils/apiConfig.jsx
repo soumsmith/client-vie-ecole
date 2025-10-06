@@ -55,7 +55,7 @@ const useAppParams = () => {
     return useMemo(() => ({
         // IDs principaux
         ecoleId: dynamicEcoleId || DEFAULT_VALUES.ECOLE_ID,
-        academicYearId: dynamicAcademicYearId || DEFAULT_VALUES.ANNEE_ID,
+        academicYearId: DEFAULT_VALUES.ANNEE_ID, //dynamicAcademicYearId || DEFAULT_VALUES.ANNEE_ID,
         periodicitieId: dynamicPeriodicitieId || DEFAULT_VALUES.PERIODICITE_ID,
         profileId: profileId || DEFAULT_VALUES.PROFIL_PROFESSEUR_ID,
         userId,
@@ -162,6 +162,9 @@ const useNiveauxUrls = () => {
          */
         getVisibleByBranche: () =>
             `${baseUrl}niveau-enseignement/get-visible-by-branche?ecole=${params.ecoleId}`,
+
+        getNiveauEcole: () =>
+            `${baseUrl}niveau/ecole/${params.ecoleId}`,
 
         /**
          * Liste de tous les niveaux d'enseignement
@@ -463,7 +466,7 @@ const useElevesUrls = () => {
         imprimerFicheInscription: (selectedYear, matricule) =>
             `${baseUrl}imprimer-Fiche-eleve/inscription/${selectedYear}/${matricule}/${params.ecoleId}`,
 
-        
+
 
         /**
          * Sauvegarde l'affectation d'élèves à une classe
@@ -716,7 +719,7 @@ const useEvaluationsUrls = () => {
          * @param {number} professeurId - ID du professeur
          */
         statistiqueProf: (ecoleId, anneeId, periodeId, professeurId) =>
-            `${baseUrl}evaluations/statistique-prof/${ecoleId}/${anneeId}/${periodeId}/${professeurId}`,
+            `${baseUrl}evaluations/statistique-prof/${ecoleId}/${params.academicYearId}/${periodeId}/${professeurId}`,
 
         /**
          * Créer une nouvelle évaluation
@@ -750,6 +753,7 @@ const useEvaluationsUrls = () => {
  */
 const useNotesUrls = () => {
     const baseUrl = getFullUrl();
+    const params = useAppParams();
 
     return useMemo(() => ({
 
@@ -759,6 +763,10 @@ const useNotesUrls = () => {
          */
         listAboutEvaluation: (evaluationCode) =>
             `${baseUrl}notes/list-about-evaluation/${evaluationCode}`,
+
+        getEvalutionsByPeriodeEtBrnche: (periode, niveau) =>
+            `${baseUrl}evaluation-periode/get-by-annee-ecole-periode-niveau/${params.academicYearId}/${params.ecoleId}/${periode}/${niveau}`,
+
 
         /**
          * Récupère les notes par classe et période
@@ -831,6 +839,17 @@ const useInscriptionsUrls = () => {
          */
         update: (inscriptionId) =>
             `${baseUrl}inscriptions/update/${inscriptionId}`,
+
+        getStudentPhoto: (eleve_id) =>
+            `${baseUrl}inscriptions/get-image-by-inscription/${eleve_id}`,
+
+        upploadStudentPhoto: (eleve_id) =>
+            `${baseUrl}inscriptions/charger-photo/${eleve_id}`,
+
+        infosComplementairesEleve: () =>
+            `${baseUrl}inscriptions/infos-complementaires/`,
+
+        //`${apiUrls.inscriptions.base}/charger-photo/${formData.eleve_id}`
 
         /**
          * Liste des élèves par classe
@@ -1414,7 +1433,7 @@ const useImportsUrls = () => {
          * @param {string} typeAction - Type d'action
          * @param {number} brancheId - ID de la branche
          */
-        importElevesComplet : (typeAction, selectedBranche) =>
+        importElevesComplet: (typeAction, selectedBranche) =>
             `${baseUrl}eleve/importer-eleve/${params.ecoleId}/${params.academicYearId}/${typeAction}/${selectedBranche}`,
 
         /**
@@ -1485,7 +1504,7 @@ const useProfilsUrls = () => {
         getProfilVisible: () => `${baseUrl}profil/profil-visible`,
         editPasseWord: () => `${baseUrl}connexion/modifier-motDePasse`,
 
-        
+
 
     }), [baseUrl]);
 };

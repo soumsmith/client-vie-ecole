@@ -477,7 +477,7 @@ export const professeurMatiereTableConfig = {
         {
             title: 'Actions',
             dataKey: 'actions',
-            flexGrow: 0.5,
+            flexGrow: 0.8,
             minWidth: 50,
             cellType: 'actions',
             fixed: 'right'

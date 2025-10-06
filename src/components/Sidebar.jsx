@@ -10,6 +10,8 @@ import CalendarIcon from "@rsuite/icons/Calendar";
 import MessageIcon from "@rsuite/icons/Message";
 import ExitIcon from "@rsuite/icons/Exit";
 import TableIcon from "@rsuite/icons/Table";
+import { usePulsParams } from './hooks/useDynamicParams';
+
 
 
 
@@ -98,14 +100,14 @@ const allMenuSections = [
   {
     type: "section",
     title: "Tableau de Bord",
-    profiles: ["Admin", "Professeur", "user", "Fondateur"],
+    profiles: ["Admin", "Professeur", "Educateur", "Fondateur"],
     items: [
       {
         type: "item",
         eventKey: "dashboard",
         icon: "DashboardIcon",
         title: "Tableau de bord",
-        profiles: ["Admin", "Professeur", "user", "Fondateur"],
+        profiles: ["Admin", "Professeur", "Educateur", "Fondateur"],
       },
     ],
   },
@@ -229,58 +231,58 @@ const allMenuSections = [
   {
     type: "section",
     title: "Gestion des classes et moyennes",
-    profiles: ["admin", "Professeur", "user", "Fondateur"],
+    profiles: ["DE", "Professeur", "user", "Fondateur"],
     items: [
       {
         type: "menu",
         eventKey: "classe-panel",
         icon: "GroupIcon",
         title: "Gestion des classes",
-        profiles: ["admin", "Professeur", "Fondateur"],
+        profiles: ["DE", "Professeur", "Fondateur"],
         children: [
           {
             eventKey: "listeClasses",
             title: "Liste des classes",
-            profiles: ["admin", "manager", "Fondateur"],
+            profiles: ["DE", "manager", "Fondateur"],
           },
           {
             eventKey: "listeSeances",
             title: "Liste des Séances",
-            profiles: ["admin", "Professeur", "Fondateur"],
+            profiles: ["DE", "Professeur", "Fondateur"],
           },
           {
             eventKey: "saisirSeances",
             title: "Saisir séances",
-            profiles: ["admin", "manager", "Fondateur"],
+            profiles: ["DE", "manager", "Fondateur"],
           },
           {
             eventKey: "ouvertureSeances",
             title: "Ouverture de seances",
-            profiles: ["admin", "manager", "Fondateur"],
+            profiles: ["DE", "manager", "Fondateur"],
           },
 
           // Emploi du temps
           {
             eventKey: "emploiDuTemps",
             title: "Emploi du temps",
-            profiles: ["admin", "manager", "Fondateur"],
+            profiles: ["DE", "manager", "Fondateur"],
           },
           {
             eventKey: "cahierDeTexte",
             title: "Cahier de texte",
-            profiles: ["admin", "Professeur", "Fondateur"],
+            profiles: ["DE", "Professeur", "Fondateur"],
           },
           // Journal pointage Badgeuse
           {
             eventKey: "journalPointage",
             title: "Journal pointage",
-            profiles: ["admin", "manager", "Fondateur"],
+            profiles: ["DE", "manager", "Fondateur"],
           },
           // Enrollement Badgeuse
           {
             eventKey: "enrollementBadgeuse",
             title: "Enrollement Badgeuse",
-            profiles: ["admin", "manager", "Fondateur"],
+            profiles: ["DE", "manager", "Fondateur"],
           },
         ],
       },
@@ -293,14 +295,14 @@ const allMenuSections = [
         eventKey: "evaluation-panel",
         icon: "GroupIcon",
         title: "Evaluation",
-        profiles: ["admin", "Professeur", "Fondateur"],
+        profiles: ["DE", "Professeur", "Fondateur"],
         children: [
           {
             type: "item",
             eventKey: "evaluation",
             icon: "BarChartIcon",
             title: "Evaluation",
-            profiles: ["admin", "Professeur", "Fondateur"],
+            profiles: ["DE", "Professeur", "Fondateur"],
           },
 
           // { eventKey: 'definirEvaluations', title: 'Définir évaluations', profiles: ['admin', 'manager', 'Fondateur'] },
@@ -309,12 +311,12 @@ const allMenuSections = [
             eventKey: "evaluation-professeur",
             icon: "TableIcon",
             title: "Statistiques exécution",
-            profiles: ["admin", "manager", "Fondateur"],
+            profiles: ["DE", "manager", "Fondateur"],
           },
           {
             eventKey: "definirPeriodeEvaluation",
-            title: "Définir période d'évaluation",
-            profiles: ["admin", "manager", "Fondateur"],
+            title: "Période d'évaluation",
+            profiles: ["DE", "manager", "Fondateur"],
           },
           // PV Evaluation
           {
@@ -322,7 +324,7 @@ const allMenuSections = [
             eventKey: "pv-evaluation",
             icon: "TableIcon",
             title: "PV Evaluation",
-            profiles: ["admin", "Professeur", "Fondateur"],
+            profiles: ["DE", "Professeur", "Fondateur"],
           },
         ],
       },
@@ -332,7 +334,7 @@ const allMenuSections = [
         eventKey: "moyenne-et-note-panel",
         icon: "GroupIcon",
         title: "Note et Moyenne",
-        profiles: ["admin", "Professeur", "Fondateur"],
+        profiles: ["DE", "Professeur", "Fondateur"],
         children: [
           // {
           //   type: "item",
@@ -368,7 +370,7 @@ const allMenuSections = [
             eventKey: "noteEtMoyenne",
             icon: "BarChartIcon",
             title: "Note et moyenne",
-            profiles: ["admin", "Professeur", "Fondateur"],
+            profiles: ["DE", "Professeur", "Fondateur"],
           },
         ],
       },
@@ -381,7 +383,7 @@ const allMenuSections = [
         eventKey: "importEvaluations",
         icon: "BarChartIcon",
         title: "Importer Evaluation",
-        profiles: ["admin", "manager", "Fondateur"],
+        profiles: ["admin", "DE", "Fondateur"],
       },
       // {
       //   type: 'item',
@@ -395,7 +397,7 @@ const allMenuSections = [
         eventKey: "bulletinScolaire",
         icon: "BarChartIcon",
         title: "Ajuster moyennes",
-        profiles: ["admin", "manager", "Fondateur"],
+        profiles: ["admin", "DE", "Fondateur"],
       },
     ],
   },
@@ -428,14 +430,14 @@ const allMenuSections = [
   {
     type: "section",
     title: "Affectations",
-    profiles: ["admin", "manager", "user", "Fondateur"],
+    profiles: ["admin", "DE", "Educateur", "Fondateur"],
     items: [
       {
         type: "item",
         eventKey: "classe-eleves",
         icon: "TableIcon",
         title: "Classe Elèves",
-        profiles: ["admin", "manager", "Fondateur"],
+        profiles: ["DE", "Educateur", "Fondateur"],
       },
 
       // Professeur - Matiere
@@ -444,7 +446,7 @@ const allMenuSections = [
         eventKey: "professeur-matiere",
         icon: "TableIcon",
         title: "Professeur - Matiere",
-        profiles: ["admin", "manager", "Fondateur"],
+        profiles: ["DE", "Educateur", "Fondateur"],
       },
       // Personnel - Classe
       {
@@ -452,7 +454,7 @@ const allMenuSections = [
         eventKey: "personnel-classe",
         icon: "TableIcon",
         title: "Personnel - Classe",
-        profiles: ["admin", "manager", "Fondateur"],
+        profiles: ["DE", "manager", "Fondateur"],
       },
     ],
   },
@@ -567,7 +569,7 @@ const allMenuSections = [
   {
     type: "section",
     title: "Inscription",
-    profiles: ["admin", "manager", "user", "Fondateur"],
+    profiles: ["admin", "DE", "Educateur", "Fondateur"],
     items: [
       // Importer des Elèves
       {
@@ -575,7 +577,7 @@ const allMenuSections = [
         eventKey: "importerEleves",
         icon: "DocPassIcon",
         title: "Importer des Elèves",
-        profiles: ["admin", "manager", "user", ""],
+        profiles: ["admin", "manager"],
       },
       // Identification Elèves
       {
@@ -583,7 +585,7 @@ const allMenuSections = [
         eventKey: "identificationEleves",
         icon: "DocPassIcon",
         title: "Identification Elèves",
-        profiles: ["admin", "manager", "user", ""],
+        profiles: ["admin", "manager"],
       },
       // Inscription à Valider
       {
@@ -591,7 +593,7 @@ const allMenuSections = [
         eventKey: "inscriptionAValider",
         icon: "DocPassIcon",
         title: "Inscription à Valider",
-        profiles: ["admin", "manager", "user", "Fondateur"],
+        profiles: ["admin", "manager", "DE", "Fondateur"],
       },
       // Liste des Elèves
       {
@@ -599,7 +601,7 @@ const allMenuSections = [
         eventKey: "listeElevesParClasse",
         icon: "DocPassIcon",
         title: "Liste des Elèves",
-        profiles: ["admin", "manager", "user", "Fondateur"],
+        profiles: ["admin", "DE", "Educateur", "Fondateur"],
       },
     ],
   },
@@ -611,21 +613,21 @@ const allMenuSections = [
   {
     type: "section",
     title: "Parametrage",
-    profiles: ["admin", "manager", "user", "Fondateur"],
+    profiles: ["admin", "manager", "DE", "Fondateur"],
     items: [
       {
         type: "item",
         eventKey: "OvertureCloture",
         icon: "DocPassIcon",
         title: "Overture / Clôture année",
-        profiles: ["admin", "manager", "user", "Fondateur"],
+        profiles: ["admin", "manager", "DE", "Fondateur"],
       },
       {
         type: "item",
         eventKey: "listeSalles",
         icon: "TableIcon",
         title: "Salles",
-        profiles: ["admin", "manager", "Fondateur"],
+        profiles: ["admin", "DE", "Fondateur"],
       },
 
       // Inscription à Valider
@@ -634,7 +636,7 @@ const allMenuSections = [
         eventKey: "listeCoefficients",
         icon: "DocPassIcon",
         title: "Coefficients des matières",
-        profiles: ["admin", "manager", "user", "Fondateur"],
+        profiles: ["admin", "manager", "DE", "Fondateur"],
       },
       // Liste des Elèves
       {
@@ -642,10 +644,8 @@ const allMenuSections = [
         eventKey: "listeMatieres",
         icon: "DocPassIcon",
         title: "Liste des Matières",
-        profiles: ["admin", "manager", "user", "Fondateur"],
+        profiles: ["admin", "manager", "DE", "Fondateur"],
       },
-
-
     ],
   },
 
@@ -667,28 +667,28 @@ const allMenuSections = [
   {
     type: "section",
     title: "Rapport",
-    profiles: ["admin", "manager", "user", "Fondateur"],
+    profiles: ["admin", "manager", "DE", "Fondateur"],
     items: [
       {
         type: "item",
         eventKey: "rapport",
         icon: "DocPassIcon",
         title: "Rapport",
-        profiles: ["admin", "manager", "user", "Fondateur"],
+        profiles: ["admin", "manager", "DE", "Fondateur"],
       },
       {
         type: "item",
         eventKey: "enqueteRapideRentree",
         icon: "DocPassIcon",
         title: "Enquête Rapide Rentrée",
-        profiles: ["admin", "manager", "user", "Fondateur"],
+        profiles: ["admin", "manager", "DE", "Fondateur"],
       },
       {
         type: "item",
         eventKey: "cartificatTravail",
         icon: "DocPassIcon",
         title: "Certificat de travail",
-        profiles: ["admin", "manager", "Fondateur"],
+        profiles: ["admin", "DE", "Fondateur"],
       },
     ],
   },
@@ -696,7 +696,7 @@ const allMenuSections = [
   {
     type: "section",
     title: "Admlinistration",
-    profiles: ["Admin", "Fondateur"],
+    profiles: ["Admin"],
     items: [
       {
         type: "item",
@@ -882,6 +882,7 @@ const normalizeUserProfile = (profile) => {
     admin: "admin",
     administrator: "admin",
     manager: "manager",
+    educateur: "Educateur",
     gestionnaire: "manager",
     user: "user",
     utilisateur: "user",
@@ -1125,6 +1126,14 @@ const Sidebar = ({
     return filterSectionsByProfile(sectionsClone, userProfile);
   }, [userProfile]);
 
+  const { ecoleId: dynamicEcoleId, academicYearId: dynamicAcademicYearId, personnelInfo: personnelInfo } = usePulsParams();
+    console.log('dynamicEcoleId', dynamicEcoleId);
+    console.log('dynamicAcademicYearId', dynamicAcademicYearId);
+    console.log('personnelInfo==>Sidebar', personnelInfo?.personnelConnecteDetail?.personnelnom);
+
+    
+    
+
   // Synchroniser l'activeKey avec les changements d'URL
   useEffect(() => {
     const newActiveKey = getEventKeyFromPath(location.pathname);
@@ -1196,6 +1205,7 @@ const Sidebar = ({
       manager: "Manager",
       user: "Utilisateur",
       Fondateur: "Fondateur",
+      Educateur : "Educateur",
     };
     return profileNames[profile] || profile;
   };
@@ -1312,6 +1322,8 @@ const Sidebar = ({
   };
 
   const userInfo = getUserInfo();
+  console.log("localStorage.getItem('userData'):", userInfo);
+
 
   const dividerStyle = {
     margin: "16px 20px",
@@ -1378,8 +1390,10 @@ const Sidebar = ({
             <span>{userInfo.initials}</span>
           </div>
           <div className="user-details">
-            <div style={sidebarStyles.userName} className="user-name">{userInfo.name}</div>
-            <div style={sidebarStyles.userRole} className="user-role">{userInfo.role}</div>
+            {/* personnelInfo.personnelConnecteDetail.profil */}
+            {/* <div style={sidebarStyles.userName} className="user-name text-white">{userInfo.name}</div> */}
+            <div style={sidebarStyles.userName} className="user-name text-white">{`${personnelInfo?.personnelConnecteDetail?.personnelnom || personnelInfo?.candidatDetails?.candidat_prenom}  ${personnelInfo?.personnelConnecteDetail?.personnelprenom || ''}  `}</div>
+            <div style={sidebarStyles.userRole} className="user-role text-white">{userInfo.role}</div>
           </div>
         </div>
       </div>
@@ -1388,3 +1402,4 @@ const Sidebar = ({
 };
 
 export default Sidebar;
+

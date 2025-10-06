@@ -51,7 +51,11 @@ const EvaluationProfesseurFilters = ({
 }) => {
     const [formError, setFormError] = useState(null);
 
+   // alert(profProfilId)
+
     const { enseignants, enseignantsLoading, enseignantsError, refetch } = useEnseignantsData(profProfilId);
+
+    console.log("enseignants==edmond", enseignants);
 
     const { 
         periodes, 

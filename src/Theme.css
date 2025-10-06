@@ -25,6 +25,15 @@
     --hover-color: #667eea;
 }
 
+#Educateur {
+    --primary-color: #ff9c00;
+    /* bleu */
+    --bg-color: #0f172a;
+    --text-color: #f1f5f9;
+    --active-color: #ff9c00;
+    --hover-color: #ff9c00;
+}
+
 #Candidat-Fondateur {
     --primary-color: #0ca5e9;
     /* bleu */
@@ -32,6 +41,15 @@
     --text-color: #f1f5f9;
     --active-color: #0ca5e9;
     --hover-color: #0ca5e9;
+}
+
+#DE {
+    --primary-color: #2ac7d5;
+    /* bleu */
+    --bg-color: #000;
+    --text-color: #f1f5f9;
+    --active-color: #2ac7d5;
+    --hover-color: #2ac7d5;
 }
 
 
@@ -56,7 +74,7 @@
 
 .sidebar-nav .rs-sidenav-item-active {
     /* background-color: var(--active-color) !important; */
-    background: linear-gradient(90deg, var(--bg-color) 0%, var(--primary-color) 100%) !important;
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--bg-color) 100%) !important;
     color: var(--text-color) !important;
     border-radius: 8px !important;
 }
