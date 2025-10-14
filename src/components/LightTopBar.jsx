@@ -54,37 +54,37 @@ const LightTopBar = ({
 
   // Menu utilisateur avec icônes unicode (pas de dépendance externe)
   const userMenuItems = [
-    {
-      label: "Mon Profil",
-      icon: <UserInfoIcon className="text-primary" />,
-      action: () => console.log('Profil'),
-      description: "Gérer mes informations"
-    },
-    {
-      label: "Modifier le profil",
-      icon: <span className="text-info fs-6">✏️</span>,
-      action: () => console.log('Modifier profil'),
-      description: "Changer photo et infos"
-    },
-    { divider: true },
-    {
-      label: "Paramètres",
-      icon: <SettingIcon className="text-secondary" />,
-      action: () => console.log('Paramètres'),
-      description: "Préférences système"
-    },
-    {
-      label: "Sécurité",
-      icon: <span className="text-warning fs-6">🔒</span>,
-      action: () => console.log('Sécurité'),
-      description: "Mot de passe et 2FA"
-    },
-    {
-      label: "Administration",
-      icon: <AdminIcon className="text-success" />,
-      action: () => console.log('Admin'),
-      description: "Panneau d'administration"
-    },
+    // {
+    //   label: "Mon Profil",
+    //   icon: <UserInfoIcon className="text-primary" />,
+    //   action: () => console.log('Profil'),
+    //   description: "Gérer mes informations"
+    // },
+    // {
+    //   label: "Modifier le profil",
+    //   icon: <span className="text-info fs-6">✏️</span>,
+    //   action: () => console.log('Modifier profil'),
+    //   description: "Changer photo et infos"
+    // },
+    // { divider: true },
+    // {
+    //   label: "Paramètres",
+    //   icon: <SettingIcon className="text-secondary" />,
+    //   action: () => console.log('Paramètres'),
+    //   description: "Préférences système"
+    // },
+    // {
+    //   label: "Sécurité",
+    //   icon: <span className="text-warning fs-6">🔒</span>,
+    //   action: () => console.log('Sécurité'),
+    //   description: "Mot de passe et 2FA"
+    // },
+    // {
+    //   label: "Administration",
+    //   icon: <AdminIcon className="text-success" />,
+    //   action: () => console.log('Admin'),
+    //   description: "Panneau d'administration"
+    // },
     { divider: true },
     {
       label: "Déconnexion",

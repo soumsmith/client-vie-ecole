@@ -134,7 +134,6 @@ const ListePersonnel = ({typeDeListe}) => {
                     console.log('Profils affectés au personnel:', modalState.selectedQuestion);
                     // L'affectation des profils est gérée dans le PersonnelModal
                     // Cette fonction sera appelée depuis le modal lors de la réussite
-                    alert('Profils affectés avec succès !');
                     setRefreshTrigger(prev => prev + 1);
                     break;
 

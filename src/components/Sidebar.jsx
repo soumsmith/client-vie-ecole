@@ -1127,9 +1127,16 @@ const Sidebar = ({
   }, [userProfile]);
 
   const { ecoleId: dynamicEcoleId, academicYearId: dynamicAcademicYearId, personnelInfo: personnelInfo } = usePulsParams();
+  const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
+
     console.log('dynamicEcoleId', dynamicEcoleId);
     console.log('dynamicAcademicYearId', dynamicAcademicYearId);
     console.log('personnelInfo==>Sidebar', personnelInfo?.personnelConnecteDetail?.personnelnom);
+    
+    //alert(localStorage.getItem('academicYearMain').niveauEnseignement.libelle);
+
+    console.log('academicYearMain==>', academicYear.niveauEnseignement.libelle);
+
 
     
     
@@ -1333,7 +1340,7 @@ const Sidebar = ({
   const userProfil = localStorage.getItem("userProfil");
 
   return (
-    <div style={sidebarStyles.container} className="sidebar-container" id={userProfil}>
+    <div  id={userProfil} style={sidebarStyles.container} className={`sidebar-container ecole-id-${academicYear?.niveauEnseignement?.id || ''} ${academicYear.niveauEnseignement.libelle.replace(/[\s()]/g, '')}`}>
       <div style={sidebarStyles.header} className="sidebar-header">
         <div className="d-flex align-items-center">
           <img
@@ -1391,7 +1398,7 @@ const Sidebar = ({
           </div>
           <div className="user-details">
             {/* personnelInfo.personnelConnecteDetail.profil */}
-            {/* <div style={sidebarStyles.userName} className="user-name text-white">{userInfo.name}</div> */}
+            <div style={sidebarStyles.userName} className="user-name text-white">{academicYear.niveauEnseignement.libelle}</div>
             <div style={sidebarStyles.userName} className="user-name text-white">{`${personnelInfo?.personnelConnecteDetail?.personnelnom || personnelInfo?.candidatDetails?.candidat_prenom}  ${personnelInfo?.personnelConnecteDetail?.personnelprenom || ''}  `}</div>
             <div style={sidebarStyles.userRole} className="user-role text-white">{userInfo.role}</div>
           </div>

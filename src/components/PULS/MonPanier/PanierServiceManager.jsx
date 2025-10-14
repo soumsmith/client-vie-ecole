@@ -290,34 +290,50 @@ export const panierTableConfig = {
         {
             field: 'fonction',
             label: 'Fonction',
-            type: 'select'
+            placeholder: 'Toutes les fonctions',
+            type: 'select',
+            dynamic: true,
+            tagColor: 'green'
         },
         {
             field: 'diplome',
             label: 'Diplôme',
-            type: 'select'
+            placeholder: 'Tous les diplômes',
+            type: 'select',
+            dynamic: true,
+            tagColor: 'blue'
         },
         {
             field: 'domaine',
             label: 'Domaine de formation',
-            type: 'select'
+            placeholder: 'Tous les domaines',
+            type: 'select',
+            dynamic: true,
+            tagColor: 'orange'
+        },
+        {
+            field: 'ecole',
+            label: 'École',
+            placeholder: 'Toutes les écoles',
+            type: 'select',
+            dynamic: true,
+            tagColor: 'purple'
         },
         {
             field: 'experience',
             label: 'Années d\'expérience',
+            placeholder: 'Toutes les expériences',
             type: 'range',
             min: 0,
-            max: 20
+            max: 20,
+            tagColor: 'cyan'
         },
         {
-            field: 'tempsAttente',
-            label: 'Temps d\'attente',
-            type: 'select',
-            options: [
-                { value: 'recent', label: 'Moins de 7 jours' },
-                { value: 'moyen', label: '1-4 semaines' },
-                { value: 'ancien', label: 'Plus d\'1 mois' }
-            ]
+            field: 'dateCreation',
+            label: 'Date d\'ajout',
+            placeholder: 'Sélectionner une date',
+            type: 'date',
+            tagColor: 'pink'
         }
     ],
     actions: [

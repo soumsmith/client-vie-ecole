@@ -249,13 +249,8 @@ const PersonnelModal = ({ modalState, onClose, onSave }) => {
             };
 
             const response = await axios.post(
-                apiUrls.connexion.affecterProfilUtilisateur(),
-                data,
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                    timeout: 15000
-                }
-            );
+                apiUrls.profils.affecterProfilUtilisateur(),
+                data);
 
             if (response.status === 200 || response.status === 201) {
                 await Swal.fire({
@@ -817,7 +812,7 @@ const PersonnelModal = ({ modalState, onClose, onSave }) => {
                                                             </div>
                                                         </div>
 
-                                                        {isSelected && (
+                                                        {/* {isSelected && (
                                                             <Badge style={{
                                                                 background: '#10b981',
                                                                 color: 'white',
@@ -826,7 +821,7 @@ const PersonnelModal = ({ modalState, onClose, onSave }) => {
                                                                 <FiCheck style={{ marginRight: '4px' }} />
                                                                 Sélectionné
                                                             </Badge>
-                                                        )}
+                                                        )} */}
                                                     </div>
                                                 </div>
                                             </Col>

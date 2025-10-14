@@ -1502,6 +1502,9 @@ const useProfilsUrls = () => {
          * Récupère les profils visibles
          */
         getProfilVisible: () => `${baseUrl}profil/profil-visible`,
+
+        affecterProfilUtilisateur: () => `${baseUrl}connexion/affecter-profil-utilisateur`,
+
         editPasseWord: () => `${baseUrl}connexion/modifier-motDePasse`,
 
 
