@@ -11,6 +11,11 @@ import LightTopBar from './LightTopBar';
 import Sidebar from './Sidebar';
 import Dashboard from './Dashboard';
 import DashboardFondateur from './DashboardFondateur';
+import KidsLandingPage from './KidsLandingPage';
+import SchoolLandingPage from './SchoolLandingPage';
+
+import KidsSchoolDashboard from './KidsSchoolDashboard';
+
 import DataTable from './DataTable';
 import RecrutementPersonnel from './RecrutementPersonnel';
 import ThemeToggle from '../contrexts/ThemeToggle';
@@ -112,6 +117,8 @@ const Layout = ({ onLogout }) => {
   ];
 
   const { ecoleId: dynamicEcoleId, academicYearId: dynamicAcademicYearId, personnelInfo: personnelInfo } = usePulsParams();
+  const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
+
   console.log('dynamicEcoleId', dynamicEcoleId);
   console.log('dynamicAcademicYearId', dynamicAcademicYearId);
   console.log('personnelInfo==>', personnelInfo);
@@ -714,12 +721,28 @@ const Layout = ({ onLogout }) => {
 
               {/* <Route path="/dashboard" element={<Dashboard />} /> */}
               {/* <Route path="/" element={<Dashboard />} /> */}
+              {/* //KidsLandingPage */}
 
-              {userProfil === "Fondateur" && (
+              
+              {academicYear.niveauEnseignement.id === 2 && (
                 <Route path="/dashboard" element={<DashboardFondateur />} />
               )}
-              {userProfil === "Professeur" && (
+              {academicYear.niveauEnseignement.id === 3 && (
                 <Route path="/dashboard" element={<Dashboard />} />
+              )}
+
+              {academicYear.niveauEnseignement.id === 1 && (
+                <Route path="/dashboard" element={<KidsLandingPage />} />
+              )}
+              {academicYear.niveauEnseignement.id === 5 && (
+                <Route path="/dashboard" element={<Dashboard />} />
+              )}
+              {academicYear.niveauEnseignement.id === 4 && (
+                <Route path="/dashboard" element={<Dashboard />} />
+              )}
+
+              {academicYear.niveauEnseignement.id === 6 && (
+                <Route path="/dashboard" element={<SchoolLandingPage />} />
               )}
 
               {/* Autres routes */}

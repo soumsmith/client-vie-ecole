@@ -7,6 +7,25 @@
     --hover-color: rgb(44, 179, 97);
 }
 
+
+.EnseignementPrimaire {
+    --primary-color: #544d94 !important;
+    --bg-color: #202024 !important;
+    --text-color: white !important;
+    --active-color: #a88bcf !important;
+    --hover-color: #a88bcf !important;
+}
+
+.BREVETDETECHNICIENBT {
+    --primary-color: #3072f1 !important;
+    --bg-color: #04183f !important;
+    --text-color: white !important;
+    --active-color: #589ff9 !important;
+    --hover-color: #3072f1 !important;
+}
+
+
+
 #Admin {
     --primary-color: #2563eb;
     /* bleu */
