@@ -17,9 +17,6 @@ import { useAllApiUrls } from '../utils/apiConfig';
  * @returns {object}
  */
 
-
-
-
 export const usePersonnelData = (refreshTrigger = 0) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -307,29 +304,66 @@ export const personnelTableConfig = {
         {
             field: 'fonction',
             label: 'Fonction',
-            type: 'select'
+            placeholder: 'Sélectionner une fonction',
+            type: 'select',
+            dynamic: true,
+            tagColor: 'green'
         },
         {
             field: 'diplome',
             label: 'Diplôme',
-            type: 'select'
+            placeholder: 'Sélectionner un diplôme',
+            type: 'select',
+            dynamic: true,
+            tagColor: 'blue'
         },
         {
             field: 'domaine',
             label: 'Domaine de formation',
-            type: 'select'
+            placeholder: 'Sélectionner un domaine',
+            type: 'select',
+            dynamic: true,
+            tagColor: 'orange'
         },
         {
             field: 'statut',
             label: 'Statut',
-            type: 'select'
+            placeholder: 'Sélectionner un statut',
+            type: 'select',
+            dynamic: true,
+            tagColor: 'red'
+        },
+        {
+            field: 'ecole',
+            label: 'École',
+            placeholder: 'Sélectionner une école',
+            type: 'select',
+            dynamic: true,
+            tagColor: 'purple'
+        },
+        {
+            field: 'sexe',
+            label: 'Sexe',
+            placeholder: 'Sélectionner le sexe',
+            type: 'select',
+            dynamic: true,
+            tagColor: 'cyan'
         },
         {
             field: 'experience',
             label: 'Années d\'expérience',
+            placeholder: 'Filtrer par expérience',
             type: 'range',
             min: 0,
-            max: 20
+            max: 20,
+            tagColor: 'violet'
+        },
+        {
+            field: 'dateCreation',
+            label: 'Date de création',
+            placeholder: 'Sélectionner une date',
+            type: 'date',
+            tagColor: 'pink'
         }
     ],
     actions: [
