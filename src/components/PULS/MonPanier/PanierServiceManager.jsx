@@ -50,6 +50,7 @@ export const usePanierData = (statut = 'EN_ATTENTE', refreshTrigger = 0) => {
             const url = personnelUrls.getPanierByStatut(statut);
             const response = await axios.get(url);
 
+            
             const processedPanierItems = response.data && Array.isArray(response.data)
                 ? response.data.map(agent => ({
                     id: agent.idPersonnel,

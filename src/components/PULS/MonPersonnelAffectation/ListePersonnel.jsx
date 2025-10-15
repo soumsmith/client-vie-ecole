@@ -26,16 +26,12 @@ const ListePersonnel = ({typeDeListe}) => {
 
     // ===========================
     // CONFIGURATION DU TABLEAU
+    // ⚠️ CORRECTION : Suppression du code inutile qui tentait de générer dynamiquement les filterConfigs
+    // La configuration retournée par getPersonnelTableConfig contient déjà tout ce qu'il faut
     // ===========================
     const tableConfig = useMemo(() => {
-        const config = getPersonnelTableConfig(typeDeListe);
-        // Générer les filtres dynamiquement basés sur les données actuelles
-        const filterConfigs = config.getFilterConfigs ? config.getFilterConfigs(personnel) : [];
-        return {
-            ...config,
-            filterConfigs
-        };
-    }, [typeDeListe, personnel]);
+        return getPersonnelTableConfig(typeDeListe);
+    }, [typeDeListe]);
 
     // ===========================
     // GESTION DES MODALS
@@ -189,7 +185,8 @@ const ListePersonnel = ({typeDeListe}) => {
     // Debug - Vérifier les données
     console.log('Personnel data:', personnel);
     console.log('Modal state:', modalState);
-    console.log('Table config actions:', tableConfig.actions);
+    console.log('Table config:', tableConfig);
+    console.log('Filter configs:', tableConfig.filterConfigs);
 
     // ===========================
     // RENDU DU COMPOSANT
@@ -327,6 +324,7 @@ const ListePersonnel = ({typeDeListe}) => {
                     <div>Modal type: {modalState.type || 'None'}</div>
                     <div>Selected: {modalState.selectedQuestion?.nomComplet || 'None'}</div>
                     <div>Actions: {tableConfig.actions?.length || 0}</div>
+                    <div>Filters: {tableConfig.filterConfigs?.length || 0}</div>
                 </div>
             )}
         </>
