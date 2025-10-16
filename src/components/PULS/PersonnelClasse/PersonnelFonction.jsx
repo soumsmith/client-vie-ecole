@@ -38,6 +38,7 @@ import {
     usePersonnelFonctionData,
     personnelFonctionTableConfig
 } from './PersonnelFonctionService';
+import GradientButton from '../../GradientButton';
 
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE MODERNE
@@ -78,7 +79,6 @@ const PersonnelFonctionFilters = ({
     const isDataLoading = fonctionsLoading;
     const hasDataError = fonctionsError;
 
-    // Préparation des données pour SelectPicker
     const fonctionsData = fonctions.map(fonction => ({
         value: fonction.id,
         label: fonction.libelle
@@ -181,22 +181,17 @@ const PersonnelFonctionFilters = ({
                             Action
                         </label>
                         <div style={{ display: 'flex', gap: 8, height: '40px' }}>
-                            <Button
-                                appearance="primary"
-                                onClick={handleSearch}
+                            {/* ✨ NOUVEAU : Utilisation de GradientButton */}
+                            <GradientButton
+                                icon={<FiSearch size={16} />}
+                                text="Afficher"
+                                loadingText="Chargement..."
                                 loading={loading}
                                 disabled={isDataLoading || loading || !selectedFonction}
-                                style={{ 
-                                    flex: 1,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontWeight: '500'
-                                }}
-                                size="lg"
-                            >
-                                {loading ? 'Chargement...' : 'Afficher'}
-                            </Button>
+                                onClick={handleSearch}
+                                variant="primary"
+                                style={{ flex: 1 }}
+                            />
                             
                             <Button
                                 onClick={handleClear}

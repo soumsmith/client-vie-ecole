@@ -14,8 +14,12 @@ import DashboardFondateur from './DashboardFondateur';
 import KidsLandingPage from './KidsLandingPage';
 import SchoolLandingPage from './SchoolLandingPage';
 import EnseignementSuperieur from './EnseignementSuperieur';
+import EnseignementSecondaireTechnique from './EnseignementSecondaireTechnique';
 
 import KidsSchoolDashboard from './KidsSchoolDashboard';
+import DashboardNiveauMaternelle from './DashboardNiveauMaternelle';
+import DefaultDashboard from './DefaultDashboard';
+
 
 import DataTable from './DataTable';
 import RecrutementPersonnel from './RecrutementPersonnel';
@@ -618,6 +622,18 @@ const Layout = ({ onLogout }) => {
     return items;
   };
 
+const getDashboardComponent = (id) => {
+  switch (id) {
+    case 1: return <KidsLandingPage />;
+    case 2: return <DashboardFondateur />;
+    case 3: return <EnseignementSuperieur />;
+    case 4: return <DashboardNiveauMaternelle />;
+    case 5: return <EnseignementSecondaireTechnique />;
+    case 6: return <SchoolLandingPage />;
+    default: return <DefaultDashboard />;
+  }
+};
+
 
   const userProfil = localStorage.getItem("userProfil");
 
@@ -722,35 +738,36 @@ const Layout = ({ onLogout }) => {
 
               {/* <Route path="/dashboard" element={<Dashboard />} /> */}
               {/* <Route path="/" element={<Dashboard />} /> */}
+
+             <Route path="/dashboard" element={getDashboardComponent(academicYear.niveauEnseignement?.id)} />
+
               
-              {/* //KidsLandingPage */}
-              {academicYear.niveauEnseignement.id === 1 && (
-                <Route path="/dashboard" element={<KidsLandingPage />} />
+              {/* {academicYear.niveauEnseignement?.id === 1 && (
+                <Route path="/dashboard" element={<renderDashboard />} />
               )}
               
-              {academicYear.niveauEnseignement.id === 2 && (
+              {academicYear.niveauEnseignement?.id === 2 && (
                 <Route path="/dashboard" element={<DashboardFondateur />} />
               )}
 
-              {/* ECOLE SUPERIEUR */}
-              {academicYear.niveauEnseignement.id === 3 && (
+              {academicYear.niveauEnseignement?.id === 3 && (
                 <Route path="/dashboard" element={<EnseignementSuperieur />} />
               )}
-              
-              {academicYear.niveauEnseignement.id === 5 && (
-                <Route path="/dashboard" element={<Dashboard />} />
+
+               {academicYear.niveauEnseignement?.id === 4 && (
+                <Route path="/dashboard" element={<DashboardNiveauMaternelle />} />
               )}
-              {academicYear.niveauEnseignement.id === 4 && (
-                <Route path="/dashboard" element={<Dashboard />} />
+              
+              {academicYear.niveauEnseignement?.id === 5 && (
+                <Route path="/dashboard" element={<EnseignementSecondaireTechnique />} />
               )}
 
-              {academicYear.niveauEnseignement.id === 6 && (
+              {academicYear.niveauEnseignement?.id === 6 && (
                 <Route path="/dashboard" element={<SchoolLandingPage />} />
               )}
 
-              {/* Autres routes */}
               <Route path="/datatable" element={<DataTable />} />
-              <Route path="/recrutement" element={<RecrutementPersonnel />} />
+              <Route path="/recrutement" element={<RecrutementPersonnel />} /> */}
 
               {/* ===========================
                    FONDATEUR

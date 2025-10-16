@@ -8,6 +8,8 @@
 }
 
 
+/* 1 */
+
 .EnseignementPrimaire {
     --primary-color: #544d94 !important;
     --bg-color: #202024 !important;
@@ -15,6 +17,47 @@
     --active-color: #a88bcf !important;
     --hover-color: #a88bcf !important;
 }
+
+/* 2 */
+.EnseignementSecondaireGénérale {
+    --primary-color: #82bc42 !important;
+    --bg-color: #202126 !important;
+    --text-color: white !important;
+    --active-color: #82bc42 !important;
+    --hover-color: #82bc42 !important;
+}
+
+/* 3 */
+
+.ENSEIGNEMENTSUPERIEUR {
+    --primary-color: #8f44ad !important;
+    --bg-color: #202126 !important;
+    --text-color: white !important;
+    --active-color: #ffa421 !important;
+    --hover-color: #8f44ad !important;
+}
+
+/* 4 */
+
+.EnseignementMaternelle {
+    --primary-color: #ff6ab4 !important;
+    --bg-color: #31316b !important;
+    --text-color: white !important;
+    --active-color: #9bcf53 !important;
+    --hover-color: #ff6ab4 !important;
+}
+
+/* 5 */
+.EnseignementSecondaireTechnique {
+    --primary-color: #8b7355 !important;
+    --bg-color: #000 !important;
+    --text-color: white !important;
+    --active-color: #f6f1ee !important;
+    --hover-color: #8b7355 !important;
+}
+
+
+/* 6 */
 
 .BREVETDETECHNICIENBT {
     --primary-color: #3072f1 !important;
@@ -24,21 +67,15 @@
     --hover-color: #3072f1 !important;
 }
 
-.ENSEIGNEMENTSUPERIEUR
-{
-    --primary-color: #8f44ad !important;
-    --bg-color: #202126 !important;
-    --text-color: white !important;
-    --active-color: #ffa421 !important;
-    --hover-color: #8f44ad !important;
-}
+/* 7 */
 
-.EnseignementSecondaireGénérale{
-    --primary-color: #82bc42 !important;
-    --bg-color: #202126 !important;
-    --text-color: white !important;
-    --active-color: #82bc42 !important;
-    --hover-color: #82bc42 !important;
+.undefined {
+    --primary-color: #2563eb !important;
+    /* bleu */
+    --bg-color: #0f172a !important;
+    --text-color: #f1f5f9 !important;
+    --active-color: #2563eb !important;
+    --hover-color: #1d4ed8 !important;
 }
 
 
@@ -51,6 +88,11 @@
     --active-color: #2563eb;
     --hover-color: #1d4ed8;
 }
+
+.btn-action-undefined {
+    background-color:#2561e7 !important;
+}
+
 
 #Professeur {
     --primary-color: #667eea;

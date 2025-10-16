@@ -83,7 +83,7 @@ const EducationDashboard = () => {
   ];
 
   return (
-    <div style={{ 
+    <div style={{
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #fff 0%, #fff 100%)',
       fontFamily: 'system-ui, -apple-system, sans-serif'
@@ -149,7 +149,7 @@ const EducationDashboard = () => {
         minHeight: '650px'
       }}>
         {/* Vertical Text - Left */}
-       
+
         {/* Vertical Text - Right */}
         <div style={{
           position: 'absolute',
@@ -172,7 +172,7 @@ const EducationDashboard = () => {
           left: '100px'
         }}>
           <svg width="60" height="60" viewBox="0 0 60 60">
-            <path d="M30 0 L35 25 L60 30 L35 35 L30 60 L25 35 L0 30 L25 25 Z" fill="none" stroke="#666" strokeWidth="2"/>
+            <path d="M30 0 L35 25 L60 30 L35 35 L30 60 L25 35 L0 30 L25 25 Z" fill="none" stroke="#666" strokeWidth="2" />
           </svg>
         </div>
 
@@ -182,7 +182,7 @@ const EducationDashboard = () => {
           right: '150px'
         }}>
           <svg width="50" height="50" viewBox="0 0 60 60">
-            <path d="M30 0 L35 25 L60 30 L35 35 L30 60 L25 35 L0 30 L25 25 Z" fill="none" stroke="#666" strokeWidth="2"/>
+            <path d="M30 0 L35 25 L60 30 L35 35 L30 60 L25 35 L0 30 L25 25 Z" fill="none" stroke="#666" strokeWidth="2" />
           </svg>
         </div>
 
@@ -202,7 +202,7 @@ const EducationDashboard = () => {
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: '80px',
-          maxWidth: '1400px',
+          maxWidth: '1200px',
           margin: '0 auto',
           alignItems: 'center',
           position: 'relative',
@@ -213,8 +213,8 @@ const EducationDashboard = () => {
             {/* Yellow circle decoration */}
             <div style={{
               position: 'absolute',
-              bottom: '-20px',
-              left: '-20px',
+              bottom: '-40px',
+              left: '-40px',
               width: '200px',
               height: '200px',
               borderRadius: '50%',
@@ -226,7 +226,7 @@ const EducationDashboard = () => {
             <div style={{
               position: 'absolute',
               top: '-30px',
-              right: '50px',
+              right: '200px',
               width: '180px',
               height: '180px',
               borderRadius: '50%',
@@ -250,12 +250,13 @@ const EducationDashboard = () => {
             <div style={{
               position: 'relative',
               zIndex: 1,
-              borderRadius: '50%',
+              borderRadius: '80px',
               overflow: 'hidden',
-              width: '500px',
-              height: '500px',
+              width: '250px',
+              height: '520px',
               border: '3px solid #1a1a1a',
               background: 'white',
+              transform: 'rotate(-15deg)',
               animation: 'slideInImage 0.8s ease-out'
             }}>
               <img
@@ -270,6 +271,22 @@ const EducationDashboard = () => {
               />
             </div>
 
+            <div style={{
+              position: 'absolute',
+              zIndex: -100,
+              borderRadius: '80px',
+              width: '250px',
+              height: '520px',
+              border: '2px solid #1a1a1a',
+              background: 'white',
+              transform: 'rotate(-15deg)',
+              animation: 'slideInImage 0.8s ease-out',
+              right: '270px',
+              top: '0px'
+            }}>
+
+            </div>
+
             {/* Arrow decoration */}
             <div style={{
               position: 'absolute',
@@ -278,15 +295,15 @@ const EducationDashboard = () => {
               zIndex: 2
             }}>
               <svg width="100" height="60" viewBox="0 0 100 60">
-                <path d="M10 30 Q 50 10, 90 30" fill="none" stroke="#1a1a1a" strokeWidth="2"/>
-                <path d="M85 25 L95 30 L85 35" fill="none" stroke="#1a1a1a" strokeWidth="2"/>
+                <path d="M10 30 Q 50 10, 90 30" fill="none" stroke="#1a1a1a" strokeWidth="2" />
+                <path d="M85 25 L95 30 L85 35" fill="none" stroke="#1a1a1a" strokeWidth="2" />
               </svg>
             </div>
           </div>
 
           {/* Right - Content */}
           <div key={activeSlide} style={{ animation: 'slideInContent 1s ease-out' }}>
-            
+
             <h1 style={{
               fontSize: '58px',
               fontWeight: '900',
@@ -322,14 +339,14 @@ const EducationDashboard = () => {
                 textTransform: 'uppercase',
                 letterSpacing: '1px'
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0 15px 40px rgba(178, 76, 227, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 10px 30px rgba(178, 76, 227, 0.3)';
-              }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                  e.currentTarget.style.boxShadow = '0 15px 40px rgba(178, 76, 227, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 10px 30px rgba(178, 76, 227, 0.3)';
+                }}
               >
                 COMMENCER MAINTENANT
               </button>
@@ -341,8 +358,8 @@ const EducationDashboard = () => {
                 right: '-80px'
               }}>
                 <svg width="120" height="80" viewBox="0 0 120 80">
-                  <path d="M20 20 Q 80 10, 100 50" fill="none" stroke="#1a1a1a" strokeWidth="2"/>
-                  <path d="M95 45 L105 50 L97 55" fill="none" stroke="#1a1a1a" strokeWidth="2"/>
+                  <path d="M20 20 Q 80 10, 100 50" fill="none" stroke="#1a1a1a" strokeWidth="2" />
+                  <path d="M95 45 L105 50 L97 55" fill="none" stroke="#1a1a1a" strokeWidth="2" />
                 </svg>
               </div>
             </div>
@@ -651,7 +668,7 @@ const EducationDashboard = () => {
               {dashboardData.nombreEleveAnc}
             </div>
             <div style={{ fontSize: '14px', color: '#64748b' }}>
-              Affectés: {dashboardData.nombreEleveAncAffGarcons + dashboardData.nombreEleveAncAffFilles} 
+              Affectés: {dashboardData.nombreEleveAncAffGarcons + dashboardData.nombreEleveAncAffFilles}
               <span style={{ margin: '0 10px' }}>•</span>
               Non affectés: {dashboardData.nombreEleveAncNonAffGarcons + dashboardData.nombreEleveAncNonAffFilles}
             </div>

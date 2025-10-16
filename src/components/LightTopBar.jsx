@@ -14,7 +14,6 @@ import {
   Whisper,
   List,
   Panel,
-  Breadcrumb,
   Tooltip
 } from 'rsuite';
 
@@ -22,10 +21,41 @@ import {
 import SearchIcon from '@rsuite/icons/Search';
 import NoticeIcon from '@rsuite/icons/Notice';
 import MessageIcon from '@rsuite/icons/Message';
-import SettingIcon from '@rsuite/icons/Setting';
-import AdminIcon from '@rsuite/icons/Admin';
 import ExitIcon from '@rsuite/icons/Exit';
-import UserInfoIcon from '@rsuite/icons/UserInfo';
+
+// Composant InfoCard réutilisable
+const InfoCard = ({ 
+  icon, 
+  label, 
+  value, 
+  bgColor = 'primary',
+  onClick,
+  className = ''
+}) => {
+  const bgColorMap = {
+    primary: 'bg-primary-light',
+    success: 'bg-success-light',
+    info: 'bg-info-light',
+    warning: 'bg-warning-light',
+    danger: 'bg-danger-light'
+  };
+
+  return (
+    <div 
+      className={`info-card ${className} ${onClick ? 'info-card-clickable' : ''}`}
+      onClick={onClick}
+      style={{ cursor: onClick ? 'pointer' : 'default' }}
+    >
+      <div className={`icon-wrapper ${bgColorMap[bgColor] || bgColorMap.primary}`}>
+        <span className="icon-emoji">{icon}</span>
+      </div>
+      <div className="info-content">
+        <div className="info-label">{label}</div>
+        <div className="info-value">{value}</div>
+      </div>
+    </div>
+  );
+};
 
 const LightTopBar = ({
   pageTitle = "Tableau de Bord",
@@ -52,44 +82,73 @@ const LightTopBar = ({
   const unreadNotifications = notifications.filter(n => n.unread).length;
   const unreadMessages = messages.filter(m => m.unread).length;
 
+  // Récupération des données académiques
+  const [academicData, setAcademicData] = useState(null);
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+
+  React.useEffect(() => {
+    // Récupérer les données de localStorage (pour démo, on utilise des données fictives)
+    const mockData = {
+      "anneeDebut": 2024,
+      "customLibelle": "Année 2024 - 2025",
+      "libelle": "Année 2024 - 2025",
+      "nbreEval": 9,
+      "niveau": "CENTRAL",
+      "niveauEnseignement": {
+        "code": "5",
+        "id": 5,
+        "libelle": "Enseignement Secondaire Technique"
+      },
+      "periodicite": {
+        "code": "3",
+        "id": 3,
+        "libelle": "Semestrielle",
+        "ordre": "3"
+      },
+      "statut": "DIFFUSE"
+    };
+    
+    // Essayer de récupérer depuis localStorage, sinon utiliser les données de démo
+    const academicYear = localStorage.getItem('academicYearMain');
+    if (academicYear) {
+      setAcademicData(JSON.parse(academicYear));
+    } else {
+      setAcademicData(mockData);
+    }
+
+    // Mettre à jour l'heure toutes les secondes
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Formater la date et l'heure
+  const formatDateTime = (date) => {
+    return date.toLocaleTimeString('fr-FR', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit' 
+    });
+  };
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString('fr-FR', { 
+      day: '2-digit',
+      month: 'short'
+    });
+  };
+
+  const timeStr = formatDateTime(currentDateTime);
+
   // Menu utilisateur avec icônes unicode (pas de dépendance externe)
   const userMenuItems = [
-    // {
-    //   label: "Mon Profil",
-    //   icon: <UserInfoIcon className="text-primary" />,
-    //   action: () => console.log('Profil'),
-    //   description: "Gérer mes informations"
-    // },
-    // {
-    //   label: "Modifier le profil",
-    //   icon: <span className="text-info fs-6">✏️</span>,
-    //   action: () => console.log('Modifier profil'),
-    //   description: "Changer photo et infos"
-    // },
-    // { divider: true },
-    // {
-    //   label: "Paramètres",
-    //   icon: <SettingIcon className="text-secondary" />,
-    //   action: () => console.log('Paramètres'),
-    //   description: "Préférences système"
-    // },
-    // {
-    //   label: "Sécurité",
-    //   icon: <span className="text-warning fs-6">🔒</span>,
-    //   action: () => console.log('Sécurité'),
-    //   description: "Mot de passe et 2FA"
-    // },
-    // {
-    //   label: "Administration",
-    //   icon: <AdminIcon className="text-success" />,
-    //   action: () => console.log('Admin'),
-    //   description: "Panneau d'administration"
-    // },
     { divider: true },
     {
       label: "Déconnexion",
       icon: <ExitIcon className="text-danger" />,
-      action: onLogout,
+      action: onLogout || (() => console.log('Déconnexion')),
       danger: true,
       description: "Fermer la session"
     }
@@ -185,133 +244,162 @@ const LightTopBar = ({
 
   return (
     <Header className="modern-light-topbar shadow-sm border-bottom">
-      <Navbar appearance="subtle" className="bg-white px-4 py-2">
-        {/* Section gauche - Titre et Breadcrumb */}
-        <Nav className="flex-grow-1">
-          <div className="d-flex flex-column justify-content-center">
-            <h4 className="mb-1 fw-bold text-dark">{pageTitle}</h4>
-            {breadcrumbItems.length > 0 && (
-              <Breadcrumb className="mb-0">
-                <Breadcrumb.Item href="/" className="text-muted">
-                  <span className="me-1">🏠</span>
-                  Accueil
-                </Breadcrumb.Item>
-                {breadcrumbItems.map((item, index) => (
-                  <Breadcrumb.Item
-                    key={index}
-                    href={item.href}
-                    active={item.active}
-                    className={item.active ? "text-primary fw-semibold" : "text-muted"}
-                  >
-                    {item.label}
-                  </Breadcrumb.Item>
-                ))}
-              </Breadcrumb>
-            )}
-          </div>
+      <Navbar appearance="subtle" className="bg-white">
+        <div className="topbar-container">
+        {/* Section gauche - Infos académiques */}
+        <Nav className="flex-grow-1 nav-left">
+          <FlexboxGrid align="middle" className="h-100">
+            <FlexboxGrid.Item colspan={24}>
+              <div className="academic-info-container d-flex flex-wrap align-items-center gap-3">
+                
+                {/* Nom de l'école */}
+                <InfoCard
+                  icon="🏫"
+                  label="École"
+                  value="Établissement Central"
+                  bgColor="primary"
+                />
+
+                {/* Année scolaire */}
+                {academicData && (
+                  <InfoCard
+                    icon="📅"
+                    label="Année scolaire"
+                    value={academicData.customLibelle || academicData.libelle}
+                    bgColor="success"
+                  />
+                )}
+
+                {/* Niveau d'enseignement */}
+                {academicData?.niveauEnseignement && (
+                  <InfoCard
+                    icon="🎓"
+                    label="Niveau"
+                    value={academicData.niveauEnseignement.libelle}
+                    bgColor="info"
+                  />
+                )}
+
+                {/* Périodicité */}
+                {academicData?.periodicite && (
+                  <InfoCard
+                    icon="⏱️"
+                    label="Périodicité"
+                    value={academicData.periodicite.libelle}
+                    bgColor="warning"
+                  />
+                )}
+
+                {/* Date et Heure */}
+                <InfoCard
+                  icon="🕐"
+                  label={formatDate(currentDateTime)}
+                  value={timeStr}
+                  bgColor="danger"
+                  className="datetime-card"
+                />
+                
+              </div>
+            </FlexboxGrid.Item>
+          </FlexboxGrid>
         </Nav>
 
         {/* Section droite - Actions et menus */}
-        <Nav pullRight>
-          <FlexboxGrid align="middle" justify="end" className="gap-2">
+        <Nav pullRight className="nav-right">
+          <div className="actions-wrapper">
 
             {/* Barre de recherche */}
-            <FlexboxGrid.Item>
-              <div className="me-3">
-                {showSearch ? (
-                  <InputGroup inside style={{ width: '280px' }} className="search-animated">
-                    <Input
-                      placeholder="Rechercher..."
-                      value={searchValue}
-                      onChange={setSearchValue}
-                      className="border-primary"
-                      onBlur={() => !searchValue && setShowSearch(false)}
-                      autoFocus
-                    />
-                    <InputGroup.Button className="bg-primary border-primary">
-                      <SearchIcon className="text-white" />
-                    </InputGroup.Button>
-                  </InputGroup>
-                ) : (
-                  <Whisper
-                    trigger="hover"
-                    speaker={<Tooltip>Rechercher</Tooltip>}
-                  >
-                    <IconButton
-                      icon={<SearchIcon />}
-                      circle
-                      size="md"
-                      appearance="subtle"
-                      className="text-primary border border-primary bg-light hover-lift"
-                      onClick={() => setShowSearch(true)}
-                    />
-                  </Whisper>
-                )}
-              </div>
-            </FlexboxGrid.Item>
+            <div className="action-item">
+              {showSearch ? (
+                <InputGroup inside className="search-input-group">
+                  <Input
+                    placeholder="Rechercher..."
+                    value={searchValue}
+                    onChange={setSearchValue}
+                    onBlur={() => !searchValue && setShowSearch(false)}
+                    autoFocus
+                  />
+                  <InputGroup.Button>
+                    <SearchIcon />
+                  </InputGroup.Button>
+                </InputGroup>
+              ) : (
+                <Whisper
+                  trigger="hover"
+                  speaker={<Tooltip>Rechercher</Tooltip>}
+                  placement="bottom"
+                >
+                  <IconButton
+                    icon={<SearchIcon />}
+                    circle
+                    size="md"
+                    appearance="subtle"
+                    className="action-btn search-btn"
+                    onClick={() => setShowSearch(true)}
+                  />
+                </Whisper>
+              )}
+            </div>
 
             {/* Notifications */}
-            <FlexboxGrid.Item>
-              <div className="position-relative me-2">
-                <Whisper
-                  trigger="click"
-                  speaker={
-                    <Popover className="border-0 p-0">
-                      <NotificationPanel />
-                    </Popover>
-                  }
-                  placement="bottomEnd"
-                >
-                  <IconButton
-                    icon={<NoticeIcon />}
-                    circle
-                    size="md"
-                    appearance="subtle"
-                    className="text-info border border-info bg-light hover-lift"
-                  />
-                </Whisper>
-                {unreadNotifications > 0 && (
-                  <Badge
-                    content={unreadNotifications}
-                    className="position-absolute top-0 start-100 translate-middle bg-danger border border-white"
-                    style={{ fontSize: '10px' }}
-                  />
-                )}
-              </div>
-            </FlexboxGrid.Item>
+            <div className="action-item position-relative">
+              <Whisper
+                trigger="click"
+                speaker={
+                  <Popover className="custom-popover">
+                    <NotificationPanel />
+                  </Popover>
+                }
+                placement="bottomEnd"
+              >
+                <IconButton
+                  icon={<NoticeIcon />}
+                  circle
+                  size="md"
+                  appearance="subtle"
+                  className="action-btn notification-btn"
+                />
+              </Whisper>
+              {unreadNotifications > 0 && (
+                <Badge
+                  content={unreadNotifications}
+                  className="custom-badge"
+                />
+              )}
+            </div>
 
             {/* Messages */}
-            <FlexboxGrid.Item>
-              <div className="position-relative me-3">
-                <Whisper
-                  trigger="click"
-                  speaker={
-                    <Popover className="border-0 p-0">
-                      <MessagePanel />
-                    </Popover>
-                  }
-                  placement="bottomEnd"
-                >
-                  <IconButton
-                    icon={<MessageIcon />}
-                    circle
-                    size="md"
-                    appearance="subtle"
-                    className="text-success border border-success bg-light hover-lift"
-                  />
-                </Whisper>
-                {unreadMessages > 0 && (
-                  <Badge
-                    content={unreadMessages}
-                    className="position-absolute top-0 start-100 translate-middle bg-success border border-white"
-                    style={{ fontSize: '10px' }}
-                  />
-                )}
-              </div>
-            </FlexboxGrid.Item>
+            <div className="action-item position-relative">
+              <Whisper
+                trigger="click"
+                speaker={
+                  <Popover className="custom-popover">
+                    <MessagePanel />
+                  </Popover>
+                }
+                placement="bottomEnd"
+              >
+                <IconButton
+                  icon={<MessageIcon />}
+                  circle
+                  size="md"
+                  appearance="subtle"
+                  className="action-btn message-btn"
+                />
+              </Whisper>
+              {unreadMessages > 0 && (
+                <Badge
+                  content={unreadMessages}
+                  className="custom-badge badge-success"
+                />
+              )}
+            </div>
+
+            {/* Séparateur */}
+            <div className="action-separator"></div>
 
             {/* Menu utilisateur */}
-            <FlexboxGrid.Item>
+            <div className="action-item">
               <Dropdown
                 placement="bottomEnd"
                 className="user-dropdown"
@@ -320,20 +408,17 @@ const LightTopBar = ({
                   <div
                     {...props}
                     ref={ref}
-                    className="d-flex align-items-center p-2 hover-lift cursor-pointer"
-                    style={{ cursor: 'pointer' }}
+                    className="user-profile-toggle"
                   >
-                    <div className="me-2 text-end d-none d-md-block">
-                      {/* <div className="fw-semibold text-dark small">{userInfo.name}</div> */}
-                      <div className="text-muted" style={{ fontSize: '11px' }}>{userInfo.role}</div>
+                    <div className="user-info d-none d-lg-block">
+                      <div className="user-role">{userInfo.role}</div>
                     </div>
                     <Avatar
                       circle
                       size="sm"
                       src={userInfo.avatar}
                       alt={userInfo.name}
-                      className="bg-gradient bg-primary text-white border border-white"
-                      style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                      className="user-avatar"
                     >
                       {userInfo.name.charAt(0)}
                     </Avatar>
@@ -393,30 +478,242 @@ const LightTopBar = ({
                   )
                 ))}
               </Dropdown>
-            </FlexboxGrid.Item>
+            </div>
 
-          </FlexboxGrid>
+          </div>
         </Nav>
+        </div>
       </Navbar>
 
       <style jsx>{`
         .modern-light-topbar {
           background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+          transition: all 0.3s ease;
+        }
+
+        /* Container principal pour éviter le wrap */
+        .topbar-container {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px 16px;
+          gap: 16px;
           min-height: 70px;
-          transition: all 0.3s ease;
         }
 
-        .hover-lift {
-          transition: all 0.3s ease;
+        .nav-left {
+          flex: 1;
+          min-width: 0;
         }
 
-        .hover-lift:hover {
+        .nav-right {
+          flex-shrink: 0;
+        }
+
+        /* Container des cartes d'information */
+        .academic-info-container {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: nowrap;
+          overflow-x: auto;
+          overflow-y: hidden;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+
+        .academic-info-container::-webkit-scrollbar {
+          display: none;
+        }
+
+        /* Styles pour InfoCard */
+        .info-card {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 12px;
+          background: white;
+          border-radius: 10px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+          border: 1px solid rgba(0, 0, 0, 0.04);
+          transition: all 0.3s ease;
+          min-width: fit-content;
+          max-width: 220px;
+          flex-shrink: 0;
+        }
+
+        .info-card:hover {
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          border-color: rgba(0, 123, 255, 0.15);
         }
 
-        .search-animated {
+        .icon-wrapper {
+          width: 36px;
+          height: 36px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18px;
+          transition: transform 0.3s ease;
+          flex-shrink: 0;
+        }
+
+        .info-card:hover .icon-wrapper {
+          transform: scale(1.1) rotate(5deg);
+        }
+
+        .bg-primary-light {
+          background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }
+
+        .bg-success-light {
+          background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        }
+
+        .bg-info-light {
+          background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+        }
+
+        .bg-warning-light {
+          background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        }
+
+        .bg-danger-light {
+          background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+        }
+
+        .icon-emoji {
+          filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.1));
+        }
+
+        .info-content {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          overflow: hidden;
+        }
+
+        .info-label {
+          font-size: 10px;
+          font-weight: 500;
+          color: #6c757d;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .info-value {
+          font-size: 13px;
+          font-weight: 600;
+          color: #212529;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        /* Style spécial pour la carte date/heure */
+        .datetime-card .info-value {
+          font-family: 'Courier New', monospace;
+          font-size: 14px;
+          font-weight: 700;
+          color: #dc3545;
+          letter-spacing: 0.5px;
+        }
+
+        /* Section actions à droite */
+        .actions-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .action-item {
+          position: relative;
+        }
+
+        /* Boutons d'action améliorés */
+        .action-btn {
+          width: 42px;
+          height: 42px;
+          border-radius: 12px !important;
+          background: white !important;
+          border: 2px solid #e9ecef !important;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .action-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .search-btn {
+          border-color: #007bff !important;
+        }
+
+        .search-btn:hover {
+          background: #007bff !important;
+          border-color: #007bff !important;
+        }
+
+        .search-btn:hover .rs-icon {
+          color: white !important;
+        }
+
+        .notification-btn {
+          border-color: #17a2b8 !important;
+        }
+
+        .notification-btn:hover {
+          background: #17a2b8 !important;
+          border-color: #17a2b8 !important;
+        }
+
+        .notification-btn:hover .rs-icon {
+          color: white !important;
+        }
+
+        .message-btn {
+          border-color: #28a745 !important;
+        }
+
+        .message-btn:hover {
+          background: #28a745 !important;
+          border-color: #28a745 !important;
+        }
+
+        .message-btn:hover .rs-icon {
+          color: white !important;
+        }
+
+        /* Barre de recherche animée */
+        .search-input-group {
+          width: 260px;
           animation: searchExpand 0.3s ease-out;
+        }
+
+        .search-input-group .rs-input {
+          border: 2px solid #007bff !important;
+          border-radius: 12px 0 0 12px !important;
+          padding: 10px 14px !important;
+          font-size: 14px !important;
+        }
+
+        .search-input-group .rs-input-group-btn {
+          background: #007bff !important;
+          border: 2px solid #007bff !important;
+          border-radius: 0 12px 12px 0 !important;
+          padding: 0 14px !important;
+        }
+
+        .search-input-group .rs-input-group-btn .rs-icon {
+          color: white !important;
         }
 
         @keyframes searchExpand {
@@ -425,13 +722,97 @@ const LightTopBar = ({
             opacity: 0;
           }
           to {
-            width: 280px;
+            width: 260px;
             opacity: 1;
           }
         }
 
-        .cursor-pointer {
+        /* Badges personnalisés */
+        .custom-badge {
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          background: #dc3545 !important;
+          color: white !important;
+          border: 2px solid white;
+          border-radius: 10px;
+          font-size: 10px !important;
+          font-weight: 600;
+          min-width: 20px !important;
+          height: 20px !important;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 6px;
+          box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+          animation: badgePulse 2s infinite;
+        }
+
+        .badge-success {
+          background: #28a745 !important;
+          box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
+        }
+
+        @keyframes badgePulse {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+        }
+
+        /* Séparateur */
+        .action-separator {
+          width: 1px;
+          height: 32px;
+          background: linear-gradient(180deg, transparent 0%, #dee2e6 50%, transparent 100%);
+          margin: 0 4px;
+        }
+
+        /* Profil utilisateur */
+        .user-profile-toggle {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 6px 12px 6px 6px;
+          background: white;
+          border: 2px solid #e9ecef;
+          border-radius: 50px;
           cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .user-profile-toggle:hover {
+          border-color: #007bff;
+          box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+          transform: translateY(-2px);
+        }
+
+        .user-info {
+          text-align: right;
+        }
+
+        .user-role {
+          font-size: 11px;
+          color: #6c757d;
+          font-weight: 500;
+          line-height: 1.2;
+        }
+
+        .user-avatar {
+          background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+          border: 2px solid white !important;
+          box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3) !important;
+        }
+
+        /* Popovers personnalisés */
+        .custom-popover {
+          border: 0 !important;
+          padding: 0 !important;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+          border-radius: 12px !important;
+          overflow: hidden;
         }
 
         .notification-panel,
@@ -440,66 +821,97 @@ const LightTopBar = ({
           max-width: 90vw;
         }
 
-        .bg-gradient {
-          background: linear-gradient(45deg, var(--bs-primary), var(--bs-info)) !important;
+        /* Dropdown utilisateur */
+        .user-dropdown .rs-dropdown-menu {
+          min-width: 280px !important;
+          border-radius: 12px !important;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+          border: 0 !important;
+          overflow: hidden;
         }
 
-        .gap-2 {
-          gap: 0.5rem;
-        }
-
-        /* Badge personnalisé */
-        .rs-badge {
-          font-size: 10px !important;
-          min-width: 18px !important;
-          height: 18px !important;
-          line-height: 16px !important;
-        }
-
-        /* Effet de survol pour les items du dropdown */
         .rs-dropdown-item:hover {
           background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
           transform: translateX(4px);
           transition: all 0.2s ease;
         }
 
-        /* Animation pour les notifications */
-        @keyframes pulse {
-          0%, 100% {
-            transform: scale(1);
+        /* Masquage progressif des InfoCards */
+        @media (max-width: 1400px) {
+          .topbar-container {
+            gap: 12px;
           }
-          50% {
-            transform: scale(1.1);
+          .academic-info-container {
+            gap: 8px;
+          }
+          .info-card:nth-child(5) {
+            display: none; /* Cache date/heure */
           }
         }
 
-        .rs-badge {
-          animation: pulse 2s infinite;
+        @media (max-width: 1200px) {
+          .info-card:nth-child(4) {
+            display: none; /* Cache périodicité */
+          }
         }
 
-        /* Responsive */
+        @media (max-width: 992px) {
+          .topbar-container {
+            gap: 8px;
+            padding: 8px 12px;
+          }
+          .info-card:nth-child(3) {
+            display: none; /* Cache niveau */
+          }
+          .search-input-group {
+            width: 200px;
+          }
+        }
+
         @media (max-width: 768px) {
-          .search-animated {
-            width: 200px !important;
+          .info-card {
+            padding: 6px 10px;
+            gap: 8px;
           }
-
-          .modern-light-topbar .navbar {
-            padding: 8px 16px !important;
+          .icon-wrapper {
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+          }
+          .info-value {
+            font-size: 12px;
+          }
+          .info-label {
+            font-size: 9px;
+          }
+          .action-btn {
+            width: 38px;
+            height: 38px;
+          }
+          .search-input-group {
+            width: 180px;
           }
         }
 
         @media (max-width: 576px) {
-          .notification-panel,
-          .message-panel {
-            width: 300px;
+          .topbar-container {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+            padding: 12px;
           }
-        }
-        .user-dropdown .rs-dropdown-menu {
-          min-width: 280px !important; /* largeur plus grande */
-        }
-          .hover-lift:hover {
-          transform: translateY(-2px);
-          box-shadow: none !important;
+          .nav-left, .nav-right {
+            width: 100%;
+          }
+          .actions-wrapper {
+            justify-content: space-around;
+          }
+          .info-card:nth-child(2) {
+            display: none; /* Cache année scolaire */
+          }
+          .action-separator {
+            display: none;
+          }
         }
       `}</style>
     </Header>

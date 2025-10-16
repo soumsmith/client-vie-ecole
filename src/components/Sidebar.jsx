@@ -48,7 +48,6 @@ const sidebarStyles = {
     position: 'sticky',
     bottom: 0,
     backgroundColor: '#fff',
-    borderTop: '1px solid #e5e5e7',
     padding: '16px 20px',
     flexShrink: 0,
     zIndex: 10,
@@ -57,6 +56,7 @@ const sidebarStyles = {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
+    borderRadius: '10px',
   },
   userAvatar: {
     width: '40px',
@@ -1135,7 +1135,7 @@ const Sidebar = ({
 
   //alert(localStorage.getItem('academicYearMain').niveauEnseignement.libelle);
 
-  console.log('academicYearMain==>', academicYear.niveauEnseignement.libelle);
+  console.log('academicYearMain==>', academicYear);
 
 
 
@@ -1340,7 +1340,7 @@ const Sidebar = ({
   const userProfil = localStorage.getItem("userProfil");
 
   return (
-    <div id={userProfil} style={sidebarStyles.container} className={`sidebar-container ecole-id-${academicYear?.niveauEnseignement?.id || ''} ${academicYear.niveauEnseignement.libelle.replace(/[\s()]/g, '')}`}>
+    <div id={userProfil} style={sidebarStyles.container} className={`sidebar-container ecole-id-${academicYear?.niveauEnseignement?.id || ''} ${academicYear.niveauEnseignement?.libelle.replace(/[\s()]/g, '')}`}>
       <div style={sidebarStyles.header} className="sidebar-header">
         <div className="d-flex align-items-center">
           <img
@@ -1394,23 +1394,22 @@ const Sidebar = ({
       <div className="" style={{ backgroundColor: "#ff8901 !important" }}>
         {/* style={sidebarStyles.footer} */}
 
-        <div style={sidebarStyles.userInfo} className="user-info sidebar-footer">
+        {/* <div style={sidebarStyles.userInfo} className="user-info sidebar-footer mx-2">
           <div style={sidebarStyles.userAvatar} className="user-avatar">
             <span>{userInfo.initials}</span>
           </div>
           <div className="user-details">
-            {/* personnelInfo.personnelConnecteDetail.profil */}
             <div style={sidebarStyles.userName} className="user-name text-white">{academicYear.niveauEnseignement.libelle}</div>
             <div style={sidebarStyles.userName} className="user-name text-white">{`${personnelInfo?.personnelConnecteDetail?.personnelnom || personnelInfo?.candidatDetails?.candidat_prenom}  ${personnelInfo?.personnelConnecteDetail?.personnelprenom || ''}  `}</div>
             <div style={sidebarStyles.userRole} className="user-role text-white">{userInfo.role}</div>
           </div>
-        </div>
+        </div> */}
 
         <img
           src="/assets/images/partenaire.jpg"
           alt="logo"
-          className="logo p-3"
-          style={{ width: "100%" }}
+          className="logo p-2"
+          style={{ width: "100%" , borderRadius:"20px"}}
         />
         
 
