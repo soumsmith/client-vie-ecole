@@ -1104,7 +1104,7 @@ const Sidebar = ({
   // État local pour l'activeKey avec synchronisation avec l'URL
   const [activeKey, setActiveKey] = useState(currentActiveKey);
 
-   // Fonction pour trouver le menu parent d'un eventKey
+  // Fonction pour trouver le menu parent d'un eventKey
   const findParentMenuKey = (eventKey, sections) => {
     for (const section of sections) {
       for (const item of section.items) {
@@ -1119,7 +1119,7 @@ const Sidebar = ({
     return null;
   };
 
-  
+
   const userProfile = getUserProfile();
   const menuSections = useMemo(() => {
     const sectionsClone = JSON.parse(JSON.stringify(allMenuSections));
@@ -1129,30 +1129,30 @@ const Sidebar = ({
   const { ecoleId: dynamicEcoleId, academicYearId: dynamicAcademicYearId, personnelInfo: personnelInfo } = usePulsParams();
   const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
 
-    console.log('dynamicEcoleId', dynamicEcoleId);
-    console.log('dynamicAcademicYearId', dynamicAcademicYearId);
-    console.log('personnelInfo==>Sidebar', personnelInfo?.personnelConnecteDetail?.personnelnom);
-    
-    //alert(localStorage.getItem('academicYearMain').niveauEnseignement.libelle);
+  console.log('dynamicEcoleId', dynamicEcoleId);
+  console.log('dynamicAcademicYearId', dynamicAcademicYearId);
+  console.log('personnelInfo==>Sidebar', personnelInfo?.personnelConnecteDetail?.personnelnom);
 
-    console.log('academicYearMain==>', academicYear.niveauEnseignement.libelle);
+  //alert(localStorage.getItem('academicYearMain').niveauEnseignement.libelle);
+
+  console.log('academicYearMain==>', academicYear.niveauEnseignement.libelle);
 
 
-    
-    
+
+
 
   // Synchroniser l'activeKey avec les changements d'URL
   useEffect(() => {
     const newActiveKey = getEventKeyFromPath(location.pathname);
     setActiveKey(newActiveKey);
-    
+
     // Trouver et ouvrir automatiquement le menu parent si l'activeKey est un sous-menu
     const parentKey = findParentMenuKey(newActiveKey, menuSections);
     if (parentKey) {
       setOpenKeys([parentKey]);
       console.log('🔄 Ouverture automatique du menu parent:', parentKey);
     }
-    
+
     console.log('🔄 URL changée:', location.pathname, '-> activeKey:', newActiveKey);
   }, [location.pathname, menuSections]);
 
@@ -1212,7 +1212,7 @@ const Sidebar = ({
       manager: "Manager",
       user: "Utilisateur",
       Fondateur: "Fondateur",
-      Educateur : "Educateur",
+      Educateur: "Educateur",
     };
     return profileNames[profile] || profile;
   };
@@ -1340,7 +1340,7 @@ const Sidebar = ({
   const userProfil = localStorage.getItem("userProfil");
 
   return (
-    <div  id={userProfil} style={sidebarStyles.container} className={`sidebar-container ecole-id-${academicYear?.niveauEnseignement?.id || ''} ${academicYear.niveauEnseignement.libelle.replace(/[\s()]/g, '')}`}>
+    <div id={userProfil} style={sidebarStyles.container} className={`sidebar-container ecole-id-${academicYear?.niveauEnseignement?.id || ''} ${academicYear.niveauEnseignement.libelle.replace(/[\s()]/g, '')}`}>
       <div style={sidebarStyles.header} className="sidebar-header">
         <div className="d-flex align-items-center">
           <img
@@ -1391,8 +1391,10 @@ const Sidebar = ({
         </Sidenav>
       </div>
 
-      <div style={sidebarStyles.footer} className="sidebar-footer">
-        <div style={sidebarStyles.userInfo} className="user-info">
+      <div className="" style={{ backgroundColor: "#ff8901 !important" }}>
+        {/* style={sidebarStyles.footer} */}
+
+        <div style={sidebarStyles.userInfo} className="user-info sidebar-footer">
           <div style={sidebarStyles.userAvatar} className="user-avatar">
             <span>{userInfo.initials}</span>
           </div>
@@ -1403,6 +1405,15 @@ const Sidebar = ({
             <div style={sidebarStyles.userRole} className="user-role text-white">{userInfo.role}</div>
           </div>
         </div>
+
+        <img
+          src="/assets/images/partenaire.jpg"
+          alt="logo"
+          className="logo p-3"
+          style={{ width: "100%" }}
+        />
+        
+
       </div>
     </div>
   );

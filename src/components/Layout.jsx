@@ -13,6 +13,7 @@ import Dashboard from './Dashboard';
 import DashboardFondateur from './DashboardFondateur';
 import KidsLandingPage from './KidsLandingPage';
 import SchoolLandingPage from './SchoolLandingPage';
+import EnseignementSuperieur from './EnseignementSuperieur';
 
 import KidsSchoolDashboard from './KidsSchoolDashboard';
 
@@ -721,19 +722,21 @@ const Layout = ({ onLogout }) => {
 
               {/* <Route path="/dashboard" element={<Dashboard />} /> */}
               {/* <Route path="/" element={<Dashboard />} /> */}
+              
               {/* //KidsLandingPage */}
-
+              {academicYear.niveauEnseignement.id === 1 && (
+                <Route path="/dashboard" element={<KidsLandingPage />} />
+              )}
               
               {academicYear.niveauEnseignement.id === 2 && (
                 <Route path="/dashboard" element={<DashboardFondateur />} />
               )}
-              {academicYear.niveauEnseignement.id === 3 && (
-                <Route path="/dashboard" element={<Dashboard />} />
-              )}
 
-              {academicYear.niveauEnseignement.id === 1 && (
-                <Route path="/dashboard" element={<KidsLandingPage />} />
+              {/* ECOLE SUPERIEUR */}
+              {academicYear.niveauEnseignement.id === 3 && (
+                <Route path="/dashboard" element={<EnseignementSuperieur />} />
               )}
+              
               {academicYear.niveauEnseignement.id === 5 && (
                 <Route path="/dashboard" element={<Dashboard />} />
               )}

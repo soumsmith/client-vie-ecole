@@ -758,7 +758,7 @@ export const videoData = {
 // ===========================
 
 export const sponsorsData = [
-  { id: 1, image: "/assets/images/schools/academie_elite.jpg", name: "Academie Elite" },
+  { id: 1, image: "/assets/images/schools/Ligues-des_directeurs-etude-cote-divoire.jpeg", name: "Academie Elite" },
   { id: 2, image: "/assets/images/schools/adam_marshall.png", name: "Adam Marshall" },
   { id: 3, image: "/assets/images/schools/ale_ahin.jpeg", name: "Ale Ahin" },
   { id: 4, image: "/assets/images/schools/anador.jpeg", name: "Anador" },
@@ -806,7 +806,9 @@ export const sponsorsData = [
   { id: 46, image: "/assets/images/schools/semailles.jpeg", name: "Semailles" },
   { id: 47, image: "/assets/images/schools/sinai.jpeg", name: "Sinai" },
   { id: 48, image: "/assets/images/schools/toutia.jpeg", name: "Toutia" },
-  { id: 49, image: "/assets/images/schools/visio.jpeg", name: "Visio" }
+  { id: 49, image: "/assets/images/schools/visio.jpeg", name: "Visio" },
+  { id: 1, image: "/assets/images/schools/academie_elite.jpg", name: "Academie Elite" },
+
 ];
 
 

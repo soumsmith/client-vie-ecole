@@ -24,6 +24,23 @@
     --hover-color: #3072f1 !important;
 }
 
+.ENSEIGNEMENTSUPERIEUR
+{
+    --primary-color: #8f44ad !important;
+    --bg-color: #202126 !important;
+    --text-color: white !important;
+    --active-color: #ffa421 !important;
+    --hover-color: #8f44ad !important;
+}
+
+.EnseignementSecondaireGénérale{
+    --primary-color: #82bc42 !important;
+    --bg-color: #202126 !important;
+    --text-color: white !important;
+    --active-color: #82bc42 !important;
+    --hover-color: #82bc42 !important;
+}
+
 
 
 #Admin {
