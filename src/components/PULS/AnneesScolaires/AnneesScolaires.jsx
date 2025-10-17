@@ -60,7 +60,7 @@ const AnneeEnCoursHeader = ({ anneeEnCours, loading, onCloturer, onNouvelle }) =
     if (!anneeEnCours) {
         return (
             <div style={{
-                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                // background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                 borderRadius: '15px',
                 padding: '25px',
                 marginBottom: '20px',
@@ -68,7 +68,7 @@ const AnneeEnCoursHeader = ({ anneeEnCours, loading, onCloturer, onNouvelle }) =
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between'
-            }}>
+            }} className="OuvertureAnneeScolaire" >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
                     <div style={{
                         background: 'rgba(255, 255, 255, 0.2)',
