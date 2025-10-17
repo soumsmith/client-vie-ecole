@@ -2,19 +2,38 @@ import React from 'react';
 import { FaArrowRight, FaSchool, FaChalkboardTeacher, FaUsers, FaGraduationCap, FaChevronDown } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
-const SchoolWelcomePage = () => {
+const DefaultDashboard = ({ niveau = 'undefined' }) => {
     const navigate = useNavigate();
-    // Fonction pour gérer la redirection
+    
     const handleRedirect = () => {
-        // Option 1: Si vous utilisez React Router
         navigate('/OvertureCloture');
-
-        // Option 2: Redirection simple
-        //window.location.href = '/OvertureCloture';
     };
 
+    const features = [
+        {
+            icon: <FaSchool />,
+            title: 'Plateforme Complète',
+            description: 'Tous les outils nécessaires pour gérer votre école en un seul endroit'
+        },
+        {
+            icon: <FaChalkboardTeacher />,
+            title: 'Gestion Facile',
+            description: 'Interface intuitive pour gérer les enseignants, élèves et classes'
+        },
+        {
+            icon: <FaUsers />,
+            title: 'Communauté Active',
+            description: 'Rejoignez des milliers d\'établissements qui nous font confiance'
+        },
+        {
+            icon: <FaGraduationCap />,
+            title: 'Suivi Académique',
+            description: 'Tableaux de bord détaillés pour suivre les performances'
+        }
+    ];
+
     return (
-        <div style={{
+        <div className={niveau} style={{
             minHeight: '100vh',
             background: 'linear-gradient(180deg, #F8F9FA 0%, #E9ECEF 100%)',
             fontFamily: 'system-ui, -apple-system, sans-serif',
@@ -60,7 +79,6 @@ const SchoolWelcomePage = () => {
           }
         `}
             </style>
-
 
             {/* Hero Section */}
             <div style={{
@@ -112,7 +130,7 @@ const SchoolWelcomePage = () => {
                     className="btn-hover"
                     onClick={handleRedirect}
                     style={{
-                        background: 'linear-gradient(135deg, #0D6EFD 0%, #0B5ED7 100%)',
+                        background: `linear-gradient(135deg, var(--success-color) 0%, var(--success-dark-color) 100%)`,
                         border: 'none',
                         padding: '22px 70px',
                         borderRadius: '20px',
@@ -120,7 +138,7 @@ const SchoolWelcomePage = () => {
                         fontSize: '10px',
                         fontWeight: '700',
                         cursor: 'pointer',
-                        boxShadow: '0 10px 30px rgba(13, 110, 253, 0.3)',
+                        boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
                         textTransform: 'uppercase',
                         letterSpacing: '1px',
                         marginBottom: '80px'
@@ -143,8 +161,7 @@ const SchoolWelcomePage = () => {
                         boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
                         height: '300px',
                         background: 'url(/assets/images/ecole.svg?w=600&h=300&fit=crop) center/cover'
-                    }}>
-                    </div>
+                    }} />
 
                     {/* Card 2 - Image */}
                     <div className="card-hover" style={{
@@ -153,18 +170,17 @@ const SchoolWelcomePage = () => {
                         boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
                         height: '300px',
                         background: 'url(/assets/images/ecole.svg?w=600&h=300&fit=crop) center/cover'
-                    }}>
-                    </div>
+                    }} />
 
                     {/* Card 3 - Learn More */}
                     <div
                         className="card-hover"
                         onClick={handleRedirect}
                         style={{
-                            background: 'linear-gradient(135deg, #0D6EFD 0%, #0B5ED7 100%)',
+                            background: `linear-gradient(135deg, var(--info-color) 0%, var(--info-dark-color) 100%)`,
                             borderRadius: '25px',
                             padding: '40px 30px',
-                            boxShadow: '0 10px 40px rgba(13, 110, 253, 0.3)',
+                            boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
                             display: 'flex',
                             flexDirection: 'column',
                             justifyContent: 'center',
@@ -213,34 +229,6 @@ const SchoolWelcomePage = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Scroll Down Indicator */}
-                {/* <div className="scroll-indicator" style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '10px',
-                    marginTop: '40px'
-                }}>
-                    <div style={{
-                        width: '50px',
-                        height: '50px',
-                        borderRadius: '50%',
-                        border: '3px solid #212529',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}>
-                        <FaChevronDown style={{ fontSize: '24px', color: '#212529' }} />
-                    </div>
-                    <span style={{
-                        fontSize: '16px',
-                        color: '#495057',
-                        fontWeight: '600'
-                    }}>
-                        Scroll Down
-                    </span>
-                </div> */}
             </div>
 
             {/* Features Section Below */}
@@ -265,72 +253,52 @@ const SchoolWelcomePage = () => {
                         gridTemplateColumns: 'repeat(4, 1fr)',
                         gap: '30px'
                     }}>
-                        {[
-                            {
-                                icon: <FaSchool />,
-                                title: 'Plateforme Complète',
-                                description: 'Tous les outils nécessaires pour gérer votre école en un seul endroit',
-                                color: '#0D6EFD'
-                            },
-                            {
-                                icon: <FaChalkboardTeacher />,
-                                title: 'Gestion Facile',
-                                description: 'Interface intuitive pour gérer les enseignants, élèves et classes',
-                                color: '#198754'
-                            },
-                            {
-                                icon: <FaUsers />,
-                                title: 'Communauté Active',
-                                description: 'Rejoignez des milliers d\'établissements qui nous font confiance',
-                                color: '#FFC107'
-                            },
-                            {
-                                icon: <FaGraduationCap />,
-                                title: 'Suivi Académique',
-                                description: 'Tableaux de bord détaillés pour suivre les performances',
-                                color: '#DC3545'
-                            }
-                        ].map((feature, index) => (
-                            <div key={index} className="card-hover" style={{
-                                background: 'white',
-                                padding: '35px',
-                                borderRadius: '20px',
-                                boxShadow: '0 5px 20px rgba(0,0,0,0.08)',
-                                textAlign: 'center',
-                                border: '2px solid #F8F9FA'
-                            }}>
-                                <div style={{
-                                    width: '80px',
-                                    height: '80px',
-                                    borderRadius: '50%',
-                                    background: `${feature.color}15`,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    margin: '0 auto 25px',
-                                    fontSize: '36px',
-                                    color: feature.color
+                        {features.map((feature, index) => {
+                            const colors = ['--success-color', '--info-color', '--warning-color', '--chart-primary-color'];
+                            const colorVar = colors[index % colors.length];
+                            
+                            return (
+                                <div key={index} className="card-hover" style={{
+                                    background: 'white',
+                                    padding: '35px',
+                                    borderRadius: '20px',
+                                    boxShadow: '0 5px 20px rgba(0,0,0,0.08)',
+                                    textAlign: 'center',
+                                    border: '2px solid #F8F9FA'
                                 }}>
-                                    {feature.icon}
+                                    <div style={{
+                                        width: '80px',
+                                        height: '80px',
+                                        borderRadius: '50%',
+                                        background: `color-mix(in srgb, var(${colorVar}) 15%, transparent)`,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        margin: '0 auto 25px',
+                                        fontSize: '36px',
+                                        color: `var(${colorVar})`
+                                    }}>
+                                        {feature.icon}
+                                    </div>
+                                    <h3 style={{
+                                        fontSize: '20px',
+                                        fontWeight: '700',
+                                        color: '#212529',
+                                        marginBottom: '15px'
+                                    }}>
+                                        {feature.title}
+                                    </h3>
+                                    <p style={{
+                                        fontSize: '15px',
+                                        color: '#6C757D',
+                                        lineHeight: '1.6',
+                                        margin: 0
+                                    }}>
+                                        {feature.description}
+                                    </p>
                                 </div>
-                                <h3 style={{
-                                    fontSize: '20px',
-                                    fontWeight: '700',
-                                    color: '#212529',
-                                    marginBottom: '15px'
-                                }}>
-                                    {feature.title}
-                                </h3>
-                                <p style={{
-                                    fontSize: '15px',
-                                    color: '#6C757D',
-                                    lineHeight: '1.6',
-                                    margin: 0
-                                }}>
-                                    {feature.description}
-                                </p>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </div>
@@ -338,4 +306,4 @@ const SchoolWelcomePage = () => {
     );
 };
 
-export default SchoolWelcomePage;
+export default DefaultDashboard;

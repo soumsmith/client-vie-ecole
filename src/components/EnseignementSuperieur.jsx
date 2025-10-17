@@ -1,16 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaFacebook, FaInstagram, FaTwitter, FaWhatsapp, FaGraduationCap, FaBook, FaTrophy, FaUsers, FaChartLine, FaCertificate } from 'react-icons/fa';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const AblazeAcademy = () => {
-    const [activeTab, setActiveTab] = useState('home');
+const EnseignementSuperieur = ({ niveau = 'ENSEIGNEMENTSUPERIEUR' }) => {
+    const [chartColors, setChartColors] = useState({});
 
-    // Données statistiques
+    useEffect(() => {
+        const root = document.documentElement;
+        const style = getComputedStyle(root);
+          
+        setChartColors({
+            primary: style.getPropertyValue('--chart-primary-color').trim() || '#ff9500',
+            secondary: style.getPropertyValue('--chart-secondary-color').trim() || '#8e44ad',
+            color1: style.getPropertyValue('--success-color').trim() || '#ff9500',
+            color2: style.getPropertyValue('--info-color').trim() || '#8e44ad',
+            color3: style.getPropertyValue('--warning-color').trim() || '#e74c3c',
+            color4: style.getPropertyValue('--dot-3-color').trim() || '#3498db'
+        });
+    }, [niveau]);
+
     const studentStats = [
-        { icon: FaUsers, value: '2 456', label: 'Étudiants Total', color: '#ff9500', bgColor: '#fff5e6' },
-        { icon: FaBook, value: '156', label: 'Cours Disponibles', color: '#8e44ad', bgColor: '#f3e5f5' },
-        { icon: FaTrophy, value: '89%', label: 'Taux de Réussite', color: '#ff9500', bgColor: '#fff5e6' },
-        { icon: FaCertificate, value: '1 234', label: 'Certificats Délivrés', color: '#8e44ad', bgColor: '#f3e5f5' }
+        { icon: FaUsers, value: '2 456', label: 'Étudiants Total' },
+        { icon: FaBook, value: '156', label: 'Cours Disponibles' },
+        { icon: FaTrophy, value: '89%', label: 'Taux de Réussite' },
+        { icon: FaCertificate, value: '1 234', label: 'Certificats Délivrés' }
     ];
 
     const performanceData = [
@@ -23,21 +36,21 @@ const AblazeAcademy = () => {
     ];
 
     const coursesData = [
-        { name: 'Sciences', value: 35, color: '#ff9500' },
-        { name: 'Mathématiques', value: 25, color: '#8e44ad' },
-        { name: 'Langues', value: 20, color: '#e74c3c' },
-        { name: 'Arts', value: 20, color: '#3498db' }
+        { name: 'Sciences', value: 35 },
+        { name: 'Mathématiques', value: 25 },
+        { name: 'Langues', value: 20 },
+        { name: 'Arts', value: 20 }
     ];
 
     const departmentProgress = [
-        { dept: 'Ingénierie', progress: 92, color: '#ff9500' },
-        { dept: 'Commerce', progress: 87, color: '#8e44ad' },
-        { dept: 'Médecine', progress: 95, color: '#e74c3c' },
-        { dept: 'Arts', progress: 83, color: '#3498db' }
+        { dept: 'Ingénierie', progress: 92 },
+        { dept: 'Commerce', progress: 87 },
+        { dept: 'Médecine', progress: 95 },
+        { dept: 'Arts', progress: 83 }
     ];
 
     return (
-        <div style={{
+        <div className={niveau} style={{
             minHeight: '100vh',
             background: 'linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%)',
             fontFamily: 'system-ui, -apple-system, sans-serif'
@@ -59,17 +72,6 @@ const AblazeAcademy = () => {
             to { opacity: 1; transform: translateX(0); }
           }
 
-          .nav-link {
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 8px 16px;
-            border-radius: 8px;
-          }
-
-          .nav-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-          }
-
           .stat-card {
             transition: all 0.3s ease;
             animation: fadeIn 0.6s ease-out;
@@ -88,16 +90,6 @@ const AblazeAcademy = () => {
           .social-icon:hover {
             transform: scale(1.2);
           }
-
-          .button-primary {
-            transition: all 0.3s ease;
-            cursor: pointer;
-          }
-
-          .button-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 149, 0, 0.4);
-          }
         `}
             </style>
 
@@ -108,10 +100,10 @@ const AblazeAcademy = () => {
                     gridTemplateColumns: '1fr 1fr',
                     minHeight: '600px'
                 }}>
-                    {/* Left Side - Orange */}
+                    {/* Left Side */}
                     <div style={{
-                        borderTopLeftRadius :'30px',
-                        borderBottomLeftRadius :'30px',
+                        borderTopLeftRadius: '30px',
+                        borderBottomLeftRadius: '30px',
                         padding: '80px 60px',
                         position: 'relative',
                         overflow: 'hidden'
@@ -144,7 +136,7 @@ const AblazeAcademy = () => {
                             height: '400px',
                             opacity: 0.1
                         }}>
-                            <FaGraduationCap size={400} color="#c690ce" />
+                            <FaGraduationCap size={400} style={{ color: 'var(--info-color)' }} />
                         </div>
 
                         {/* Social Icons */}
@@ -167,13 +159,14 @@ const AblazeAcademy = () => {
                                         width: '45px',
                                         height: '45px',
                                         borderRadius: '50%',
-                                        background: '#8e44ad',
+                                        background: 'var(--info-color)',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         animation: `slideIn 0.6s ease-out ${index * 0.1}s both`
                                     }}
                                 >
+                                    <Icon size={20} color="white" />
                                 </div>
                             ))}
                         </div>
@@ -186,7 +179,7 @@ const AblazeAcademy = () => {
                             <h1 style={{
                                 fontSize: '48px',
                                 fontWeight: '700',
-                                color: '#ff9500',
+                                color: 'var(--success-color)',
                                 marginBottom: '30px',
                                 lineHeight: '1.2'
                             }}>
@@ -201,8 +194,6 @@ const AblazeAcademy = () => {
                             }}>
                                 Découvrez une expérience éducative exceptionnelle qui transforme l'apprentissage en une aventure passionnante. Notre académie offre un environnement stimulant où chaque étudiant peut s'épanouir et atteindre son plein potentiel.
                             </p>
-
-                   
                         </div>
 
                         {/* Bottom decorative dots */}
@@ -225,13 +216,13 @@ const AblazeAcademy = () => {
                         </div>
                     </div>
 
-                    {/* Right Side - Purple */}
+                    {/* Right Side */}
                     <div style={{
-                        background: 'linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%)',
+                        background: `linear-gradient(135deg, var(--info-color) 0%, var(--info-dark-color) 100%)`,
                         padding: '80px 60px',
                         display: 'flex',
-                        borderTopRightRadius :'30px',
-                        borderBottomRightRadius :'30px',
+                        borderTopRightRadius: '30px',
+                        borderBottomRightRadius: '30px',
                         flexDirection: 'column',
                         justifyContent: 'center',
                         alignItems: 'center',
@@ -258,7 +249,7 @@ const AblazeAcademy = () => {
                             <h2 style={{
                                 fontSize: '72px',
                                 fontWeight: '900',
-                                color: '#ff9500',
+                                color: 'var(--success-color)',
                                 marginBottom: '20px',
                                 lineHeight: '1.1',
                                 textAlign: 'right',
@@ -331,7 +322,7 @@ const AblazeAcademy = () => {
                     fontWeight: '800',
                     textAlign: 'center',
                     marginBottom: '60px',
-                    background: 'linear-gradient(135deg, #8e44ad 0%, #ff9500 100%)',
+                    background: `linear-gradient(135deg, var(--info-color) 0%, var(--success-color) 100%)`,
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent'
                 }}>
@@ -345,48 +336,55 @@ const AblazeAcademy = () => {
                     gap: '30px',
                     marginBottom: '60px'
                 }}>
-                    {studentStats.map((stat, index) => (
-                        <div
-                            key={index}
-                            className="stat-card"
-                            style={{
-                                background: 'white',
-                                borderRadius: '20px',
-                                padding: '35px',
-                                boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-                                textAlign: 'center',
-                                animationDelay: `${index * 0.1}s`
-                            }}
-                        >
-                            <div style={{
-                                width: '80px',
-                                height: '80px',
-                                borderRadius: '50%',
-                                background: stat.bgColor,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                margin: '0 auto 25px'
-                            }}>
-                                <stat.icon size={36} color={stat.color} />
+                    {studentStats.map((stat, index) => {
+                        const colors = ['--success-color', '--info-color', '--warning-color', '--success-color'];
+                        const bgColors = ['--success-color', '--info-color', '--warning-color', '--info-color'];
+                        const colorVar = colors[index % colors.length];
+                        const bgVar = bgColors[index % bgColors.length];
+                        
+                        return (
+                            <div
+                                key={index}
+                                className="stat-card"
+                                style={{
+                                    background: 'white',
+                                    borderRadius: '20px',
+                                    padding: '35px',
+                                    boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+                                    textAlign: 'center',
+                                    animationDelay: `${index * 0.1}s`
+                                }}
+                            >
+                                <div style={{
+                                    width: '80px',
+                                    height: '80px',
+                                    borderRadius: '50%',
+                                    background: `color-mix(in srgb, var(${bgVar}) 15%, transparent)`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    margin: '0 auto 25px'
+                                }}>
+                                    <stat.icon size={36} style={{ color: `var(${colorVar})` }} />
+                                </div>
+                                <div style={{
+                                    fontSize: '38px',
+                                    fontWeight: '800',
+                                    color: `var(${colorVar})`,
+                                    marginBottom: '12px'
+                                }}>
+                                    {stat.value}
+                                </div>
+                                <div style={{
+                                    fontSize: '15px',
+                                    color: '#7e8ba3',
+                                    fontWeight: '600'
+                                }}>
+                                    {stat.label}
+                                </div>
                             </div>
-                            <div style={{
-                                fontSize: '38px',
-                                fontWeight: '800',
-                                color: stat.color,
-                                marginBottom: '12px'
-                            }}>
-                                {stat.value}
-                            </div>
-                            <div style={{
-                                fontSize: '15px',
-                                color: '#7e8ba3',
-                                fontWeight: '600'
-                            }}>
-                                {stat.label}
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 {/* Charts Section */}
@@ -412,7 +410,7 @@ const AblazeAcademy = () => {
                             alignItems: 'center',
                             gap: '12px'
                         }}>
-                            <FaChartLine color="#8e44ad" />
+                            <FaChartLine style={{ color: 'var(--info-color)' }} />
                             Croissance des Inscriptions
                         </h3>
                         <ResponsiveContainer width="100%" height={300}>
@@ -432,17 +430,17 @@ const AblazeAcademy = () => {
                                 <Line
                                     type="monotone"
                                     dataKey="students"
-                                    stroke="#ff9500"
+                                    stroke={chartColors.primary}
                                     strokeWidth={3}
-                                    dot={{ fill: '#ff9500', r: 6 }}
+                                    dot={{ fill: chartColors.primary, r: 6 }}
                                     name="Étudiants"
                                 />
                                 <Line
                                     type="monotone"
                                     dataKey="courses"
-                                    stroke="#8e44ad"
+                                    stroke={chartColors.secondary}
                                     strokeWidth={3}
-                                    dot={{ fill: '#8e44ad', r: 6 }}
+                                    dot={{ fill: chartColors.secondary, r: 6 }}
                                     name="Cours"
                                 />
                             </LineChart>
@@ -465,7 +463,7 @@ const AblazeAcademy = () => {
                             alignItems: 'center',
                             gap: '12px'
                         }}>
-                            <FaBook color="#ff9500" />
+                            <FaBook style={{ color: 'var(--success-color)' }} />
                             Répartition des Cours
                         </h3>
                         <ResponsiveContainer width="100%" height={300}>
@@ -481,7 +479,7 @@ const AblazeAcademy = () => {
                                     dataKey="value"
                                 >
                                     {coursesData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                        <Cell key={`cell-${index}`} fill={[chartColors.color1, chartColors.color2, chartColors.color3, chartColors.color4][index]} />
                                     ))}
                                 </Pie>
                                 <Tooltip />
@@ -512,49 +510,54 @@ const AblazeAcademy = () => {
                             alignItems: 'center',
                             gap: '12px'
                         }}>
-                            <FaTrophy color="#ffd700" />
+                            <FaTrophy style={{ color: '#ffd700' }} />
                             Performance des Départements
                         </h3>
                         <div style={{ marginTop: '25px' }}>
-                            {departmentProgress.map((item, index) => (
-                                <div key={index} style={{ marginBottom: '30px' }}>
-                                    <div style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        marginBottom: '12px'
-                                    }}>
-                                        <span style={{
-                                            fontSize: '16px',
-                                            fontWeight: '600',
-                                            color: '#2c3e50'
-                                        }}>
-                                            {item.dept}
-                                        </span>
-                                        <span style={{
-                                            fontSize: '16px',
-                                            fontWeight: '700',
-                                            color: item.color
-                                        }}>
-                                            {item.progress}%
-                                        </span>
-                                    </div>
-                                    <div style={{
-                                        width: '100%',
-                                        height: '12px',
-                                        background: '#f0f0f0',
-                                        borderRadius: '10px',
-                                        overflow: 'hidden'
-                                    }}>
+                            {departmentProgress.map((item, index) => {
+                                const colors = ['--success-color', '--info-color', '--warning-color', '--dot-3-color'];
+                                const colorVar = colors[index % colors.length];
+                                
+                                return (
+                                    <div key={index} style={{ marginBottom: '30px' }}>
                                         <div style={{
-                                            width: `${item.progress}%`,
-                                            height: '100%',
-                                            background: item.color,
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            marginBottom: '12px'
+                                        }}>
+                                            <span style={{
+                                                fontSize: '16px',
+                                                fontWeight: '600',
+                                                color: '#2c3e50'
+                                            }}>
+                                                {item.dept}
+                                            </span>
+                                            <span style={{
+                                                fontSize: '16px',
+                                                fontWeight: '700',
+                                                color: `var(${colorVar})`
+                                            }}>
+                                                {item.progress}%
+                                            </span>
+                                        </div>
+                                        <div style={{
+                                            width: '100%',
+                                            height: '12px',
+                                            background: '#f0f0f0',
                                             borderRadius: '10px',
-                                            transition: 'width 1s ease-out'
-                                        }} />
+                                            overflow: 'hidden'
+                                        }}>
+                                            <div style={{
+                                                width: `${item.progress}%`,
+                                                height: '100%',
+                                                background: `var(${colorVar})`,
+                                                borderRadius: '10px',
+                                                transition: 'width 1s ease-out'
+                                            }} />
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -574,7 +577,7 @@ const AblazeAcademy = () => {
                             alignItems: 'center',
                             gap: '12px'
                         }}>
-                            <FaGraduationCap color="#8e44ad" />
+                            <FaGraduationCap style={{ color: 'var(--info-color)' }} />
                             Comparaison des Départements
                         </h3>
                         <ResponsiveContainer width="100%" height={260}>
@@ -592,7 +595,7 @@ const AblazeAcademy = () => {
                                 />
                                 <Bar dataKey="progress" radius={[10, 10, 0, 0]}>
                                     {departmentProgress.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                        <Cell key={`cell-${index}`} fill={[chartColors.color1, chartColors.color2, chartColors.color3, chartColors.color4][index]} />
                                     ))}
                                 </Bar>
                             </BarChart>
@@ -604,4 +607,4 @@ const AblazeAcademy = () => {
     );
 };
 
-export default AblazeAcademy;
+export default EnseignementSuperieur;

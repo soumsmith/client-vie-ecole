@@ -30,6 +30,7 @@ import IconBox from "../Composant/IconBox";
 import { getUserProfile } from "../../hooks/userUtils";
 
 
+
 const AddCoefficientModal = ({ show, selectedBranche, onClose, onSave }) => {
     const [formData, setFormData] = useState({
         matiereId: null,
@@ -223,17 +224,7 @@ const AddCoefficientModal = ({ show, selectedBranche, onClose, onSave }) => {
                     alignItems: 'center',
                     gap: '16px'
                 }}>
-                    <Avatar
-                        size="lg"
-                        style={{
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            color: 'white',
-                            fontWeight: '600',
-                            fontSize: '18px'
-                        }}
-                    >
-                        <FiPlus size={24} />
-                    </Avatar>
+                    <IconBox icon={FiPlus} size={34} />
                     <div style={{ flex: 1 }}>
                         <Text size="lg" weight="semibold" style={{ color: '#0f172a', marginBottom: '4px' }}>
                             Ajouter une Matière

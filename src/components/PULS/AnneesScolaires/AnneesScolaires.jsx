@@ -35,11 +35,14 @@ import {
     useAnneesScolairesData, 
     anneesScolairesTableConfig
 } from './AnneesScolairesService';
+import IconBox from "../Composant/IconBox";
+
 
 // ===========================
 // COMPOSANT D'EN-TÊTE AVEC ANNÉE EN COURS
 // ===========================
 const AnneeEnCoursHeader = ({ anneeEnCours, loading, onCloturer, onNouvelle }) => {
+    const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
     if (loading) {
         return (
             <div style={{
@@ -60,7 +63,6 @@ const AnneeEnCoursHeader = ({ anneeEnCours, loading, onCloturer, onNouvelle }) =
     if (!anneeEnCours) {
         return (
             <div style={{
-                // background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                 borderRadius: '15px',
                 padding: '25px',
                 marginBottom: '20px',
@@ -68,7 +70,7 @@ const AnneeEnCoursHeader = ({ anneeEnCours, loading, onCloturer, onNouvelle }) =
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between'
-            }} className="OuvertureAnneeScolaire" >
+            }}  className={`OuvertureAnneeScolaire-${academicYear.niveauEnseignement?.libelle.replace(/[\s()]/g, '')} OuvertureAnneeScolaire-niveauEnseignement-${academicYear.niveauEnseignement?.id}`} >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
                     <div style={{
                         background: 'rgba(255, 255, 255, 0.2)',
@@ -201,16 +203,7 @@ const AnneesStatsHeader = ({ annees, loading }) => {
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    borderRadius: '10px',
-                    padding: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <FiCalendar size={18} color="white" />
-                </div>
+                <IconBox icon={FiCalendar} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Liste des Années Scolaires

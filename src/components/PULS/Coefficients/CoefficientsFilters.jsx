@@ -17,6 +17,8 @@ import {
 import { useNiveauxBranchesData } from "../utils/CommonDataService";
 import { getUserProfile } from "../../hooks/userUtils";
 import IconBox from "../Composant/IconBox";
+import GradientButton from '../../GradientButton';
+
 
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE MODERNE AVEC BOUTON AJOUTER
@@ -33,6 +35,7 @@ const CoefficientsFilters = ({
     const [formError, setFormError] = useState(null);
     const userProfile = getUserProfile();
     const { branches, branchesLoading, branchesError, refetch } = useNiveauxBranchesData();
+    const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
 
     const handleSearch = useCallback(() => {
         if (!selectedBranche) {
@@ -161,23 +164,16 @@ const CoefficientsFilters = ({
                             Actions
                         </label>
                         <div style={{ display: 'flex', gap: 8, height: '40px' }}>
-                            <Button
-                                appearance="primary"
-                                onClick={handleSearch}
+                             <GradientButton
+                                icon={<FiSearch size={16} />}
+                                text="Afficher"
+                                loadingText="Chargement..."
                                 loading={loading}
                                 disabled={isDataLoading || loading || !selectedBranche}
-                                style={{
-                                    flex: 1,
-                                    //background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontWeight: '500'
-                                }}
-                                size="md"
-                                className={`${userProfile}-btn-search`}
-                            >
-                                {loading ? 'Chargement...' : 'Afficher'}
-                            </Button>
+                                onClick={handleSearch}
+                                variant="primary"
+                                style={{ flex: 1 }}
+                            />
 
                             <Button
                                 onClick={handleClear}
@@ -229,16 +225,18 @@ const CoefficientsFilters = ({
             </Row>
 
             {/* Indicateur de progression */}
-            <div style={{ marginTop: 15 }}>
+            <div className={`steps-container ${selectedBranche ? `has-branche-${academicYear.niveauEnseignement?.libelle.replace(/[\s()]/g, '')} has-branche-${academicYear.niveauEnseignement?.id}` : `no-branche-${academicYear.niveauEnseignement?.libelle.replace(/[\s()]/g, '')} no-branche-${academicYear.niveauEnseignement?.id}`}`}
+                style={{ marginTop: 15 }}
+                >
                 <Steps
                     current={selectedBranche ? 1 : 0}
                     size="small"
-                    style={{ background: '#f8fafc', padding: '15px', borderRadius: '8px' }}
                 >
                     <Steps.Item title="Branche" />
                     <Steps.Item title="Coefficients" />
                 </Steps>
             </div>
+
 
             {/* Loading indicator discret */}
             {isDataLoading && (

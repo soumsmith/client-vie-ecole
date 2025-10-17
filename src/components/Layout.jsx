@@ -10,9 +10,9 @@ import LightTopBar from './LightTopBar';
 
 import Sidebar from './Sidebar';
 import Dashboard from './Dashboard';
-import DashboardFondateur from './DashboardFondateur';
-import KidsLandingPage from './KidsLandingPage';
-import SchoolLandingPage from './SchoolLandingPage';
+import DashboardEnseignementSecondaireGenerale from './DashboardEnseignementSecondaireGenerale';
+import DashboardPrimaire from './DashboardPrimaire';
+import BREVETDETECHNICIENBT from './BREVETDETECHNICIENBT';
 import EnseignementSuperieur from './EnseignementSuperieur';
 import EnseignementSecondaireTechnique from './EnseignementSecondaireTechnique';
 
@@ -624,12 +624,12 @@ const Layout = ({ onLogout }) => {
 
 const getDashboardComponent = (id) => {
   switch (id) {
-    case 1: return <KidsLandingPage />;
-    case 2: return <DashboardFondateur />;
+    case 1: return <DashboardPrimaire />;
+    case 2: return <DashboardEnseignementSecondaireGenerale />;
     case 3: return <EnseignementSuperieur />;
     case 4: return <DashboardNiveauMaternelle />;
-    case 5: return <EnseignementSecondaireTechnique />;
-    case 6: return <SchoolLandingPage />;
+    case 5: return <EnseignementSecondaireTechnique />; //ok
+    case 6: return <BREVETDETECHNICIENBT />; //ok
     default: return <DefaultDashboard />;
   }
 };
@@ -747,7 +747,7 @@ const getDashboardComponent = (id) => {
               )}
               
               {academicYear.niveauEnseignement?.id === 2 && (
-                <Route path="/dashboard" element={<DashboardFondateur />} />
+                <Route path="/dashboard" element={<DashboardEnseignementSecondaireGenerale />} />
               )}
 
               {academicYear.niveauEnseignement?.id === 3 && (
@@ -763,7 +763,7 @@ const getDashboardComponent = (id) => {
               )}
 
               {academicYear.niveauEnseignement?.id === 6 && (
-                <Route path="/dashboard" element={<SchoolLandingPage />} />
+                <Route path="/dashboard" element={<BREVETDETECHNICIENBT />} />
               )}
 
               <Route path="/datatable" element={<DataTable />} />
