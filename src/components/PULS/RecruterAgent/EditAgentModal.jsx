@@ -55,14 +55,11 @@ const EditAgentModal = ({ open, onClose, agent, onSave }) => {
         { label: 'En cours d\'évaluation', value: 'EN_EVALUATION' }
     ];
 
-    // Configuration EmailJS
+    // Configuration EmailJS - CORRIGÉE
     const emailJSConfig = {
-        serviceId: 'service_p5b4z05',
-        templateId: 'template_khmrq5i',
-        userId: 'rQ8B8i3jHyGwChdlj',
-        userName: 'GAIN SARL',
-        userEmail: 'soumsmith1@gmail.com',
-        libVersion: '3.12.1'
+        service_id: 'service_p5b4z05',
+        template_id: 'template_khmrq5i',
+        user_id: 'rQ8B8i3jHyGwChdlj'
     };
 
     // Charger les données de l'agent quand le modal s'ouvre
@@ -85,21 +82,35 @@ const EditAgentModal = ({ open, onClose, agent, onSave }) => {
         }));
     };
 
-    // Fonction pour envoyer l'email via EmailJS
+    // Fonction pour envoyer l'email via EmailJS - CORRIGÉE
     const sendEmailNotification = async () => {
         const emailData = {
-            user_name: emailJSConfig.userName,
-            user_email: emailJSConfig.userEmail,
-            message: `Bonjour Monsieur/Madame ${agent.nomComplet || ''}\n\nVeuillez utiliser ces paramètres pour vous connecter à notre application`,
-            lib_version: emailJSConfig.libVersion,
-            service_id: emailJSConfig.serviceId,
-            template_id: emailJSConfig.templateId,
-            user_id: emailJSConfig.userId
+            service_id: emailJSConfig.service_id,
+            template_id: emailJSConfig.template_id,
+            user_id: emailJSConfig.user_id,
+            template_params: {
+                user_name: 'GAIN SARL',
+                to_name: agent.nomComplet || 'Agent',
+                to_email: agent.email || 'soumsmith1@gmail.com',
+                from_name: 'GAIN SARL',
+                reply_to: 'soumsmith1@gmail.com',
+                message: `Bonjour Monsieur/Madame ${agent.nomComplet || ''},\n\nVous avez été recruté(e) avec succès.\n\nVeuillez utiliser vos identifiants pour vous connecter à notre application.\n\nCordialement,\nL'équipe GAIN SARL`,
+                agent_name: agent.nomComplet || '',
+                agent_email: agent.email || '',
+                statut: statutOptions.find(opt => opt.value === formData.statutRecrutement)?.label || ''
+            }
         };
 
+        console.log('📧 Envoi email avec les données:', emailData);
+
         const response = await axios.post(
-            'https://api.emailjs.comv1.0/email/send-form',
-            emailData
+            'https://api.emailjs.com/api/v1.0/email/send',
+            emailData,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
         );
 
         return response;
@@ -112,6 +123,8 @@ const EditAgentModal = ({ open, onClose, agent, onSave }) => {
         }
 
         const url = personnelUrls.saveRecutementSouscriptionRecruter(agent.id);
+        console.log('🔗 URL API recrutement:', url);
+        
         const response = await axios.post(url, {});
 
         return response;
@@ -155,23 +168,25 @@ const EditAgentModal = ({ open, onClose, agent, onSave }) => {
 
             // Étape 1: Envoyer l'email de notification
             try {
-                console.log('Envoi de l\'email de notification...');
-                await sendEmailNotification();
+                console.log('📤 Envoi de l\'email de notification...');
+                const emailResponse = await sendEmailNotification();
                 emailSuccess = true;
-                console.log('Email envoyé avec succès');
+                console.log('✅ Email envoyé avec succès:', emailResponse.data);
             } catch (error) {
-                console.error('Erreur lors de l\'envoi de l\'email:', error);
+                console.error('❌ Erreur lors de l\'envoi de l\'email:', error);
+                console.error('Détails:', error.response?.data || error.message);
                 emailError = error;
             }
 
             // Étape 2: Recruter l'agent via l'API interne
             try {
-                console.log('Recrutement de l\'agent via API...');
+                console.log('🔄 Recrutement de l\'agent via API...');
                 const response = await recruterAgent();
                 apiSuccess = true;
-                console.log('Agent recruté avec succès:', response.data);
+                console.log('✅ Agent recruté avec succès:', response.data);
             } catch (error) {
-                console.error('Erreur lors du recrutement:', error);
+                console.error('❌ Erreur lors du recrutement:', error);
+                console.error('Détails:', error.response?.data || error.message);
                 apiError = error;
             }
 
@@ -200,7 +215,7 @@ const EditAgentModal = ({ open, onClose, agent, onSave }) => {
                     icon: 'warning',
                     title: 'Recrutement validé avec avertissement',
                     text: `${agent.nomComplet} a été recruté avec succès, mais l'email de notification n'a pas pu être envoyé.`,
-                    footer: `Erreur email: ${emailError?.message || 'Erreur inconnue'}`,
+                    footer: `Erreur email: ${emailError?.response?.data?.message || emailError?.message || 'Erreur inconnue'}`,
                     confirmButtonColor: '#10b981'
                 });
 
@@ -218,7 +233,7 @@ const EditAgentModal = ({ open, onClose, agent, onSave }) => {
                     icon: 'error',
                     title: 'Erreur de recrutement',
                     text: `L'email a été envoyé mais le recrutement de ${agent.nomComplet} a échoué.`,
-                    footer: `Erreur API: ${apiError?.message || 'Erreur inconnue'}`,
+                    footer: `Erreur API: ${apiError?.response?.data?.message || apiError?.message || 'Erreur inconnue'}`,
                     confirmButtonColor: '#ef4444'
                 });
             } else {
@@ -226,13 +241,13 @@ const EditAgentModal = ({ open, onClose, agent, onSave }) => {
                     icon: 'error',
                     title: 'Échec complet',
                     text: `Le recrutement de ${agent.nomComplet} a échoué ainsi que l'envoi de l'email.`,
-                    footer: `Erreurs: API - ${apiError?.message || 'Erreur inconnue'}, Email - ${emailError?.message || 'Erreur inconnue'}`,
+                    footer: `Erreurs: API - ${apiError?.response?.data?.message || apiError?.message || 'Erreur inconnue'}, Email - ${emailError?.response?.data?.message || emailError?.message || 'Erreur inconnue'}`,
                     confirmButtonColor: '#ef4444'
                 });
             }
 
         } catch (error) {
-            console.error('Erreur inattendue:', error);
+            console.error('❌ Erreur inattendue:', error);
 
             await Swal.fire({
                 icon: 'error',

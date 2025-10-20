@@ -321,7 +321,7 @@ export const agentsTableConfig = {
         //     type: 'delete',
         //     icon: <FiTrash2 />,
         //     tooltip: 'Retirer de la liste',
-        //     color: '#e74c3c'
+        //     color: '#e74c3c' 
         // }
     ]
 };

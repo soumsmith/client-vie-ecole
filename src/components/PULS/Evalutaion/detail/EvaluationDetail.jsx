@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { 
-    Panel, 
-    Row, 
-    Col, 
-    Message, 
-    Loader, 
+import {
+    Panel,
+    Row,
+    Col,
+    Message,
+    Loader,
     Badge,
     Button,
     Input,
@@ -21,10 +21,10 @@ import {
     Tooltip,
     Whisper
 } from 'rsuite';
-import { 
-    FiArrowLeft, 
-    FiEdit, 
-    FiSave, 
+import {
+    FiArrowLeft,
+    FiEdit,
+    FiSave,
     FiLock,
     FiUnlock,
     FiUser,
@@ -52,7 +52,7 @@ import {
 import DataTable from "../../../DataTable";
 
 // Import des hooks pour les données communes
-import { 
+import {
     usePeriodesData
 } from "../../utils/CommonDataService";
 
@@ -97,9 +97,9 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur }) => {
     }
 
     return (
-        <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
+        <div style={{
+            display: 'flex',
+            alignItems: 'center',
             justifyContent: 'center',
             padding: '4px',
             gap: '4px'
@@ -131,9 +131,9 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur }) => {
                     e.target.style.boxShadow = 'none';
                 }}
             />
-            <span style={{ 
-                fontSize: '12px', 
-                color: '#64748b', 
+            <span style={{
+                fontSize: '12px',
+                color: '#64748b',
                 fontWeight: '500'
             }}>
                 /{noteSur}
@@ -155,7 +155,7 @@ const EditablePecCell = ({ rowData, onPecChange, isLocked }) => {
 
     const handleToggle = () => {
         if (isLocked) return; // Empêcher la modification si verrouillé
-        
+
         const newValue = !isActive;
         setIsActive(newValue);
         if (onPecChange) {
@@ -164,9 +164,9 @@ const EditablePecCell = ({ rowData, onPecChange, isLocked }) => {
     };
 
     return (
-        <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
+        <div style={{
+            display: 'flex',
+            alignItems: 'center',
             justifyContent: 'center',
             padding: '8px',
             gap: '8px'
@@ -200,10 +200,10 @@ const EditablePecCell = ({ rowData, onPecChange, isLocked }) => {
                     }}
                 />
             </div>
-            
+
             {/* Texte indicateur */}
-            <span style={{ 
-                fontSize: '12px', 
+            <span style={{
+                fontSize: '12px',
                 fontWeight: '600',
                 color: isActive ? '#16a34a' : '#6b7280',
                 minWidth: '30px',
@@ -218,11 +218,11 @@ const EditablePecCell = ({ rowData, onPecChange, isLocked }) => {
 // ===========================
 // MODAL DE MODIFICATION D'ÉVALUATION
 // ===========================
-const ModificationModal = ({ 
-    open, 
-    onClose, 
-    evaluation, 
-    onSave 
+const ModificationModal = ({
+    open,
+    onClose,
+    evaluation,
+    onSave
 }) => {
     const [formData, setFormData] = useState({});
     const [loading, setLoading] = useState(false);
@@ -277,15 +277,15 @@ const ModificationModal = ({
                     Modifier une évaluation
                 </Modal.Title>
             </Modal.Header>
-            
+
             <Modal.Body>
                 <Row gutter={20}>
                     <Col xs={24} sm={12}>
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569'
                             }}>
                                 Type d'évaluation
@@ -299,12 +299,12 @@ const ModificationModal = ({
                                 cleanable={false}
                             />
                         </div>
-                        
+
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569'
                             }}>
                                 Période
@@ -320,10 +320,10 @@ const ModificationModal = ({
                         </div>
 
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569'
                             }}>
                                 Classe
@@ -336,10 +336,10 @@ const ModificationModal = ({
                         </div>
 
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569'
                             }}>
                                 Matière
@@ -354,10 +354,10 @@ const ModificationModal = ({
 
                     <Col xs={24} sm={12}>
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569'
                             }}>
                                 Noté sur
@@ -373,10 +373,10 @@ const ModificationModal = ({
                         </div>
 
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569'
                             }}>
                                 Date
@@ -391,10 +391,10 @@ const ModificationModal = ({
                         </div>
 
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569'
                             }}>
                                 Durée
@@ -414,11 +414,11 @@ const ModificationModal = ({
                 <Button onClick={onClose} appearance="subtle">
                     Annuler
                 </Button>
-                <Button 
-                    onClick={handleSave} 
-                    appearance="primary" 
+                <Button
+                    onClick={handleSave}
+                    appearance="primary"
                     loading={loading}
-                    style={{ 
+                    style={{
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         border: 'none'
                     }}
@@ -436,41 +436,41 @@ const ModificationModal = ({
 const EvaluationDetail = () => {
     const { evaluationCode } = useParams();
     const navigate = useNavigate();
-    
+
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     // ===========================
     // HOOKS POUR LES DONNÉES
     // ===========================
-    const { 
-        evaluation, 
-        loading: evaluationLoading, 
+    const {
+        evaluation,
+        loading: evaluationLoading,
         error: evaluationError,
         refetch: refetchEvaluation
     } = useEvaluationDetail(evaluationCode);
 
-    const { 
-        notes, 
-        loading: notesLoading, 
+    const {
+        notes,
+        loading: notesLoading,
         error: notesError,
         updateNote,
         refetch: refetchNotes
     } = useEvaluationNotes(evaluationCode);
 
-    const { 
-        lockInfo, 
+    const {
+        lockInfo,
         loading: lockLoading,
         refetch: refetchLock
     } = useEvaluationLock(evaluation?.id);
 
-    const { 
+    const {
         professeur,
         loading: professeurLoading
     } = useProfesseurDetails(
-        // evaluation?.matiereEcole?.id,
-        // evaluation?.classe?.id,
-        // evaluation?.annee?.id
-    );
+            // evaluation?.matiereEcole?.id,
+            // evaluation?.classe?.id,
+            // evaluation?.annee?.id
+        );
 
 
     console.log("======= je suis ========");
@@ -497,11 +497,11 @@ const EvaluationDetail = () => {
     // ===========================
     const processedNotes = React.useMemo(() => {
         console.log('🔄 Traitement des données pour DataTable:', notes.length, 'notes');
-        
+
         return notes.map(note => ({
             // Données originales
             ...note,
-            
+
             // Propriétés aplaties pour la recherche et filtres
             matricule: note.eleve?.matricule || '',
             nom: note.eleve?.nom || '',
@@ -511,11 +511,11 @@ const EvaluationDetail = () => {
             urlPhoto: note.eleve?.urlPhoto || '',
             redoublant: note.inscription?.redoublant || 'NON',
             boursier: note.inscription?.boursier || '',
-            
+
             // Propriétés calculées pour les filtres
             pecStatus: note.pec === 1 ? 'ACTIVE' : 'INACTIVE',
             pecLabel: note.pec === 1 ? 'Activé (OUI)' : 'Désactivé (NON)',
-            
+
             // Garder les objets originaux pour les renderers
             eleve: note.eleve,
             inscription: note.inscription
@@ -525,7 +525,7 @@ const EvaluationDetail = () => {
     // Configuration DataTable avec customRenderer intégrés directement
     const tableConfig = React.useMemo(() => {
         console.log('🔧 Configuration DataTable:', { isLocked, noteSur: evaluation?.noteSur });
-        
+
         return {
             columns: [
                 {
@@ -559,7 +559,7 @@ const EvaluationDetail = () => {
                                 width: '36px',
                                 height: '36px',
                                 borderRadius: '50%',
-                                background: rowData.sexe === 'FEMININ' 
+                                background: rowData.sexe === 'FEMININ'
                                     ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
                                     : 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
                                 display: 'flex',
@@ -666,10 +666,10 @@ const EvaluationDetail = () => {
                         const noteSur = parseFloat(evaluation?.noteSur || '10');
                         let status = 'Non noté';
                         let colors = { bg: '#f1f5f9', text: '#64748b', border: '#e2e8f0' };
-                        
+
                         if (!isNaN(note)) {
                             const pourcentage = (note / noteSur) * 100;
-                            
+
                             if (pourcentage >= 85) {
                                 status = 'Excellent';
                                 colors = { bg: '#dcfce7', text: '#16a34a', border: '#22c55e' };
@@ -684,7 +684,7 @@ const EvaluationDetail = () => {
                                 colors = { bg: '#fef2f2', text: '#dc2626', border: '#ef4444' };
                             }
                         }
-                        
+
                         return (
                             <div style={{
                                 padding: '4px 8px',
@@ -706,7 +706,7 @@ const EvaluationDetail = () => {
             // ← Champs de recherche avec propriétés aplaties
             searchableFields: [
                 'matricule',
-                'nom', 
+                'nom',
                 'prenom',
                 'nomComplet'
             ],
@@ -773,13 +773,13 @@ const EvaluationDetail = () => {
     // ===========================
     const stats = React.useMemo(() => {
         if (notes.length === 0) return { moyenne: 0, noteMax: 0, noteMin: 0, nombreNotes: 0 };
-        
+
         const notesValides = notes.filter(n => n.note !== null && n.note !== undefined);
         if (notesValides.length === 0) return { moyenne: 0, noteMax: 0, noteMin: 0, nombreNotes: 0 };
-        
+
         const notesValues = notesValides.map(n => parseFloat(n.note));
         const somme = notesValues.reduce((acc, note) => acc + note, 0);
-        
+
         return {
             moyenne: (somme / notesValues.length).toFixed(2),
             noteMax: Math.max(...notesValues),
@@ -793,11 +793,11 @@ const EvaluationDetail = () => {
     // ===========================
     if (evaluationLoading) {
         return (
-            <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                height: '50vh' 
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '50vh'
             }}>
                 <Loader size="lg" content="Chargement des détails..." />
             </div>
@@ -818,8 +818,8 @@ const EvaluationDetail = () => {
     // RENDU DU COMPOSANT
     // ===========================
     return (
-        <div style={{ 
-             
+        <div style={{
+
             minHeight: '100vh',
             padding: '20px 0'
         }}>
@@ -854,7 +854,7 @@ const EvaluationDetail = () => {
                                         </p>
                                     </div>
                                 </div>
-                                
+
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                     {isLocked ? (
                                         <Badge color="red" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -865,7 +865,7 @@ const EvaluationDetail = () => {
                                             <FiUnlock size={14} /> Modifiable
                                         </Badge>
                                     )}
-                                    
+
                                     <Whisper
                                         placement="top"
                                         speaker={<Tooltip>Actualiser les données</Tooltip>}
@@ -877,12 +877,12 @@ const EvaluationDetail = () => {
                                             style={{ borderRadius: '6px' }}
                                         />
                                     </Whisper>
-                                    
+
                                     <Button
                                         appearance="primary"
                                         startIcon={<FiEdit />}
                                         onClick={() => setShowModificationModal(true)}
-                                        style={{ 
+                                        style={{
                                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                             border: 'none',
                                             borderRadius: '8px'
@@ -922,7 +922,7 @@ const EvaluationDetail = () => {
                                             {evaluation.classe?.libelle}
                                         </div>
                                     </div>
-                                    
+
                                     <div style={{ marginBottom: 15 }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
                                             <FiCalendar color="#10b981" />
@@ -969,8 +969,8 @@ const EvaluationDetail = () => {
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
                                             <strong>Date limite de saisie :</strong>
                                         </div>
-                                        <div style={{ 
-                                            color: isLocked ? '#ef4444' : '#22c55e', 
+                                        <div style={{
+                                            color: isLocked ? '#ef4444' : '#22c55e',
                                             fontSize: '14px',
                                             fontWeight: '500'
                                         }}>
@@ -999,9 +999,9 @@ const EvaluationDetail = () => {
                                 <Loader size="sm" content="Chargement..." />
                             ) : professeur ? (
                                 <div style={{ textAlign: 'center' }}>
-                                    <Avatar 
-                                        size="lg" 
-                                        style={{ 
+                                    <Avatar
+                                        size="lg"
+                                        style={{
                                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                             marginBottom: 10
                                         }}
@@ -1015,9 +1015,9 @@ const EvaluationDetail = () => {
                                         {professeur.fonction?.libelle}
                                     </div>
                                     {professeur.contact && (
-                                        <div style={{ 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
                                             justifyContent: 'center',
                                             gap: 5,
                                             color: '#64748b',
@@ -1046,28 +1046,28 @@ const EvaluationDetail = () => {
                                 border: '1px solid rgba(102, 126, 234, 0.1)'
                             }}
                         >
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
+                            <div className="mt-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
                                 <div style={{ textAlign: 'center', padding: '10px', background: '#f0f9ff', borderRadius: '8px' }}>
                                     <div style={{ fontSize: '18px', fontWeight: '600', color: '#0369a1' }}>
                                         {stats.moyenne}
                                     </div>
                                     <div style={{ fontSize: '12px', color: '#64748b' }}>Moyenne</div>
                                 </div>
-                                
+
                                 <div style={{ textAlign: 'center', padding: '10px', background: '#f0fdf4', borderRadius: '8px' }}>
                                     <div style={{ fontSize: '18px', fontWeight: '600', color: '#16a34a' }}>
                                         {stats.nombreNotes}
                                     </div>
                                     <div style={{ fontSize: '12px', color: '#64748b' }}>Notes saisies</div>
                                 </div>
-                                
+
                                 <div style={{ textAlign: 'center', padding: '10px', background: '#fefce8', borderRadius: '8px' }}>
                                     <div style={{ fontSize: '18px', fontWeight: '600', color: '#ca8a04' }}>
                                         {stats.noteMax}
                                     </div>
                                     <div style={{ fontSize: '12px', color: '#64748b' }}>Note max</div>
                                 </div>
-                                
+
                                 <div style={{ textAlign: 'center', padding: '10px', background: '#fef2f2', borderRadius: '8px' }}>
                                     <div style={{ fontSize: '18px', fontWeight: '600', color: '#dc2626' }}>
                                         {stats.noteMin}
@@ -1085,9 +1085,9 @@ const EvaluationDetail = () => {
                         <Panel
                             header={
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <span style={{ 
-                                        fontSize: '16px', 
-                                        fontWeight: '600', 
+                                    <span style={{
+                                        fontSize: '16px',
+                                        fontWeight: '600',
                                         color: '#1e293b',
                                         display: 'flex',
                                         alignItems: 'center',
@@ -1124,64 +1124,64 @@ const EvaluationDetail = () => {
                                 <DataTable
                                     title=""
                                     subtitle={`${processedNotes.length} élève(s)`}
-                                    
+
                                     data={processedNotes}
                                     loading={notesLoading}
                                     error={null}
-                                    
+
                                     columns={tableConfig.columns}
                                     searchableFields={tableConfig.searchableFields}
                                     filterConfigs={tableConfig.filterConfigs}
-                                    
-                                    onAction={() => {}} // Pas d'actions sur les lignes
+
+                                    onAction={() => { }} // Pas d'actions sur les lignes
                                     onRefresh={refetchNotes}
-                                    
+
                                     defaultPageSize={tableConfig.pageSize}
                                     pageSizeOptions={[10, 20, 50, 100]}
                                     tableHeight={tableConfig.tableHeight}
-                                    
+
                                     enableRefresh={true}
                                     enableCreate={false}
                                     selectable={false}
                                     rowKey="id"
-                                    
+
                                     showSearch={true}
                                     showFilters={true}
                                     showPagination={true}
-                                    
+
                                     customStyles={{
-                                        container: { 
+                                        container: {
                                             backgroundColor: "transparent"
                                         },
-                                        panel: { 
-                                            border: "none", 
+                                        panel: {
+                                            border: "none",
                                             boxShadow: "none"
                                         },
-                                        table: { 
+                                        table: {
                                             // Garder le scroll fonctionnel même si verrouillé
                                             opacity: isLocked ? 0.75 : 1,
                                             // NE PAS utiliser pointer-events: none pour garder le scroll
                                             overflow: 'auto'
                                         }
                                     }}
-                                    
+
                                     // Message personnalisé si verrouillé
                                     emptyMessage={
                                         processedNotes.length === 0
-                                            ? (isLocked 
+                                            ? (isLocked
                                                 ? "Évaluation verrouillée - Aucun élève trouvé"
                                                 : "Aucun élève trouvé")
                                             : undefined
                                     }
-                                    
+
                                     // Permettre le scroll même si verrouillé
                                     scrollable={true}
                                 />
                             )}
-                            
+
                             {/* Debug des données */}
                             {process.env.NODE_ENV === 'development' && (
-                                <div style={{ 
+                                <div style={{
                                     marginTop: '10px',
                                     padding: '10px',
                                     background: '#f8f9fa',
@@ -1191,17 +1191,17 @@ const EvaluationDetail = () => {
                                     <strong>🔍 Debug:</strong> {processedNotes.length} notes traitées
                                     {processedNotes.length > 0 && (
                                         <div>
-                                            Exemple de données: matricule="{processedNotes[0].matricule}", 
-                                            sexe="{processedNotes[0].sexe}", 
+                                            Exemple de données: matricule="{processedNotes[0].matricule}",
+                                            sexe="{processedNotes[0].sexe}",
                                             pec={processedNotes[0].pec}
                                         </div>
                                     )}
                                 </div>
                             )}
-                            
+
                             {/* Message d'information sur le verrouillage */}
                             {isLocked && lockInfo && (
-                                <div style={{ 
+                                <div style={{
                                     marginTop: '15px',
                                     padding: '15px',
                                     background: '#fef2f2',

@@ -149,7 +149,7 @@ const RecruterAgent = () => {
                 <div className="col-lg-12">
                     <DataTable
                         title="Liste des Agents à Recruter"
-                        subtitle={`${agents.length} agent(s) disponible(s)`}
+                        subtitle={`agent(s) disponible(s)`}
                         data={agents}
                         loading={loading}
                         error={error}

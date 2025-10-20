@@ -1,14 +1,16 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { 
-    SelectPicker, 
-    Button, 
-    Panel, 
-    Row, 
-    Col, 
-    Message, 
-    Loader, 
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import {
+    SelectPicker,
+    Button,
+    Panel,
+    Row,
+    Col,
+    Message,
+    Loader,
     Badge,
     Steps,
     Modal,
@@ -16,11 +18,11 @@ import {
     DatePicker,
     InputNumber
 } from 'rsuite';
-import { 
-    FiSearch, 
-    FiRotateCcw, 
-    FiCalendar, 
-    FiBookOpen, 
+import {
+    FiSearch,
+    FiRotateCcw,
+    FiCalendar,
+    FiBookOpen,
     FiBarChart,
     FiPlus,
     FiEye,
@@ -31,50 +33,205 @@ import {
 // Import des fonctions externalisées
 import { useCommonState } from '../../hooks/useCommonState';
 import DataTable from "../../DataTable";
-import { 
+import {
     useEvaluationsData,
-    evaluationsTableConfig
+    getEvaluationsTableConfig
 } from './EvaluationService';
-// Import des hooks unifiés depuis CommonDataService
-import { 
-    useClassesData, 
+import {
+    useClassesData,
     useMatieresData,
     usePeriodesData
 } from "../utils/CommonDataService";
+import { useAllApiUrls } from "../utils/apiConfig";
 
 // ===========================
-// MODAL DE MODIFICATION D'ÉVALUATION
+// 🎨 CONFIGURATION SWEETALERT2 PERSONNALISÉE
 // ===========================
-const ModificationModal = ({ 
-    open, 
-    onClose, 
-    evaluation, 
-    onSave 
+const showConfirmDialog = (options) => {
+    return Swal.fire({
+        title: options.title || 'Êtes-vous sûr?',
+        text: options.text || '',
+        icon: options.icon || 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#667eea',
+        cancelButtonColor: '#94a3b8',
+        confirmButtonText: options.confirmButtonText || 'Oui, confirmer',
+        cancelButtonText: 'Annuler',
+        reverseButtons: true,
+        ...options
+    });
+};
+
+const showSuccessAlert = (message) => {
+    return Swal.fire({
+        icon: 'success',
+        title: 'Succès!',
+        text: message,
+        confirmButtonColor: '#667eea',
+        timer: 2000,
+        timerProgressBar: true
+    });
+};
+
+const showErrorAlert = (message) => {
+    return Swal.fire({
+        icon: 'error',
+        title: 'Erreur!',
+        text: message,
+        confirmButtonColor: '#ef4444'
+    });
+};
+
+// ===========================
+// 🆕 MODAL UNIFIÉ CRÉATION/MODIFICATION
+// ===========================
+const EvaluationModal = ({
+    open,
+    onClose,
+    evaluation = null,
+    onSave,
+    mode = 'create', // 'create' ou 'edit'
+    currentClasseId = null,
+    currentUserId = null,
+    currentAnneeId = null
 }) => {
     const [formData, setFormData] = useState({});
     const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
 
     const { periodes } = usePeriodesData();
+    const { classes } = useClassesData();
 
+    const {
+        matieres,
+        loading: matieresLoading,
+        fetchMatieres
+    } = useMatieresData();
+
+    // Charger les matières quand une classe est sélectionnée
     useEffect(() => {
-        if (evaluation && open) {
-            setFormData({
-                typeId: evaluation.type_id,
-                periodeId: evaluation.periode_id,
-                classeId: evaluation.classe_id,
-                matiereId: evaluation.matiere_id,
-                noteSur: evaluation.noteSur,
-                date: evaluation.date ? new Date(evaluation.date) : new Date(),
-                duree: evaluation.duree_raw
-            });
+        const classeId = formData.classeId || evaluation?.classe_id || currentClasseId;
+        if (classeId && open) {
+            console.log('📚 Chargement des matières pour la classe:', classeId);
+            fetchMatieres(classeId, currentAnneeId || 38);
         }
-    }, [evaluation, open]);
+    }, [formData.classeId, evaluation?.classe_id, currentClasseId, open, fetchMatieres, currentAnneeId]);
+
+    // Initialiser le formulaire
+    useEffect(() => {
+        if (open) {
+            if (mode === 'edit' && evaluation) {
+                // Mode modification
+                console.log('🔧 Mode MODIFICATION - Initialisation avec:', evaluation);
+
+                let dureeDate = null;
+                if (evaluation.duree_raw) {
+                    const [hours, minutes] = evaluation.duree_raw.split('-');
+                    dureeDate = new Date();
+                    dureeDate.setHours(parseInt(hours) || 0);
+                    dureeDate.setMinutes(parseInt(minutes) || 0);
+                    dureeDate.setSeconds(0);
+                }
+
+                let evaluationDate = new Date();
+                if (evaluation.date) {
+                    try {
+                        evaluationDate = new Date(evaluation.date);
+                        if (isNaN(evaluationDate.getTime())) {
+                            evaluationDate = new Date();
+                        }
+                    } catch (error) {
+                        evaluationDate = new Date();
+                    }
+                }
+
+                setFormData({
+                    typeId: evaluation.type_id,
+                    periodeId: evaluation.periode_id,
+                    classeId: evaluation.classe_id,
+                    matiereId: evaluation.matiere_id,
+                    noteSur: evaluation.noteSur,
+                    date: evaluationDate,
+                    duree: dureeDate
+                });
+            } else {
+                // Mode création
+                console.log('✨ Mode CRÉATION - Initialisation avec classe:', currentClasseId);
+                
+                const now = new Date();
+                const defaultDuree = new Date();
+                defaultDuree.setHours(2);
+                defaultDuree.setMinutes(0);
+                defaultDuree.setSeconds(0);
+
+                setFormData({
+                    typeId: 2, // Devoir par défaut
+                    periodeId: null,
+                    classeId: currentClasseId,
+                    matiereId: null,
+                    noteSur: '20',
+                    date: now,
+                    duree: defaultDuree
+                });
+            }
+            setErrors({});
+        }
+    }, [evaluation, open, mode, currentClasseId]);
+
+    // Validation du formulaire
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!formData.typeId) {
+            newErrors.typeId = 'Le type est requis';
+        }
+        if (!formData.periodeId) {
+            newErrors.periodeId = 'La période est requise';
+        }
+        if (!formData.classeId) {
+            newErrors.classeId = 'La classe est requise';
+        }
+        if (!formData.matiereId) {
+            newErrors.matiereId = 'La matière est requise';
+        }
+        if (!formData.noteSur) {
+            newErrors.noteSur = 'La note sur est requise';
+        }
+        if (!formData.date) {
+            newErrors.date = 'La date est requise';
+        }
+        if (!formData.duree) {
+            newErrors.duree = 'La durée est requise';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
     const handleSave = async () => {
+        if (!validateForm()) {
+            showErrorAlert('Veuillez remplir tous les champs obligatoires');
+            return;
+        }
+
         try {
             setLoading(true);
+
+            // Convertir la durée
+            let dureeFormatted = '';
+            if (formData.duree) {
+                const hours = formData.duree.getHours().toString().padStart(2, '0');
+                const minutes = formData.duree.getMinutes().toString().padStart(2, '0');
+                dureeFormatted = `${hours}-${minutes}`;
+            }
+
+            const dataToSave = {
+                ...formData,
+                duree: dureeFormatted
+            };
+
             if (onSave) {
-                await onSave(formData);
+                await onSave(dataToSave);
             }
             onClose();
         } catch (error) {
@@ -85,9 +242,9 @@ const ModificationModal = ({
     };
 
     const typesData = [
-        { label: 'Interrogation', value: 3 },
+        { label: 'Composition', value: 1 },
         { label: 'Devoir', value: 2 },
-        { label: 'Composition', value: 1 }
+        { label: 'Interrogation', value: 3 }
     ];
 
     const notesSurData = [
@@ -100,21 +257,21 @@ const ModificationModal = ({
         <Modal open={open} onClose={onClose} size="lg">
             <Modal.Header>
                 <Modal.Title style={{ color: '#1e293b', fontWeight: '600' }}>
-                    Modifier une évaluation
+                    {mode === 'create' ? '✨ Créer une évaluation' : '✏️ Modifier une évaluation'}
                 </Modal.Title>
             </Modal.Header>
-            
+
             <Modal.Body>
                 <Row gutter={20}>
                     <Col xs={24} sm={12}>
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569'
                             }}>
-                                Type d'évaluation
+                                Type d'évaluation *
                             </label>
                             <SelectPicker
                                 data={typesData}
@@ -124,16 +281,19 @@ const ModificationModal = ({
                                 style={{ width: '100%' }}
                                 cleanable={false}
                             />
+                            {errors.typeId && (
+                                <span style={{ color: '#ef4444', fontSize: '12px' }}>{errors.typeId}</span>
+                            )}
                         </div>
-                        
+
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569'
                             }}>
-                                Période
+                                Période *
                             </label>
                             <SelectPicker
                                 data={periodes}
@@ -143,50 +303,93 @@ const ModificationModal = ({
                                 style={{ width: '100%' }}
                                 cleanable={false}
                             />
+                            {errors.periodeId && (
+                                <span style={{ color: '#ef4444', fontSize: '12px' }}>{errors.periodeId}</span>
+                            )}
                         </div>
 
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569'
                             }}>
-                                Classe
+                                Classe *
                             </label>
-                            <Input
-                                value={evaluation?.classe || ''}
-                                disabled
-                                style={{ width: '100%', backgroundColor: '#f8fafc' }}
-                            />
+                            {mode === 'edit' ? (
+                                <Input
+                                    value={evaluation?.classe || ''}
+                                    disabled
+                                    style={{ width: '100%', backgroundColor: '#f8fafc' }}
+                                />
+                            ) : (
+                                <SelectPicker
+                                    data={classes}
+                                    value={formData.classeId}
+                                    onChange={(value) => {
+                                        setFormData(prev => ({ ...prev, classeId: value, matiereId: null }));
+                                    }}
+                                    placeholder="Sélectionner la classe"
+                                    style={{ width: '100%' }}
+                                    cleanable={false}
+                                    searchable
+                                />
+                            )}
+                            {errors.classeId && (
+                                <span style={{ color: '#ef4444', fontSize: '12px' }}>{errors.classeId}</span>
+                            )}
                         </div>
 
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569'
                             }}>
-                                Matière
+                                Matière *
                             </label>
-                            <Input
-                                value={evaluation?.matiere || ''}
-                                disabled
-                                style={{ width: '100%', backgroundColor: '#f8fafc' }}
+                            <SelectPicker
+                                data={matieres.map(matiere => ({
+                                    value: matiere.id,
+                                    label: matiere.libelle,
+                                    id: matiere.id
+                                }))}
+                                value={formData.matiereId}
+                                onChange={(value) => setFormData(prev => ({ ...prev, matiereId: value }))}
+                                placeholder="Sélectionner la matière"
+                                style={{ width: '100%' }}
+                                loading={matieresLoading}
+                                cleanable={false}
+                                searchable
+                                disabled={!formData.classeId}
+                                renderMenu={menu => {
+                                    if (matieres.length === 0 && !matieresLoading) {
+                                        return (
+                                            <div style={{ padding: '10px', textAlign: 'center', color: '#999' }}>
+                                                {formData.classeId ? 'Aucune matière disponible' : 'Sélectionnez d\'abord une classe'}
+                                            </div>
+                                        );
+                                    }
+                                    return menu;
+                                }}
                             />
+                            {errors.matiereId && (
+                                <span style={{ color: '#ef4444', fontSize: '12px' }}>{errors.matiereId}</span>
+                            )}
                         </div>
                     </Col>
 
                     <Col xs={24} sm={12}>
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569'
                             }}>
-                                Noté sur
+                                Noté sur *
                             </label>
                             <SelectPicker
                                 data={notesSurData}
@@ -196,60 +399,95 @@ const ModificationModal = ({
                                 style={{ width: '100%' }}
                                 cleanable={false}
                             />
+                            {errors.noteSur && (
+                                <span style={{ color: '#ef4444', fontSize: '12px' }}>{errors.noteSur}</span>
+                            )}
                         </div>
 
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569'
                             }}>
-                                Date
+                                Date et heure *
                             </label>
                             <DatePicker
-                                value={formData.date}
-                                onChange={(value) => setFormData(prev => ({ ...prev, date: value }))}
+                                value={formData.date || new Date()}
+                                onChange={(value) => {
+                                    setFormData(prev => ({ ...prev, date: value }));
+                                }}
                                 format="dd/MM/yyyy HH:mm"
                                 style={{ width: '100%' }}
-                                showMeridian
+                                placeholder="Sélectionner date et heure"
+                                cleanable={false}
+                                showMeridian={false}
+                                ranges={[
+                                    {
+                                        label: 'Maintenant',
+                                        value: new Date()
+                                    }
+                                ]}
                             />
+                            {errors.date && (
+                                <span style={{ color: '#ef4444', fontSize: '12px' }}>{errors.date}</span>
+                            )}
                         </div>
 
                         <div style={{ marginBottom: 20 }}>
-                            <label style={{ 
-                                display: 'block', 
-                                marginBottom: 8, 
-                                fontWeight: '500', 
+                            <label style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: '500',
                                 color: '#475569'
                             }}>
-                                Durée
+                                Durée *
                             </label>
-                            <Input
+                            <DatePicker
+                                format="HH:mm"
                                 value={formData.duree}
                                 onChange={(value) => setFormData(prev => ({ ...prev, duree: value }))}
-                                placeholder="00-15"
+                                placeholder="HH:mm"
                                 style={{ width: '100%' }}
+                                ranges={[]}
+                                hideMinutes={minute => minute % 5 !== 0}
+                                cleanable={false}
                             />
+                            {errors.duree && (
+                                <span style={{ color: '#ef4444', fontSize: '12px' }}>{errors.duree}</span>
+                            )}
                         </div>
                     </Col>
                 </Row>
+
+                <div style={{
+                    marginTop: 20,
+                    padding: '15px',
+                    background: '#f0f9ff',
+                    borderRadius: '8px',
+                    border: '1px solid #bae6fd'
+                }}>
+                    <p style={{ margin: 0, fontSize: '13px', color: '#0369a1' }}>
+                        <strong>Note :</strong> Les champs marqués d'un astérisque (*) sont obligatoires
+                    </p>
+                </div>
             </Modal.Body>
 
             <Modal.Footer>
                 <Button onClick={onClose} appearance="subtle">
                     Annuler
                 </Button>
-                <Button 
-                    onClick={handleSave} 
-                    appearance="primary" 
+                <Button
+                    onClick={handleSave}
+                    appearance="primary"
                     loading={loading}
-                    style={{ 
+                    style={{
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         border: 'none'
                     }}
                 >
-                    Modifier
+                    {mode === 'create' ? 'Créer' : 'Modifier'}
                 </Button>
             </Modal.Footer>
         </Modal>
@@ -259,10 +497,10 @@ const ModificationModal = ({
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE MODERNE
 // ===========================
-const EvaluationFilters = ({ 
-    onSearch, 
-    onClear, 
-    loading = false, 
+const EvaluationFilters = ({
+    onSearch,
+    onClear,
+    loading = false,
     error = null,
     selectedClasse,
     selectedMatiere,
@@ -274,29 +512,24 @@ const EvaluationFilters = ({
     const [formError, setFormError] = useState(null);
     const { classes, classesLoading, classesError, refetch } = useClassesData();
 
-    // Utilisation du hook unifié useMatieresData depuis CommonDataService
     const {
         matieres,
         loading: matieresLoading,
         error: matieresError,
         fetchMatieres,
         clearMatieres
-    } = useMatieresData(); // Mode manuel : pas de paramètres automatiques
+    } = useMatieresData();
 
-    const { 
-        periodes, 
-        loading: periodesLoading, 
-        error: periodesError 
+    const {
+        periodes,
+        loading: periodesLoading,
+        error: periodesError
     } = usePeriodesData();
 
-    // Charger les matières quand une classe est sélectionnée
     useEffect(() => {
-        console.log('🔄 Effect déclenché pour classe:', selectedClasse);
         if (selectedClasse) {
-            console.log('📚 Chargement des matières pour classe ID:', selectedClasse);
-            fetchMatieres(selectedClasse, 38); // Utilisation manuelle du hook unifié
+            fetchMatieres(selectedClasse, 38);
         } else {
-            console.log('🗑️ Nettoyage des matières (pas de classe sélectionnée)');
             clearMatieres();
         }
     }, [selectedClasse, fetchMatieres, clearMatieres]);
@@ -309,8 +542,8 @@ const EvaluationFilters = ({
 
         setFormError(null);
         if (onSearch) {
-            onSearch({ 
-                classeId: selectedClasse, 
+            onSearch({
+                classeId: selectedClasse,
                 matiereId: selectedMatiere,
                 periodeId: selectedPeriode
             });
@@ -326,7 +559,7 @@ const EvaluationFilters = ({
     const hasDataError = classesError || periodesError || matieresError;
 
     return (
-        <div style={{ 
+        <div style={{
             background: 'white',
             borderRadius: '15px',
             padding: '25px',
@@ -334,10 +567,9 @@ const EvaluationFilters = ({
             border: '1px solid rgba(102, 126, 234, 0.1)',
             marginBottom: '20px'
         }}>
-            {/* En-tête moderne */}
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: 12,
                 marginBottom: 25,
                 paddingBottom: 15,
@@ -363,7 +595,6 @@ const EvaluationFilters = ({
                 </div>
             </div>
 
-            {/* Messages d'erreur compacts */}
             {hasDataError && (
                 <div style={{ marginBottom: 20 }}>
                     <Message type="error" showIcon style={{ background: '#fef2f2', border: '1px solid #fecaca' }}>
@@ -380,14 +611,13 @@ const EvaluationFilters = ({
                 </div>
             )}
 
-            {/* Formulaire de filtres */}
             <Row gutter={20}>
                 <Col xs={24} sm={12} md={8}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: '#475569',
                             fontSize: '14px'
                         }}>
@@ -397,9 +627,7 @@ const EvaluationFilters = ({
                             data={classes}
                             value={selectedClasse}
                             onChange={(value) => {
-                                console.log('🏫 Classe sélectionnée:', value);
                                 onClasseChange(value);
-                                // Réinitialiser la matière quand on change de classe
                                 if (onMatiereChange) onMatiereChange(null);
                             }}
                             placeholder="Choisir une classe"
@@ -415,29 +643,23 @@ const EvaluationFilters = ({
 
                 <Col xs={24} sm={12} md={8}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: '#475569',
                             fontSize: '14px'
                         }}>
                             Matière (optionnel)
                         </label>
                         <SelectPicker
-                            data={matieres.map(matiere => {
-                                console.log('🏷️ Formatage matière pour dropdown:', matiere);
-                                return {
-                                    value: matiere.id,
-                                    label: matiere.libelle,
-                                    id: matiere.id
-                                };
-                            })}
+                            data={matieres.map(matiere => ({
+                                value: matiere.id,
+                                label: matiere.libelle,
+                                id: matiere.id
+                            }))}
                             value={selectedMatiere}
-                            onChange={(value) => {
-                                console.log('📚 Matière sélectionnée:', value);
-                                onMatiereChange(value);
-                            }}
+                            onChange={onMatiereChange}
                             placeholder={matieresLoading ? "Chargement..." : matieres.length === 0 ? "Sélectionnez d'abord une classe" : "Toutes les matières"}
                             searchable
                             style={{ width: '100%' }}
@@ -461,10 +683,10 @@ const EvaluationFilters = ({
 
                 <Col xs={24} sm={12} md={4}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: '#475569',
                             fontSize: '14px'
                         }}>
@@ -487,10 +709,10 @@ const EvaluationFilters = ({
 
                 <Col xs={24} sm={12} md={4}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: 'transparent',
                             fontSize: '14px'
                         }}>
@@ -502,7 +724,7 @@ const EvaluationFilters = ({
                                 onClick={handleSearch}
                                 loading={loading}
                                 disabled={isDataLoading || loading}
-                                style={{ 
+                                style={{
                                     flex: 1,
                                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                     border: 'none',
@@ -513,11 +735,11 @@ const EvaluationFilters = ({
                             >
                                 {loading ? 'Recherche...' : 'Rechercher'}
                             </Button>
-                            
+
                             <Button
                                 onClick={handleClear}
                                 disabled={loading}
-                                style={{ 
+                                style={{
                                     minWidth: '45px',
                                     borderRadius: '8px',
                                     border: '1px solid #e2e8f0'
@@ -531,10 +753,9 @@ const EvaluationFilters = ({
                 </Col>
             </Row>
 
-            {/* Indicateur de progression */}
             <div style={{ marginTop: 15 }}>
-                <Steps 
-                    current={selectedClasse ? (selectedMatiere || selectedPeriode ? 2 : 1) : 0} 
+                <Steps
+                    current={selectedClasse ? (selectedMatiere || selectedPeriode ? 2 : 1) : 0}
                     size="small"
                     style={{ background: '#f8fafc', padding: '15px', borderRadius: '8px' }}
                 >
@@ -544,12 +765,11 @@ const EvaluationFilters = ({
                 </Steps>
             </div>
 
-            {/* Loading indicator discret */}
             {isDataLoading && (
-                <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 10, 
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
                     marginTop: 15,
                     padding: '10px 15px',
                     background: '#f0f9ff',
@@ -575,12 +795,15 @@ const Evaluations = () => {
     const [selectedClasse, setSelectedClasse] = useState(null);
     const [selectedMatiere, setSelectedMatiere] = useState(null);
     const [selectedPeriode, setSelectedPeriode] = useState(null);
-    const [showModificationModal, setShowModificationModal] = useState(false);
+    const [showEvaluationModal, setShowEvaluationModal] = useState(false);
     const [selectedEvaluation, setSelectedEvaluation] = useState(null);
+    const [modalMode, setModalMode] = useState('create');
+    const apiUrls = useAllApiUrls();
 
-    // ===========================
-    // HOOKS PERSONNALISÉS
-    // ===========================
+    // ⚠️ TODO: Récupérer ces valeurs depuis le contexte utilisateur
+    const CURRENT_USER_ID = "361"; // À remplacer par la vraie valeur
+    const CURRENT_ANNEE_ID = "385"; // À remplacer par la vraie valeur
+
     const {
         modalState,
         handleTableAction,
@@ -597,124 +820,342 @@ const Evaluations = () => {
     } = useEvaluationsData();
 
     // ===========================
-    // GESTION DE LA RECHERCHE
+    // ✅ GESTION CRÉATION D'ÉVALUATION
     // ===========================
+    const handleCreateSave = useCallback(async (formData) => {
+        const result = await showConfirmDialog({
+            title: 'Créer l\'évaluation',
+            text: 'Voulez-vous vraiment créer cette évaluation?',
+            icon: 'question',
+            confirmButtonText: 'Oui, créer'
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
+        try {
+            console.log('💾 Création de l\'évaluation:', formData);
+
+            const payload = {
+                id: null,
+                code: "",
+                date: formData.date ? formData.date.toISOString() : new Date().toISOString(),
+                eleve: null,
+                heure: "",
+                duree: formData.duree || "02-00",
+                etat: "",
+                note: "",
+                noteSur: parseInt(formData.noteSur) || 20,
+                dateLimite: "",
+                type: {
+                    id: formData.typeId,
+                    code: "",
+                    libelle: ""
+                },
+                matiereEcole: {
+                    id: formData.matiereId,
+                    code: "",
+                    libelle: ""
+                },
+                classe: {
+                    id: formData.classeId,
+                    code: "",
+                    libelle: ""
+                },
+                periode: {
+                    id: formData.periodeId,
+                    code: "",
+                    libelle: ""
+                },
+                annee: {
+                    id: CURRENT_ANNEE_ID
+                },
+                user: CURRENT_USER_ID
+            };
+
+            console.log('📤 Payload envoyé:', payload);
+
+            const response = await axios.post(
+                apiUrls.evaluations.saveAndDisplayEvaluation(),
+                payload
+            );
+
+            console.log('✅ Création réussie:', response.data);
+
+            await showSuccessAlert('L\'évaluation a été créée avec succès!');
+
+            // Rafraîchir les données
+            if (selectedClasse) {
+                await searchEvaluations(selectedClasse, selectedMatiere, selectedPeriode);
+            }
+
+            setShowEvaluationModal(false);
+            setSelectedEvaluation(null);
+
+        } catch (error) {
+            console.error('❌ Erreur lors de la création:', error);
+            await showErrorAlert(
+                error.response?.data?.message || 
+                'Une erreur est survenue lors de la création de l\'évaluation'
+            );
+        }
+    }, [selectedClasse, selectedMatiere, selectedPeriode, searchEvaluations, apiUrls.evaluations, CURRENT_USER_ID, CURRENT_ANNEE_ID]);
+
+    // ===========================
+    // ✅ GESTION MODIFICATION D'ÉVALUATION
+    // ===========================
+    const handleModificationSave = useCallback(async (formData) => {
+        const result = await showConfirmDialog({
+            title: 'Confirmer la modification',
+            text: 'Voulez-vous vraiment modifier cette évaluation?',
+            icon: 'question',
+            confirmButtonText: 'Oui, modifier'
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
+        try {
+            console.log('💾 Sauvegarde des modifications:', formData);
+
+            const payload = {
+                id: selectedEvaluation.id,
+                code: selectedEvaluation.code,
+                numero: selectedEvaluation.numero,
+                date: formData.date ? formData.date.toISOString() : selectedEvaluation.date,
+                noteSur: formData.noteSur || selectedEvaluation.noteSur,
+                duree: formData.duree || selectedEvaluation.duree_raw,
+                pec: selectedEvaluation.pec,
+                type: {
+                    id: formData.typeId || selectedEvaluation.type_id
+                },
+                periode: {
+                    id: formData.periodeId || selectedEvaluation.periode_id
+                },
+                classe: {
+                    id: formData.classeId || selectedEvaluation.classe_id
+                },
+                matiereEcole: {
+                    id: formData.matiereId || selectedEvaluation.matiere_id
+                },
+                annee: {
+                    id: selectedEvaluation.annee_id
+                }
+            };
+
+            console.log('📤 Payload envoyé:', payload);
+
+            const response = await axios.post(
+                apiUrls.evaluations.updateDisplayEvaluation(),
+                payload
+            );
+
+            console.log('✅ Modification réussie:', response.data);
+
+            await showSuccessAlert('L\'évaluation a été modifiée avec succès!');
+
+            if (selectedClasse) {
+                await searchEvaluations(selectedClasse, selectedMatiere, selectedPeriode);
+            }
+
+            setShowEvaluationModal(false);
+            setSelectedEvaluation(null);
+
+        } catch (error) {
+            console.error('❌ Erreur lors de la modification:', error);
+            await showErrorAlert(
+                error.response?.data?.message || 
+                'Une erreur est survenue lors de la modification de l\'évaluation'
+            );
+        }
+    }, [selectedEvaluation, selectedClasse, selectedMatiere, selectedPeriode, searchEvaluations, apiUrls.evaluations]);
+
+    // ===========================
+    // ✅ GESTION SUPPRESSION D'ÉVALUATION
+    // ===========================
+    const handleDeleteEvaluation = useCallback(async (evaluationId) => {
+        const result = await showConfirmDialog({
+            title: 'Confirmer la suppression',
+            text: 'Cette action est irréversible. Voulez-vous vraiment supprimer cette évaluation?',
+            icon: 'warning',
+            confirmButtonText: 'Oui, supprimer',
+            confirmButtonColor: '#ef4444'
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
+        try {
+            console.log('🗑️ Suppression de l\'évaluation:', evaluationId);
+
+            // Appel DELETE à l'API
+            const response = await axios.delete(
+                `${apiUrls.evaluations.deleteEvaluation(evaluationId, CURRENT_USER_ID)}`
+            );
+
+            console.log('✅ Suppression réussie:', response.data);
+
+            await showSuccessAlert('L\'évaluation a été supprimée avec succès!');
+
+            // Rafraîchir les données
+            if (selectedClasse) {
+                await searchEvaluations(selectedClasse, selectedMatiere, selectedPeriode);
+            }
+
+        } catch (error) {
+            console.error('❌ Erreur lors de la suppression:', error);
+            await showErrorAlert(
+                error.response?.data?.message || 
+                'Une erreur est survenue lors de la suppression de l\'évaluation'
+            );
+        }
+    }, [selectedClasse, selectedMatiere, selectedPeriode, searchEvaluations, apiUrls.evaluations, CURRENT_USER_ID]);
+
+    // ===========================
+    // ✅ TOGGLE PEC AVEC CONFIRMATION
+    // ===========================
+    const handlePecToggle = useCallback(async (rowData, checked) => {
+        const result = await showConfirmDialog({
+            title: checked ? 'Activer PEC' : 'Désactiver PEC',
+            text: `Voulez-vous vraiment ${checked ? 'activer' : 'désactiver'} le PEC pour cette évaluation?`,
+            icon: 'question',
+            confirmButtonText: checked ? 'Oui, activer' : 'Oui, désactiver'
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
+        try {
+            const payload = {
+                id: rowData.id,
+                code: rowData.code,
+                numero: rowData.numero,
+                date: rowData.date,
+                noteSur: rowData.noteSur,
+                duree: rowData.duree_raw,
+                pec: checked ? 1 : 0,
+                type: {
+                    id: rowData.type_id
+                },
+                periode: {
+                    id: rowData.periode_id
+                },
+                classe: {
+                    id: rowData.classe_id
+                },
+                matiereEcole: {
+                    id: rowData.matiere_id
+                },
+                annee: {
+                    id: rowData.annee_id
+                }
+            };
+
+            const response = await axios.post(
+                apiUrls.evaluations.updateDisplayEvaluation(),
+                payload
+            );
+
+            await showSuccessAlert(
+                `Le PEC a été ${checked ? 'activé' : 'désactivé'} avec succès!`
+            );
+
+            if (selectedClasse) {
+                await searchEvaluations(selectedClasse, selectedMatiere, selectedPeriode);
+            }
+
+        } catch (error) {
+            console.error('❌ Erreur lors de la mise à jour PEC:', error);
+            await showErrorAlert(
+                error.response?.data?.message || 
+                'Une erreur est survenue lors de la mise à jour du PEC'
+            );
+        }
+    }, [selectedClasse, selectedMatiere, selectedPeriode, searchEvaluations, apiUrls.evaluations]);
+
+    const tableConfig = useMemo(() =>
+        getEvaluationsTableConfig({
+            onPecToggle: handlePecToggle
+        }),
+        [handlePecToggle]
+    );
+
     const handleSearch = useCallback(async ({ classeId, matiereId, periodeId }) => {
-        console.log('🔍 Lancement de la recherche des évaluations:', { classeId, matiereId, periodeId });
         await searchEvaluations(classeId, matiereId, periodeId);
     }, [searchEvaluations]);
 
     const handleClearSearch = useCallback(() => {
-        console.log('🗑️ Effacement des résultats de recherche');
         setSelectedClasse(null);
         setSelectedMatiere(null);
         setSelectedPeriode(null);
         clearResults();
     }, [clearResults]);
 
-    // ===========================
-    // GESTION DU TABLEAU ET NAVIGATION
-    // ===========================
     const handleTableActionLocal = useCallback((actionType, item) => {
-        console.log('Action:', actionType, 'Item:', item);
-
-        // Gestion spécifique pour l'action "voir" - Navigation vers le détail
         if (actionType === 'view' && item && item.code) {
             navigate(`/evaluations/detail/${item.code}`);
             return;
         }
 
-        // Gestion spécifique pour l'action "modifier" - Ouvrir le modal
         if (actionType === 'edit' && item) {
             setSelectedEvaluation(item);
-            setShowModificationModal(true);
+            setModalMode('edit');
+            setShowEvaluationModal(true);
             return;
         }
 
-        // Gestion spécifique pour l'action "créer"
+        if (actionType === 'delete' && item) {
+            handleDeleteEvaluation(item.id);
+            return;
+        }
+
         if (actionType === 'create') {
-            navigate('/evaluations/create');
+            setSelectedEvaluation(null);
+            setModalMode('create');
+            setShowEvaluationModal(true);
             return;
         }
 
-        // Pour les autres actions (delete, download, etc.), utiliser le modal par défaut
         handleTableAction(actionType, item);
-    }, [navigate, handleTableAction]);
+    }, [navigate, handleTableAction, handleDeleteEvaluation]);
 
-    // ===========================
-    // GESTION DU MODAL DE MODIFICATION
-    // ===========================
-    const handleModificationSave = useCallback(async (formData) => {
-        try {
-            console.log('Sauvegarde des modifications:', formData);
-            // Ici vous pouvez ajouter l'appel API pour modifier l'évaluation
-            // await updateEvaluation(selectedEvaluation.id, formData);
-
-            // Actualiser les données après modification
-            if (selectedClasse) {
-                await searchEvaluations(selectedClasse, selectedMatiere, selectedPeriode);
-            }
-            
-            setShowModificationModal(false);
-            setSelectedEvaluation(null);
-        } catch (error) {
-            console.error('Erreur lors de la modification:', error);
-        }
-    }, [selectedEvaluation, selectedClasse, selectedMatiere, selectedPeriode, searchEvaluations]);
-
-    // ===========================
-    // GESTION DU MODAL PAR DÉFAUT
-    // ===========================
     const handleModalSave = useCallback(async () => {
         try {
-            switch (modalState.type) {
-                case 'delete':
-                    console.log('Supprimer l\'évaluation:', modalState.selectedItem);
-                    // Ici vous pouvez ajouter la logique de suppression
-                    // await deleteEvaluation(modalState.selectedItem.id);
-
-                    // Actualiser les données après suppression
-                    setRefreshTrigger(prev => prev + 1);
-                    break;
-
-                default:
-                    console.log('Action non gérée:', modalState.type);
-                    break;
+            if (modalState.type === 'delete') {
+                await handleDeleteEvaluation(modalState.selectedItem.id);
             }
-
             handleCloseModal();
         } catch (error) {
             console.error('Erreur lors de la sauvegarde:', error);
         }
-    }, [modalState.type, modalState.selectedItem, handleCloseModal]);
+    }, [modalState.type, modalState.selectedItem, handleCloseModal, handleDeleteEvaluation]);
 
-    // ===========================
-    // GESTION DU BOUTON CRÉER
-    // ===========================
     const handleCreateEvaluation = useCallback(() => {
-        navigate('/evaluations/create');
-    }, [navigate]);
+        if (!selectedClasse) {
+            showErrorAlert('Veuillez d\'abord sélectionner une classe avant de créer une évaluation');
+            return;
+        }
+        setSelectedEvaluation(null);
+        setModalMode('create');
+        setShowEvaluationModal(true);
+    }, [selectedClasse]);
 
-    // ===========================
-    // GESTION DU RAFRAÎCHISSEMENT
-    // ===========================
     const handleRefresh = useCallback(() => {
         if (selectedClasse) {
             searchEvaluations(selectedClasse, selectedMatiere, selectedPeriode);
         }
     }, [selectedClasse, selectedMatiere, selectedPeriode, searchEvaluations]);
 
-    // ===========================
-    // RENDU DU COMPOSANT
-    // ===========================
     return (
-        <div style={{ 
-             
+        <div style={{
             minHeight: '100vh',
             padding: '20px 0'
         }}>
             <div className="container-fluid">
-                {/* Formulaire de recherche */}
                 <div className="row">
                     <div className="col-lg-12">
                         <EvaluationFilters
@@ -732,7 +1173,6 @@ const Evaluations = () => {
                     </div>
                 </div>
 
-                {/* Message d'information moderne */}
                 {!searchPerformed && !searchLoading && (
                     <div className="row mb-4">
                         <div className="col-lg-12">
@@ -769,7 +1209,6 @@ const Evaluations = () => {
                     </div>
                 )}
 
-                {/* Erreur de recherche moderne */}
                 {searchError && (
                     <div className="row mb-4">
                         <div className="col-lg-12">
@@ -806,7 +1245,6 @@ const Evaluations = () => {
                     </div>
                 )}
 
-                {/* DataTable avec style amélioré */}
                 {searchPerformed && (
                     <div className="row">
                         <div className="col-lg-12">
@@ -820,30 +1258,24 @@ const Evaluations = () => {
                                 <DataTable
                                     title="Liste des Évaluations"
                                     subtitle="évaluation(s) trouvée(s)"
-                                    
                                     data={evaluations}
                                     loading={searchLoading}
                                     error={null}
-                                    
-                                    columns={evaluationsTableConfig.columns}
-                                    searchableFields={evaluationsTableConfig.searchableFields}
-                                    filterConfigs={evaluationsTableConfig.filterConfigs}
-                                    actions={evaluationsTableConfig.actions}
-                                    
+                                    columns={tableConfig.columns}
+                                    searchableFields={tableConfig.searchableFields}
+                                    filterConfigs={tableConfig.filterConfigs}
+                                    actions={tableConfig.actions}
                                     onAction={handleTableActionLocal}
                                     onRefresh={handleRefresh}
                                     onCreateNew={handleCreateEvaluation}
-                                    
                                     defaultPageSize={15}
                                     pageSizeOptions={[10, 15, 25, 50]}
                                     tableHeight={600}
-                                    
                                     enableRefresh={true}
                                     enableCreate={true}
                                     createButtonText="Nouvelle Évaluation"
                                     selectable={false}
                                     rowKey="id"
-                                    
                                     customStyles={{
                                         container: { backgroundColor: "transparent" },
                                         panel: { minHeight: "600px", border: "none", boxShadow: "none" },
@@ -854,7 +1286,6 @@ const Evaluations = () => {
                     </div>
                 )}
 
-                {/* Aucun résultat - style moderne */}
                 {searchPerformed && evaluations?.length === 0 && !searchLoading && (
                     <div className="row">
                         <div className="col-lg-12">
@@ -885,7 +1316,7 @@ const Evaluations = () => {
                                 </p>
                                 <Button
                                     appearance="primary"
-                                    style={{ 
+                                    style={{
                                         marginTop: 15,
                                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                         border: 'none'
@@ -901,18 +1332,21 @@ const Evaluations = () => {
                 )}
             </div>
 
-            {/* Modal de modification */}
-            <ModificationModal
-                open={showModificationModal}
+            {/* 🆕 MODAL UNIFIÉ CRÉATION/MODIFICATION */}
+            <EvaluationModal
+                open={showEvaluationModal}
                 onClose={() => {
-                    setShowModificationModal(false);
+                    setShowEvaluationModal(false);
                     setSelectedEvaluation(null);
                 }}
                 evaluation={selectedEvaluation}
-                onSave={handleModificationSave}
+                onSave={modalMode === 'create' ? handleCreateSave : handleModificationSave}
+                mode={modalMode}
+                currentClasseId={selectedClasse}
+                currentUserId={CURRENT_USER_ID}
+                currentAnneeId={CURRENT_ANNEE_ID}
             />
 
-            {/* Modal pour les autres actions (delete, etc.) */}
             {modalState.isOpen && (
                 <Modal open={modalState.isOpen} onClose={handleCloseModal}>
                     <Modal.Header>

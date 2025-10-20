@@ -297,6 +297,9 @@ const usePersonnelUrls = () => {
         getByProf: (anneeId, profId, ecoleId) =>
             `${baseUrl}personnel-matiere-classe/get-by-prof?annee=${anneeId}&prof=${profId}&ecole=${ecoleId}`,
 
+        getClasseParProf: (personnel_id) =>
+            `${baseUrl}souscription-personnel/classe-par-prof/${personnel_id}/${params.academicYearId}`,
+
         /**
          * Récupère les matières d'un professeur pour une classe spécifique
          * @param {number} classeId - ID de la classe
@@ -696,6 +699,15 @@ const useEvaluationsUrls = () => {
          */
         getById: (evaluationId) =>
             `${baseUrl}evaluation/${evaluationId}`,
+
+        updateDisplayEvaluation: () =>
+            `${baseUrl}evaluations/update-display`,
+
+        saveAndDisplayEvaluation: () =>
+            `${baseUrl}evaluations/saveAndDisplay`,
+
+        deleteEvaluation: (evaluationId, userId) => 
+                `${baseUrl}evaluations/delete-handle/${evaluationId}/${userId}`,
 
         /**
          * Récupère une évaluation par code

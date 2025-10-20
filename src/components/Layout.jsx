@@ -799,8 +799,8 @@ const getDashboardComponent = (id) => {
 
               
 
-              <Route path="/monPersonel" element={<ListePersonnel typeDeListe="listePersonnel" />} />
-              <Route path="/affectationProfilPersonel" element={<ListePersonnel typeDeListe="affectationPersonel" />} />
+              <Route path="/monPersonel" element={<ListePersonnel typeDeListe="listePersonnel" tableTitle ="Liste du personel" />} />
+              <Route path="/affectationProfilPersonel" element={<ListePersonnel typeDeListe="affectationPersonel" tableTitle ="Liste du personel à affecter à un profil" />} />
 
               <Route path="/saisirSeances" element={<ListeSeancesSaisies />} />
               <Route path="/listeSeances" element={<ListeSeancesSaisies />} />

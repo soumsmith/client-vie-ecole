@@ -90,7 +90,7 @@ const PersonnelModal = ({ modalState, onClose, onSave }) => {
         try {
             setLoading(true);
             const response = await axios.get(
-                apiUrls.personnel.getClasseParProf(personnel.id, dynamicAcademicYearId)
+                apiUrls.personnel.getClasseParProf(personnel.id) //
             );
             setClasses(response.data || []);
         } catch (error) {

@@ -150,7 +150,7 @@ const AjouterPanier = () => {
                 <div className="col-lg-12">
                     <DataTable
                         title="Liste du personnel validé par GAIN SARL"
-                        subtitle={`${personnel.length} personnel(s) disponible(s)`}
+                        subtitle={`personnel(s) disponible(s)`}
                         data={personnel}
                         loading={loading}
                         error={error}
