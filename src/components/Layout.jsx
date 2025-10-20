@@ -93,7 +93,7 @@ import ListeMatieresAdmin from './PULS/ListeMatieresAdmin/ListeMatieresAdmin'
 import EcranSeances from './PULS/SeancesSaisies/EcranSeances';
 import ProgressionPedagogique from './PULS/ProgressionPedagogique/ProgressionPedagogique';
 
-import ProfilUtilisateur from './PULS/Profile/ ProfilUtilisateur';
+import ProfilUtilisateur from './PULS/Profile/ProfilUtilisateur';
 import CahierDeTexte from './PULS/CahierDeTexte/CahierDeTexte'
 import ModifierMotDePasse from './PULS/GestionMoTdePasse/ModifierMotDePasse';
 import ModifierInfoPersonnelles from './PULS/GestionUserInfos/ModifierInfoPersonnelles';

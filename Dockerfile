@@ -1,8 +1,15 @@
-# Fetching the latest node image on Alpine Linux
-FROM node:alpine AS builder
+# Alternative: Using Debian-based Node image for better package availability
+FROM node:20-slim AS builder
 
 # Install required dependencies for building
-RUN apk add --no-cache git openssh python3 make g++
+RUN apt-get update && apt-get install -y \
+    git \
+    openssh-client \
+    python3 \
+    make \
+    g++ \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
 # Setting up the work directory
 WORKDIR /app
