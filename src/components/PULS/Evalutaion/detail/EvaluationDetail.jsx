@@ -877,19 +877,6 @@ const EvaluationDetail = () => {
                                             style={{ borderRadius: '6px' }}
                                         />
                                     </Whisper>
-
-                                    <Button
-                                        appearance="primary"
-                                        startIcon={<FiEdit />}
-                                        onClick={() => setShowModificationModal(true)}
-                                        style={{
-                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                            border: 'none',
-                                            borderRadius: '8px'
-                                        }}
-                                    >
-                                        Modifier
-                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -1177,26 +1164,6 @@ const EvaluationDetail = () => {
                                     // Permettre le scroll même si verrouillé
                                     scrollable={true}
                                 />
-                            )}
-
-                            {/* Debug des données */}
-                            {process.env.NODE_ENV === 'development' && (
-                                <div style={{
-                                    marginTop: '10px',
-                                    padding: '10px',
-                                    background: '#f8f9fa',
-                                    borderRadius: '4px',
-                                    fontSize: '12px'
-                                }}>
-                                    <strong>🔍 Debug:</strong> {processedNotes.length} notes traitées
-                                    {processedNotes.length > 0 && (
-                                        <div>
-                                            Exemple de données: matricule="{processedNotes[0].matricule}",
-                                            sexe="{processedNotes[0].sexe}",
-                                            pec={processedNotes[0].pec}
-                                        </div>
-                                    )}
-                                </div>
                             )}
 
                             {/* Message d'information sur le verrouillage */}

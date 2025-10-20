@@ -54,8 +54,8 @@ const useAppParams = () => {
 
     return useMemo(() => ({
         // IDs principaux
-        ecoleId: dynamicEcoleId || DEFAULT_VALUES.ECOLE_ID,
-        academicYearId: dynamicAcademicYearId || DEFAULT_VALUES.ANNEE_ID, //DEFAULT_VALUES.ANNEE_ID, //
+        ecoleId: dynamicEcoleId , //|| DEFAULT_VALUES.ECOLE_ID,
+        academicYearId: dynamicAcademicYearId || DEFAULT_VALUES.ANNEE_ID , //DEFAULT_VALUES.ANNEE_ID, // dynamicAcademicYearId || DEFAULT_VALUES.ANNEE_ID, //
         periodicitieId: dynamicPeriodicitieId || DEFAULT_VALUES.PERIODICITE_ID,
         profileId: profileId || DEFAULT_VALUES.PROFIL_PROFESSEUR_ID,
         userId,
