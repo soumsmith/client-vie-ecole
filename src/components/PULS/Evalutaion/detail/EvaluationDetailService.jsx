@@ -93,7 +93,7 @@ export const useEvaluationDetail = (evaluationCode) => {
                     dateCreation: response.data.dateCreation,
                     dateUpdate: response.data.dateUpdate,
                     dateLimite: response.data.dateLimite,
-                    dateLimiteFormatted: formatDate(response.data.dateLimite),
+                    dateLimiteFormatted: response.data.dateLimite,  //formatDate(response.data.dateLimite),
                     type: {
                         id: response.data.type?.id,
                         libelle: response.data.type?.libelle,
