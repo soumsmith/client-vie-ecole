@@ -166,7 +166,7 @@ const ListeMessages = ({ typeMessage}) => {
                         pageSizeOptions={[10, 20, 50]}
                         tableHeight={600}
                         enableRefresh={true}
-                        enableCreate={true}
+                        enableCreate={false}
                         createButtonText="Nouveau Message"
                         selectable={false} // Désactivé car on n'utilise plus la sélection multiple
                         rowKey="id"

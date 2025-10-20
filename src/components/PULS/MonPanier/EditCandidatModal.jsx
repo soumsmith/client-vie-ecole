@@ -156,10 +156,12 @@ const EditCandidatModal = ({ show, candidat, onClose, onSave }) => {
             console.log('✅ Réponse du serveur:', response);
 
             if (response.status === 200 || response.status === 201) {
+
+                const message = response.data + ` à ${candidat.nomComplet}.` || `Le message a été envoyé avec succès à ${candidat.nomComplet}.`
                 await Swal.fire({
                     icon: 'success',
                     title: 'Message envoyé !',
-                    text: `Le message a été envoyé avec succès à ${candidat.nomComplet}.`,
+                    text: message,
                     confirmButtonColor: '#10b981',
                     timer: 3000,
                     showConfirmButton: true

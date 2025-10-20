@@ -73,7 +73,7 @@ export const useEvaluationDetail = (evaluationCode) => {
 
             const cacheKey = `evaluation-detail-${code}`;
             const cachedData = getFromCache(cacheKey);
-            
+
             if (cachedData) {
                 setData(cachedData);
                 setLoading(false);
@@ -81,7 +81,7 @@ export const useEvaluationDetail = (evaluationCode) => {
             }
 
             const response = await axios.get(apiUrls.evaluations.getByCode(code));
-            
+
             if (response.data) {
                 const processedData = {
                     id: response.data.id,
@@ -204,7 +204,7 @@ export const useEvaluationNotes = (evaluationCode) => {
 
             const cacheKey = `evaluation-notes-${code}`;
             const cachedData = getFromCache(cacheKey);
-            
+
             if (cachedData) {
                 setData(cachedData);
                 setLoading(false);
@@ -212,7 +212,7 @@ export const useEvaluationNotes = (evaluationCode) => {
             }
 
             const response = await axios.get(apiUrls.notes.listAboutEvaluation(code));
-            
+
             if (response.data && Array.isArray(response.data)) {
                 const processedNotes = response.data.map((noteItem, index) => ({
                     id: noteItem.id || `note-${index}`,
@@ -255,7 +255,7 @@ export const useEvaluationNotes = (evaluationCode) => {
                     const nomA = a.eleve.nom?.toLowerCase() || '';
                     const nomB = b.eleve.nom?.toLowerCase() || '';
                     if (nomA !== nomB) return nomA.localeCompare(nomB);
-                    
+
                     const prenomA = a.eleve.prenom?.toLowerCase() || '';
                     const prenomB = b.eleve.prenom?.toLowerCase() || '';
                     return prenomA.localeCompare(prenomB);
@@ -278,9 +278,9 @@ export const useEvaluationNotes = (evaluationCode) => {
     const updateNote = useCallback(async (noteId, newNote, newPec) => {
         try {
             // Mettre à jour localement d'abord pour une meilleure UX
-            setData(prevData => 
-                prevData.map(item => 
-                    item.id === noteId 
+            setData(prevData =>
+                prevData.map(item =>
+                    item.id === noteId
                         ? { ...item, note: newNote, pec: newPec }
                         : item
                 )
@@ -288,7 +288,7 @@ export const useEvaluationNotes = (evaluationCode) => {
 
             // Appel API pour sauvegarder (à implémenter selon votre backend)
             // await axios.put(`${getFullUrl()}notes/${noteId}`, { note: newNote, pec: newPec });
-            
+
         } catch (err) {
             // En cas d'erreur, restaurer les données précédentes
             fetchNotes(evaluationCode);
@@ -328,7 +328,7 @@ export const useEvaluationLock = (evaluationId) => {
             setError(null);
 
             const response = await axios.get(apiUrls.evaluations.isLocked(id));
-            
+
             if (response.data) {
                 setLockInfo({
                     isLocked: response.data.isLocked,
@@ -385,8 +385,8 @@ export const useProfesseurDetails = (matiereId, classeId, anneeId = DEFAULT_ANNE
 
             const response = await axios.get(apiUrls.personnel.getProfesseurByMatiere(annee, matiere, classe));
             //const response = await axios.get(apiUrls.personnel.getProfesseurByMatiere(annee, matiere, classe));
-            
-            
+
+
             if (response.data && Array.isArray(response.data) && response.data.length > 0) {
                 const profData = response.data[0]; // Prendre le premier professeur
                 setData({
@@ -462,7 +462,7 @@ export const notesTableConfig = {
                         width: '32px',
                         height: '32px',
                         borderRadius: '50%',
-                        background: rowData.eleve?.sexe === 'FEMININ' 
+                        background: rowData.eleve?.sexe === 'FEMININ'
                             ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
                             : 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
                         display: 'flex',

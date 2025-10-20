@@ -8,10 +8,10 @@ import DataTable from "../../DataTable";
 import { usePersonnelData, getPersonnelTableConfig } from './PersonnelServiceManager';
 import getFullUrl from "../../hooks/urlUtils";
 
-const ListePersonnel = ({typeDeListe}) => {
+const ListePersonnel = ({ typeDeListe, tableTitle }) => {
     const navigate = useNavigate();
     const [refreshTrigger, setRefreshTrigger] = useState(0);
-    
+
     // État des modals - Gestion directe
     const [modalState, setModalState] = useState({
         isOpen: false,
@@ -80,7 +80,7 @@ const ListePersonnel = ({typeDeListe}) => {
     // ===========================
     const handleDownloadDocuments = useCallback((personnel) => {
         const documents = [];
-        
+
         if (personnel.cvLien) {
             documents.push({ name: 'CV', url: personnel.cvLien });
         }
@@ -111,7 +111,7 @@ const ListePersonnel = ({typeDeListe}) => {
     const handleModalSave = useCallback(async () => {
         try {
             console.log('Sauvegarde modal - Type:', modalState.type, 'Données:', modalState.selectedQuestion);
-            
+
             switch (modalState.type) {
                 case 'delete':
                     console.log('Supprimer le personnel:', modalState.selectedQuestion);
@@ -260,7 +260,7 @@ const ListePersonnel = ({typeDeListe}) => {
             <div className="row mt-3">
                 <div className="col-lg-12">
                     <DataTable
-                        title="Liste du Personnel"
+                        title={tableTitle}
                         subtitle={`membre${personnel.length > 1 ? 's' : ''} du personnel`}
                         data={personnel}
                         loading={loading}
@@ -303,30 +303,6 @@ const ListePersonnel = ({typeDeListe}) => {
                 onClose={handleCloseModal}
                 onSave={handleModalSave}
             />
-
-            {/* Debug : Affichage des informations de débogage en développement */}
-            {process.env.NODE_ENV === 'development' && (
-                <div style={{ 
-                    position: 'fixed', 
-                    bottom: '10px', 
-                    right: '10px', 
-                    backgroundColor: 'rgba(0,0,0,0.8)', 
-                    color: 'white', 
-                    padding: '10px', 
-                    borderRadius: '5px',
-                    fontSize: '12px',
-                    maxWidth: '300px',
-                    zIndex: 9999
-                }}>
-                    <div><strong>Debug Info:</strong></div>
-                    <div>Personnel count: {personnel.length}</div>
-                    <div>Modal open: {modalState.isOpen ? 'Yes' : 'No'}</div>
-                    <div>Modal type: {modalState.type || 'None'}</div>
-                    <div>Selected: {modalState.selectedQuestion?.nomComplet || 'None'}</div>
-                    <div>Actions: {tableConfig.actions?.length || 0}</div>
-                    <div>Filters: {tableConfig.filterConfigs?.length || 0}</div>
-                </div>
-            )}
         </>
     );
 };

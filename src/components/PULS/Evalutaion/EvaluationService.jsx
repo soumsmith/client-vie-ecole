@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Badge } from "rsuite";
+import { Badge, Toggle } from "rsuite";
 import {
   FiEye,
   FiEdit,
@@ -18,7 +18,6 @@ import {
   FiUser,
   FiUsers,
 } from "react-icons/fi";
-import {Toggle} from 'rsuite';
 import { getFromCache, setToCache } from "../utils/cacheUtils";
 import { useAllApiUrls } from "../utils/apiConfig";
 import { usePulsParams } from "../../hooks/useDynamicParams";
@@ -95,9 +94,6 @@ const determineStatut = (evaluation) => {
   }
 };
 
-// Note: Le hook usePeriodesData a été déplacé vers CommonDataService.js
-// pour éviter la duplication et utiliser les données de l'utilisateur connecté
-
 // ===========================
 // HOOK POUR RÉCUPÉRER LES ÉVALUATIONS D'UNE CLASSE/MATIÈRE/PÉRIODE
 // ===========================
@@ -118,7 +114,7 @@ export const useEvaluationsData = (refreshTrigger = 0) => {
     personnelInfo: personnelInfo,
     academicYearId: dynamicAcademicYearId,
     ecoleId: dynamicEcoleId
-} = usePulsParams();
+  } = usePulsParams();
 
   const searchEvaluations = useCallback(
     async (
@@ -293,48 +289,34 @@ export const useEvaluationsData = (refreshTrigger = 0) => {
 // ===========================
 // CONFIGURATION DU TABLEAU DES ÉVALUATIONS
 // ===========================
-export const evaluationsTableConfig = {
-  columns: [
-    {
-      title: "N°",
-      dataKey: "numero",
-      flexGrow: 0.5,
-      minWidth: 70,
-      // cellType: 'custom',
-      // customRenderer: (rowData) => (
-      //     <div style={{
-      //         padding: '6px 8px',
-      //         backgroundColor: '#667eea',
-      //         color: 'white',
-      //         borderRadius: '8px',
-      //         fontSize: '12px',
-      //         fontWeight: 'bold',
-      //         textAlign: 'center',
-      //         minWidth: '45px'
-      //     }}>
-      //         {rowData.numero}
-      //     </div>
-      // ),
-      sortable: true,
-    },
-    {
-      title: "Date",
-      dataKey: "date_display",
-      flexGrow: 1,
-      minWidth: 110,
-      cellType: "custom",
-      customRenderer: (rowData) => (
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <FiCalendar size={14} color="#667eea" />
-          <span style={{ fontSize: "13px", fontWeight: "500" }}>
-            {rowData.date_display}
-          </span>
-        </div>
-      ),
-      sortable: true,
-    },
-    {
-        title: "Type d'évalutaion",
+export const getEvaluationsTableConfig = (callbacks = {}) => {
+  return {
+    columns: [
+      {
+        title: "N°",
+        dataKey: "numero",
+        flexGrow: 0.5,
+        minWidth: 70,
+        sortable: true,
+      },
+      {
+        title: "Date",
+        dataKey: "date_display",
+        flexGrow: 1,
+        minWidth: 110,
+        cellType: "custom",
+        customRenderer: (rowData) => (
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <FiCalendar size={14} color="#667eea" />
+            <span style={{ fontSize: "13px", fontWeight: "500" }}>
+              {rowData.date_display}
+            </span>
+          </div>
+        ),
+        sortable: true,
+      },
+      {
+        title: "Type d'évaluation",
         dataKey: "evaluation_display",
         flexGrow: 2.5,
         minWidth: 100,
@@ -342,13 +324,13 @@ export const evaluationsTableConfig = {
         customRenderer: (rowData) => (
           <div>
             <div style={{ 
-                          fontWeight: '600', 
-                          color: '#1e293b',
-                          fontSize: '14px',
-                          marginBottom: '2px'
-                      }}>
-                          {rowData.evaluation_display}
-                      </div>
+              fontWeight: '600', 
+              color: '#1e293b',
+              fontSize: '14px',
+              marginBottom: '2px'
+            }}>
+              {rowData.evaluation_display}
+            </div>
             <div
               style={{
                 fontSize: "11px",
@@ -365,241 +347,239 @@ export const evaluationsTableConfig = {
         ),
         sortable: true,
       },
-    {
-      title: "Matière",
-      dataKey: "evaluation_display",
-      flexGrow: 1.5,
-      minWidth: 100,
-      cellType: "custom",
-      customRenderer: (rowData) => (
-        <div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              marginBottom: "2px",
-            }}
-          >
-            <FiBookOpen size={12} color="#10b981" />
-            <span
+      {
+        title: "Matière",
+        dataKey: "matiere",
+        flexGrow: 1.5,
+        minWidth: 100,
+        cellType: "custom",
+        customRenderer: (rowData) => (
+          <div>
+            <div
               style={{
-                fontSize: "12px",
-                color: "#059669",
-                fontWeight: "500",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                marginBottom: "2px",
               }}
             >
-              {rowData.matiere}
-            </span>
+              <FiBookOpen size={12} color="#10b981" />
+              <span
+                style={{
+                  fontSize: "12px",
+                  color: "#059669",
+                  fontWeight: "500",
+                }}
+              >
+                {rowData.matiere}
+              </span>
+            </div>
           </div>
-        </div>
-      ),
-      sortable: true,
-    },
-    {
-      title: "Note sur",
-      dataKey: "noteSur",
-      flexGrow: 1,
-      minWidth: 120,
-    },
-    {
-      title: "Période",
-      dataKey: "periode",
-      flexGrow: 2.2,
-      minWidth: 120,
-      cellType: "custom",
-      customRenderer: (rowData) => (
-        <div>
-          {rowData.periode}
-          <div
-            style={{
-              fontSize: "11px",
-              color: "#64748b",
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-            }}
-          >
-            <span>Coef: {rowData.coefficient}</span>
-          </div>
-        </div>
-      ),
-      sortable: true,
-    },
-    {
-      title: "Classe",
-      dataKey: "classe",
-      flexGrow: 1,
-      minWidth: 100,
-      cellType: "custom",
-      customRenderer: (rowData) => (
-        <div>
-          <div
-            style={{
-              fontWeight: "600",
-              color: "#1e293b",
-              fontSize: "13px",
-              marginBottom: "2px",
-            }}
-          >
-            {rowData.classe}
-          </div>
-          <div
-            style={{
-              fontSize: "11px",
-              color: "#64748b",
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-            }}
-          >
-            <FiUsers size={11} />
-            <span>{rowData.nombreEleves} élèves</span>
-          </div>
-        </div>
-      ),
-      sortable: true,
-    },
-    {
-      title: "Statut",
-      dataKey: "statut_display",
-      flexGrow: 1.5,
-      minWidth: 100,
-      cellType: "custom",
-      customRenderer: (rowData) => {
-        const colorMap = {
-          Programmée: { bg: "#fef3c7", text: "#d97706", border: "#f59e0b" },
-          "En cours": { bg: "#dbeafe", text: "#2563eb", border: "#3b82f6" },
-          Terminée: { bg: "#dcfce7", text: "#16a34a", border: "#22c55e" },
-          Annulée: { bg: "#fee2e2", text: "#dc2626", border: "#ef4444" },
-        };
-
-        const colors =
-          colorMap[rowData.statut_display] || colorMap["Programmée"];
-
-        return (
-          <div
-            style={{
-              padding: "4px 8px",
-              backgroundColor: colors.bg,
-              color: colors.text,
-              border: `1px solid ${colors.border}`,
-              borderRadius: "6px",
-              fontSize: "12px",
-              fontWeight: "500",
-              textAlign: "center",
-            }}
-          >
-            {rowData.statut_display}
-          </div>
-        );
+        ),
+        sortable: true,
       },
-      sortable: true,
-    },
-    {
-      title: "P.E.C",
-      dataKey: "pec",
-      flexGrow: 1,
-      minWidth: 70,
-      cellType: "custom",
-      customRenderer: (rowData) => (
-        <Toggle
-          checked={rowData.pec === 1}
-          // onChange={(checked) => handleParametreChange('annuel', checked)}
-          checkedChildren="Oui"
-          color="green"
-          unCheckedChildren="Non"
-          size="md"
-        />
-      ),
-    },
-    {
-      title: "Actions",
-      dataKey: "actions",
-      flexGrow: 1,
-      minWidth: 120,
-      cellType: "actions",
-      fixed: "right",
-    },
-  ],
-  filterConfigs: [
-    {
-      field: "type",
-      label: "Type d'évaluation",
-      type: "select",
-      dynamic: true,
-      tagColor: "blue",
-    },
-    {
-      field: "statut_display",
-      label: "Statut",
-      type: "select",
-      dynamic: true,
-      tagColor: "green",
-    },
-    {
-      field: "matiere",
-      label: "Matière",
-      type: "select",
-      dynamic: true,
-      tagColor: "purple",
-    },
-    {
-      field: "periode",
-      label: "Période",
-      type: "select",
-      dynamic: true,
-      tagColor: "orange",
-    },
-    {
-      field: "date_display",
-      label: "Date",
-      type: "date",
-      tagColor: "cyan",
-    },
-  ],
-  searchableFields: [
-    "numero",
-    "evaluation_display",
-    "type",
-    "matiere",
-    "periode",
-    "classe",
-    "description_complete",
-  ],
-  actions: [
-    {
-      type: "view",
-      icon: <FiEye />,
-      tooltip: "Voir les détails de l'évaluation",
-      color: "#3498db",
-    },
-    {
-      type: "edit",
-      icon: <FiEdit />,
-      tooltip: "Modifier l'évaluation",
-      color: "#f39c12",
-    },
-    // {
-    //     type: 'download',
-    //     icon: <FiDownload />,
-    //     tooltip: 'Télécharger la feuille d\'émargement',
-    //     color: '#9b59b6'
-    // },
-    {
-      type: "delete",
-      icon: <FiTrash2 />,
-      tooltip: "Supprimer l'évaluation",
-      color: "#e74c3c",
-    },
-  ],
-  // Configuration supplémentaire pour le tableau
-  defaultSortField: "date_display",
-  defaultSortOrder: "desc",
-  pageSize: 10,
-  showPagination: true,
-  showSearch: true,
-  showFilters: true,
-  enableExport: true,
-  exportFormats: ["excel", "pdf", "csv"],
+      {
+        title: "Note sur",
+        dataKey: "noteSur",
+        flexGrow: 1,
+        minWidth: 120,
+      },
+      {
+        title: "Période",
+        dataKey: "periode",
+        flexGrow: 2.2,
+        minWidth: 120,
+        cellType: "custom",
+        customRenderer: (rowData) => (
+          <div>
+            {rowData.periode}
+            <div
+              style={{
+                fontSize: "11px",
+                color: "#64748b",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+              }}
+            >
+              <span>Coef: {rowData.coefficient}</span>
+            </div>
+          </div>
+        ),
+        sortable: true,
+      },
+      {
+        title: "Classe",
+        dataKey: "classe",
+        flexGrow: 1,
+        minWidth: 100,
+        cellType: "custom",
+        customRenderer: (rowData) => (
+          <div>
+            <div
+              style={{
+                fontWeight: "600",
+                color: "#1e293b",
+                fontSize: "13px",
+                marginBottom: "2px",
+              }}
+            >
+              {rowData.classe}
+            </div>
+            <div
+              style={{
+                fontSize: "11px",
+                color: "#64748b",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+              }}
+            >
+              <FiUsers size={11} />
+              <span>{rowData.nombreEleves} élèves</span>
+            </div>
+          </div>
+        ),
+        sortable: true,
+      },
+      {
+        title: "Statut",
+        dataKey: "statut_display",
+        flexGrow: 1.5,
+        minWidth: 100,
+        cellType: "custom",
+        customRenderer: (rowData) => {
+          const colorMap = {
+            Programmée: { bg: "#fef3c7", text: "#d97706", border: "#f59e0b" },
+            "En cours": { bg: "#dbeafe", text: "#2563eb", border: "#3b82f6" },
+            Terminée: { bg: "#dcfce7", text: "#16a34a", border: "#22c55e" },
+            Annulée: { bg: "#fee2e2", text: "#dc2626", border: "#ef4444" },
+          };
+
+          const colors =
+            colorMap[rowData.statut_display] || colorMap["Programmée"];
+
+          return (
+            <div
+              style={{
+                padding: "4px 8px",
+                backgroundColor: colors.bg,
+                color: colors.text,
+                border: `1px solid ${colors.border}`,
+                borderRadius: "6px",
+                fontSize: "12px",
+                fontWeight: "500",
+                textAlign: "center",
+              }}
+            >
+              {rowData.statut_display}
+            </div>
+          );
+        },
+        sortable: true,
+      },
+      {
+        title: "P.E.C",
+        dataKey: "pec",
+        flexGrow: 1,
+        minWidth: 70,
+        cellType: "custom",
+        customRenderer: (rowData) => (
+          <Toggle
+            checked={rowData.pec === 1}
+            onChange={(checked) => {
+              if (callbacks.onPecToggle) {
+                callbacks.onPecToggle(rowData, checked);
+              }
+            }}
+            checkedChildren="Oui"
+            color="green"
+            unCheckedChildren="Non"
+            size="md"
+          />
+        ),
+      },
+      {
+        title: "Actions",
+        dataKey: "actions",
+        flexGrow: 1,
+        minWidth: 120,
+        cellType: "actions",
+        fixed: "right",
+      },
+    ],
+    filterConfigs: [
+      {
+        field: "type",
+        label: "Type d'évaluation",
+        type: "select",
+        dynamic: true,
+        tagColor: "blue",
+      },
+      {
+        field: "statut_display",
+        label: "Statut",
+        type: "select",
+        dynamic: true,
+        tagColor: "green",
+      },
+      {
+        field: "matiere",
+        label: "Matière",
+        type: "select",
+        dynamic: true,
+        tagColor: "purple",
+      },
+      {
+        field: "periode",
+        label: "Période",
+        type: "select",
+        dynamic: true,
+        tagColor: "orange",
+      },
+      {
+        field: "date_display",
+        label: "Date",
+        type: "date",
+        tagColor: "cyan",
+      },
+    ],
+    searchableFields: [
+      "numero",
+      "evaluation_display",
+      "type",
+      "matiere",
+      "periode",
+      "classe",
+      "description_complete",
+    ],
+    actions: [
+      {
+        type: "view",
+        icon: <FiEye size={17} />,
+        tooltip: "Voir les détails de l'évaluation",
+        color: "#3498db",
+      },
+      {
+        type: "edit",
+        icon: <FiEdit size={17} />,
+        tooltip: "Modifier l'évaluation",
+        color: "#f39c12",
+      },
+      {
+        type: "delete",
+        icon: <FiTrash2 size={17} />,
+        tooltip: "Supprimer l'évaluation",
+        color: "#e74c3c",
+      },
+    ],
+    defaultSortField: "date_display",
+    defaultSortOrder: "desc",
+    pageSize: 10,
+    showPagination: true,
+    showSearch: true,
+    showFilters: true,
+    enableExport: true,
+    exportFormats: ["excel", "pdf", "csv"],
+  };
 };

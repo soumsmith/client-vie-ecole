@@ -97,11 +97,12 @@ const PersonnelDetailsModal = ({
 
             console.log('✅ Réponse du serveur:', response);
 
-            if (response.status === 200 || response.status === 201) {
+            if (response.status === 200 || response.status === 201 && response.data != null) {
+                const message = response.data || 'Le personnel a été enregistré avec succès dans le panier.'
                 await Swal.fire({
                     icon: 'success',
                     title: 'Succès !',
-                    text: 'Le personnel a été enregistré avec succès dans le panier.',
+                    text: message,
                     confirmButtonColor: '#10b981',
                     timer: 3000,
                     showConfirmButton: true
