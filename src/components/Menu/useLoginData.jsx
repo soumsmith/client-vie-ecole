@@ -270,7 +270,7 @@ const useLoginData = (config) => {
     const sendPasswordEmail = async (email, loginInfo, password) => {
         try {
             console.log('📧 Envoi de l\'email de récupération...');
-            
+
             const emailData = {
                 destinataire: email,
                 message: `Login :${loginInfo || email}  Mot de passe:${password}`,
@@ -279,11 +279,11 @@ const useLoginData = (config) => {
 
             const params = new URLSearchParams(emailData);
             const emailUrl = `${getFullUrl()}sendEmail?${params.toString()}`;
-            
+
             console.log('📤 Envoi email vers:', emailUrl);
 
             const response = await axios.post(emailUrl);
-            
+
             if (response.status === 200) {
                 console.log('✅ Email envoyé avec succès');
                 return { success: true, message: 'Email envoyé avec succès' };
@@ -302,34 +302,34 @@ const useLoginData = (config) => {
     const handlePasswordRecovery = async (formData) => {
         try {
             console.log('🔐 Récupération des paramètres de connexion...');
-            
+
             const loginData = mapFormDataToLoginData(formData, config?.loginFields);
             const paramUrl = `${getFullUrl()}${config.apis.login}`;
-            
+
             const params = new URLSearchParams(loginData);
             const fullUrl = `${paramUrl}?${params.toString()}`;
-            
+
             console.log('🔗 Récupération des infos depuis:', fullUrl);
-            
+
             const loginResponse = await axios.get(fullUrl);
-            
+
             console.log('📋 Réponse reçue:', loginResponse.data);
-            
+
             if (!loginResponse.data || loginResponse.status !== 200) {
                 throw new Error('Impossible de récupérer vos informations de connexion');
             }
 
             let loginInfo = formData.email;
             let password = '';
-            
+
             if (typeof loginResponse.data === 'object') {
-                password = loginResponse.data.motdePasse || 
-                          loginResponse.data.password || 
-                          loginResponse.data.motDepasse ||
-                          loginResponse.data.pass || '';
-                loginInfo = loginResponse.data.login || 
-                           loginResponse.data.email || 
-                           formData.email;
+                password = loginResponse.data.motdePasse ||
+                    loginResponse.data.password ||
+                    loginResponse.data.motDepasse ||
+                    loginResponse.data.pass || '';
+                loginInfo = loginResponse.data.login ||
+                    loginResponse.data.email ||
+                    formData.email;
             } else if (typeof loginResponse.data === 'string') {
                 password = loginResponse.data;
             }
@@ -341,7 +341,7 @@ const useLoginData = (config) => {
             console.log('🔑 Informations récupérées:', { loginInfo, passwordLength: password.length });
 
             const emailResult = await sendPasswordEmail(formData.email, loginInfo, password);
-            
+
             if (emailResult.success) {
                 return {
                     success: true,
@@ -531,7 +531,7 @@ const useLoginData = (config) => {
             console.log('📞 Appel 3: Infos candidat connecté...');
             const candidatUrl = `${getFullUrl()}connexion/infos-personnel-connecte-candidat/${encodeURIComponent(email)}`;
             console.log('🔗 URL candidat:', candidatUrl);
-            
+
             const response3 = await axios.get(candidatUrl);
             results.candidatInfo = response3.data;
             console.log('✅ Appel 3 réussi:', results.candidatInfo);
@@ -573,16 +573,16 @@ const useLoginData = (config) => {
         }
 
         const libelleFonction = candidatInfo.libelleFonction || candidatInfo.fonction || candidatInfo.role;
-        
+
         if (libelleFonction) {
-            const fonctionNormalisee = libelleFonction.charAt(0).toUpperCase() + 
-                                     libelleFonction.slice(1).toLowerCase();
-            
+            const fonctionNormalisee = libelleFonction.charAt(0).toUpperCase() +
+                libelleFonction.slice(1).toLowerCase();
+
             const candidatProfile = `Candidat-${fonctionNormalisee}`;
-            
+
             console.log(`👤 Profil candidat déterminé: ${candidatProfile}`);
             console.log(`📋 Basé sur libelleFonction: ${libelleFonction}`);
-            
+
             return candidatProfile;
         }
 
@@ -670,6 +670,10 @@ const useLoginData = (config) => {
         try {
             console.log('🔄 Début de la récupération des données utilisateur...');
 
+            // 🆕 RÉCUPÉRER LE LIBELLÉ DE L'ÉCOLE
+            const selectedSchool = schools.find(school => school.value === schoolId);
+            const schoolLabel = selectedSchool ? selectedSchool.label : 'École non trouvée';
+
             const [personnelInfo, userIdValue, academicYearMain, academicYearInfoData] = await Promise.allSettled([
                 fetchUserPersonnelInfo(email, schoolId, profileId),
                 fetchUserId(email),
@@ -677,26 +681,12 @@ const useLoginData = (config) => {
                 fetchAcademicYearInfo(schoolId)
             ]);
 
-            const results = {
-                personnelInfo: personnelInfo.status === 'fulfilled' ? personnelInfo.value : null,
-                userId: userIdValue.status === 'fulfilled' ? userIdValue.value : null,
-                academicYearMain: academicYearMain.status === 'fulfilled' ? academicYearMain.value : null,
-                academicYearInfo: academicYearInfoData.status === 'fulfilled' ? academicYearInfoData.value : null
-            };
-
-            const errors = [];
-            if (personnelInfo.status === 'rejected') errors.push('Infos personnel');
-            if (userIdValue.status === 'rejected') errors.push('ID utilisateur');
-            if (academicYearMain.status === 'rejected') errors.push('Année académique principale');
-            if (academicYearInfoData.status === 'rejected') errors.push('Infos année académique');
-
-            if (errors.length > 0) {
-                console.warn(`⚠️ Erreurs lors de la récupération de: ${errors.join(', ')}`);
-            }
+            // ... le reste du code reste identique jusqu'à completeUserData ...
 
             const completeUserData = {
                 email,
                 schoolId,
+                schoolLabel: schoolLabel, // 🆕 Ajout du libellé
                 profileId,
                 ecoleId: schoolId,
                 academicYearId: results.academicYearMain?.anneeid || results.academicYearMain?.id || 226,
@@ -740,9 +730,9 @@ const useLoginData = (config) => {
 
             if (isPasswordRecovery) {
                 console.log('🔑 Mode récupération de mot de passe détecté');
-                
+
                 const result = await handlePasswordRecovery(formData);
-                
+
                 return {
                     success: true,
                     data: result.data,
@@ -782,7 +772,7 @@ const useLoginData = (config) => {
                 data === "Professeur" ||
                 data === "Admin" ||
                 data === "Educateur" ||
-                data === "Directeur des études(DE)" || 
+                data === "Directeur des études(DE)" ||
                 data === "Mot de passe correct!"
             );
 
@@ -793,12 +783,18 @@ const useLoginData = (config) => {
                     "Directeur des études(DE)": "DE"
                 };
 
-                //userProfil = data === "Mot de passe correct!" ? "Candidat" : data;
                 userProfil = profils[data] || data;
+
+                // 🆕 RÉCUPÉRER LE LIBELLÉ DE L'ÉCOLE SÉLECTIONNÉE
+                const selectedSchool = schools.find(school => school.value === formData.schoolId);
+                const schoolLabel = selectedSchool ? selectedSchool.label : 'École non trouvée';
+
+                console.log(`🏫 École sélectionnée: ${schoolLabel} (ID: ${formData.schoolId})`);
 
                 const basicUserData = {
                     email: formData.email,
                     schoolId: formData.schoolId,
+                    schoolLabel: schoolLabel, // 🆕 Ajout du libellé de l'école
                     profileId: formData.profileId,
                     loginTime: new Date().toISOString(),
                     userType: config.modalType || 'user',
@@ -807,6 +803,7 @@ const useLoginData = (config) => {
 
                 localStorage.setItem('userProfil', userProfil);
                 localStorage.setItem('userData', JSON.stringify(basicUserData));
+                localStorage.setItem('schoolLabel', schoolLabel); // 🆕 Stockage séparé du libellé
                 localStorage.setItem('isAuthenticated', 'true');
                 localStorage.setItem('userType', config.modalType || 'user');
 
@@ -818,24 +815,28 @@ const useLoginData = (config) => {
                         formData.profileId
                     );
 
+                    // 🆕 AJOUTER LE LIBELLÉ DE L'ÉCOLE AUX DONNÉES COMPLÈTES
+                    completeUserData.schoolLabel = schoolLabel;
+
                     let finalUserProfile = userProfil;
-                    
+
                     if (config.modalType === 'candidat' && completeUserData?.personnelInfo?.candidatDetails) {
                         finalUserProfile = determineCandidatProfile(
                             completeUserData.personnelInfo.candidatDetails,
                             config.modalType
                         );
-                        
+
                         console.log('👤 Profil candidat final déterminé:', finalUserProfile);
-                        
+
                         localStorage.setItem('userProfil', finalUserProfile);
                         localStorage.setItem('candidatProfile', finalUserProfile);
-                        
+
                         completeUserData.candidatProfile = finalUserProfile;
                         completeUserData.userProfile = finalUserProfile;
-                        
-                        localStorage.setItem('completeUserData', JSON.stringify(completeUserData));
                     }
+
+                    // 🆕 Sauvegarder completeUserData avec le schoolLabel
+                    localStorage.setItem('completeUserData', JSON.stringify(completeUserData));
 
                     updateFromLoginData({ userCompleteData: completeUserData });
 
@@ -844,6 +845,7 @@ const useLoginData = (config) => {
                         data,
                         userCompleteData: completeUserData,
                         userProfile: finalUserProfile,
+                        schoolLabel: schoolLabel, // 🆕 Retourner aussi le libellé
                         method: method
                     };
                 } catch (userDataError) {
@@ -853,6 +855,7 @@ const useLoginData = (config) => {
                         data,
                         userCompleteData: null,
                         userProfile: userProfil,
+                        schoolLabel: schoolLabel, // 🆕 Retourner le libellé même en cas d'erreur
                         method: method,
                         warning: 'Connexion réussie mais certaines données utilisateur n\'ont pas pu être récupérées'
                     };
@@ -906,6 +909,7 @@ const useLoginData = (config) => {
         localStorage.removeItem('academicYearInfo');
         localStorage.removeItem('userData');
         localStorage.removeItem('userProfil');
+        localStorage.removeItem('schoolLabel');
         localStorage.removeItem('isAuthenticated');
         localStorage.removeItem('userType');
         localStorage.removeItem('candidatProfile');

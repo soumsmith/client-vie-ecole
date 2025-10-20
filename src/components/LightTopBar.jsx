@@ -22,6 +22,7 @@ import SearchIcon from '@rsuite/icons/Search';
 import NoticeIcon from '@rsuite/icons/Notice';
 import MessageIcon from '@rsuite/icons/Message';
 import ExitIcon from '@rsuite/icons/Exit';
+import MoreIcon from '@rsuite/icons/More';
 
 // Composant InfoCard réutilisable
 const InfoCard = ({ 
@@ -51,7 +52,7 @@ const InfoCard = ({
       </div>
       <div className="info-content">
         <div className="info-label">{label}</div>
-        <div className="info-value">{value}</div>
+        <div className="info-value fs-8">{value}</div>
       </div>
     </div>
   );
@@ -65,6 +66,8 @@ const LightTopBar = ({
 }) => {
   const [searchValue, setSearchValue] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+  const [showAllCards, setShowAllCards] = useState(false);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
   // Données de test pour les notifications
   const [notifications] = useState([
@@ -85,6 +88,16 @@ const LightTopBar = ({
   // Récupération des données académiques
   const [academicData, setAcademicData] = useState(null);
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
+
+  React.useEffect(() => {
+    // Gérer le resize pour le responsive
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   React.useEffect(() => {
     // Récupérer les données de localStorage (pour démo, on utilise des données fictives)
@@ -109,7 +122,7 @@ const LightTopBar = ({
     };
     
     // Essayer de récupérer depuis localStorage, sinon utiliser les données de démo
-    const academicYear = localStorage.getItem('academicYearMain');
+    const academicYear = sessionStorage.getItem('academicYearMain');
     if (academicYear) {
       setAcademicData(JSON.parse(academicYear));
     } else {
@@ -153,6 +166,56 @@ const LightTopBar = ({
       description: "Fermer la session"
     }
   ];
+
+  // Déterminer le nombre de cartes à afficher selon la largeur d'écran
+  const getMaxVisibleCards = () => {
+    if (screenWidth <= 1331) return 2;
+    if (screenWidth <= 1370) return 3;
+    if (screenWidth <= 1570) return 4;
+    if (screenWidth <= 1730) return 5;
+    return allCards.length; // Afficher toutes les cartes sur grand écran
+  };
+
+  // Préparer toutes les cartes
+  const allCards = [
+    {
+      icon: "🏫",
+      label: "École",
+      value: sessionStorage.getItem('schoolLabel') || "Lycée Moderne",
+      bgColor: "primary"
+    },
+    academicData && {
+      icon: "📅",
+      label: "Année scolaire",
+      value: academicData.customLibelle || academicData.libelle,
+      bgColor: "success"
+    },
+    academicData?.niveauEnseignement && {
+      icon: "🎓",
+      label: "Niveau",
+      value: academicData.niveauEnseignement.libelle,
+      bgColor: "info"
+    },
+    academicData?.periodicite && {
+      icon: "⏱️",
+      label: "Périodicité",
+      value: academicData.periodicite.libelle,
+      bgColor: "warning"
+    },
+    {
+      icon: "🕐",
+      label: formatDate(currentDateTime),
+      value: timeStr,
+      bgColor: "danger",
+      className: "datetime-card"
+    }
+  ].filter(Boolean);
+
+  const maxVisibleCards = getMaxVisibleCards();
+
+  // Cartes à afficher (selon largeur écran ou toutes)
+  const visibleCards = showAllCards ? allCards : allCards.slice(0, maxVisibleCards);
+  const hasHiddenCards = allCards.length > maxVisibleCards;
 
   // Rendu des notifications
   const NotificationPanel = () => (
@@ -243,249 +306,9 @@ const LightTopBar = ({
   );
 
   return (
-    <Header className="modern-light-topbar shadow-sm border-bottom">
-      <Navbar appearance="subtle" className="bg-white">
-        <div className="topbar-container">
-        {/* Section gauche - Infos académiques */}
-        <Nav className="flex-grow-1 nav-left">
-          <FlexboxGrid align="middle" className="h-100">
-            <FlexboxGrid.Item colspan={24}>
-              <div className="academic-info-container d-flex flex-wrap align-items-center gap-3">
-                
-                {/* Nom de l'école */}
-                <InfoCard
-                  icon="🏫"
-                  label="École"
-                  value="Établissement Central"
-                  bgColor="primary"
-                />
-
-                {/* Année scolaire */}
-                {academicData && (
-                  <InfoCard
-                    icon="📅"
-                    label="Année scolaire"
-                    value={academicData.customLibelle || academicData.libelle}
-                    bgColor="success"
-                  />
-                )}
-
-                {/* Niveau d'enseignement */}
-                {academicData?.niveauEnseignement && (
-                  <InfoCard
-                    icon="🎓"
-                    label="Niveau"
-                    value={academicData.niveauEnseignement.libelle}
-                    bgColor="info"
-                  />
-                )}
-
-                {/* Périodicité */}
-                {academicData?.periodicite && (
-                  <InfoCard
-                    icon="⏱️"
-                    label="Périodicité"
-                    value={academicData.periodicite.libelle}
-                    bgColor="warning"
-                  />
-                )}
-
-                {/* Date et Heure */}
-                <InfoCard
-                  icon="🕐"
-                  label={formatDate(currentDateTime)}
-                  value={timeStr}
-                  bgColor="danger"
-                  className="datetime-card"
-                />
-                
-              </div>
-            </FlexboxGrid.Item>
-          </FlexboxGrid>
-        </Nav>
-
-        {/* Section droite - Actions et menus */}
-        <Nav pullRight className="nav-right">
-          <div className="actions-wrapper">
-
-            {/* Barre de recherche */}
-            <div className="action-item">
-              {showSearch ? (
-                <InputGroup inside className="search-input-group">
-                  <Input
-                    placeholder="Rechercher..."
-                    value={searchValue}
-                    onChange={setSearchValue}
-                    onBlur={() => !searchValue && setShowSearch(false)}
-                    autoFocus
-                  />
-                  <InputGroup.Button>
-                    <SearchIcon />
-                  </InputGroup.Button>
-                </InputGroup>
-              ) : (
-                <Whisper
-                  trigger="hover"
-                  speaker={<Tooltip>Rechercher</Tooltip>}
-                  placement="bottom"
-                >
-                  <IconButton
-                    icon={<SearchIcon />}
-                    circle
-                    size="md"
-                    appearance="subtle"
-                    className="action-btn search-btn"
-                    onClick={() => setShowSearch(true)}
-                  />
-                </Whisper>
-              )}
-            </div>
-
-            {/* Notifications */}
-            <div className="action-item position-relative">
-              <Whisper
-                trigger="click"
-                speaker={
-                  <Popover className="custom-popover">
-                    <NotificationPanel />
-                  </Popover>
-                }
-                placement="bottomEnd"
-              >
-                <IconButton
-                  icon={<NoticeIcon />}
-                  circle
-                  size="md"
-                  appearance="subtle"
-                  className="action-btn notification-btn"
-                />
-              </Whisper>
-              {unreadNotifications > 0 && (
-                <Badge
-                  content={unreadNotifications}
-                  className="custom-badge"
-                />
-              )}
-            </div>
-
-            {/* Messages */}
-            <div className="action-item position-relative">
-              <Whisper
-                trigger="click"
-                speaker={
-                  <Popover className="custom-popover">
-                    <MessagePanel />
-                  </Popover>
-                }
-                placement="bottomEnd"
-              >
-                <IconButton
-                  icon={<MessageIcon />}
-                  circle
-                  size="md"
-                  appearance="subtle"
-                  className="action-btn message-btn"
-                />
-              </Whisper>
-              {unreadMessages > 0 && (
-                <Badge
-                  content={unreadMessages}
-                  className="custom-badge badge-success"
-                />
-              )}
-            </div>
-
-            {/* Séparateur */}
-            <div className="action-separator"></div>
-
-            {/* Menu utilisateur */}
-            <div className="action-item">
-              <Dropdown
-                placement="bottomEnd"
-                className="user-dropdown"
-                trigger="click"
-                renderToggle={(props, ref) => (
-                  <div
-                    {...props}
-                    ref={ref}
-                    className="user-profile-toggle"
-                  >
-                    <div className="user-info d-none d-lg-block">
-                      <div className="user-role">{userInfo.role}</div>
-                    </div>
-                    <Avatar
-                      circle
-                      size="sm"
-                      src={userInfo.avatar}
-                      alt={userInfo.name}
-                      className="user-avatar"
-                    >
-                      {userInfo.name.charAt(0)}
-                    </Avatar>
-                  </div>
-                )}
-              >
-                {/* En-tête du menu */}
-                <div className="p-3 bg-light border-bottom">
-                  <FlexboxGrid align="middle">
-                    <FlexboxGrid.Item colspan={6}>
-                      <Avatar
-                        circle
-                        size="md"
-                        src={userInfo.avatar}
-                        alt={userInfo.name}
-                        className="bg-gradient bg-primary text-white"
-                      >
-                        {userInfo.name.charAt(0)}
-                      </Avatar>
-                    </FlexboxGrid.Item>
-                    <FlexboxGrid.Item colspan={18}>
-                      <div className="ms-2">
-                        <div className="fw-bold text-dark">{userInfo.name}</div>
-                        <div className="text-muted small">{userInfo.email}</div>
-                        <span className="badge bg-primary rounded-pill mt-1" style={{ fontSize: '10px' }}>
-                          {userInfo.role}
-                        </span>
-                      </div>
-                    </FlexboxGrid.Item>
-                  </FlexboxGrid>
-                </div>
-
-                {/* Items du menu */}
-                {userMenuItems.map((item, index) => (
-                  item.divider ? (
-                    <Dropdown.Item key={index} divider />
-                  ) : (
-                    <Dropdown.Item
-                      key={index}
-                      onSelect={item.action}
-                      className={`p-3 ${item.danger ? 'text-danger' : ''}`}
-                    >
-                      <FlexboxGrid align="middle">
-                        <FlexboxGrid.Item colspan={4}>
-                          {item.icon}
-                        </FlexboxGrid.Item>
-                        <FlexboxGrid.Item colspan={20}>
-                          <div className="ms-2">
-                            <div className="fw-semibold">{item.label}</div>
-                            {item.description && (
-                              <small className="text-muted">{item.description}</small>
-                            )}
-                          </div>
-                        </FlexboxGrid.Item>
-                      </FlexboxGrid>
-                    </Dropdown.Item>
-                  )
-                ))}
-              </Dropdown>
-            </div>
-
-          </div>
-        </Nav>
-        </div>
-      </Navbar>
-
-      <style jsx>{`
+    <>
+      <style>{`
+        /* TOP BAR CSS */
         .modern-light-topbar {
           background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
           transition: all 0.3s ease;
@@ -516,14 +339,8 @@ const LightTopBar = ({
           align-items: center;
           gap: 10px;
           flex-wrap: nowrap;
-          overflow-x: auto;
+          overflow-x: visible;
           overflow-y: hidden;
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-
-        .academic-info-container::-webkit-scrollbar {
-          display: none;
         }
 
         /* Styles pour InfoCard */
@@ -540,6 +357,18 @@ const LightTopBar = ({
           min-width: fit-content;
           max-width: 220px;
           flex-shrink: 0;
+          animation: cardSlideIn 0.3s ease-out;
+        }
+
+        @keyframes cardSlideIn {
+          from {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
         }
 
         .info-card:hover {
@@ -622,6 +451,57 @@ const LightTopBar = ({
           font-weight: 700;
           color: #dc3545;
           letter-spacing: 0.5px;
+        }
+
+        /* Bouton toggle pour afficher plus/moins */
+        .toggle-cards-btn {
+          width: 42px;
+          height: 42px;
+          border-radius: 12px;
+          background: white;
+          border: 2px solid #6c757d;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          flex-shrink: 0;
+          color: #6c757d;
+          font-weight: 600;
+          position: relative;
+        }
+
+        .toggle-cards-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          border-color: #007bff;
+          color: #007bff;
+        }
+
+        .toggle-cards-btn.active {
+          border-color: #007bff;
+          color: #007bff;
+          background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }
+
+        /* Badge de compteur sur le bouton */
+        .toggle-badge {
+          position: absolute;
+          top: -6px;
+          right: -6px;
+          background: #007bff;
+          color: white;
+          border-radius: 10px;
+          font-size: 10px;
+          font-weight: 600;
+          min-width: 18px;
+          height: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 5px;
+          border: 2px solid white;
+          box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
         }
 
         /* Section actions à droite */
@@ -836,38 +716,6 @@ const LightTopBar = ({
           transition: all 0.2s ease;
         }
 
-        /* Masquage progressif des InfoCards */
-        @media (max-width: 1400px) {
-          .topbar-container {
-            gap: 12px;
-          }
-          .academic-info-container {
-            gap: 8px;
-          }
-          .info-card:nth-child(5) {
-            display: none; /* Cache date/heure */
-          }
-        }
-
-        @media (max-width: 1200px) {
-          .info-card:nth-child(4) {
-            display: none; /* Cache périodicité */
-          }
-        }
-
-        @media (max-width: 992px) {
-          .topbar-container {
-            gap: 8px;
-            padding: 8px 12px;
-          }
-          .info-card:nth-child(3) {
-            display: none; /* Cache niveau */
-          }
-          .search-input-group {
-            width: 200px;
-          }
-        }
-
         @media (max-width: 768px) {
           .info-card {
             padding: 6px 10px;
@@ -884,7 +732,7 @@ const LightTopBar = ({
           .info-label {
             font-size: 9px;
           }
-          .action-btn {
+          .action-btn, .toggle-cards-btn {
             width: 38px;
             height: 38px;
           }
@@ -892,29 +740,239 @@ const LightTopBar = ({
             width: 180px;
           }
         }
-
-        @media (max-width: 576px) {
-          .topbar-container {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 12px;
-            padding: 12px;
-          }
-          .nav-left, .nav-right {
-            width: 100%;
-          }
-          .actions-wrapper {
-            justify-content: space-around;
-          }
-          .info-card:nth-child(2) {
-            display: none; /* Cache année scolaire */
-          }
-          .action-separator {
-            display: none;
-          }
-        }
       `}</style>
-    </Header>
+      
+      <Header className="modern-light-topbar shadow-sm border-bottom">
+        <Navbar appearance="subtle" className="bg-white">
+          <div className="topbar-container">
+            {/* Section gauche - Infos académiques */}
+            <Nav className="flex-grow-1 nav-left">
+              <FlexboxGrid align="middle" className="h-100">
+                <FlexboxGrid.Item colspan={24}>
+                  <div className="academic-info-container d-flex flex-wrap align-items-center gap-3">
+                    
+                    {/* Cartes visibles */}
+                    {visibleCards.map((card, index) => (
+                      <InfoCard
+                        key={index}
+                        icon={card.icon}
+                        label={card.label}
+                        value={card.value}
+                        bgColor={card.bgColor}
+                        className={card.className}
+                      />
+                    ))}
+
+                    {/* Bouton toggle si plus de 3 cartes */}
+                    {hasHiddenCards && (
+                      <Whisper
+                        trigger="hover"
+                        speaker={
+                          <Tooltip>
+                            {showAllCards ? 'Voir moins' : `Voir ${allCards.length - maxVisibleCards} de plus`}
+                          </Tooltip>
+                        }
+                        placement="bottom"
+                      >
+                        <div
+                          className={`toggle-cards-btn ${showAllCards ? 'active' : ''}`}
+                          onClick={() => setShowAllCards(!showAllCards)}
+                        >
+                          {showAllCards ? '−' : '+'}
+                          {!showAllCards && (
+                            <span className="toggle-badge">{allCards.length - maxVisibleCards}</span>
+                          )}
+                        </div>
+                      </Whisper>
+                    )}
+                    
+                  </div>
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
+            </Nav>
+
+            {/* Section droite - Actions et menus */}
+            <Nav pullRight className="nav-right">
+              <div className="actions-wrapper">
+
+                {/* Barre de recherche */}
+                {/* <div className="action-item">
+                  {showSearch ? (
+                    <InputGroup inside className="search-input-group">
+                      <Input
+                        placeholder="Rechercher..."
+                        value={searchValue}
+                        onChange={setSearchValue}
+                        onBlur={() => !searchValue && setShowSearch(false)}
+                        autoFocus
+                      />
+                      <InputGroup.Button>
+                        <SearchIcon />
+                      </InputGroup.Button>
+                    </InputGroup>
+                  ) : (
+                    <Whisper
+                      trigger="hover"
+                      speaker={<Tooltip>Rechercher</Tooltip>}
+                      placement="bottom"
+                    >
+                      <IconButton
+                        icon={<SearchIcon />}
+                        circle
+                        size="md"
+                        appearance="subtle"
+                        className="action-btn search-btn"
+                        onClick={() => setShowSearch(true)}
+                      />
+                    </Whisper>
+                  )}
+                </div> */}
+
+                {/* Notifications */}
+                <div className="action-item position-relative">
+                  <Whisper
+                    trigger="click"
+                    speaker={
+                      <Popover className="custom-popover">
+                        <NotificationPanel />
+                      </Popover>
+                    }
+                    placement="bottomEnd"
+                  >
+                    <IconButton
+                      icon={<NoticeIcon />}
+                      circle
+                      size="md"
+                      appearance="subtle"
+                      className="action-btn notification-btn"
+                    />
+                  </Whisper>
+                  {unreadNotifications > 0 && (
+                    <Badge
+                      content={unreadNotifications}
+                      className="custom-badge"
+                    />
+                  )}
+                </div>
+
+                {/* Messages */}
+                <div className="action-item position-relative">
+                  <Whisper
+                    trigger="click"
+                    speaker={
+                      <Popover className="custom-popover">
+                        <MessagePanel />
+                      </Popover>
+                    }
+                    placement="bottomEnd"
+                  >
+                    <IconButton
+                      icon={<MessageIcon />}
+                      circle
+                      size="md"
+                      appearance="subtle"
+                      className="action-btn message-btn"
+                    />
+                  </Whisper>
+                  {unreadMessages > 0 && (
+                    <Badge
+                      content={unreadMessages}
+                      className="custom-badge badge-success"
+                    />
+                  )}
+                </div>
+
+                {/* Séparateur */}
+                <div className="action-separator"></div>
+
+                {/* Menu utilisateur */}
+                <div className="action-item">
+                  <Dropdown
+                    placement="bottomEnd"
+                    className="user-dropdown"
+                    trigger="click"
+                    renderToggle={(props, ref) => (
+                      <div
+                        {...props}
+                        ref={ref}
+                        className="user-profile-toggle"
+                      >
+                        <div className="user-info d-none d-lg-block">
+                          <div className="user-role">{userInfo.role}</div>
+                        </div>
+                        <Avatar
+                          circle
+                          size="sm"
+                          src={userInfo.avatar}
+                          alt={userInfo.name}
+                          className="user-avatar"
+                        >
+                          {userInfo.name.charAt(0)}
+                        </Avatar>
+                      </div>
+                    )}
+                  >
+                    {/* En-tête du menu */}
+                    <div className="p-3 bg-light border-bottom">
+                      <FlexboxGrid align="middle">
+                        <FlexboxGrid.Item colspan={6}>
+                          <Avatar
+                            circle
+                            size="md"
+                            src={userInfo.avatar}
+                            alt={userInfo.name}
+                            className="bg-gradient bg-primary text-white"
+                          >
+                            {userInfo.name.charAt(0)}
+                          </Avatar>
+                        </FlexboxGrid.Item>
+                        <FlexboxGrid.Item colspan={18}>
+                          <div className="ms-2">
+                            <div className="fw-bold text-dark">{userInfo.name}</div>
+                            <div className="text-muted small">{userInfo.email}</div>
+                            <span className="badge bg-primary rounded-pill mt-1" style={{ fontSize: '10px' }}>
+                              {userInfo.role}
+                            </span>
+                          </div>
+                        </FlexboxGrid.Item>
+                      </FlexboxGrid>
+                    </div>
+
+                    {/* Items du menu */}
+                    {userMenuItems.map((item, index) => (
+                      item.divider ? (
+                        <Dropdown.Item key={index} divider />
+                      ) : (
+                        <Dropdown.Item
+                          key={index}
+                          onSelect={item.action}
+                          className={`p-3 ${item.danger ? 'text-danger' : ''}`}
+                        >
+                          <FlexboxGrid align="middle">
+                            <FlexboxGrid.Item colspan={4}>
+                              {item.icon}
+                            </FlexboxGrid.Item>
+                            <FlexboxGrid.Item colspan={20}>
+                              <div className="ms-2">
+                                <div className="fw-semibold">{item.label}</div>
+                                {item.description && (
+                                  <small className="text-muted">{item.description}</small>
+                                )}
+                              </div>
+                            </FlexboxGrid.Item>
+                          </FlexboxGrid>
+                        </Dropdown.Item>
+                      )
+                    ))}
+                  </Dropdown>
+                </div>
+
+              </div>
+            </Nav>
+          </div>
+        </Navbar>
+      </Header>
+    </>
   );
 };
 

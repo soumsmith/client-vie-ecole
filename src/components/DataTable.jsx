@@ -136,6 +136,7 @@ const DataTable = ({
 
   // Hook pour la largeur responsive de la table
   const tableWidth = useTableDimensions(minTableWidth);
+  const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
 
   // ==================== UTILITAIRES DE DONNÉES ====================
 
@@ -781,7 +782,7 @@ const DataTable = ({
                   appearance="primary"
                   startIcon={<PlusIcon />}
                   onClick={handleCreateClick}
-                  style={{ backgroundColor: '#667eea', border: 'none' }}
+                   className={`datatable-add-btn-${academicYear.niveauEnseignement?.libelle.replace(/[\s()]/g, '')} datatable-add-btn-niveauEnseignement-${academicYear.niveauEnseignement?.id}`} 
                 >
                   {createButtonText}
                 </Button>

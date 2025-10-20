@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Container, Header, Nav, Progress, Panel } from 'rsuite';
-import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter, FaStar, FaHeart, FaBolt, FaCircle, FaBook, FaGraduationCap, FaTrophy, FaUsers } from 'react-icons/fa';
-import { FiMenu, FiSearch, FiChevronLeft, FiChevronRight, FiBookOpen, FiAward, FiTarget } from 'react-icons/fi';
+import { Button, Progress } from 'rsuite';
+import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter, FaStar, FaHeart, FaBolt, FaCircle, FaBook, FaGraduationCap, FaTrophy } from 'react-icons/fa';
+import { FiChevronLeft, FiChevronRight, FiBookOpen, FiAward, FiTarget } from 'react-icons/fi';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const KidsLandingPage = () => {
+const DashboardPrimaire = ({ niveau = 'EnseignementPrimaire' }) => {
     const [activeSlide, setActiveSlide] = useState(0);
+    const [chartColors, setChartColors] = useState({});
+
+    useEffect(() => {
+        const root = document.documentElement;
+        const style = getComputedStyle(root);
+        
+        setChartColors({
+            primary: style.getPropertyValue('--chart-primary-color').trim() || '#667eea',
+            secondary: style.getPropertyValue('--chart-secondary-color').trim() || '#f093fb',
+            activity1: style.getPropertyValue('--primary-color').trim() || '#667eea',
+            activity2: style.getPropertyValue('--chart-secondary-color').trim() || '#f093fb',
+            activity3: style.getPropertyValue('--info-color').trim() || '#4facfe',
+            activity4: style.getPropertyValue('--success-color').trim() || '#43e97b'
+        });
+    }, [niveau]);
 
     const slides = [
         {
@@ -31,29 +46,21 @@ const KidsLandingPage = () => {
         }
     ];
 
-    // Auto-play des slides
     useEffect(() => {
         const interval = setInterval(() => {
             setActiveSlide((prev) => (prev + 1) % slides.length);
-        }, 5000); // Change toutes les 5 secondes
-
+        }, 5000);
         return () => clearInterval(interval);
     }, [slides.length]);
 
-    const nextSlide = () => {
-        setActiveSlide((prev) => (prev + 1) % slides.length);
-    };
+    const nextSlide = () => setActiveSlide((prev) => (prev + 1) % slides.length);
+    const prevSlide = () => setActiveSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
-    const prevSlide = () => {
-        setActiveSlide((prev) => (prev - 1 + slides.length) % slides.length);
-    };
-
-    // Données statistiques pour les graphiques
     const progressData = [
-        { matiere: 'Français', progression: 85, color: '#667eea' },
-        { matiere: 'Maths', progression: 78, color: '#f093fb' },
-        { matiere: 'Sciences', progression: 92, color: '#4facfe' },
-        { matiere: 'Histoire', progression: 88, color: '#43e97b' }
+        { matiere: 'Français', progression: 85 },
+        { matiere: 'Maths', progression: 78 },
+        { matiere: 'Sciences', progression: 92 },
+        { matiere: 'Histoire', progression: 88 }
     ];
 
     const performanceData = [
@@ -66,140 +73,38 @@ const KidsLandingPage = () => {
     ];
 
     const activitiesData = [
-        { name: 'Lecture', value: 35, color: '#667eea' },
-        { name: 'Exercices', value: 30, color: '#f093fb' },
-        { name: 'Jeux', value: 20, color: '#4facfe' },
-        { name: 'Projets', value: 15, color: '#43e97b' }
+        { name: 'Lecture', value: 35 },
+        { name: 'Exercices', value: 30 },
+        { name: 'Jeux', value: 20 },
+        { name: 'Projets', value: 15 }
     ];
 
     const statsCards = [
-        {
-            icon: FaBook,
-            value: '156',
-            label: 'Leçons complétées',
-            color: '#667eea',
-            bgColor: '#667eea15'
-        },
-        {
-            icon: FaTrophy,
-            value: '42',
-            label: 'Badges gagnés',
-            color: '#ffd700',
-            bgColor: '#ffd70015'
-        },
-        {
-            icon: FiAward,
-            value: '89%',
-            label: 'Taux de réussite',
-            color: '#43e97b',
-            bgColor: '#43e97b15'
-        },
-        {
-            icon: FiTarget,
-            value: '28',
-            label: 'Objectifs atteints',
-            color: '#f093fb',
-            bgColor: '#f093fb15'
-        }
+        { icon: FaBook, value: '156', label: 'Leçons complétées' },
+        { icon: FaTrophy, value: '42', label: 'Badges gagnés' },
+        { icon: FiAward, value: '89%', label: 'Taux de réussite' },
+        { icon: FiTarget, value: '28', label: 'Objectifs atteints' }
     ];
 
     return (
-        <div style={{
+        <div className={niveau} style={{
             minHeight: '100vh',
             background: 'linear-gradient(135deg, #fef9f0 0%, #fef5ff 50%, #f0f8ff 100%)',
             overflow: 'hidden',
             position: 'relative'
         }}>
             {/* Éléments décoratifs flottants */}
-            <div style={{
-                position: 'absolute',
-                top: '80px',
-                left: '180px',
-                animation: 'float 6s ease-in-out infinite'
-            }}>
-                <FaStar size={40} color="#7ed321" />
-            </div>
-
-            <div style={{
-                position: 'absolute',
-                top: '50px',
-                left: '320px',
-                animation: 'float 8s ease-in-out infinite'
-            }}>
-                <FaHeart size={45} color="#a78bce" />
-            </div>
-
-            <div style={{
-                position: 'absolute',
-                top: '100px',
-                left: '460px',
-                animation: 'float 7s ease-in-out infinite'
-            }}>
-                <FaCircle size={50} color="#4a9ff5" />
-            </div>
-
-            <div style={{
-                position: 'absolute',
-                bottom: '100px',
-                left: '50px',
-                animation: 'float 5s ease-in-out infinite'
-            }}>
-                <FaCircle size={60} color="#ffd700" />
-            </div>
-
-            <div style={{
-                position: 'absolute',
-                top: '40%',
-                left: '5px',
-                animation: 'float 9s ease-in-out infinite'
-            }}>
-                <FaCircle size={35} color="#ff69b4" />
-            </div>
-
-            <div style={{
-                position: 'absolute',
-                bottom: '200px',
-                right: '100px',
-                animation: 'float 6s ease-in-out infinite'
-            }}>
-                <FaStar size={30} color="#b8a0d6" opacity={0.6} />
-            </div>
-
-            <div style={{
-                position: 'absolute',
-                top: '200px',
-                right: '50px',
-                animation: 'float 7s ease-in-out infinite'
-            }}>
-                <FaStar size={25} color="#c8b8d8" opacity={0.7} />
-            </div>
-
-            <div style={{
-                position: 'absolute',
-                bottom: '350px',
-                left: '100px',
-                animation: 'float 8s ease-in-out infinite'
-            }}>
-                <FaStar size={20} color="#d8c8e8" opacity={0.5} />
-            </div>
-
-            <div style={{
-                position: 'absolute',
-                top: '50%',
-                right: '80px',
-                animation: 'float 5s ease-in-out infinite'
-            }}>
-                <FaStar size={35} color="#a88bce" opacity={0.6} />
-            </div>
-
-            <div style={{
-                position: 'absolute',
-                top: '120px',
-                right: '200px',
-                animation: 'float 10s ease-in-out infinite'
-            }}>
-                <FaBolt size={40} color="#4a9ff5" />
-            </div>
+            {[
+                { Icon: FaStar, top: '80px', left: '180px', color: 'var(--success-color)', animation: 'float 6s ease-in-out infinite' },
+                { Icon: FaHeart, top: '50px', left: '320px', color: 'var(--primary-color)', animation: 'float 8s ease-in-out infinite' },
+                { Icon: FaCircle, top: '100px', left: '460px', color: 'var(--info-color)', animation: 'float 7s ease-in-out infinite' },
+                { Icon: FaCircle, bottom: '100px', left: '50px', color: 'var(--warning-color)', animation: 'float 5s ease-in-out infinite' },
+                { Icon: FaBolt, top: '120px', right: '200px', color: 'var(--info-color)', animation: 'float 10s ease-in-out infinite' }
+            ].map((item, idx) => (
+                <div key={idx} style={{ position: 'absolute', ...item, fontSize: idx === 3 ? '60px' : '40px' }}>
+                    <item.Icon />
+                </div>
+            ))}
 
             <style>
                 {`
@@ -223,20 +128,6 @@ const KidsLandingPage = () => {
             to { opacity: 1; transform: translateY(0); }
           }
 
-          .nav-item {
-            transition: all 0.3s ease;
-            cursor: pointer;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-weight: 600;
-            color: #fff !important;
-          }
-
-          .nav-item:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-          }
-
           .social-icon {
             transition: all 0.3s ease;
             cursor: pointer;
@@ -246,10 +137,6 @@ const KidsLandingPage = () => {
             transform: scale(1.2) rotate(5deg);
           }
 
-          .step-number {
-            animation: pulse 2s ease-in-out infinite;
-          }
-
           .nav-button {
             transition: all 0.3s ease;
             cursor: pointer;
@@ -257,7 +144,6 @@ const KidsLandingPage = () => {
 
           .nav-button:hover {
             transform: scale(1.1);
-            background: #6c5ce7 !important;
           }
 
           .stat-card {
@@ -271,22 +157,8 @@ const KidsLandingPage = () => {
         `}
             </style>
 
-            {/* Header */}
-            <Header style={{
-                background: 'transparent',
-                padding: '20px 50px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-            }}>
-
-                <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-
-                </div>
-            </Header>
-
             {/* Contenu Principal */}
-            <Container style={{
+            <div style={{
                 padding: '60px 80px',
                 maxWidth: '1400px',
                 margin: '0 auto'
@@ -305,7 +177,7 @@ const KidsLandingPage = () => {
                             fontWeight: '800',
                             lineHeight: '1.2',
                             marginBottom: '20px',
-                            color: '#a78bce'
+                            color: 'var(--primary-color)'
                         }}>
                             {slides[activeSlide].title}
                         </h1>
@@ -314,7 +186,7 @@ const KidsLandingPage = () => {
                             fontWeight: '900',
                             lineHeight: '1.1',
                             marginBottom: '30px',
-                            background: 'linear-gradient(135deg, #4a4c8f 0%, #764ba2 100%)',
+                            background: `linear-gradient(135deg, var(--primary-color) 0%, var(--chart-secondary-color) 100%)`,
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent'
                         }}>
@@ -332,58 +204,28 @@ const KidsLandingPage = () => {
                         <Button
                             size="lg"
                             style={{
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                background: `linear-gradient(135deg, var(--primary-color) 0%, var(--chart-secondary-color) 100%)`,
                                 border: 'none',
                                 borderRadius: '50px',
                                 padding: '18px 45px',
                                 fontSize: '18px',
                                 fontWeight: '700',
                                 color: 'white',
-                                boxShadow: '0 10px 30px rgba(102, 126, 234, 0.4)',
+                                boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
                                 transition: 'all 0.3s ease',
                                 cursor: 'pointer'
                             }}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.transform = 'translateY(-3px)';
-                                e.currentTarget.style.boxShadow = '0 15px 40px rgba(102, 126, 234, 0.5)';
+                                e.currentTarget.style.boxShadow = '0 15px 40px rgba(0,0,0,0.25)';
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 10px 30px rgba(102, 126, 234, 0.4)';
+                                e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
                             }}
                         >
                             {slides[activeSlide].buttonText}
                         </Button>
-
-                        {/* <div style={{
-                            display: 'flex',
-                            gap: '20px',
-                            marginTop: '50px'
-                        }}>
-                            {[
-                                { Icon: FaFacebook, color: '#4267B2' },
-                                { Icon: FaInstagram, color: '#E1306C' },
-                                { Icon: FaLinkedin, color: '#0077B5' },
-                                { Icon: FaTwitter, color: '#1DA1F2' }
-                            ].map(({ Icon, color }, index) => (
-                                <div
-                                    key={index}
-                                    className="social-icon"
-                                    style={{
-                                        width: '45px',
-                                        height: '45px',
-                                        borderRadius: '50%',
-                                        background: 'white',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
-                                    }}
-                                >
-                                    <Icon size={22} color={color} />
-                                </div>
-                            ))}
-                        </div> */}
                     </div>
 
                     {/* Colonne droite - Image */}
@@ -392,10 +234,10 @@ const KidsLandingPage = () => {
                             position: 'relative',
                             width: '520px',
                             height: '520px',
-                            background: 'linear-gradient(135deg, #e0d5f5 0%, #b8a8d8 100%)',
+                            background: `linear-gradient(135deg, var(--bg-light-color) 0%, var(--primary-color)40 100%)`,
                             borderRadius: '40% 60% 60% 40% / 60% 40% 60% 40%',
                             padding: '15px',
-                            boxShadow: '0 20px 60px rgba(167, 139, 206, 0.3)',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
                             animation: 'float 8s ease-in-out infinite'
                         }}>
                             <div style={{
@@ -419,32 +261,6 @@ const KidsLandingPage = () => {
                                     }}
                                 />
                             </div>
-
-                            <div style={{
-                                position: 'absolute',
-                                bottom: '40px',
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                                display: 'flex',
-                                gap: '25px'
-                            }}>
-                                {[
-                                    { color: '#ffd700', size: '25px' },
-                                    { color: '#4a9ff5', size: '30px' },
-                                    { color: '#ff69b4', size: '25px' }
-                                ].map((dot, index) => (
-                                    <div
-                                        key={index}
-                                        style={{
-                                            width: dot.size,
-                                            height: dot.size,
-                                            borderRadius: '50%',
-                                            background: dot.color,
-                                            boxShadow: `0 4px 15px ${dot.color}80`
-                                        }}
-                                    />
-                                ))}
-                            </div>
                         </div>
 
                         <div style={{
@@ -459,22 +275,21 @@ const KidsLandingPage = () => {
                             {[1, 2, 3].map((num, index) => (
                                 <div
                                     key={num}
-                                    className="step-number"
                                     style={{
                                         width: '60px',
                                         height: '60px',
                                         borderRadius: '50%',
-                                        background: index === activeSlide ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'white',
+                                        background: index === activeSlide ? `linear-gradient(135deg, var(--primary-color) 0%, var(--chart-secondary-color) 100%)` : 'white',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         fontSize: '24px',
                                         fontWeight: '800',
-                                        color: index === activeSlide ? 'white' : '#667eea',
+                                        color: index === activeSlide ? 'white' : 'var(--primary-color)',
                                         boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
                                         cursor: 'pointer',
                                         transition: 'all 0.3s ease',
-                                        animationDelay: `${index * 0.3}s`
+                                        animation: 'pulse 2s ease-in-out infinite'
                                     }}
                                     onClick={() => setActiveSlide(index)}
                                     onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
@@ -502,11 +317,11 @@ const KidsLandingPage = () => {
                             width: '55px',
                             height: '55px',
                             borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            background: `linear-gradient(135deg, var(--primary-color) 0%, var(--chart-secondary-color) 100%)`,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            boxShadow: '0 6px 20px rgba(102, 126, 234, 0.4)'
+                            boxShadow: '0 6px 20px rgba(0,0,0,0.2)'
                         }}
                     >
                         <FiChevronLeft size={28} color="white" />
@@ -522,7 +337,7 @@ const KidsLandingPage = () => {
                                     height: '12px',
                                     borderRadius: '10px',
                                     background: index === activeSlide
-                                        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                                        ? `linear-gradient(135deg, var(--primary-color) 0%, var(--chart-secondary-color) 100%)`
                                         : '#d0d5dd',
                                     transition: 'all 0.3s ease',
                                     cursor: 'pointer'
@@ -538,17 +353,17 @@ const KidsLandingPage = () => {
                             width: '55px',
                             height: '55px',
                             borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            background: `linear-gradient(135deg, var(--primary-color) 0%, var(--chart-secondary-color) 100%)`,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            boxShadow: '0 6px 20px rgba(102, 126, 234, 0.4)'
+                            boxShadow: '0 6px 20px rgba(0,0,0,0.2)'
                         }}
                     >
                         <FiChevronRight size={28} color="white" />
                     </div>
                 </div>
-            </Container>
+            </div>
 
             {/* Section Statistiques */}
             <div style={{
@@ -561,7 +376,7 @@ const KidsLandingPage = () => {
                     fontWeight: '800',
                     textAlign: 'center',
                     marginBottom: '60px',
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    background: `linear-gradient(135deg, var(--primary-color) 0%, var(--chart-secondary-color) 100%)`,
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent'
                 }}>
@@ -575,48 +390,53 @@ const KidsLandingPage = () => {
                     gap: '30px',
                     marginBottom: '60px'
                 }}>
-                    {statsCards.map((stat, index) => (
-                        <div
-                            key={index}
-                            className="stat-card"
-                            style={{
-                                background: 'white',
-                                borderRadius: '20px',
-                                padding: '30px',
-                                boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-                                textAlign: 'center',
-                                animationDelay: `${index * 0.1}s`
-                            }}
-                        >
-                            <div style={{
-                                width: '70px',
-                                height: '70px',
-                                borderRadius: '50%',
-                                background: stat.bgColor,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                margin: '0 auto 20px'
-                            }}>
-                                <stat.icon size={32} color={stat.color} />
+                    {statsCards.map((stat, index) => {
+                        const colors = ['--primary-color', '--warning-color', '--success-color', '--chart-secondary-color'];
+                        const colorVar = colors[index % colors.length];
+                        
+                        return (
+                            <div
+                                key={index}
+                                className="stat-card"
+                                style={{
+                                    background: 'white',
+                                    borderRadius: '20px',
+                                    padding: '30px',
+                                    boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+                                    textAlign: 'center',
+                                    animationDelay: `${index * 0.1}s`
+                                }}
+                            >
+                                <div style={{
+                                    width: '70px',
+                                    height: '70px',
+                                    borderRadius: '50%',
+                                    background: `color-mix(in srgb, var(${colorVar}) 15%, transparent)`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    margin: '0 auto 20px'
+                                }}>
+                                    <stat.icon size={32} style={{ color: `var(${colorVar})` }} />
+                                </div>
+                                <div style={{
+                                    fontSize: '36px',
+                                    fontWeight: '800',
+                                    color: `var(${colorVar})`,
+                                    marginBottom: '10px'
+                                }}>
+                                    {stat.value}
+                                </div>
+                                <div style={{
+                                    fontSize: '14px',
+                                    color: '#7e8ba3',
+                                    fontWeight: '600'
+                                }}>
+                                    {stat.label}
+                                </div>
                             </div>
-                            <div style={{
-                                fontSize: '36px',
-                                fontWeight: '800',
-                                color: stat.color,
-                                marginBottom: '10px'
-                            }}>
-                                {stat.value}
-                            </div>
-                            <div style={{
-                                fontSize: '14px',
-                                color: '#7e8ba3',
-                                fontWeight: '600'
-                            }}>
-                                {stat.label}
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 {/* Graphiques */}
@@ -627,16 +447,13 @@ const KidsLandingPage = () => {
                     marginBottom: '60px'
                 }}>
                     {/* Graphique de progression par matière */}
-                    <Panel
-                        bordered
-                        style={{
-                            background: 'white',
-                            borderRadius: '20px',
-                            padding: '30px',
-                            boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-                            border: 'none'
-                        }}
-                    >
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '20px',
+                        padding: '30px',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+                        border: 'none'
+                    }}>
                         <h3 style={{
                             fontSize: '24px',
                             fontWeight: '700',
@@ -646,7 +463,7 @@ const KidsLandingPage = () => {
                             alignItems: 'center',
                             gap: '10px'
                         }}>
-                            <FiBookOpen color="#667eea" />
+                            <FiBookOpen style={{ color: 'var(--primary-color)' }} />
                             Progression par Matière
                         </h3>
                         <ResponsiveContainer width="100%" height={300}>
@@ -664,24 +481,21 @@ const KidsLandingPage = () => {
                                 />
                                 <Bar dataKey="progression" radius={[10, 10, 0, 0]}>
                                     {progressData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                        <Cell key={`cell-${index}`} fill={index % 2 === 0 ? chartColors.primary : chartColors.secondary} />
                                     ))}
                                 </Bar>
                             </BarChart>
                         </ResponsiveContainer>
-                    </Panel>
+                    </div>
 
                     {/* Graphique d'évolution des notes */}
-                    <Panel
-                        bordered
-                        style={{
-                            background: 'white',
-                            borderRadius: '20px',
-                            padding: '30px',
-                            boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-                            border: 'none'
-                        }}
-                    >
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '20px',
+                        padding: '30px',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+                        border: 'none'
+                    }}>
                         <h3 style={{
                             fontSize: '24px',
                             fontWeight: '700',
@@ -691,7 +505,7 @@ const KidsLandingPage = () => {
                             alignItems: 'center',
                             gap: '10px'
                         }}>
-                            <FiTarget color="#f093fb" />
+                            <FiTarget style={{ color: 'var(--chart-secondary-color)' }} />
                             Évolution des Notes
                         </h3>
                         <ResponsiveContainer width="100%" height={300}>
@@ -710,14 +524,14 @@ const KidsLandingPage = () => {
                                 <Line
                                     type="monotone"
                                     dataKey="notes"
-                                    stroke="#f093fb"
+                                    stroke={chartColors.secondary}
                                     strokeWidth={3}
-                                    dot={{ fill: '#f093fb', r: 6 }}
+                                    dot={{ fill: chartColors.secondary, r: 6 }}
                                     activeDot={{ r: 8 }}
                                 />
                             </LineChart>
                         </ResponsiveContainer>
-                    </Panel>
+                    </div>
                 </div>
 
                 {/* Graphique en camembert et barres de progression */}
@@ -727,16 +541,13 @@ const KidsLandingPage = () => {
                     gap: '40px'
                 }}>
                     {/* Répartition des activités */}
-                    <Panel
-                        bordered
-                        style={{
-                            background: 'white',
-                            borderRadius: '20px',
-                            padding: '30px',
-                            boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-                            border: 'none'
-                        }}
-                    >
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '20px',
+                        padding: '30px',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+                        border: 'none'
+                    }}>
                         <h3 style={{
                             fontSize: '24px',
                             fontWeight: '700',
@@ -746,7 +557,7 @@ const KidsLandingPage = () => {
                             alignItems: 'center',
                             gap: '10px'
                         }}>
-                            <FaGraduationCap color="#43e97b" />
+                            <FaGraduationCap style={{ color: 'var(--success-color)' }} />
                             Répartition des Activités
                         </h3>
                         <ResponsiveContainer width="100%" height={300}>
@@ -762,25 +573,22 @@ const KidsLandingPage = () => {
                                     dataKey="value"
                                 >
                                     {activitiesData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                        <Cell key={`cell-${index}`} fill={Object.values(chartColors)[index] || chartColors.primary} />
                                     ))}
                                 </Pie>
                                 <Tooltip />
                             </PieChart>
                         </ResponsiveContainer>
-                    </Panel>
+                    </div>
 
                     {/* Objectifs mensuels */}
-                    <Panel
-                        bordered
-                        style={{
-                            background: 'white',
-                            borderRadius: '20px',
-                            padding: '30px',
-                            boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-                            border: 'none'
-                        }}
-                    >
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '20px',
+                        padding: '30px',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+                        border: 'none'
+                    }}>
                         <h3 style={{
                             fontSize: '24px',
                             fontWeight: '700',
@@ -790,46 +598,51 @@ const KidsLandingPage = () => {
                             alignItems: 'center',
                             gap: '10px'
                         }}>
-                            <FaTrophy color="#ffd700" />
+                            <FaTrophy style={{ color: 'var(--warning-color)' }} />
                             Objectifs du Mois
                         </h3>
                         <div style={{ marginTop: '20px' }}>
-                            {progressData.map((item, index) => (
-                                <div key={index} style={{ marginBottom: '25px' }}>
-                                    <div style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        marginBottom: '10px'
-                                    }}>
-                                        <span style={{
-                                            fontSize: '16px',
-                                            fontWeight: '600',
-                                            color: '#2c3e50'
+                            {progressData.map((item, index) => {
+                                const colors = ['--primary-color', '--chart-secondary-color', '--success-color', '--info-color'];
+                                const colorVar = colors[index % colors.length];
+                                
+                                return (
+                                    <div key={index} style={{ marginBottom: '25px' }}>
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            marginBottom: '10px'
                                         }}>
-                                            {item.matiere}
-                                        </span>
-                                        <span style={{
-                                            fontSize: '16px',
-                                            fontWeight: '700',
-                                            color: item.color
-                                        }}>
-                                            {item.progression}%
-                                        </span>
+                                            <span style={{
+                                                fontSize: '16px',
+                                                fontWeight: '600',
+                                                color: '#2c3e50'
+                                            }}>
+                                                {item.matiere}
+                                            </span>
+                                            <span style={{
+                                                fontSize: '16px',
+                                                fontWeight: '700',
+                                                color: `var(${colorVar})`
+                                            }}>
+                                                {item.progression}%
+                                            </span>
+                                        </div>
+                                        <Progress.Line
+                                            percent={item.progression}
+                                            strokeColor={`var(${colorVar})`}
+                                            strokeWidth={12}
+                                            showInfo={false}
+                                        />
                                     </div>
-                                    <Progress.Line
-                                        percent={item.progression}
-                                        strokeColor={item.color}
-                                        strokeWidth={12}
-                                        showInfo={false}
-                                    />
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
-                    </Panel>
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
 
-export default KidsLandingPage;
+export default DashboardPrimaire;

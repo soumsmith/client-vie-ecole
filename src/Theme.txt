@@ -1,0 +1,296 @@
+/* ============================================
+   DÉFINITION DES THÈMES - VARIABLES CSS
+   ============================================ */
+
+:root {
+    --blue-color: #1d4ed8;
+    --blue-dark-color: #1d4ed8;
+}
+
+/* --- Thèmes par Rôle --- */
+#Fondateur {
+    --primary-color: rgb(44, 179, 97);
+    --bg-color: #1e293b;
+    --text-color: white;
+    --active-color: rgb(44, 179, 97);
+    --hover-color: rgb(44, 179, 97);
+}
+
+#Admin {
+    --primary-color: var(--blue-color);
+    --bg-color: #0f172a;
+    --text-color: #f1f5f9;
+    --active-color: var(--blue-color);
+    --hover-color: #1d4ed8;
+}
+
+.undefined {
+    --primary-color: var(--blue-color);
+    --bg-color: #0f172a;
+    --text-color: #f1f5f9;
+    --active-color: var(--blue-color);
+    --hover-color: #1d4ed8;
+}
+
+#Professeur {
+    --primary-color: #667eea;
+    --bg-color: #0f172a;
+    --text-color: #f1f5f9;
+    --active-color: #667eea;
+    --hover-color: #667eea;
+}
+
+#Educateur {
+    --primary-color: #ff9c00;
+    --bg-color: #0f172a;
+    --text-color: #f1f5f9;
+    --active-color: #ff9c00;
+    --hover-color: #ff9c00;
+}
+
+#Candidat-Fondateur {
+    --primary-color: #0ca5e9;
+    --bg-color: #000;
+    --text-color: #f1f5f9;
+    --active-color: #0ca5e9;
+    --hover-color: #0ca5e9;
+}
+
+#DE {
+    --primary-color: #2ac7d5;
+    --bg-color: #000;
+    --text-color: #f1f5f9;
+    --active-color: #2ac7d5;
+    --hover-color: #2ac7d5;
+}
+
+/* --- Thèmes par Niveau d'Enseignement --- */
+.EnseignementMaternelle {
+    --primary-color: #ff6ab4 !important;
+    --bg-color: #31316b !important;
+    --text-color: white !important;
+    --active-color: #9bcf53 !important;
+    --hover-color: #ff6ab4 !important;
+}
+
+.EnseignementPrimaire {
+    --primary-color: #544d94 !important;
+    --bg-color: #202024 !important;
+    --text-color: white !important;
+    --active-color: #a88bcf !important;
+    --hover-color: #a88bcf !important;
+}
+
+.EnseignementSecondaireGénérale {
+    --primary-color: #82bc42 !important;
+    --bg-color: #202126 !important;
+    --text-color: white !important;
+    --active-color: #82bc42 !important;
+    --hover-color: #82bc42 !important;
+}
+
+.EnseignementSecondaireTechnique {
+    --primary-color: #8b7355 !important;
+    --bg-color: #000 !important;
+    --text-color: white !important;
+    --active-color: #f6f1ee !important;
+    --hover-color: #8b7355 !important;
+}
+
+.ENSEIGNEMENTSUPERIEUR {
+    --primary-color: #8f44ad !important;
+    --bg-color: #202126 !important;
+    --text-color: white !important;
+    --active-color: #ffa421 !important;
+    --hover-color: #8f44ad !important;
+}
+
+.BREVETDETECHNICIENBT {
+    --primary-color: #3072f1 !important;
+    --bg-color: #04183f !important;
+    --text-color: white !important;
+    --active-color: #589ff9 !important;
+    --hover-color: #3072f1 !important;
+}
+
+.undefined {
+    --primary-color: var(--blue-color) !important;
+    --bg-color: #0f172a !important;
+    --text-color: #f1f5f9 !important;
+    --active-color: var(--blue-color) !important;
+    --hover-color: var(--blue-color) !important;
+}
+
+
+/* ============================================
+   STYLES GÉNÉRIQUES APPLIQUÉS AUX THÈMES
+   ============================================ */
+
+/* --- Sidebar --- */
+.sidebar-container,
+.desktop-sidebar,
+.sidebar-header {
+    background: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+.sidebar-nav .rs-sidenav-item {
+    color: var(--text-color) !important;
+}
+
+.sidebar-nav .rs-sidenav-item:hover {
+    background-color: var(--hover-color) !important;
+    color: var(--text-color) !important;
+}
+
+.sidebar-nav .rs-sidenav-item-active {
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--bg-color) 100%) !important;
+    color: var(--text-color) !important;
+    border-radius: 8px !important;
+}
+
+.sidebar-nav .rs-sidenav-item svg {
+    color: var(--active-color) !important;
+}
+
+.sidebar-nav .rs-sidenav-item:hover svg,
+.sidebar-nav .rs-sidenav-item-active svg {
+    color: var(--text-color) !important;
+}
+
+.sidebar-footer {
+    background: var(--primary-color) !important;
+    color: var(--text-color) !important;
+}
+
+/* --- Boutons --- */
+.add-button {
+    background-color: var(--primary-color);
+    border: none;
+}
+
+/* --- Tableaux --- */
+.rs-table-cell-header div,
+.rs-table-cell-header-sortable .rs-table-cell-content,
+.rs-table-cell-header-sortable .rs-table-cell-last {
+    background: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+.rs-table-cell-content {
+    color: var(--text-color) !important;
+}
+
+#AppPage-Fondateur.rs-table-row-header {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+}
+
+/* --- Textes et Éléments --- */
+.brand-title,
+.rs-sidenav-subtle .rs-dropdown-item {
+    color: var(--text-color) !important;
+}
+
+.hover:hover {
+    background: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+/* --- Dropdowns --- */
+.custom-dropdown-menu .custom-dropdown-item:hover {
+    background: linear-gradient(90deg, var(--bg-color) 0%, var(--primary-color) 100%) !important;
+    color: var(--text-color) !important;
+    transition: all 0.2s ease !important;
+    border-radius: 11px !important;
+}
+
+.rs-dropdown-expand {
+    border-radius: 9px !important;
+    border: 1px solid var(--primary-color);
+}
+
+.rs-dropdown-expand>.rs-sidenav-item {
+    background: var(--primary-color) !important;
+}
+
+.rs-dropdown-expand svg {
+    color: #f1f5f9 !important;
+}
+
+
+/* ============================================
+   BOUTONS DE RECHERCHE PAR PROFIL
+   ============================================ */
+.Fondateur-btn-search {
+    background-color: rgb(44, 179, 97) !important;
+    border: none;
+    color: white !important;
+}
+
+.Admin-btn-search {
+    background-color: var(--blue-color) !important;
+    border: none;
+    color: #f1f5f9 !important;
+}
+
+.Professeur-btn-search {
+    background-color: #667eea !important;
+    border: none;
+    color: #f1f5f9 !important;
+}
+
+.Candidat-Fondateur-btn-search {
+    background-color: #0ca5e9 !important;
+    border: none;
+    color: #f1f5f9 !important;
+}
+
+
+/* ============================================
+   STYLES ICONBOX ET STEPS (NIVEAU D'ENSEIGNEMENT)
+   ============================================ */
+.IconBox-undefined,
+.IconBox-niveauEnseignement-undefined {
+    border: 1px solid var(--blue-color) !important;
+    color: var(--blue-color) !important;
+    background-color: #d9e3fa;
+    border-radius: 10px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.OuvertureAnneeScolaire-undefined,
+.OuvertureAnneeScolaire-niveauEnseignement-undefined {
+    background: linear-gradient(90deg, var(--blue-color) 0%, var(--blue-dark-color) 100%) !important;
+}
+
+.datatable-add-btn-undefined{
+    background: linear-gradient(90deg, var(--blue-color) 0%, var(--blue-dark-color) 100%) !important;
+}
+
+
+.btn-action-undefined {
+    background-color: var(--blue-color) !important;
+}
+
+/* --- Steps avec Branches --- */
+.has-branche-undefined .rs-steps-item-status-process .rs-steps-item-icon-wrapper {
+    background-color: var(--blue-color) !important;
+    border-color: var(--blue-color) !important;
+    color: var(--rs-text-inverse, #f7f7fa);
+}
+
+.has-branche-undefined .rs-steps-item-status-finish .rs-steps-item-icon-wrapper {
+    border-color: var(--blue-color) !important;
+    color: var(--blue-color) !important;
+}
+
+/* --- Steps sans Branches --- */
+.no-branche-undefined .rs-steps-item-status-process .rs-steps-item-icon-wrapper {
+    background-color: var(--blue-color) !important;
+    border-color: var(--blue-color) !important;
+    color: var(--rs-text-inverse, #f7f7fa);
+}

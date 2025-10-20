@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { FaUsers, FaUserCheck, FaUser, FaHome, FaBookOpen, FaChartLine } from 'react-icons/fa';
+import { FaUsers, FaUserCheck, FaUser, FaChartLine } from 'react-icons/fa';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
-const EducationDashboard = () => {
+const DashboardEnseignementSecondaireGenerale = ({ niveau = 'EnseignementSecondaireGénérale' }) => {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [chartColors, setChartColors] = useState({ male: '#4f9bff', female: '#b24ce3' });
 
-  // Données statistiques (simulées - à remplacer par les vraies données de l'API)
+  useEffect(() => {
+    const root = document.documentElement;
+    const style = getComputedStyle(root);
+    
+    setChartColors({
+      male: style.getPropertyValue('--chart-primary-color').trim() || '#4f9bff',
+      female: style.getPropertyValue('--chart-secondary-color').trim() || '#b24ce3'
+    });
+  }, [niveau]);
+
   const dashboardData = {
     nombreTotalEleve: 1245,
     nombreTotalEleveGarcons: 678,
@@ -44,35 +54,33 @@ const EducationDashboard = () => {
     {
       title: "Meilleure Plateforme d'Éducation Pour Apprendre",
       subtitle: "Commencez votre parcours aujourd'hui",
-      description: "Découvrez une expérience d'apprentissage unique avec notre plateforme éducative innovante. Nous offrons un enseignement de qualité adapté à tous les niveaux, du primaire au secondaire, avec des méthodes pédagogiques modernes et efficaces.",
+      description: "Découvrez une expérience d'apprentissage unique avec notre plateforme éducative innovante. Nous offrons un enseignement de qualité adapté à tous les niveaux.",
       image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=700&fit=crop"
     },
     {
       title: "Apprenez Avec Des Enseignants Experts",
       subtitle: "Une éducation de qualité pour tous",
-      description: "Notre équipe pédagogique qualifiée et expérimentée accompagne chaque élève dans son parcours scolaire. Des cours interactifs, un suivi personnalisé et des résultats garantis pour la réussite de tous nos apprenants.",
+      description: "Notre équipe pédagogique qualifiée accompagne chaque élève. Des cours interactifs, un suivi personnalisé et des résultats garantis.",
       image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=700&fit=crop"
     },
     {
       title: "Enseignement Flexible et Accessible",
       subtitle: "Étudiez à votre propre rythme",
-      description: "Accédez à des ressources pédagogiques de qualité, disponibles à tout moment. Notre système d'apprentissage flexible s'adapte aux besoins de chaque élève pour garantir une progression optimale dans toutes les matières.",
+      description: "Accédez à des ressources pédagogiques de qualité. Notre système d'apprentissage flexible s'adapte aux besoins de chaque élève.",
       image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&h=700&fit=crop"
     }
   ];
 
-  // Auto-play des slides - Change toutes les 5 secondes
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
-
     return () => clearInterval(interval);
   }, [slides.length]);
 
   const studentDistribution = [
-    { name: 'Garçons', value: dashboardData.nombreTotalEleveGarcons, color: '#4F9BFF' },
-    { name: 'Filles', value: dashboardData.nombreTotalEleveFilles, color: '#B24CE3' }
+    { name: 'Garçons', value: dashboardData.nombreTotalEleveGarcons },
+    { name: 'Filles', value: dashboardData.nombreTotalEleveFilles }
   ];
 
   const staffData = [
@@ -83,7 +91,7 @@ const EducationDashboard = () => {
   ];
 
   return (
-    <div style={{
+    <div className={niveau} style={{
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #fff 0%, #fff 100%)',
       fontFamily: 'system-ui, -apple-system, sans-serif'
@@ -118,27 +126,8 @@ const EducationDashboard = () => {
             transform: translateY(-5px);
             box-shadow: 0 15px 40px rgba(0,0,0,0.15);
           }
-
-          .social-icon {
-            transition: all 0.3s ease;
-            cursor: pointer;
-          }
-
-          .social-icon:hover {
-            transform: scale(1.15);
-          }
-
-          .nav-link {
-            transition: all 0.3s ease;
-            cursor: pointer;
-          }
-
-          .nav-link:hover {
-            color: #4F9BFF !important;
-          }
         `}
       </style>
-
 
       {/* Hero Section */}
       <div style={{
@@ -148,29 +137,8 @@ const EducationDashboard = () => {
         overflow: 'hidden',
         minHeight: '650px'
       }}>
-        {/* Vertical Text - Left */}
-
-        {/* Vertical Text - Right */}
-        <div style={{
-          position: 'absolute',
-          right: '30px',
-          top: '50%',
-          transform: 'translateY(-50%) rotate(90deg)',
-          fontSize: '14px',
-          fontWeight: '600',
-          color: '#666',
-          letterSpacing: '2px',
-          whiteSpace: 'nowrap'
-        }}>
-          Obtenez une réduction de -15% avec le code promo GRATUIT
-        </div>
-
         {/* Decorative stars */}
-        <div style={{
-          position: 'absolute',
-          top: '100px',
-          left: '100px'
-        }}>
+        <div style={{ position: 'absolute', top: '100px', left: '100px' }}>
           <svg width="60" height="60" viewBox="0 0 60 60">
             <path d="M30 0 L35 25 L60 30 L35 35 L30 60 L25 35 L0 30 L25 25 Z" fill="none" stroke="#666" strokeWidth="2" />
           </svg>
@@ -178,23 +146,12 @@ const EducationDashboard = () => {
 
         <div style={{
           position: 'absolute',
-          top: '150px',
-          right: '150px'
-        }}>
-          <svg width="50" height="50" viewBox="0 0 60 60">
-            <path d="M30 0 L35 25 L60 30 L35 35 L30 60 L25 35 L0 30 L25 25 Z" fill="none" stroke="#666" strokeWidth="2" />
-          </svg>
-        </div>
-
-        {/* Green decorative shape bottom right */}
-        <div style={{
-          position: 'absolute',
           bottom: '-100px',
           right: '-100px',
           width: '400px',
           height: '400px',
           borderRadius: '50%',
-          background: 'linear-gradient(135deg, #7ED321 0%, #6BC419 100%)',
+          background: `linear-gradient(135deg, var(--success-color) 0%, var(--success-dark-color) 100%)`,
           opacity: 0.6
         }} />
 
@@ -210,7 +167,7 @@ const EducationDashboard = () => {
         }}>
           {/* Left - Image */}
           <div style={{ position: 'relative' }}>
-            {/* Yellow circle decoration */}
+            {/* Yellow circle */}
             <div style={{
               position: 'absolute',
               bottom: '-40px',
@@ -218,11 +175,11 @@ const EducationDashboard = () => {
               width: '200px',
               height: '200px',
               borderRadius: '50%',
-              background: '#FFD93D',
+              background: 'var(--warning-color)',
               zIndex: 0
             }} />
 
-            {/* Blue circle decoration */}
+            {/* Blue circle */}
             <div style={{
               position: 'absolute',
               top: '-30px',
@@ -230,11 +187,11 @@ const EducationDashboard = () => {
               width: '180px',
               height: '180px',
               borderRadius: '50%',
-              background: '#4F9BFF',
+              background: 'var(--chart-primary-color)',
               zIndex: 0
             }} />
 
-            {/* Gray circle decoration */}
+            {/* Gray circle */}
             <div style={{
               position: 'absolute',
               top: '20px',
@@ -280,12 +237,9 @@ const EducationDashboard = () => {
               border: '2px solid #1a1a1a',
               background: 'white',
               transform: 'rotate(-15deg)',
-              animation: 'slideInImage 0.8s ease-out',
               right: '270px',
               top: '0px'
-            }}>
-
-            </div>
+            }} />
 
             {/* Arrow decoration */}
             <div style={{
@@ -303,7 +257,6 @@ const EducationDashboard = () => {
 
           {/* Right - Content */}
           <div key={activeSlide} style={{ animation: 'slideInContent 1s ease-out' }}>
-
             <h1 style={{
               fontSize: '58px',
               fontWeight: '900',
@@ -326,7 +279,7 @@ const EducationDashboard = () => {
 
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <button style={{
-                background: 'linear-gradient(135deg, #B24CE3 0%, #9B4CE3 100%)',
+                background: `linear-gradient(135deg, var(--success-color) 0%, var(--success-dark-color) 100%)`,
                 border: 'none',
                 padding: '20px 60px',
                 borderRadius: '12px',
@@ -334,18 +287,18 @@ const EducationDashboard = () => {
                 fontSize: '18px',
                 fontWeight: '700',
                 cursor: 'pointer',
-                boxShadow: '0 10px 30px rgba(178, 76, 227, 0.3)',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
                 transition: 'all 0.3s ease',
                 textTransform: 'uppercase',
                 letterSpacing: '1px'
               }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-3px)';
-                  e.currentTarget.style.boxShadow = '0 15px 40px rgba(178, 76, 227, 0.4)';
+                  e.currentTarget.style.boxShadow = '0 15px 40px rgba(0,0,0,0.25)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 10px 30px rgba(178, 76, 227, 0.3)';
+                  e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
                 }}
               >
                 COMMENCER MAINTENANT
@@ -378,7 +331,7 @@ const EducationDashboard = () => {
                     width: index === activeSlide ? '40px' : '15px',
                     height: '15px',
                     borderRadius: '10px',
-                    background: index === activeSlide ? '#B24CE3' : '#E0E0E0',
+                    background: index === activeSlide ? 'var(--success-color)' : '#E0E0E0',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease'
                   }}
@@ -400,7 +353,7 @@ const EducationDashboard = () => {
           fontWeight: '800',
           textAlign: 'center',
           marginBottom: '60px',
-          background: 'linear-gradient(135deg, #B24CE3 0%, #7ED321 100%)',
+          background: `linear-gradient(135deg, var(--success-color) 0%, var(--warning-color) 100%)`,
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
         }}>
@@ -414,131 +367,53 @@ const EducationDashboard = () => {
           gap: '30px',
           marginBottom: '50px'
         }}>
-          <div className="stat-card" style={{
-            background: 'linear-gradient(135deg, #B24CE315 0%, #B24CE325 100%)',
-            border: '1px solid #B24CE330',
-            borderRadius: '20px',
-            padding: '35px',
-            textAlign: 'center'
-          }}>
-            <div style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #B24CE3 0%, #9B4CE3 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 25px',
-              color: 'white',
-              fontSize: '36px'
+          {[
+            { Icon: FaUsers, value: dashboardData.nombreTotalEleve, label: 'Total Élèves', sublabel: `${dashboardData.nombreTotalEleveGarcons} garçons • ${dashboardData.nombreTotalEleveFilles} filles`, colorVar: '--success-color' },
+            { Icon: FaUserCheck, value: dashboardData.nombreEleveAff, label: 'Élèves Affectés', sublabel: `${((dashboardData.nombreEleveAff / dashboardData.nombreTotalEleve) * 100).toFixed(1)}% du total`, colorVar: '--info-color' },
+            { Icon: FaUser, value: dashboardData.nombrePersonnel, label: 'Personnel Total', sublabel: 'Tous les membres du personnel', colorVar: '--warning-color' }
+          ].map((stat, idx) => (
+            <div key={idx} className="stat-card" style={{
+              background: `color-mix(in srgb, var(${stat.colorVar}) 10%, transparent)`,
+              border: `1px solid color-mix(in srgb, var(${stat.colorVar}) 30%, transparent)`,
+              borderRadius: '20px',
+              padding: '35px',
+              textAlign: 'center'
             }}>
-              <FaUsers />
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                background: `linear-gradient(135deg, var(${stat.colorVar}), var(${stat.colorVar}))`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 25px',
+                color: 'white',
+                fontSize: '36px'
+              }}>
+                <stat.Icon />
+              </div>
+              <div style={{
+                fontSize: '42px',
+                fontWeight: '800',
+                color: `var(${stat.colorVar})`,
+                marginBottom: '10px'
+              }}>
+                {stat.value}
+              </div>
+              <div style={{
+                fontSize: '16px',
+                color: '#64748b',
+                fontWeight: '600',
+                marginBottom: '10px'
+              }}>
+                {stat.label}
+              </div>
+              <div style={{ fontSize: '14px', color: '#94a3b8' }}>
+                {stat.sublabel}
+              </div>
             </div>
-            <div style={{
-              fontSize: '42px',
-              fontWeight: '800',
-              color: '#B24CE3',
-              marginBottom: '10px'
-            }}>
-              {dashboardData.nombreTotalEleve}
-            </div>
-            <div style={{
-              fontSize: '16px',
-              color: '#64748b',
-              fontWeight: '600',
-              marginBottom: '10px'
-            }}>
-              Total Élèves
-            </div>
-            <div style={{ fontSize: '14px', color: '#94a3b8' }}>
-              {dashboardData.nombreTotalEleveGarcons} garçons • {dashboardData.nombreTotalEleveFilles} filles
-            </div>
-          </div>
-
-          <div className="stat-card" style={{
-            background: 'linear-gradient(135deg, #7ED32115 0%, #7ED32125 100%)',
-            border: '1px solid #7ED32130',
-            borderRadius: '20px',
-            padding: '35px',
-            textAlign: 'center'
-          }}>
-            <div style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #7ED321 0%, #6BC419 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 25px',
-              color: 'white',
-              fontSize: '36px'
-            }}>
-              <FaUserCheck />
-            </div>
-            <div style={{
-              fontSize: '42px',
-              fontWeight: '800',
-              color: '#7ED321',
-              marginBottom: '10px'
-            }}>
-              {dashboardData.nombreEleveAff}
-            </div>
-            <div style={{
-              fontSize: '16px',
-              color: '#64748b',
-              fontWeight: '600',
-              marginBottom: '10px'
-            }}>
-              Élèves Affectés
-            </div>
-            <div style={{ fontSize: '14px', color: '#94a3b8' }}>
-              {((dashboardData.nombreEleveAff / dashboardData.nombreTotalEleve) * 100).toFixed(1)}% du total
-            </div>
-          </div>
-
-          <div className="stat-card" style={{
-            background: 'linear-gradient(135deg, #FFD93D15 0%, #FFD93D25 100%)',
-            border: '1px solid #FFD93D30',
-            borderRadius: '20px',
-            padding: '35px',
-            textAlign: 'center'
-          }}>
-            <div style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #FFD93D 0%, #FFC94D 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 25px',
-              color: 'white',
-              fontSize: '36px'
-            }}>
-              <FaUser />
-            </div>
-            <div style={{
-              fontSize: '42px',
-              fontWeight: '800',
-              color: '#FFD93D',
-              marginBottom: '10px'
-            }}>
-              {dashboardData.nombrePersonnel}
-            </div>
-            <div style={{
-              fontSize: '16px',
-              color: '#64748b',
-              fontWeight: '600',
-              marginBottom: '10px'
-            }}>
-              Personnel Total
-            </div>
-            <div style={{ fontSize: '14px', color: '#94a3b8' }}>
-              Tous les membres du personnel
-            </div>
-          </div>
+          ))}
         </div>
 
         {/* Charts Section */}
@@ -564,7 +439,7 @@ const EducationDashboard = () => {
               alignItems: 'center',
               gap: '12px'
             }}>
-              <FaChartLine color="#B24CE3" />
+              <FaChartLine style={{ color: 'var(--success-color)' }} />
               Répartition du Personnel
             </h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -581,8 +456,8 @@ const EducationDashboard = () => {
                   }}
                 />
                 <Legend />
-                <Bar dataKey="masculin" fill="#4F9BFF" radius={[10, 10, 0, 0]} name="Hommes" />
-                <Bar dataKey="feminin" fill="#B24CE3" radius={[10, 10, 0, 0]} name="Femmes" />
+                <Bar dataKey="masculin" fill={chartColors.male} radius={[10, 10, 0, 0]} name="Hommes" />
+                <Bar dataKey="feminin" fill={chartColors.female} radius={[10, 10, 0, 0]} name="Femmes" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -603,7 +478,7 @@ const EducationDashboard = () => {
               alignItems: 'center',
               gap: '12px'
             }}>
-              <FaUsers color="#7ED321" />
+              <FaUsers style={{ color: 'var(--info-color)' }} />
               Répartition Élèves
             </h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -619,7 +494,7 @@ const EducationDashboard = () => {
                   dataKey="value"
                 >
                   {studentDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                    <Cell key={`cell-${index}`} fill={index === 0 ? chartColors.male : chartColors.female} />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -635,127 +510,72 @@ const EducationDashboard = () => {
           gap: '30px',
           marginBottom: '50px'
         }}>
-          {/* Anciens */}
-          <div className="stat-card" style={{
-            background: 'white',
-            borderRadius: '20px',
-            padding: '30px',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-            border: '2px solid #B24CE3'
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              marginBottom: '20px'
+          {[
+            { label: 'Élèves Anciens', value: dashboardData.nombreEleveAnc, aff: dashboardData.nombreEleveAncAffGarcons + dashboardData.nombreEleveAncAffFilles, nonAff: dashboardData.nombreEleveAncNonAffGarcons + dashboardData.nombreEleveAncNonAffFilles, colorVar: '--success-color' },
+            { label: 'Élèves Nouveaux', value: dashboardData.nombreEleveNouv, aff: dashboardData.nombreEleveNouvAffGarcons + dashboardData.nombreEleveNouvAffFilles, nonAff: dashboardData.nombreEleveNouvNonAffGarcons + dashboardData.nombreEleveNouvNonAffFilles, colorVar: '--info-color' },
+            { label: 'Infrastructure', salles: dashboardData.sallesDispo, classes: dashboardData.nombreClasses, colorVar: '--warning-color' }
+          ].map((item, idx) => (
+            <div key={idx} className="stat-card" style={{
+              background: 'white',
+              borderRadius: '20px',
+              padding: '30px',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
+              border: `2px solid var(${item.colorVar})`
             }}>
               <div style={{
-                width: '15px',
-                height: '15px',
-                borderRadius: '50%',
-                background: '#B24CE3'
-              }} />
-              <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#2c3e50' }}>
-                Élèves Anciens
-              </h4>
-            </div>
-            <div style={{
-              fontSize: '48px',
-              fontWeight: '800',
-              color: '#B24CE3',
-              marginBottom: '15px'
-            }}>
-              {dashboardData.nombreEleveAnc}
-            </div>
-            <div style={{ fontSize: '14px', color: '#64748b' }}>
-              Affectés: {dashboardData.nombreEleveAncAffGarcons + dashboardData.nombreEleveAncAffFilles}
-              <span style={{ margin: '0 10px' }}>•</span>
-              Non affectés: {dashboardData.nombreEleveAncNonAffGarcons + dashboardData.nombreEleveAncNonAffFilles}
-            </div>
-          </div>
-
-          {/* Nouveaux */}
-          <div className="stat-card" style={{
-            background: 'white',
-            borderRadius: '20px',
-            padding: '30px',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-            border: '2px solid #7ED321'
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              marginBottom: '20px'
-            }}>
-              <div style={{
-                width: '15px',
-                height: '15px',
-                borderRadius: '50%',
-                background: '#7ED321'
-              }} />
-              <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#2c3e50' }}>
-                Élèves Nouveaux
-              </h4>
-            </div>
-            <div style={{
-              fontSize: '48px',
-              fontWeight: '800',
-              color: '#7ED321',
-              marginBottom: '15px'
-            }}>
-              {dashboardData.nombreEleveNouv}
-            </div>
-            <div style={{ fontSize: '14px', color: '#64748b' }}>
-              Affectés: {dashboardData.nombreEleveNouvAffGarcons + dashboardData.nombreEleveNouvAffFilles}
-              <span style={{ margin: '0 10px' }}>•</span>
-              Non affectés: {dashboardData.nombreEleveNouvNonAffGarcons + dashboardData.nombreEleveNouvNonAffFilles}
-            </div>
-          </div>
-
-          {/* Infrastructure */}
-          <div className="stat-card" style={{
-            background: 'white',
-            borderRadius: '20px',
-            padding: '30px',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-            border: '2px solid #FFD93D'
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              marginBottom: '20px'
-            }}>
-              <div style={{
-                width: '15px',
-                height: '15px',
-                borderRadius: '50%',
-                background: '#FFD93D'
-              }} />
-              <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#2c3e50' }}>
-                Infrastructure
-              </h4>
-            </div>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginBottom: '10px'
-            }}>
-              <div>
-                <div style={{ fontSize: '14px', color: '#64748b', marginBottom: '5px' }}>Salles dispo</div>
-                <div style={{ fontSize: '32px', fontWeight: '800', color: '#7ED321' }}>
-                  {dashboardData.sallesDispo}
-                </div>
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                marginBottom: '20px'
+              }}>
+                <div style={{
+                  width: '15px',
+                  height: '15px',
+                  borderRadius: '50%',
+                  background: `var(${item.colorVar})`
+                }} />
+                <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#2c3e50' }}>
+                  {item.label}
+                </h4>
               </div>
-              <div>
-                <div style={{ fontSize: '14px', color: '#64748b', marginBottom: '5px' }}>Classes</div>
-                <div style={{ fontSize: '32px', fontWeight: '800', color: '#4F9BFF' }}>
-                  {dashboardData.nombreClasses}
+              {item.value !== undefined ? (
+                <>
+                  <div style={{
+                    fontSize: '48px',
+                    fontWeight: '800',
+                    color: `var(${item.colorVar})`,
+                    marginBottom: '15px'
+                  }}>
+                    {item.value}
+                  </div>
+                  <div style={{ fontSize: '14px', color: '#64748b' }}>
+                    Affectés: {item.aff}
+                    <span style={{ margin: '0 10px' }}>•</span>
+                    Non affectés: {item.nonAff}
+                  </div>
+                </>
+              ) : (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginBottom: '10px'
+                }}>
+                  <div>
+                    <div style={{ fontSize: '14px', color: '#64748b', marginBottom: '5px' }}>Salles dispo</div>
+                    <div style={{ fontSize: '32px', fontWeight: '800', color: 'var(--info-color)' }}>
+                      {item.salles}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '14px', color: '#64748b', marginBottom: '5px' }}>Classes</div>
+                    <div style={{ fontSize: '32px', fontWeight: '800', color: 'var(--chart-primary-color)' }}>
+                      {item.classes}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
-          </div>
+          ))}
         </div>
 
         {/* Personnel Details */}
@@ -781,23 +601,23 @@ const EducationDashboard = () => {
             gap: '30px'
           }}>
             {[
-              { label: 'Administratif', masculin: dashboardData.personnelAdmMasculin, feminin: dashboardData.personnelAdmFeminin, color: '#B24CE3' },
-              { label: 'Educateur', masculin: dashboardData.personnelEducateurMasculin, feminin: dashboardData.personnelEducateurFeminin, color: '#7ED321' },
-              { label: 'Enseignant', masculin: dashboardData.personnelEnseignantMasculin, feminin: dashboardData.personnelEnseignantFeminin, color: '#FFD93D' },
-              { label: 'Permanent', masculin: dashboardData.enseignantPermanentMasculin, feminin: dashboardData.enseignantPermanentFeminin, color: '#4F9BFF' }
+              { label: 'Administratif', masculin: dashboardData.personnelAdmMasculin, feminin: dashboardData.personnelAdmFeminin, colorVar: '--success-color' },
+              { label: 'Educateur', masculin: dashboardData.personnelEducateurMasculin, feminin: dashboardData.personnelEducateurFeminin, colorVar: '--info-color' },
+              { label: 'Enseignant', masculin: dashboardData.personnelEnseignantMasculin, feminin: dashboardData.personnelEnseignantFeminin, colorVar: '--warning-color' },
+              { label: 'Permanent', masculin: dashboardData.enseignantPermanentMasculin, feminin: dashboardData.enseignantPermanentFeminin, colorVar: '--chart-primary-color' }
             ].map((item, index) => (
               <div key={index} style={{
                 textAlign: 'center',
                 padding: '25px',
-                background: `${item.color}10`,
+                background: `color-mix(in srgb, var(${item.colorVar}) 10%, transparent)`,
                 borderRadius: '15px',
-                border: `2px solid ${item.color}30`
+                border: `2px solid color-mix(in srgb, var(${item.colorVar}) 30%, transparent)`
               }}>
                 <div style={{
                   width: '60px',
                   height: '60px',
                   borderRadius: '50%',
-                  background: item.color,
+                  background: `var(${item.colorVar})`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -818,11 +638,11 @@ const EducationDashboard = () => {
                 }}>
                   <div>
                     <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '5px' }}>Hommes</div>
-                    <div style={{ color: '#4F9BFF' }}>{item.masculin}</div>
+                    <div style={{ color: chartColors.male }}>{item.masculin}</div>
                   </div>
                   <div>
                     <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '5px' }}>Femmes</div>
-                    <div style={{ color: '#B24CE3' }}>{item.feminin}</div>
+                    <div style={{ color: chartColors.female }}>{item.feminin}</div>
                   </div>
                 </div>
               </div>
@@ -834,4 +654,4 @@ const EducationDashboard = () => {
   );
 };
 
-export default EducationDashboard;
+export default DashboardEnseignementSecondaireGenerale;
