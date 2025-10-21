@@ -3,6 +3,8 @@ import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
 import { Container, Header, Content, Drawer, IconButton, Nav, Navbar, Sidebar as RSuiteSidebar, FlexboxGrid } from 'rsuite';
 import MenuIcon from '@rsuite/icons/Menu';
 import { allMenuSections } from './menuConfig';
+import useLoginData from './Menu/useLoginData';
+
 
 
 // Import du nouveau TopBar
@@ -111,6 +113,8 @@ const Layout = ({ onLogout }) => {
   const location = useLocation();
   const [showDrawer, setShowDrawer] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  const { handleLogout } = useLoginData();
 
   // Liste des eventKeys qui correspondent à des menus déroulants (ne doivent pas naviguer)
   const dropdownMenuKeys = [
@@ -721,7 +725,7 @@ const getDashboardComponent = (id) => {
           {!isMobile && (
             <LightTopBar
               pageTitle={getPageTitle()}
-              onLogout={onLogout}
+              onLogout={handleLogout} 
               userInfo={{
                 name: personnelInfo?.nom || personnelInfo?.name || "Utilisateur",
                 role: userProfil || "Membre",
@@ -739,7 +743,7 @@ const getDashboardComponent = (id) => {
               {/* <Route path="/dashboard" element={<Dashboard />} /> */}
               {/* <Route path="/" element={<Dashboard />} /> */}
 
-             <Route path="/dashboard" element={getDashboardComponent(academicYear.niveauEnseignement?.id)} />
+             <Route path="/dashboard" element={getDashboardComponent(academicYear?.niveauEnseignement?.id)} />
 
               
               {/* {academicYear.niveauEnseignement?.id === 1 && (

@@ -6,8 +6,6 @@ import React, { createContext, useState, useEffect } from 'react';
 
 const UserContext = createContext();
 
-
-
 /**
  * Provider pour le contexte utilisateur
  * Gère les paramètres dynamiques basés sur les données de connexion
@@ -56,9 +54,9 @@ export const UserProvider = ({ children }) => {
 
                 const newParams = {
                     ecoleId: parsedData.schoolId || parsedUserData?.schoolId || null,
-                    userId: parsedData.userId || userId ? parseInt(userId) : null,
+                    userId: parsedData.userId || (userId ? parseInt(userId) : null),
                     academicYearId: parsedAcademicYearMain?.id || parsedAcademicYearMain?.anneeid || null,
-                    periodiciteId: parsedAcademicYearInfo?.periodiciteid || 2, // Valeur par défaut
+                    periodiciteId: parsedAcademicYearInfo?.periodiciteid || null,
                     profileId: parsedData.profileId || parsedUserData?.profileId || null,
                     email: parsedData.email || parsedUserData?.email || null,
                     personnelInfo: parsedData.personnelInfo || parsedPersonnelInfo || null,
@@ -69,28 +67,28 @@ export const UserProvider = ({ children }) => {
                 setIsAuthenticated(true);
                 console.log('✅ Paramètres utilisateur initialisés:', newParams);
             } else {
-                // Valeurs par défaut si pas de données utilisateur
+                // Pas de données utilisateur, tous les paramètres restent null
                 setUserParams({
-                    ecoleId: 38, // Valeur par défaut
+                    ecoleId: null,
                     userId: null,
-                    academicYearId: 226, // Valeur par défaut
-                    periodiciteId: 2, // Valeur par défaut
+                    academicYearId: null,
+                    periodiciteId: null,
                     profileId: null,
                     email: null,
                     personnelInfo: null,
                     academicYearInfo: null
                 });
                 setIsAuthenticated(false);
-                console.log('⚠️ Aucune donnée utilisateur trouvée, utilisation des valeurs par défaut');
+                console.log('⚠️ Aucune donnée utilisateur trouvée');
             }
         } catch (error) {
             console.error('❌ Erreur lors de l\'initialisation des paramètres utilisateur:', error);
-            // Valeurs par défaut en cas d'erreur
+            // En cas d'erreur, réinitialiser à null
             setUserParams({
-                ecoleId: 38,
+                ecoleId: null,
                 userId: null,
-                academicYearId: 226,
-                periodiciteId: 2,
+                academicYearId: null,
+                periodiciteId: null,
                 profileId: null,
                 email: null,
                 personnelInfo: null,
@@ -122,14 +120,14 @@ export const UserProvider = ({ children }) => {
             const { userCompleteData } = loginData;
             
             const newParams = {
-                ecoleId: userCompleteData.schoolId,
-                userId: userCompleteData.userId,
-                academicYearId: userCompleteData.academicYearMain?.id || userCompleteData.academicYearMain?.anneeid,
-                periodiciteId: userCompleteData.academicYearInfo?.periodiciteid || 2,
-                profileId: userCompleteData.profileId,
-                email: userCompleteData.email,
-                personnelInfo: userCompleteData.personnelInfo,
-                academicYearInfo: userCompleteData.academicYearInfo
+                ecoleId: userCompleteData.schoolId || null,
+                userId: userCompleteData.userId || null,
+                academicYearId: userCompleteData.academicYearMain?.id || userCompleteData.academicYearMain?.anneeid || null,
+                periodiciteId: userCompleteData.academicYearInfo?.periodiciteid || null,
+                profileId: userCompleteData.profileId || null,
+                email: userCompleteData.email || null,
+                personnelInfo: userCompleteData.personnelInfo || null,
+                academicYearInfo: userCompleteData.academicYearInfo || null
             };
 
             setUserParams(newParams);
@@ -143,10 +141,10 @@ export const UserProvider = ({ children }) => {
      */
     const clearUserParams = () => {
         setUserParams({
-            ecoleId: 38,
+            ecoleId: null,
             userId: null,
-            academicYearId: 226,
-            periodiciteId: 2,
+            academicYearId: null,
+            periodiciteId: null,
             profileId: null,
             email: null,
             personnelInfo: null,
@@ -157,30 +155,27 @@ export const UserProvider = ({ children }) => {
     };
 
     /**
-     * Récupère un paramètre spécifique avec fallback
+     * Récupère un paramètre spécifique
      * @param {string} paramName - Nom du paramètre
-     * @param {any} defaultValue - Valeur par défaut
-     * @returns {any} - Valeur du paramètre
+     * @returns {any} - Valeur du paramètre (peut être null)
      */
-    const getParam = (paramName, defaultValue = null) => {
-        return userParams[paramName] !== null && userParams[paramName] !== undefined
-            ? userParams[paramName]
-            : defaultValue;
+    const getParam = (paramName) => {
+        return userParams[paramName];
     };
 
     /**
-     * Récupère tous les paramètres avec fallbacks
-     * @returns {object} - Tous les paramètres avec valeurs par défaut
+     * Récupère tous les paramètres
+     * @returns {object} - Tous les paramètres
      */
     const getAllParams = () => ({
-        ecoleId: getParam('ecoleId', 38),
-        userId: getParam('userId'),
-        academicYearId: getParam('academicYearId', 226),
-        periodiciteId: getParam('periodiciteId', 2),
-        profileId: getParam('profileId'),
-        email: getParam('email'),
-        personnelInfo: getParam('personnelInfo'),
-        academicYearInfo: getParam('academicYearInfo')
+        ecoleId: userParams.ecoleId,
+        userId: userParams.userId,
+        academicYearId: userParams.academicYearId,
+        periodiciteId: userParams.periodiciteId,
+        profileId: userParams.profileId,
+        email: userParams.email,
+        personnelInfo: userParams.personnelInfo,
+        academicYearInfo: userParams.academicYearInfo
     });
 
     // ===========================
@@ -206,15 +201,15 @@ export const UserProvider = ({ children }) => {
         getParam,
         getAllParams,
         
-        // Paramètres individuels avec fallbacks
-        ecoleId: getParam('ecoleId', 38),
-        userId: getParam('userId'),
-        academicYearId: getParam('academicYearId', 226),
-        periodiciteId: getParam('periodiciteId', 2),
-        profileId: getParam('profileId'),
-        email: getParam('email'),
-        personnelInfo: getParam('personnelInfo'),
-        academicYearInfo: getParam('academicYearInfo')
+        // Paramètres individuels (valeurs dynamiques uniquement)
+        ecoleId: userParams.ecoleId,
+        userId: userParams.userId,
+        academicYearId: userParams.academicYearId,
+        periodiciteId: userParams.periodiciteId,
+        profileId: userParams.profileId,
+        email: userParams.email,
+        personnelInfo: userParams.personnelInfo,
+        academicYearInfo: userParams.academicYearInfo
     };
 
     return (

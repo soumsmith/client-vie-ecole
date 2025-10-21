@@ -1340,7 +1340,7 @@ const Sidebar = ({
   const userProfil = localStorage.getItem("userProfil");
 
   return (
-    <div id={userProfil} style={sidebarStyles.container} className={`sidebar-container ecole-id-${academicYear?.niveauEnseignement?.id || ''} ${academicYear.niveauEnseignement?.libelle.replace(/[\s()]/g, '')}`}>
+    <div id={userProfil} style={sidebarStyles.container} className={`sidebar-container ecole-id-${academicYear?.niveauEnseignement?.id || ''} ${academicYear?.niveauEnseignement?.libelle.replace(/[\s()]/g, '')}`}>
       <div style={sidebarStyles.header} className="sidebar-header">
         <div className="d-flex align-items-center">
           <img

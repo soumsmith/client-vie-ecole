@@ -17,20 +17,22 @@ const DEFAULT_ANNEE_ID = 226;
 // ===========================
 // FONCTIONS UTILITAIRES
 // ===========================
-const formatDate = (dateString) => {
-    if (!dateString) return 'Non définie';
-    try {
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return 'Date invalide';
-        return date.toLocaleDateString('fr-FR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
-    } catch (error) {
-        return 'Date invalide';
-    }
-};
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+
+  // Supprimer les crochets [UTC] et espaces éventuels
+  const cleanDate = dateStr.replace(/\[.*\]/, "");
+
+  const date = new Date(cleanDate);
+  if (isNaN(date)) return "Date invalide";
+
+  return date.toLocaleDateString("fr-FR", {
+    year: "2-digit",//"numeric",
+    month: "2-digit", //"long",
+    day: "numeric",
+  });
+}
+
 
 const formatTime = (dateString) => {
     if (!dateString) return '';
@@ -53,6 +55,29 @@ const formatDuration = (duration) => {
         return `${hours}h${minutes}`;
     }
     return duration || '2h00';
+};
+
+/**
+ * Sauvegarde une note d'évaluation
+ */
+export const saveNote = async (noteId, note, pec, apiUrls) => {
+    try {
+        const payload = {
+            id: noteId,
+            note: parseFloat(note) || 0,
+            pec: pec ? 1 : 0
+        };
+
+        const response = await axios.put(
+            apiUrls.notes.update(noteId),
+            payload
+        );
+
+        return response.data;
+    } catch (error) {
+        console.error('❌ Erreur lors de la sauvegarde de la note:', error);
+        throw error;
+    }
 };
 
 // ===========================
@@ -202,15 +227,6 @@ export const useEvaluationNotes = (evaluationCode) => {
             setLoading(true);
             setError(null);
 
-            const cacheKey = `evaluation-notes-${code}`;
-            const cachedData = getFromCache(cacheKey);
-
-            if (cachedData) {
-                setData(cachedData);
-                setLoading(false);
-                return;
-            }
-
             const response = await axios.get(apiUrls.notes.listAboutEvaluation(code));
 
             if (response.data && Array.isArray(response.data)) {
@@ -247,21 +263,20 @@ export const useEvaluationNotes = (evaluationCode) => {
                         statut: noteItem.classeEleve?.statut,
                         dateCreation: noteItem.classeEleve?.dateCreation
                     },
+                    // ✅ IMPORTANT : Conserver les données brutes
                     raw_data: noteItem
                 }));
 
-                // Trier par nom de famille puis prénom
+                // Trier par nom
                 processedNotes.sort((a, b) => {
                     const nomA = a.eleve.nom?.toLowerCase() || '';
                     const nomB = b.eleve.nom?.toLowerCase() || '';
                     if (nomA !== nomB) return nomA.localeCompare(nomB);
-
                     const prenomA = a.eleve.prenom?.toLowerCase() || '';
                     const prenomB = b.eleve.prenom?.toLowerCase() || '';
                     return prenomA.localeCompare(prenomB);
                 });
 
-                setToCache(cacheKey, processedNotes, 2); // Cache pendant 2 minutes
                 setData(processedNotes);
             }
         } catch (err) {
@@ -322,10 +337,11 @@ export const useEvaluationLock = (evaluationId) => {
 
     const checkLock = useCallback(async (id) => {
         if (!id) return;
-
+        
         try {
             setLoading(true);
             setError(null);
+           
 
             const response = await axios.get(apiUrls.evaluations.isLocked(id));
 
@@ -384,7 +400,6 @@ export const useProfesseurDetails = (matiereId, classeId, anneeId = DEFAULT_ANNE
             });
 
             const response = await axios.get(apiUrls.personnel.getProfesseurByMatiere(annee, matiere, classe));
-            //const response = await axios.get(apiUrls.personnel.getProfesseurByMatiere(annee, matiere, classe));
 
 
             if (response.data && Array.isArray(response.data) && response.data.length > 0) {

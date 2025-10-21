@@ -650,7 +650,7 @@ const EvaluationFilters = ({
                             color: '#475569',
                             fontSize: '14px'
                         }}>
-                            Matière (optionnel)
+                            Matière *
                         </label>
                         <SelectPicker
                             data={matieres.map(matiere => ({
@@ -690,7 +690,7 @@ const EvaluationFilters = ({
                             color: '#475569',
                             fontSize: '14px'
                         }}>
-                            Période (optionnel)
+                            Période *
                         </label>
                         <SelectPicker
                             data={periodes}

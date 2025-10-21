@@ -2,30 +2,20 @@ import { useUserContext } from './useUserContext';
 
 /**
  * Hook pour récupérer les paramètres dynamiques basés sur les données utilisateur
- * Remplace les valeurs codées en dur par des valeurs dynamiques
- * @param {object} options - Options de configuration
- * @returns {object} - Paramètres dynamiques avec fallbacks
+ * Utilise uniquement les données du contexte utilisateur
+ * @returns {object} - Paramètres dynamiques depuis le contexte
  */
-export const useDynamicParams = (options = {}) => {
-    const {
-        ecoleId: defaultEcoleId = 38,
-        academicYearId: defaultAcademicYearId = 226,
-        periodiciteId: defaultPeriodiciteId = 2,
-        userId: defaultUserId = null,
-        profileId: defaultProfileId = null,
-        email: defaultEmail = null
-    } = options;
-
+export const useDynamicParams = () => {
     const userContext = useUserContext();
 
-    // Récupérer les paramètres avec fallbacks
+    // Récupérer les paramètres directement depuis le contexte
     const params = {
-        ecoleId: userContext.ecoleId || defaultEcoleId,
-        academicYearId: userContext.academicYearId || defaultAcademicYearId,
-        periodiciteId: userContext.periodiciteId || defaultPeriodiciteId,
-        userId: userContext.userId || defaultUserId,
-        profileId: userContext.profileId || defaultProfileId,
-        email: userContext.email || defaultEmail,
+        ecoleId: userContext.ecoleId,
+        academicYearId: userContext.academicYearId,
+        periodiciteId: userContext.periodiciteId,
+        userId: userContext.userId,
+        profileId: userContext.profileId,
+        email: userContext.email,
         personnelInfo: userContext.personnelInfo,
         academicYearInfo: userContext.academicYearInfo
     };
@@ -49,32 +39,17 @@ export const useDynamicParams = (options = {}) => {
 
 /**
  * Hook spécialisé pour les services PULS
- * Fournit les paramètres les plus couramment utilisés dans les services
- * @param {object} options - Options de configuration
+ * Fournit les paramètres directement depuis le contexte utilisateur
  * @returns {object} - Paramètres pour les services PULS
  */
-export const usePulsParams = (options = {}) => {
-    const {
-        useDefaultEcoleId = true,
-        useDefaultAcademicYearId = true,
-        useDefaultPeriodiciteId = true
-    } = options;
-
+export const usePulsParams = () => {
     const userContext = useUserContext();
     
     return {
-        // Paramètres principaux avec fallbacks intelligents
-        ecoleId: useDefaultEcoleId 
-            ? (userContext.ecoleId || 38)
-            : userContext.ecoleId,
-            
-        academicYearId: useDefaultAcademicYearId
-            ? (userContext.academicYearId || 226)
-            : userContext.academicYearId,
-            
-        periodiciteId: useDefaultPeriodiciteId
-            ? (userContext.periodiciteId || 2)
-            : userContext.periodiciteId,
+        // Paramètres principaux depuis le contexte
+        ecoleId: userContext.ecoleId,
+        academicYearId: userContext.academicYearId,
+        periodiciteId: userContext.periodiciteId,
             
         // Paramètres utilisateur
         userId: userContext.userId,
@@ -94,7 +69,7 @@ export const usePulsParams = (options = {}) => {
 /**
  * Hook pour les paramètres de requête API
  * Génère automatiquement les paramètres pour les requêtes API
- * @param {object} options - Options de configuration
+ * @param {object} options - Options pour inclure/exclure certains paramètres
  * @returns {object} - Paramètres pour les requêtes API
  */
 export const useApiParams = (options = {}) => {
@@ -102,25 +77,25 @@ export const useApiParams = (options = {}) => {
         includeEcoleId = true,
         includeAcademicYearId = true,
         includePeriodiciteId = true,
-        includeUserId = false,
-        includeProfileId = false,
-        includeEmail = false
+        includeUserId = true,
+        includeProfileId = true,
+        includeEmail = true
     } = options;
 
     const userContext = useUserContext();
 
     const apiParams = {};
 
-    if (includeEcoleId) {
-        apiParams.ecoleId = userContext.ecoleId || 38;
+    if (includeEcoleId && userContext.ecoleId) {
+        apiParams.ecoleId = userContext.ecoleId;
     }
     
-    if (includeAcademicYearId) {
-        apiParams.academicYearId = userContext.academicYearId || 226;
+    if (includeAcademicYearId && userContext.academicYearId) {
+        apiParams.academicYearId = userContext.academicYearId;
     }
     
-    if (includePeriodiciteId) {
-        apiParams.periodiciteId = userContext.periodiciteId || 2;
+    if (includePeriodiciteId && userContext.periodiciteId) {
+        apiParams.periodiciteId = userContext.periodiciteId;
     }
     
     if (includeUserId && userContext.userId) {
@@ -136,4 +111,4 @@ export const useApiParams = (options = {}) => {
     }
 
     return apiParams;
-}; 
+};

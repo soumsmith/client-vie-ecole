@@ -414,8 +414,8 @@ const useLoginData = (config) => {
                 email: storedData.userData?.email || storedData.completeUserData?.email,
                 userId: storedData.userId,
                 profileId: storedData.userData?.profileId || storedData.completeUserData?.profileId,
-                ecoleId: storedData.userData?.schoolId || storedData.completeUserData?.schoolId || 38,
-                academicYearId: storedData.academicYearMain?.anneeid || storedData.academicYearMain?.id || 226,
+                ecoleId: storedData.userData?.schoolId || storedData.completeUserData?.schoolId,
+                academicYearId: storedData.academicYearMain?.anneeid || storedData.academicYearMain?.id,
                 periodiciteId: 2,
                 personnelInfo: storedData.userPersonnelInfo,
                 academicYearInfo: storedData.academicYearInfo,
@@ -663,7 +663,7 @@ const useLoginData = (config) => {
     /**
      * Récupère toutes les données utilisateur après connexion
      */
-    const fetchAllUserData = async (email, schoolId, profileId) => {
+    const fetchAllUserData__ = async (email, schoolId, profileId) => {
         setLoadingUserData(true);
         setUserDataError(null);
 
@@ -689,7 +689,7 @@ const useLoginData = (config) => {
                 schoolLabel: schoolLabel, // 🆕 Ajout du libellé
                 profileId,
                 ecoleId: schoolId,
-                academicYearId: results.academicYearMain?.anneeid || results.academicYearMain?.id || 226,
+                academicYearId: results.academicYearMain?.anneeid || results.academicYearMain?.id,
                 periodiciteId: 2,
                 userId: results.userId,
                 personnelInfo: results.personnelInfo,
@@ -699,6 +699,70 @@ const useLoginData = (config) => {
                 userType: config.modalType || 'user'
             };
 
+            localStorage.setItem('completeUserData', JSON.stringify(completeUserData));
+
+            console.log('✅ Toutes les données utilisateur récupérées avec succès:', completeUserData);
+            return completeUserData;
+
+        } catch (error) {
+            console.error('❌ Erreur lors de la récupération des données utilisateur:', error.message);
+            setUserDataError('Erreur lors de la récupération des données utilisateur');
+            throw error;
+        } finally {
+            setLoadingUserData(false);
+        }
+    };
+
+    /**
+ * Récupère toutes les données utilisateur après connexion
+ */
+    const fetchAllUserData = async (email, schoolId, profileId) => {
+        setLoadingUserData(true);
+        setUserDataError(null);
+
+        try {
+            console.log('🔄 Début de la récupération des données utilisateur...');
+
+            // 🆕 RÉCUPÉRER LE LIBELLÉ DE L'ÉCOLE
+            const selectedSchool = schools.find(school => school.value === schoolId);
+            const schoolLabel = selectedSchool ? selectedSchool.label : 'École non trouvée';
+
+            // Récupération parallèle avec Promise.allSettled
+            const [personnelInfoResult, userIdResult, academicYearMainResult, academicYearInfoResult] = await Promise.allSettled([
+                fetchUserPersonnelInfo(email, schoolId, profileId),
+                fetchUserId(email),
+                fetchAcademicYearMain(schoolId),
+                fetchAcademicYearInfo(schoolId)
+            ]);
+
+            // ✅ Extraire les valeurs des résultats
+            const results = {
+                personnelInfo: personnelInfoResult.status === 'fulfilled' ? personnelInfoResult.value : null,
+                userId: userIdResult.status === 'fulfilled' ? userIdResult.value : null,
+                academicYearMain: academicYearMainResult.status === 'fulfilled' ? academicYearMainResult.value : null,
+                academicYearInfo: academicYearInfoResult.status === 'fulfilled' ? academicYearInfoResult.value : null
+            };
+
+            console.log('📊 Résultats extraits:', results);
+
+            // Construire l'objet des données complètes
+            const completeUserData = {
+                email,
+                schoolId,
+                schoolLabel: schoolLabel,
+                profileId,
+                ecoleId: schoolId,
+                academicYearId: results.academicYearMain?.anneeid || results.academicYearMain?.id,
+                periodiciteId: 2,
+                userId: results.userId,
+                personnelInfo: results.personnelInfo,
+                academicYearMain: results.academicYearMain,
+                academicYearInfo: results.academicYearInfo,
+                loginTime: new Date().toISOString(),
+                userType: config.modalType || 'user'
+            };
+
+            // Sauvegarder dans localStorage
             localStorage.setItem('completeUserData', JSON.stringify(completeUserData));
 
             console.log('✅ Toutes les données utilisateur récupérées avec succès:', completeUserData);
