@@ -917,28 +917,19 @@ export const usePeriodesData = (periodicitieId = null, refreshTrigger = 0) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
+  const finalPeriodicitieId = academicYear?.periodicite.id;
 
   const appParams = useAppParams();
   const periodesUrls = usePeriodesUrls();
-  const finalPeriodicitieId = periodicitieId || appParams.periodicitieId;
 
   const fetchPeriodes = useCallback(
     async (skipCache = false) => {
       try {
         setLoading(true);
         setError(null);
-        const cacheKey = `common-periodes-data-${finalPeriodicitieId}`;
 
-        if (!skipCache) {
-          const cachedData = getFromCache(cacheKey);
-          if (cachedData) {
-            setData(cachedData);
-            setLoading(false);
-            return;
-          }
-        }
-
-        const url = periodesUrls.listByPeriodicite(finalPeriodicitieId);
+        const url = periodesUrls.listByPeriodicite();
         const response = await axios.get(url);
 
         const processed =
@@ -957,7 +948,6 @@ export const usePeriodesData = (periodicitieId = null, refreshTrigger = 0) => {
             }))
             : [];
 
-        setToCache(cacheKey, processed, CACHE_DURATION);
         setData(processed);
       } catch (err) {
         console.error("Erreur lors de la récupération des périodes:", err);

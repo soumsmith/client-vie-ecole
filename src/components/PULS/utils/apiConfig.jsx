@@ -54,10 +54,10 @@ const useAppParams = () => {
 
     return useMemo(() => ({
         // IDs principaux
-        ecoleId: dynamicEcoleId , //|| DEFAULT_VALUES.ECOLE_ID,
-        academicYearId: dynamicAcademicYearId || DEFAULT_VALUES.ANNEE_ID , //DEFAULT_VALUES.ANNEE_ID, // dynamicAcademicYearId || DEFAULT_VALUES.ANNEE_ID, //
-        periodicitieId: dynamicPeriodicitieId || DEFAULT_VALUES.PERIODICITE_ID,
-        profileId: profileId || DEFAULT_VALUES.PROFIL_PROFESSEUR_ID,
+        ecoleId: dynamicEcoleId,
+        academicYearId: dynamicAcademicYearId,
+        periodicitieId: dynamicPeriodicitieId,
+        profileId: profileId,
         userId,
 
         // Informations du personnel
@@ -405,13 +405,19 @@ const usePeriodesUrls = () => {
     const params = useAppParams();
     const baseUrl = getFullUrl();
 
+
+    const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
+    //console.log(academicYear.periodicite.id)
+    //alert(academicYear.periodicite.id);
+
+
     return useMemo(() => ({
 
         /**
          * Liste des périodes par périodicité (utilise automatiquement la périodicité de l'utilisateur connecté)
          */
         listByPeriodicite: () =>
-            `${baseUrl}periodes/list-by-periodicite?id=${params.periodicitieId}`,
+            `${baseUrl}periodes/list-by-periodicite?id=${academicYear.periodicite.id}`,
 
         /**
          * Liste des périodes par périodicité spécifique
@@ -693,6 +699,9 @@ const useEvaluationsUrls = () => {
             return `${baseUrl}evaluations/get-classe-matiere-periode?${urlParams.toString()}`;
         },
 
+        imprimerProcesVerbal: (classeId, uuid) =>
+            `${baseUrl}imprimer-proces-verbal/imprimer-proces-verbal/${classeId}/${uuid}`,
+
         /**
          * Récupère une évaluation spécifique par ID
          * @param {number} evaluationId - ID de l'évaluation
@@ -706,8 +715,8 @@ const useEvaluationsUrls = () => {
         saveAndDisplayEvaluation: () =>
             `${baseUrl}evaluations/saveAndDisplay`,
 
-        deleteEvaluation: (evaluationId, userId) => 
-                `${baseUrl}evaluations/delete-handle/${evaluationId}/${userId}`,
+        deleteEvaluation: (evaluationId, userId) =>
+            `${baseUrl}evaluations/delete-handle/${evaluationId}/${userId}`,
 
         /**
          * Récupère une évaluation par code
@@ -779,6 +788,10 @@ const useNotesUrls = () => {
         getEvalutionsByPeriodeEtBrnche: (periode, niveau) =>
             `${baseUrl}evaluation-periode/get-by-annee-ecole-periode-niveau/${params.academicYearId}/${params.ecoleId}/${periode}/${niveau}`,
 
+        update: (matiereId, classeId) =>
+            `${baseUrl}personnel-matiere-classe/get-professeur-by-matiere?annee=${params.academicYearId}&matiere=${matiereId}&classe=${classeId}`,
+        handleNotes: () =>
+            `${baseUrl}notes/handle-notes`,
 
         /**
          * Récupère les notes par classe et période

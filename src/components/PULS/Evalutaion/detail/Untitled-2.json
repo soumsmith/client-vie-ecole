@@ -1,0 +1,315 @@
+{
+    "classeEleve": {
+        "classe": {
+            "branche": {
+                "filiere": {
+                    "code": "F001",
+                    "id": 1,
+                    "libelle": "GENERAL"
+                },
+                "id": 1,
+                "libelle": "6EME",
+                "niveau": {
+                    "code": "01",
+                    "id": 1,
+                    "libelle": "Sixième",
+                    "ordre": 1
+                },
+                "niveauEnseignement": {
+                    "code": "2",
+                    "id": 2,
+                    "libelle": "Enseignement Secondaire Générale"
+                },
+                "programme": {
+                    "code": "PRG_CI",
+                    "dateCreation": "2024-07-28T12:39:46Z[UTC]",
+                    "dateUpdate": "2024-07-28T12:39:46Z[UTC]",
+                    "id": "efae384a-688f-4b0e-b6fd-9e960ebf78fc",
+                    "libelle": "Ivoirien"
+                }
+            },
+            "code": "6EMEE",
+            "dateCreation": "2023-12-05T10:17:41Z[UTC]",
+            "dateUpdate": "2023-12-05T10:17:41Z[UTC]",
+            "ecole": {
+                "code": "057955",
+                "id": 38,
+                "identifiantVieEcole": "hinneh",
+                "libelle": "Collège Privé Hînneh Biabou ",
+                "niveauEnseignement": {
+                    "code": "2",
+                    "id": 2,
+                    "libelle": "Enseignement Secondaire Générale"
+                },
+                "nomSignataire": "M.SANGARE",
+                "tel": "0789353025"
+            },
+            "effectif": 52,
+            "id": 6713,
+            "identifiantVieEcole": "57",
+            "libelle": "6EME E",
+            "visible": 1
+        },
+        "dateCreation": "2025-09-20T18:59:56Z[UTC]",
+        "dateUpdate": "2025-09-20T18:59:56Z[UTC]",
+        "id": 61929,
+        "inscription": {
+            "afecte": "AFFECTE",
+            "annee": {
+                "anneeDebut": 2025,
+                "customLibelle": "Année 2025 - 2026",
+                "dateCreation": "2025-09-15T23:31:32Z[UTC]",
+                "dateUpdate": "2025-09-15T23:32:10Z[UTC]",
+                "id": 385,
+                "libelle": "Année 2025 - 2026",
+                "nbreEval": 9,
+                "niveau": "CENTRAL",
+                "niveauEnseignement": {
+                    "code": "2",
+                    "id": 2,
+                    "libelle": "Enseignement Secondaire Générale"
+                },
+                "periodicite": {
+                    "code": "2",
+                    "dateCreation": "2023-09-01T00:00:00Z[UTC]",
+                    "dateUpdate": "2023-09-01T00:00:00Z[UTC]",
+                    "id": 2,
+                    "isDefault": "DEFAULT",
+                    "libelle": "Trimestrielle",
+                    "ordre": "2"
+                },
+                "statut": "DIFFUSE",
+                "user": "34"
+            },
+            "boursier": "",
+            "branche": {
+                "filiere": {
+                    "code": "F001",
+                    "id": 1,
+                    "libelle": "GENERAL"
+                },
+                "id": 1,
+                "libelle": "6EME",
+                "niveau": {
+                    "code": "01",
+                    "id": 1,
+                    "libelle": "Sixième",
+                    "ordre": 1
+                },
+                "niveauEnseignement": {
+                    "code": "2",
+                    "id": 2,
+                    "libelle": "Enseignement Secondaire Générale"
+                },
+                "programme": {
+                    "code": "PRG_CI",
+                    "dateCreation": "2024-07-28T12:39:46Z[UTC]",
+                    "dateUpdate": "2024-07-28T12:39:46Z[UTC]",
+                    "id": "efae384a-688f-4b0e-b6fd-9e960ebf78fc",
+                    "libelle": "Ivoirien"
+                }
+            },
+            "ecole": {
+                "code": "057955",
+                "id": 38,
+                "identifiantVieEcole": "hinneh",
+                "libelle": "Collège Privé Hînneh Biabou ",
+                "niveauEnseignement": {
+                    "code": "2",
+                    "id": 2,
+                    "libelle": "Enseignement Secondaire Générale"
+                },
+                "nomSignataire": "M.SANGARE",
+                "tel": "0789353025"
+            },
+            "eleve": {
+                "dateNaissance": "2015-04-30",
+                "id": 40310,
+                "lieuNaissance": "Plateau",
+                "matricule": "25052467K",
+                "nationalite": "OUI",
+                "nom": "AIDARA",
+                "prenom": "HASSANE MOHAMED VEHI",
+                "sexe": "MASCULIN"
+            },
+            "etranger_africain": false,
+            "etranger_non_africain": false,
+            "id": 74876,
+            "ivoirien": true,
+            "lv2": "",
+            "redoublant": "NON",
+            "statut": "VALIDEE"
+        },
+        "statut": "ACTIF"
+    },
+    "dateCreation": "2025-10-21T16:13:07.048Z",
+    "dateUpdate": "2025-10-21T16:13:07.048Z",
+    "evaluation": {
+        "annee": {
+            "anneeDebut": 2025,
+            "customLibelle": "Année 2025 - 2026",
+            "dateCreation": "2025-09-15T23:31:32Z[UTC]",
+            "dateUpdate": "2025-09-15T23:32:10Z[UTC]",
+            "id": 385,
+            "libelle": "Année 2025 - 2026",
+            "nbreEval": 9,
+            "niveau": "CENTRAL",
+            "niveauEnseignement": {
+                "code": "2",
+                "id": 2,
+                "libelle": "Enseignement Secondaire Générale"
+            },
+            "periodicite": {
+                "code": "2",
+                "dateCreation": "2023-09-01T00:00:00Z[UTC]",
+                "dateUpdate": "2023-09-01T00:00:00Z[UTC]",
+                "id": 2,
+                "isDefault": "DEFAULT",
+                "libelle": "Trimestrielle",
+                "ordre": "2"
+            },
+            "statut": "DIFFUSE",
+            "user": "34"
+        },
+        "classe": {
+            "branche": {
+                "filiere": {
+                    "code": "F001",
+                    "id": 1,
+                    "libelle": "GENERAL"
+                },
+                "id": 1,
+                "libelle": "6EME",
+                "niveau": {
+                    "code": "01",
+                    "id": 1,
+                    "libelle": "Sixième",
+                    "ordre": 1
+                },
+                "niveauEnseignement": {
+                    "code": "2",
+                    "id": 2,
+                    "libelle": "Enseignement Secondaire Générale"
+                },
+                "programme": {
+                    "code": "PRG_CI",
+                    "dateCreation": "2024-07-28T12:39:46Z[UTC]",
+                    "dateUpdate": "2024-07-28T12:39:46Z[UTC]",
+                    "id": "efae384a-688f-4b0e-b6fd-9e960ebf78fc",
+                    "libelle": "Ivoirien"
+                }
+            },
+            "code": "6EMEE",
+            "dateCreation": "2023-12-05T10:17:41Z[UTC]",
+            "dateUpdate": "2023-12-05T10:17:41Z[UTC]",
+            "ecole": {
+                "code": "057955",
+                "id": 38,
+                "identifiantVieEcole": "hinneh",
+                "libelle": "Collège Privé Hînneh Biabou ",
+                "niveauEnseignement": {
+                    "code": "2",
+                    "id": 2,
+                    "libelle": "Enseignement Secondaire Générale"
+                },
+                "nomSignataire": "M.SANGARE",
+                "tel": "0789353025"
+            },
+            "effectif": 52,
+            "id": 6713,
+            "identifiantVieEcole": "57",
+            "libelle": "6EME E",
+            "visible": 1
+        },
+        "code": "953f4003-a87f-4e22-a5e1-e7f368ee318b",
+        "date": "2025-10-20T18:54:37Z[UTC]",
+        "dateCreation": "2025-10-20T18:55:01.216Z[UTC]",
+        "dateLimite": "",
+        "dateUpdate": "2025-10-20T18:55:55Z[UTC]",
+        "duree": "02-00",
+        "etat": "",
+        "heure": "",
+        "id": 93524,
+        "matiereEcole": {
+            "bonus": 0,
+            "categorie": {
+                "code": "03",
+                "id": 3,
+                "libelle": "Littéraire"
+            },
+            "code": "05",
+            "dateCreation": "2023-05-16T22:35:48",
+            "dateUpdate": "2023-11-29T14:18:48",
+            "ecole": {
+                "code": "057955",
+                "id": 38,
+                "identifiantVieEcole": "hinneh",
+                "libelle": "Collège Privé Hînneh Biabou ",
+                "niveauEnseignement": {
+                    "code": "2",
+                    "id": 2,
+                    "libelle": "Enseignement Secondaire Générale"
+                },
+                "nomSignataire": "M.SANGARE",
+                "tel": "0789353025"
+            },
+            "id": 2022,
+            "libelle": "ANGLAIS",
+            "matiere": {
+                "bonus": 0,
+                "categorie": {
+                    "code": "03",
+                    "id": 3,
+                    "libelle": "Littéraire"
+                },
+                "code": "05",
+                "id": 5,
+                "libelle": "ANGLAIS",
+                "niveauEnseignement": {
+                    "code": "2",
+                    "id": 2,
+                    "libelle": "Enseignement Secondaire Générale"
+                },
+                "numOrdre": 5,
+                "parentMatiereLibelle": "ANGLAIS",
+                "pec": 1
+            },
+            "niveauEnseignement": {
+                "code": "2",
+                "id": 2,
+                "libelle": "Enseignement Secondaire Générale"
+            },
+            "numOrdre": 5,
+            "parentMatiereLibelle": "ANGLAIS",
+            "pec": 1
+        },
+        "noteSur": "20",
+        "numero": 21889,
+        "pec": 1,
+        "periode": {
+            "coef": "1.0",
+            "id": 1,
+            "libelle": "Premier Trimestre",
+            "niveau": 1,
+            "periodicite": {
+                "code": "2",
+                "dateCreation": "2023-09-01T00:00:00Z[UTC]",
+                "dateUpdate": "2023-09-01T00:00:00Z[UTC]",
+                "id": 2,
+                "isDefault": "DEFAULT",
+                "libelle": "Trimestrielle",
+                "ordre": "2"
+            }
+        },
+        "type": {
+            "id": 1,
+            "libelle": "Devoir",
+            "niveauEnseignement": 2,
+            "typeSeance": "EVAL"
+        },
+        "user": "165"
+    },
+    "id": 2912935,
+    "note": 12,
+    "pec": 1
+}

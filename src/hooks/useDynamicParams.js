@@ -3,45 +3,29 @@ import { useUserContext } from './useUserContext';
 
 /**
  * Hook pour récupérer les paramètres dynamiques basés sur les données utilisateur
- * Remplace les valeurs codées en dur par des valeurs dynamiques
- * @param {object} options - Options de configuration
- * @param {number} options.ecoleId - ID de l'école par défaut
- * @param {number} options.academicYearId - ID de l'année académique par défaut
- * @param {number} options.periodiciteId - ID de la périodicité par défaut
- * @param {number|null} options.userId - ID utilisateur par défaut
- * @param {number|null} options.profileId - ID profil par défaut
- * @param {string|null} options.email - Email par défaut
- * @returns {object} - Paramètres dynamiques avec fallbacks et utilitaires
+ * Utilise uniquement les données du contexte utilisateur
+ * @returns {object} - Paramètres dynamiques avec utilitaires
  */
-export const useDynamicParams = (options = {}) => {
-    const {
-        ecoleId: defaultEcoleId = 38,
-        academicYearId: defaultAcademicYearId = 226,
-        periodiciteId: defaultPeriodiciteId = 2,
-        userId: defaultUserId = null,
-        profileId: defaultProfileId = null,
-        email: defaultEmail = null
-    } = options;
-
+export const useDynamicParams = () => {
     const userContext = useUserContext();
 
     // Mémoriser les paramètres pour éviter les re-rendus inutiles
     const params = useMemo(() => ({
-        ecoleId: userContext.ecoleId || defaultEcoleId,
-        academicYearId: userContext.academicYearId || defaultAcademicYearId,
-        periodiciteId: userContext.periodiciteId || defaultPeriodiciteId,
-        userId: userContext.userId || defaultUserId,
-        profileId: userContext.profileId || defaultProfileId,
-        email: userContext.email || defaultEmail,
+        ecoleId: userContext.ecoleId,
+        academicYearId: userContext.academicYearId,
+        periodiciteId: userContext.periodiciteId,
+        userId: userContext.userId,
+        profileId: userContext.profileId,
+        email: userContext.email,
         personnelInfo: userContext.personnelInfo,
         academicYearInfo: userContext.academicYearInfo
     }), [
-        userContext.ecoleId, defaultEcoleId,
-        userContext.academicYearId, defaultAcademicYearId,
-        userContext.periodiciteId, defaultPeriodiciteId,
-        userContext.userId, defaultUserId,
-        userContext.profileId, defaultProfileId,
-        userContext.email, defaultEmail,
+        userContext.ecoleId,
+        userContext.academicYearId,
+        userContext.periodiciteId,
+        userContext.userId,
+        userContext.profileId,
+        userContext.email,
         userContext.personnelInfo,
         userContext.academicYearInfo
     ]);
@@ -87,19 +71,13 @@ export const useDynamicParams = (options = {}) => {
 
 /**
  * Hook spécialisé pour les services PULS
- * Fournit les paramètres les plus couramment utilisés dans les services
+ * Fournit les paramètres directement depuis le contexte utilisateur
  * @param {object} options - Options de configuration
- * @param {boolean} options.useDefaultEcoleId - Utiliser l'ID école par défaut si non défini
- * @param {boolean} options.useDefaultAcademicYearId - Utiliser l'ID année académique par défaut si non défini
- * @param {boolean} options.useDefaultPeriodiciteId - Utiliser l'ID périodicité par défaut si non défini
  * @param {boolean} options.requireAuth - Nécessite une authentification
  * @returns {object} - Paramètres pour les services PULS
  */
 export const usePulsParams = (options = {}) => {
     const {
-        useDefaultEcoleId = true,
-        useDefaultAcademicYearId = true,
-        useDefaultPeriodiciteId = true,
         requireAuth = false
     } = options;
 
@@ -111,18 +89,10 @@ export const usePulsParams = (options = {}) => {
     }
 
     const params = useMemo(() => ({
-        // Paramètres principaux avec fallbacks intelligents
-        ecoleId: useDefaultEcoleId 
-            ? (userContext.ecoleId || 38)
-            : userContext.ecoleId,
-            
-        academicYearId: useDefaultAcademicYearId
-            ? (userContext.academicYearId || 226)
-            : userContext.academicYearId,
-            
-        periodiciteId: useDefaultPeriodiciteId
-            ? (userContext.periodiciteId || 2)
-            : userContext.periodiciteId,
+        // Paramètres principaux depuis le contexte
+        ecoleId: userContext.ecoleId,
+        academicYearId: userContext.academicYearId,
+        periodiciteId: userContext.periodiciteId,
             
         // Paramètres utilisateur
         userId: userContext.userId,
@@ -137,12 +107,16 @@ export const usePulsParams = (options = {}) => {
         isAuthenticated: userContext.isAuthenticated,
         isInitialized: userContext.isInitialized
     }), [
-        useDefaultEcoleId, userContext.ecoleId,
-        useDefaultAcademicYearId, userContext.academicYearId,
-        useDefaultPeriodiciteId, userContext.periodiciteId,
-        userContext.userId, userContext.profileId, userContext.email,
-        userContext.personnelInfo, userContext.academicYearInfo,
-        userContext.isAuthenticated, userContext.isInitialized
+        userContext.ecoleId,
+        userContext.academicYearId,
+        userContext.periodiciteId,
+        userContext.userId,
+        userContext.profileId,
+        userContext.email,
+        userContext.personnelInfo,
+        userContext.academicYearInfo,
+        userContext.isAuthenticated,
+        userContext.isInitialized
     ]);
 
     // Validation des données
@@ -190,21 +164,21 @@ export const useApiParams = (options = {}) => {
         const params = {};
 
         if (includeEcoleId) {
-            const ecoleId = userContext.ecoleId || 38;
+            const ecoleId = userContext.ecoleId;
             if (!excludeNullValues || ecoleId) {
                 params.ecoleId = ecoleId;
             }
         }
         
         if (includeAcademicYearId) {
-            const academicYearId = userContext.academicYearId || 226;
+            const academicYearId = userContext.academicYearId;
             if (!excludeNullValues || academicYearId) {
                 params.academicYearId = academicYearId;
             }
         }
         
         if (includePeriodiciteId) {
-            const periodiciteId = userContext.periodiciteId || 2;
+            const periodiciteId = userContext.periodiciteId;
             if (!excludeNullValues || periodiciteId) {
                 params.periodiciteId = periodiciteId;
             }
@@ -290,7 +264,7 @@ export const useUserData = () => {
         if (userData.personnelInfo?.prenom && userData.personnelInfo?.nom) {
             return `${userData.personnelInfo.prenom} ${userData.personnelInfo.nom}`;
         }
-        return userData.email || `Utilisateur ${userData.userId}`;
+        return userData.email || `Utilisateur ${userData.userId || 'inconnu'}`;
     }, [userData]);
 
     return {

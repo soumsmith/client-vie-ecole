@@ -22,11 +22,11 @@ import { getFromCache, setToCache } from "../utils/cacheUtils";
 import { useAllApiUrls } from "../utils/apiConfig";
 import { usePulsParams } from "../../hooks/useDynamicParams";
 import axios from "axios";
+import { useAppParams } from '../utils/apiConfig';
 
 // ===========================
 // CONFIGURATION GLOBALE (VALEURS PAR DÉFAUT)
 // ===========================
-const DEFAULT_ECOLE_ID = 38;
 
 // ===========================
 // FONCTION UTILITAIRE POUR FORMATAGE DES DATES
@@ -108,6 +108,7 @@ export const useEvaluationsData = (refreshTrigger = 0) => {
   const [error, setError] = useState(null);
   const [searchPerformed, setSearchPerformed] = useState(false);
   const apiUrls = useAllApiUrls();
+  const params = useAppParams();
 
   const {
     periodicitieId: dynamicPeriodicitieId,
@@ -117,6 +118,7 @@ export const useEvaluationsData = (refreshTrigger = 0) => {
   } = usePulsParams();
 
   const searchEvaluations = useCallback(
+
     async (
       classeId,
       matiereId = null,
@@ -135,28 +137,19 @@ export const useEvaluationsData = (refreshTrigger = 0) => {
         setLoading(true);
         setError(null);
         setSearchPerformed(false);
-        
+
         // Construction des paramètres de query
-        const params = new URLSearchParams();
-        params.append("classeId", classeId);
-        params.append("annee", dynamicAcademicYearId);
-        if (matiereId) params.append("matiereId", matiereId);
-        if (periodeId) params.append("periodeId", periodeId);
-        const cacheKey = `evaluations-${classeId}-${matiereId || "all"}-${
-          periodeId || "all"
-        }-${dynamicAcademicYearId}`;
-        // Vérifier le cache
-        const cachedData = getFromCache(cacheKey);
-        if (cachedData) {
-          setData(cachedData);
-          setSearchPerformed(true);
-          setLoading(false);
-          return;
-        }
+        const appsparams = new URLSearchParams();
+        appsparams.append("classeId", classeId);
+        appsparams.append("annee", dynamicAcademicYearId);
+        if (matiereId) appsparams.append("matiereId", matiereId);
+        if (periodeId) appsparams.append("periodeId", periodeId);
+
+
         // Appel direct à l'API (pas de proxy)
         const filters = {
           classeId: classeId,
-          annee: dynamicAcademicYearId,
+          annee: params.academicYearId,
           matiereId: matiereId,
           periodeId: periodeId
         };
@@ -205,7 +198,7 @@ export const useEvaluationsData = (refreshTrigger = 0) => {
               classe_code: evaluation.classe?.code || "",
               classe_effectif: evaluation.classe?.effectif || 0,
               ecole: evaluation.classe?.ecole?.libelle || "École inconnue",
-              ecole_id: evaluation.classe?.ecole?.id || DEFAULT_ECOLE_ID,
+              ecole_id: evaluation.classe?.ecole?.id,
               ecole_code: evaluation.classe?.ecole?.code || "",
               ecole_tel: evaluation.classe?.ecole?.tel || "",
               ecole_signataire: evaluation.classe?.ecole?.nomSignataire || "",
@@ -227,22 +220,18 @@ export const useEvaluationsData = (refreshTrigger = 0) => {
               pec: evaluation.pec || 0,
               coefficient: parseFloat(evaluation.periode?.coef || "1.0"),
               nombreEleves: evaluation.classe?.effectif || 0,
-              evaluation_display: `${evaluation.type?.libelle || "Devoir"} N°${
-                evaluation.numero || index + 1
-              }`,
-              description_complete: `${
-                evaluation.type?.libelle || "Devoir"
-              } de ${evaluation.matiereEcole?.libelle || "Matière"} - ${
-                evaluation.periode?.libelle || "Période"
-              }`,
-              details_display: `${formatDuration(evaluation.duree)} • /${
-                evaluation.noteSur || "20"
-              } • ${evaluation.classe?.effectif || 0} élèves`,
+              evaluation_display: `${evaluation.type?.libelle || "Devoir"} N°${evaluation.numero || index + 1
+                }`,
+              description_complete: `${evaluation.type?.libelle || "Devoir"
+                } de ${evaluation.matiereEcole?.libelle || "Matière"} - ${evaluation.periode?.libelle || "Période"
+                }`,
+              details_display: `${formatDuration(evaluation.duree)} • /${evaluation.noteSur || "20"
+                } • ${evaluation.classe?.effectif || 0} élèves`,
               raw_data: evaluation,
             };
           });
         }
-        setToCache(cacheKey, processedEvaluations);
+        //setToCache(cacheKey, processedEvaluations);
         setData(processedEvaluations);
         setSearchPerformed(true);
       } catch (err) {
@@ -323,8 +312,8 @@ export const getEvaluationsTableConfig = (callbacks = {}) => {
         cellType: "custom",
         customRenderer: (rowData) => (
           <div>
-            <div style={{ 
-              fontWeight: '600', 
+            <div style={{
+              fontWeight: '600',
               color: '#1e293b',
               fontSize: '14px',
               marginBottom: '2px'

@@ -23,12 +23,15 @@ import NoticeIcon from '@rsuite/icons/Notice';
 import MessageIcon from '@rsuite/icons/Message';
 import ExitIcon from '@rsuite/icons/Exit';
 import MoreIcon from '@rsuite/icons/More';
+import { useNavigate } from 'react-router-dom';
+
+
 
 // Composant InfoCard réutilisable
-const InfoCard = ({ 
-  icon, 
-  label, 
-  value, 
+const InfoCard = ({
+  icon,
+  label,
+  value,
   bgColor = 'primary',
   onClick,
   className = ''
@@ -42,7 +45,7 @@ const InfoCard = ({
   };
 
   return (
-    <div 
+    <div
       className={`info-card ${className} ${onClick ? 'info-card-clickable' : ''}`}
       onClick={onClick}
       style={{ cursor: onClick ? 'pointer' : 'default' }}
@@ -68,6 +71,39 @@ const LightTopBar = ({
   const [showSearch, setShowSearch] = useState(false);
   const [showAllCards, setShowAllCards] = useState(false);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const navigate = useNavigate();
+
+  /**
+* Fonction de déconnexion complète
+* Vide tous les localStorage et sessionStorage et redirige vers la page de connexion
+*/
+  /**
+ * Fonction de déconnexion complète
+ * Vide tous les localStorage et sessionStorage et redirige vers la page de connexion
+ */
+  const handleLogout = () => {
+    try {
+      console.log('🚪 Déconnexion en cours...');
+
+      // Vider complètement le localStorage
+      localStorage.clear();
+      console.log('✅ localStorage vidé');
+
+      // Vider complètement le sessionStorage
+      sessionStorage.clear();
+      console.log('✅ sessionStorage vidé');
+
+      console.log('✅ Déconnexion terminée avec succès');
+
+      // Rediriger vers la page de connexion
+      navigate('/'); // ou la route de votre page de connexion
+
+    } catch (error) {
+      console.error('❌ Erreur lors de la déconnexion:', error);
+      // Même en cas d'erreur, forcer la redirection
+      navigate('/');
+    }
+  };
 
   // Données de test pour les notifications
   const [notifications] = useState([
@@ -120,7 +156,7 @@ const LightTopBar = ({
       },
       "statut": "DIFFUSE"
     };
-    
+
     // Essayer de récupérer depuis localStorage, sinon utiliser les données de démo
     const academicYear = sessionStorage.getItem('academicYearMain');
     if (academicYear) {
@@ -139,15 +175,15 @@ const LightTopBar = ({
 
   // Formater la date et l'heure
   const formatDateTime = (date) => {
-    return date.toLocaleTimeString('fr-FR', { 
-      hour: '2-digit', 
-      minute: '2-digit', 
-      second: '2-digit' 
+    return date.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
     });
   };
 
   const formatDate = (date) => {
-    return date.toLocaleDateString('fr-FR', { 
+    return date.toLocaleDateString('fr-FR', {
       day: '2-digit',
       month: 'short'
     });
@@ -161,7 +197,7 @@ const LightTopBar = ({
     {
       label: "Déconnexion",
       icon: <ExitIcon className="text-danger" />,
-      action: onLogout || (() => console.log('Déconnexion')),
+      action: handleLogout,
       danger: true,
       description: "Fermer la session"
     }
@@ -231,7 +267,7 @@ const LightTopBar = ({
               <FlexboxGrid align="middle">
                 <FlexboxGrid.Item colspan={2}>
                   <div className={`rounded-circle p-2 text-white ${notif.type === 'info' ? 'bg-primary' :
-                      notif.type === 'success' ? 'bg-success' : 'bg-warning'
+                    notif.type === 'success' ? 'bg-success' : 'bg-warning'
                     }`}>
                     <NoticeIcon size="sm" />
                   </div>
@@ -741,7 +777,7 @@ const LightTopBar = ({
           }
         }
       `}</style>
-      
+
       <Header className="modern-light-topbar shadow-sm border-bottom">
         <Navbar appearance="subtle" className="bg-white">
           <div className="topbar-container">
@@ -750,7 +786,7 @@ const LightTopBar = ({
               <FlexboxGrid align="middle" className="h-100">
                 <FlexboxGrid.Item colspan={24}>
                   <div className="academic-info-container d-flex flex-wrap align-items-center gap-3">
-                    
+
                     {/* Cartes visibles */}
                     {visibleCards.map((card, index) => (
                       <InfoCard
@@ -785,7 +821,7 @@ const LightTopBar = ({
                         </div>
                       </Whisper>
                     )}
-                    
+
                   </div>
                 </FlexboxGrid.Item>
               </FlexboxGrid>

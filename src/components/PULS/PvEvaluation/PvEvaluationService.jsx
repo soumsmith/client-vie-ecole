@@ -1,31 +1,25 @@
 /**
  * Service pour la gestion des PV Évaluations
- * VERSION COMPLÈTE avec filtres classe/matière/période et DataTable
- * MISE À JOUR: Formatage basé sur le modèle de données réel de l'API + Téléchargement PV
+ * VERSION COMPLÈTE avec téléchargement corrigé
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Badge } from 'rsuite';
-import { FiEye, FiEdit, FiTrash2, FiDownload, FiCalendar, FiBookOpen, FiClock, FiUser, FiUsers, FiFileText } from 'react-icons/fi';
+import { FiCalendar, FiBookOpen, FiDownload, FiFileText } from 'react-icons/fi';
 import { getFromCache, setToCache } from '../utils/cacheUtils';
 import { useAllApiUrls } from '../utils/apiConfig';
 import axios from 'axios';
+import { useAppParams } from '../utils/apiConfig';
+import getFullUrl from "../../hooks/urlUtils";
 
 // ===========================
 // CONFIGURATION GLOBALE
 // ===========================
-const DEFAULT_ECOLE_ID = 38;
-const DEFAULT_PERIODICITE_ID = 2;
 const DEFAULT_ANNEE_ID = 226;
 
 // ===========================
-// FONCTION UTILITAIRE POUR FORMATAGE DES DATES
+// FONCTIONS UTILITAIRES
 // ===========================
-/**
- * Formate une date ISO en format français JJ/MM/AAAA
- * @param {string} dateString
- * @returns {string}
- */
 const formatDate = (dateString) => {
     if (!dateString) return 'Non définie';
     try {
@@ -41,14 +35,6 @@ const formatDate = (dateString) => {
     }
 };
 
-// ===========================
-// FONCTION UTILITAIRE POUR FORMATAGE DE LA DURÉE
-// ===========================
-/**
- * Formate une durée de type "02-00" en "2h00"
- * @param {string} duration
- * @returns {string}
- */
 const formatDuration = (duration) => {
     if (!duration) return '2h00';
     if (typeof duration === 'string' && duration.includes('-')) {
@@ -61,14 +47,6 @@ const formatDuration = (duration) => {
     return duration || '2h00';
 };
 
-// ===========================
-// FONCTION UTILITAIRE POUR DÉTERMINER LE STATUT D'UNE ÉVALUATION
-// ===========================
-/**
- * Détermine le statut d'une évaluation selon la date et l'état
- * @param {object} evaluation
- * @returns {string}
- */
 const determineStatut = (evaluation) => {
     if (evaluation.etat && evaluation.etat.trim() !== '') {
         return evaluation.etat;
@@ -85,51 +63,107 @@ const determineStatut = (evaluation) => {
 };
 
 // ===========================
-// FONCTION POUR TÉLÉCHARGER LE PV
+// FONCTION DE TÉLÉCHARGEMENT DU PV
 // ===========================
 /**
  * Télécharge le PV d'une évaluation
- * @param {string|number} classeId - ID de la classe sélectionnée
- * @param {string|number} evaluationId - ID de l'évaluation/item
+ * @param {string|number} classeId - ID de la classe
+ * @param {string} code - Code de l'évaluation
  * @returns {Promise<boolean>}
  */
-export const downloadPvEvaluation = async (classeId, evaluationId) => {
+export const downloadPvEvaluation = async (classeId, code) => {
     try {
-        console.log('🔽 Téléchargement du PV pour classe:', classeId, 'évaluation:', evaluationId);
+        if (!classeId) {
+            throw new Error('ID de classe manquant');
+        }
         
-        // Construction de l'URL de l'API avec le bon format
-        const apiUrls = useAllApiUrls();
-        const downloadUrl = apiUrls.evaluations.imprimerProcesVerbal(classeId, evaluationId);
+        if (!code) {
+            throw new Error('Code de l\'évaluation manquant');
+        }
 
+        console.log('🔽 Téléchargement du PV - Classe:', classeId, 'Code:', code);
+        
+        // Construction de l'URL complète
+        const downloadUrl = `${getFullUrl()}imprimer-proces-verbal/imprimer-proces-verbal/${classeId}/${code}`;
         console.log('📥 URL de téléchargement:', downloadUrl);
 
-        // Lancer simplement l'API - elle va télécharger automatiquement
-        window.open(downloadUrl, '_blank');
+        // Appel API avec axios
+        const response = await axios.get(downloadUrl, {
+            responseType: 'blob',
+            timeout: 30000,
+        });
+
+        console.log('✅ Réponse reçue:', response);
+
+        // Vérifier si la réponse contient des données
+        if (!response.data || response.data.size === 0) {
+            throw new Error('Le fichier téléchargé est vide');
+        }
+
+        // Récupérer le nom du fichier
+        let fileName = `PV_Evaluation_${code}.pdf`;
+        const contentDisposition = response.headers['content-disposition'];
+        if (contentDisposition) {
+            const fileNameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+            if (fileNameMatch && fileNameMatch[1]) {
+                fileName = fileNameMatch[1].replace(/['"]/g, '');
+            }
+        }
+
+        console.log('📄 Nom du fichier:', fileName);
+
+        // Créer un blob URL et déclencher le téléchargement
+        const blob = new Blob([response.data], { 
+            type: response.headers['content-type'] || 'application/pdf' 
+        });
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        // Créer un lien de téléchargement
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = fileName;
         
-        console.log('✅ Téléchargement initié avec succès');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Libérer l'URL blob
+        setTimeout(() => {
+            window.URL.revokeObjectURL(blobUrl);
+        }, 100);
+
+        console.log('✅ Téléchargement réussi !');
         return true;
 
     } catch (error) {
         console.error('❌ Erreur lors du téléchargement du PV:', error);
-        throw new Error(error.message || 'Erreur lors du téléchargement');
+        
+        if (error.response) {
+            if (error.response.status === 404) {
+                throw new Error('PV non trouvé. Vérifiez que l\'évaluation existe.');
+            } else if (error.response.status === 500) {
+                throw new Error('Erreur serveur lors de la génération du PV.');
+            } else {
+                throw new Error(`Erreur ${error.response.status}: ${error.response.statusText}`);
+            }
+        } else if (error.request) {
+            throw new Error('Impossible de contacter le serveur. Vérifiez votre connexion.');
+        } else {
+            throw new Error(error.message || 'Erreur lors du téléchargement');
+        }
     }
 };
 
 // ===========================
-// HOOK POUR RÉCUPÉRER LES ÉVALUATIONS D'UNE CLASSE/MATIÈRE/PÉRIODE
+// HOOK POUR RÉCUPÉRER LES ÉVALUATIONS
 // ===========================
-/**
- * Récupère la liste des évaluations selon la classe, la matière, la période et l'année
- * @param {number} refreshTrigger
- * @returns {object}
- */
 export const usePvEvaluationsData = (refreshTrigger = 0) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [searchPerformed, setSearchPerformed] = useState(false);
     const apiUrls = useAllApiUrls();
-    
+    const params = useAppParams();
 
     const searchEvaluations = useCallback(async (classeId, matiereId, periodeId, anneeId = DEFAULT_ANNEE_ID) => {
         if (!classeId) {
@@ -163,13 +197,6 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
             setLoading(true);
             setError(null);
             setSearchPerformed(false);
-            
-            // Construction des paramètres de query
-            const params = new URLSearchParams();
-            params.append('classeId', classeId);
-            params.append('matiereId', matiereId);
-            params.append('periodeId', periodeId);
-            params.append('annee', anneeId);
 
             const cacheKey = `pv-evaluations-${classeId}-${matiereId}-${periodeId}-${anneeId}`;
             
@@ -182,10 +209,17 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
                 return;
             }
 
-            // Appel direct à l'API
-            const response = await axios.get(apiUrls.evaluations.getClasseMatierePeriodie({ classe: classeId, matiere: matiereId, periode: periodeId, annee: anneeId }));
+            // Appel API
+            const response = await axios.get(
+                apiUrls.evaluations.getClasseMatierePeriodie({ 
+                    classeId, 
+                    matiereId, 
+                    periodeId, 
+                    annee: params.academicYearId 
+                })
+            );
             
-            // Traitement des évaluations selon la vraie structure
+            // Traitement des évaluations
             let processedEvaluations = [];
             if (response.data && Array.isArray(response.data)) {
                 processedEvaluations = response.data.map((evaluation, index) => {
@@ -194,7 +228,7 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
                     return {
                         id: evaluation.id || `eval-${index}`,
                         code: evaluation.code || `eval-${index}`,
-                        uuid: evaluation.uuid || evaluation.code || null, // Ajout du champ UUID pour le téléchargement
+                        uuid: evaluation.uuid || evaluation.code || null,
                         numero: evaluation.numero || `${index + 1}`,
                         date: evaluation.date || evaluation.dateCreation || new Date().toISOString(),
                         date_display: evaluation.dateToFilter || formatDate(evaluation.date || evaluation.dateCreation),
@@ -207,7 +241,6 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
                         noteSur: evaluation.noteSur || '20',
                         note_sur_display: `/${evaluation.noteSur || '20'}`,
                         
-                        // Informations matière
                         matiere: evaluation.matiereEcole?.libelle || 'Matière inconnue',
                         matiere_id: evaluation.matiereEcole?.id || matiereId,
                         matiere_code: evaluation.matiereEcole?.code || '',
@@ -216,43 +249,36 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
                         matiere_pec: evaluation.matiereEcole?.pec || 0,
                         matiere_bonus: evaluation.matiereEcole?.bonus || 0,
                         
-                        // Informations période
                         periode: evaluation.periode?.libelle || 'Période inconnue',
                         periode_id: evaluation.periode?.id || periodeId,
                         periode_coef: parseFloat(evaluation.periode?.coef || '1.0'),
                         periode_niveau: evaluation.periode?.niveau || 1,
                         periode_isfinal: evaluation.periode?.isfinal || '',
                         
-                        // Informations classe
                         classe: evaluation.classe?.libelle || 'Classe inconnue',
                         classe_id: evaluation.classe?.id || classeId,
                         classe_code: evaluation.classe?.code || '',
                         classe_effectif: evaluation.classe?.effectif || 0,
                         
-                        // Informations école
                         ecole: evaluation.classe?.ecole?.libelle || 'École inconnue',
-                        ecole_id: evaluation.classe?.ecole?.id || DEFAULT_ECOLE_ID,
+                        ecole_id: evaluation.classe?.ecole?.id,
                         ecole_code: evaluation.classe?.ecole?.code || '',
                         ecole_tel: evaluation.classe?.ecole?.tel || '',
                         ecole_signataire: evaluation.classe?.ecole?.nomSignataire || '',
                         
-                        // Informations de branche
                         serie: evaluation.classe?.branche?.serie?.libelle || '',
                         filiere: evaluation.classe?.branche?.filiere?.libelle || '',
                         niveau: evaluation.classe?.branche?.niveau?.libelle || '',
                         
-                        // Informations année
                         annee: evaluation.annee?.libelle || 'Année inconnue',
                         annee_id: evaluation.annee?.id || anneeId,
                         annee_debut: evaluation.annee?.anneeDebut || 2024,
                         annee_statut: evaluation.annee?.statut || 'DIFFUSE',
                         
-                        // Statut et état
                         statut: statut,
                         statut_display: statut,
                         etat_original: evaluation.etat || '',
                         
-                        // Informations supplémentaires
                         heure: evaluation.heure || '',
                         dateLimite: evaluation.dateLimite || '',
                         user: evaluation.user || '',
@@ -262,12 +288,10 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
                         coefficient: parseFloat(evaluation.periode?.coef || '1.0'),
                         nombreEleves: evaluation.classe?.effectif || 0,
                         
-                        // Affichage optimisé
                         evaluation_display: `${evaluation.type?.libelle || 'Devoir'} N°${evaluation.numero || (index + 1)}`,
                         description_complete: `${evaluation.type?.libelle || 'Devoir'} de ${evaluation.matiereEcole?.libelle || 'Matière'} - ${evaluation.periode?.libelle || 'Période'}`,
                         details_display: `${formatDuration(evaluation.duree)} • /${evaluation.noteSur || '20'} • ${evaluation.classe?.effectif || 0} élèves`,
                         
-                        // Données brutes pour debug
                         raw_data: evaluation
                     };
                 });
@@ -288,7 +312,7 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [apiUrls, params]);
 
     const clearResults = useCallback(() => {
         setData([]);
@@ -314,7 +338,7 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
 };
 
 // ===========================
-// CONFIGURATION DU TABLEAU DES PV ÉVALUATIONS
+// CONFIGURATION DU TABLEAU
 // ===========================
 export const pvEvaluationsTableConfig = {
     columns: [
@@ -327,8 +351,6 @@ export const pvEvaluationsTableConfig = {
             customRenderer: (rowData) => (
                 <div style={{
                     padding: '6px 8px',
-                    // backgroundColor: '#667eea',
-                    // color: 'white',
                     borderRadius: '8px',
                     fontSize: '12px',
                     fontWeight: 'bold',
@@ -564,38 +586,13 @@ export const pvEvaluationsTableConfig = {
         'description_complete'
     ],
     actions: [
-        // {
-        //     type: 'view',
-        //     icon: <FiEye />,
-        //     tooltip: 'Voir les détails du PV',
-        //     color: '#3498db'
-        // },
-        // {
-        //     type: 'edit',
-        //     icon: <FiEdit />,
-        //     tooltip: 'Modifier l\'évaluation',
-        //     color: '#f39c12'
-        // },
         {
             type: 'download',
             icon: <FiDownload size={17} />,
             tooltip: 'Télécharger le PV',
             color: '#9b59b6'
-        },
-        // {
-        //     type: 'pv',
-        //     icon: <FiFileText />,
-        //     tooltip: 'Générer le PV complet',
-        //     color: '#2ecc71'
-        // },
-        // {
-        //     type: 'delete',
-        //     icon: <FiTrash2 />,
-        //     tooltip: 'Supprimer l\'évaluation',
-        //     color: '#e74c3c'
-        // }
+        }
     ],
-    // Configuration supplémentaire pour le tableau
     defaultSortField: 'date_display',
     defaultSortOrder: 'desc',
     pageSize: 10,
