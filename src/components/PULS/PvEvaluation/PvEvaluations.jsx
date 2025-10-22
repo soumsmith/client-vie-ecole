@@ -325,7 +325,7 @@ const PvEvaluations = () => {
                 <Notification type="warning" header="Erreur" closable>
                     Code de l'évaluation manquant. Impossible de télécharger le PV.
                 </Notification>,
-                { placement: 'topEnd', duration: 4000 }
+                {placement: 'topEnd', duration: 4000 }
             );
             console.error('❌ Évaluation sans code:', evaluation);
             return;

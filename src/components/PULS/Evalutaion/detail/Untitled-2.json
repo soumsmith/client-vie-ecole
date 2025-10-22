@@ -7,13 +7,13 @@
                     "id": 1,
                     "libelle": "GENERAL"
                 },
-                "id": 1,
-                "libelle": "6EME",
+                "id": 8,
+                "libelle": "3EME",
                 "niveau": {
-                    "code": "01",
-                    "id": 1,
-                    "libelle": "Sixième",
-                    "ordre": 1
+                    "code": "04",
+                    "id": 4,
+                    "libelle": "Troisième",
+                    "ordre": 4
                 },
                 "niveauEnseignement": {
                     "code": "2",
@@ -28,9 +28,7 @@
                     "libelle": "Ivoirien"
                 }
             },
-            "code": "6EMEE",
-            "dateCreation": "2023-12-05T10:17:41Z[UTC]",
-            "dateUpdate": "2023-12-05T10:17:41Z[UTC]",
+            "code": "13",
             "ecole": {
                 "code": "057955",
                 "id": 38,
@@ -44,15 +42,21 @@
                 "nomSignataire": "M.SANGARE",
                 "tel": "0789353025"
             },
-            "effectif": 52,
-            "id": 6713,
-            "identifiantVieEcole": "57",
-            "libelle": "6EME E",
+            "effectif": 40,
+            "id": 6091,
+            "identifiantVieEcole": "39",
+            "langueVivante": {
+                "code": "LV1",
+                "id": 1,
+                "libelle": "ALL",
+                "type": "1"
+            },
+            "libelle": "3EME A",
             "visible": 1
         },
-        "dateCreation": "2025-09-20T18:59:56Z[UTC]",
-        "dateUpdate": "2025-09-20T18:59:56Z[UTC]",
-        "id": 61929,
+        "dateCreation": "2025-09-20T19:31:37Z[UTC]",
+        "dateUpdate": "2025-09-20T19:31:37Z[UTC]",
+        "id": 62918,
         "inscription": {
             "afecte": "AFFECTE",
             "annee": {
@@ -88,13 +92,13 @@
                     "id": 1,
                     "libelle": "GENERAL"
                 },
-                "id": 1,
-                "libelle": "6EME",
+                "id": 8,
+                "libelle": "3EME",
                 "niveau": {
-                    "code": "01",
-                    "id": 1,
-                    "libelle": "Sixième",
-                    "ordre": 1
+                    "code": "04",
+                    "id": 4,
+                    "libelle": "Troisième",
+                    "ordre": 4
                 },
                 "niveauEnseignement": {
                     "code": "2",
@@ -123,18 +127,19 @@
                 "tel": "0789353025"
             },
             "eleve": {
-                "dateNaissance": "2015-04-30",
-                "id": 40310,
-                "lieuNaissance": "Plateau",
-                "matricule": "25052467K",
-                "nationalite": "OUI",
-                "nom": "AIDARA",
-                "prenom": "HASSANE MOHAMED VEHI",
-                "sexe": "MASCULIN"
+                "dateNaissance": "2010-12-14",
+                "id": 80,
+                "lieuNaissance": "BOUAKÉ ",
+                "matricule": "22856376B",
+                "nationalite": "IVOIRIENNE ",
+                "nom": "BAMBA",
+                "prenom": "Aïchata  Noura ",
+                "sexe": "FEMININ",
+                "urlPhoto": "https://s3.eu-west-3.amazonaws.com/vie-ecoles/hinneh/photos/eleves/987d88cab8694405bc8a969ebd935e5b.jpg"
             },
             "etranger_africain": false,
             "etranger_non_africain": false,
-            "id": 74876,
+            "id": 75904,
             "ivoirien": true,
             "lv2": "",
             "redoublant": "NON",
@@ -142,8 +147,8 @@
         },
         "statut": "ACTIF"
     },
-    "dateCreation": "2025-10-21T16:13:07.048Z",
-    "dateUpdate": "2025-10-21T16:13:07.048Z",
+    "dateCreation": "2025-10-22T18:26:49Z[UTC]",
+    "dateUpdate": "2025-10-22T18:26:49Z[UTC]",
     "evaluation": {
         "annee": {
             "anneeDebut": 2025,
@@ -178,13 +183,13 @@
                     "id": 1,
                     "libelle": "GENERAL"
                 },
-                "id": 1,
-                "libelle": "6EME",
+                "id": 8,
+                "libelle": "3EME",
                 "niveau": {
-                    "code": "01",
-                    "id": 1,
-                    "libelle": "Sixième",
-                    "ordre": 1
+                    "code": "04",
+                    "id": 4,
+                    "libelle": "Troisième",
+                    "ordre": 4
                 },
                 "niveauEnseignement": {
                     "code": "2",
@@ -199,9 +204,7 @@
                     "libelle": "Ivoirien"
                 }
             },
-            "code": "6EMEE",
-            "dateCreation": "2023-12-05T10:17:41Z[UTC]",
-            "dateUpdate": "2023-12-05T10:17:41Z[UTC]",
+            "code": "13",
             "ecole": {
                 "code": "057955",
                 "id": 38,
@@ -215,31 +218,37 @@
                 "nomSignataire": "M.SANGARE",
                 "tel": "0789353025"
             },
-            "effectif": 52,
-            "id": 6713,
-            "identifiantVieEcole": "57",
-            "libelle": "6EME E",
+            "effectif": 40,
+            "id": 6091,
+            "identifiantVieEcole": "39",
+            "langueVivante": {
+                "code": "LV1",
+                "id": 1,
+                "libelle": "ALL",
+                "type": "1"
+            },
+            "libelle": "3EME A",
             "visible": 1
         },
-        "code": "953f4003-a87f-4e22-a5e1-e7f368ee318b",
-        "date": "2025-10-20T18:54:37Z[UTC]",
-        "dateCreation": "2025-10-20T18:55:01.216Z[UTC]",
+        "code": "65fba435-6d04-42ab-804d-8efc1104a489",
+        "date": "2025-10-22T18:26:00Z[UTC]",
+        "dateCreation": "2025-10-22T18:26:11.484Z[UTC]",
         "dateLimite": "",
-        "dateUpdate": "2025-10-20T18:55:55Z[UTC]",
+        "dateUpdate": "2025-10-22T18:26:11Z[UTC]",
         "duree": "02-00",
         "etat": "",
         "heure": "",
-        "id": 93524,
+        "id": 93532,
         "matiereEcole": {
             "bonus": 0,
             "categorie": {
-                "code": "03",
-                "id": 3,
-                "libelle": "Littéraire"
+                "code": "02",
+                "id": 2,
+                "libelle": "Scientifique"
             },
-            "code": "05",
+            "code": "07",
             "dateCreation": "2023-05-16T22:35:48",
-            "dateUpdate": "2023-11-29T14:18:48",
+            "dateUpdate": "2023-11-29T14:19:21",
             "ecole": {
                 "code": "057955",
                 "id": 38,
@@ -253,25 +262,25 @@
                 "nomSignataire": "M.SANGARE",
                 "tel": "0789353025"
             },
-            "id": 2022,
-            "libelle": "ANGLAIS",
+            "id": 2024,
+            "libelle": "MATHEMATIQUES",
             "matiere": {
                 "bonus": 0,
                 "categorie": {
-                    "code": "03",
-                    "id": 3,
-                    "libelle": "Littéraire"
+                    "code": "02",
+                    "id": 2,
+                    "libelle": "Scientifique"
                 },
-                "code": "05",
-                "id": 5,
-                "libelle": "ANGLAIS",
+                "code": "07",
+                "id": 7,
+                "libelle": "MATHEMATIQUES",
                 "niveauEnseignement": {
                     "code": "2",
                     "id": 2,
                     "libelle": "Enseignement Secondaire Générale"
                 },
-                "numOrdre": 5,
-                "parentMatiereLibelle": "ANGLAIS",
+                "numOrdre": 11,
+                "parentMatiereLibelle": "MATHEMATIQUES",
                 "pec": 1
             },
             "niveauEnseignement": {
@@ -279,13 +288,13 @@
                 "id": 2,
                 "libelle": "Enseignement Secondaire Générale"
             },
-            "numOrdre": 5,
-            "parentMatiereLibelle": "ANGLAIS",
+            "numOrdre": 11,
+            "parentMatiereLibelle": "MATHEMATIQUES",
             "pec": 1
         },
         "noteSur": "20",
-        "numero": 21889,
-        "pec": 1,
+        "numero": 21896,
+        "pec": 0,
         "periode": {
             "coef": "1.0",
             "id": 1,
@@ -302,14 +311,15 @@
             }
         },
         "type": {
-            "id": 1,
-            "libelle": "Devoir",
+            "id": 2,
+            "libelle": "Devoir de niveau",
             "niveauEnseignement": 2,
             "typeSeance": "EVAL"
         },
         "user": "165"
     },
-    "id": 2912935,
+    "id": 2912950,
     "note": 12,
-    "pec": 1
+    "pec": 1,
+    "statut": "M"
 }
