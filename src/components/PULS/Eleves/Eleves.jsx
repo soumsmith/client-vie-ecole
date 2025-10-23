@@ -1,22 +1,22 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { 
-    SelectPicker, 
-    Button, 
-    Panel, 
-    Row, 
-    Col, 
-    Message, 
-    Loader, 
+import {
+    SelectPicker,
+    Button,
+    Panel,
+    Row,
+    Col,
+    Message,
+    Loader,
     Badge,
     Steps
 } from 'rsuite';
-import { 
-    FiSearch, 
-    FiRotateCcw, 
-    FiUser, 
-    FiUsers, 
+import {
+    FiSearch,
+    FiRotateCcw,
+    FiUser,
+    FiUsers,
     FiBookOpen,
     FiPlus
 } from 'react-icons/fi';
@@ -27,7 +27,7 @@ import { useAllApiUrls } from '../utils/apiConfig';
 // Import des fonctions externalisées
 import { useCommonState } from '../../hooks/useCommonState';
 import DataTable from "../../DataTable";
-import { 
+import {
     useElevesData,
     elevesTableConfig
 } from './EleveService';
@@ -35,14 +35,16 @@ import { useNiveauxBranchesData, useClassesByBrancheData } from "../utils/Common
 
 // Import du modal d'affectation
 import ModalAffectationEleves from './ModalAffectationEleves';
+import GradientButton from '../../GradientButton';
+import IconBox from "../Composant/IconBox";
 
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE MODERNE
 // ===========================
-const EleveFilters = ({ 
-    onSearch, 
-    onClear, 
-    loading = false, 
+const EleveFilters = ({
+    onSearch,
+    onClear,
+    loading = false,
     error = null,
     selectedBranche,
     selectedClasse,
@@ -86,8 +88,8 @@ const EleveFilters = ({
 
         setFormError(null);
         if (onSearch) {
-            onSearch({ 
-                brancheId: selectedBranche, 
+            onSearch({
+                brancheId: selectedBranche,
                 classeId: selectedClasse
             });
         }
@@ -107,7 +109,7 @@ const EleveFilters = ({
     }));
 
     return (
-        <div style={{ 
+        <div style={{
             background: 'white',
             borderRadius: '15px',
             padding: '25px',
@@ -116,24 +118,15 @@ const EleveFilters = ({
             marginBottom: '20px'
         }}>
             {/* En-tête moderne */}
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: 12,
                 marginBottom: 25,
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    borderRadius: '10px',
-                    padding: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <FiUsers size={18} color="white" />
-                </div>
+                <IconBox icon={FiUsers} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Liste des Élèves par Classe
@@ -165,10 +158,10 @@ const EleveFilters = ({
             <Row gutter={20}>
                 <Col xs={24} sm={12} md={10}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: '#475569',
                             fontSize: '14px'
                         }}>
@@ -198,10 +191,10 @@ const EleveFilters = ({
 
                 <Col xs={24} sm={12} md={8}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: '#475569',
                             fontSize: '14px'
                         }}>
@@ -244,37 +237,31 @@ const EleveFilters = ({
 
                 <Col xs={24} sm={12} md={6}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: 'transparent',
                             fontSize: '14px'
                         }}>
                             Action
                         </label>
                         <div style={{ display: 'flex', gap: 8, height: '40px' }}>
-                            <Button
-                                appearance="primary"
-                                onClick={handleSearch}
+                            <GradientButton
+                                icon={<FiSearch size={16} />}
+                                text="Recherche"
+                                loadingText="Chargement..."
                                 loading={loading}
                                 disabled={isDataLoading || loading || !selectedBranche || !selectedClasse}
-                                style={{ 
-                                    flex: 1,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontWeight: '500'
-                                }}
-                                size="lg"
-                            >
-                                {loading ? 'Recherche...' : 'Afficher'}
-                            </Button>
-                            
+                                onClick={handleSearch}
+                                variant="primary"
+                                style={{ flex: 1 }}
+                            />
+
                             <Button
                                 onClick={handleClear}
                                 disabled={loading}
-                                style={{ 
+                                style={{
                                     minWidth: '45px',
                                     borderRadius: '8px',
                                     border: '1px solid #e2e8f0'
@@ -290,8 +277,8 @@ const EleveFilters = ({
 
             {/* Indicateur de progression */}
             <div style={{ marginTop: 15 }}>
-                <Steps 
-                    current={selectedBranche ? (selectedClasse ? 2 : 1) : 0} 
+                <Steps
+                    current={selectedBranche ? (selectedClasse ? 2 : 1) : 0}
                     size="small"
                     style={{ background: '#f8fafc', padding: '15px', borderRadius: '8px' }}
                 >
@@ -303,10 +290,10 @@ const EleveFilters = ({
 
             {/* Loading indicator discret */}
             {isDataLoading && (
-                <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 10, 
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
                     marginTop: 15,
                     padding: '10px 15px',
                     background: '#f0f9ff',
@@ -360,7 +347,7 @@ const Eleves = () => {
     // ===========================
     const handleSearch = useCallback(async ({ brancheId, classeId }) => {
         console.log('🔍 Lancement de la recherche des élèves:', { brancheId, classeId });
-        
+
         // Récupérer les infos de la classe sélectionnée
         const selectedClasseData = classes.find(c => c.id === classeId);
         if (selectedClasseData) {
@@ -372,7 +359,7 @@ const Eleves = () => {
                 effectifActuel: 0 // Sera mis à jour après le chargement
             });
         }
-        
+
         await searchEleves(classeId);
     }, [searchEleves, classes]);
 
@@ -450,7 +437,7 @@ const Eleves = () => {
                 console.error('Erreur lors de la suppression:', error);
 
                 let errorMessage = 'Une erreur inattendue est survenue lors de la suppression.';
-                
+
                 if (error.response) {
                     if (error.response.status === 404) {
                         errorMessage = 'Élève non trouvé. Il a peut-être déjà été retiré.';
@@ -501,12 +488,12 @@ const Eleves = () => {
     // ===========================
     const handleAffectationSuccess = useCallback(async (newAffectations) => {
         console.log('Nouvelles affectations créées:', newAffectations);
-        
+
         // Rafraîchir la liste des élèves
         if (selectedClasse) {
             await searchEleves(selectedClasse);
         }
-        
+
         setRefreshTrigger(prev => prev + 1);
     }, [selectedClasse, searchEleves]);
 
@@ -534,8 +521,8 @@ const Eleves = () => {
     // RENDU DU COMPOSANT
     // ===========================
     return (
-        <div style={{ 
-             
+        <div style={{
+
             minHeight: '100vh',
             padding: '20px 0'
         }}>
@@ -643,31 +630,31 @@ const Eleves = () => {
                             }}>
                                 <DataTable
                                     title={`Liste des Élèves - ${selectedClasseInfo?.libelle || 'Classe'}`}
-                                    subtitle={`${eleves?.length || 0} élève(s) • Capacité: ${selectedClasseInfo?.effectifActuel || 0}/${selectedClasseInfo?.effectifMax || 0}`}
-                                    
+                                    subtitle={`élève(s) • Capacité: ${selectedClasseInfo?.effectifActuel || 0}/${selectedClasseInfo?.effectifMax || 0}`}
+
                                     data={eleves}
                                     loading={searchLoading}
                                     error={null}
-                                    
+
                                     columns={elevesTableConfig.columns}
                                     searchableFields={elevesTableConfig.searchableFields}
                                     filterConfigs={elevesTableConfig.filterConfigs}
                                     actions={elevesTableConfig.actions}
-                                    
+
                                     onAction={handleTableActionLocal}
                                     onRefresh={handleRefresh}
                                     onCreateNew={() => handleTableActionLocal('create')}
-                                    
+
                                     defaultPageSize={15}
                                     pageSizeOptions={[10, 15, 25, 50]}
                                     tableHeight={600}
-                                    
+
                                     enableRefresh={true}
                                     enableCreate={true}
                                     createButtonText="Affecter des Élèves"
                                     selectable={false}
                                     rowKey="id"
-                                    
+
                                     customStyles={{
                                         container: { backgroundColor: "transparent" },
                                         panel: { minHeight: "600px", border: "none", boxShadow: "none" },
@@ -709,7 +696,7 @@ const Eleves = () => {
                                 </p>
                                 <Button
                                     appearance="primary"
-                                    style={{ 
+                                    style={{
                                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                         border: 'none'
                                     }}

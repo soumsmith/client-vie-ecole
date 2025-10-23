@@ -12,7 +12,6 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://46.105.52.105:8889', //http://10.3.119.232:8889
-        secure: false,
         configure: (proxy) => {
           // Gestion des erreurs simplifiée
           proxy.on('error', (err, req, res) => {

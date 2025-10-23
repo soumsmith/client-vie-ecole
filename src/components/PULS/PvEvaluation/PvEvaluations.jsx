@@ -27,6 +27,9 @@ import {
     downloadPvEvaluation
 } from './PvEvaluationService';
 import { usePeriodesData, useClassesData, useMatieresData } from "../utils/CommonDataService";
+import IconBox from "../Composant/IconBox";
+import GradientButton from '../../GradientButton';
+
 
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE
@@ -49,7 +52,7 @@ const PvEvaluationFilters = ({
         classes,
         loading: classesLoading,
         error: classesError
-    } = useClassesData(38);
+    } = useClassesData();
 
     const {
         matieres,
@@ -69,7 +72,7 @@ const PvEvaluationFilters = ({
     useEffect(() => {
         if (selectedClasse) {
             console.log('📚 Chargement des matières pour classe ID:', selectedClasse);
-            fetchMatieres(selectedClasse, 38);
+            fetchMatieres(selectedClasse);
         } else {
             clearMatieres();
         }
@@ -113,9 +116,7 @@ const PvEvaluationFilters = ({
         <div className="pv-filters-container">
             {/* En-tête */}
             <div className="pv-filters-header">
-                <div className="pv-filters-icon">
-                    <FiFileText size={18} color="white" />
-                </div>
+                <IconBox icon={FiFileText} />
                 <div>
                     <h5 className="pv-filters-title">
                         Recherche des PV Évaluations
@@ -227,16 +228,18 @@ const PvEvaluationFilters = ({
                     <div className="pv-form-group">
                         <label className="pv-form-label-transparent">Action</label>
                         <div className="pv-actions-container">
-                            <Button
-                                appearance="primary"
-                                onClick={handleSearch}
+                            {/*  */}
+                            <GradientButton
+                                icon={<FiSearch size={16} />}
+                                text="Recherche"
+                                loadingText="Chargement..."
                                 loading={loading}
-                                disabled={isDataLoading || loading || !selectedClasse || !selectedMatiere || !selectedPeriode}
-                                className="pv-search-button"
-                                size="lg"
-                            >
-                                {loading ? 'Recherche...' : 'Rechercher'}
-                            </Button>
+                                isabled={isDataLoading || loading || !selectedClasse || !selectedMatiere || !selectedPeriode}
+                                onClick={handleSearch}
+                                variant="primary"
+                                style={{ flex: 1 }}
+                            />
+
 
                             <Button
                                 onClick={handleClear}
@@ -459,7 +462,7 @@ const PvEvaluations = () => {
     // RENDU DU COMPOSANT
     // ===========================
     return (
-        <div className="pv-evaluations-container">
+        <div>
             <div className="container-fluid">
                 {/* Formulaire de recherche */}
                 <div className="row">

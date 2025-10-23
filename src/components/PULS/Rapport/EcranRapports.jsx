@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useRef } from "react";
-import { 
-    Panel, 
-    SelectPicker, 
-    Toggle, 
-    Button, 
-    Notification, 
-    Loader, 
-    Radio, 
+import {
+    Panel,
+    SelectPicker,
+    Toggle,
+    Button,
+    Notification,
+    Loader,
+    Radio,
     RadioGroup,
     Input,
     InputNumber,
@@ -53,15 +53,15 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
         annee: null,
         periode: null,
         annuel: false,
-        
+
         // Modèle DRENA
         modeleDrena: 'dren3',
-        
+
         // Paramètres facultatifs
         classe: null,
         matriculeEleves: '',
         formatExcel: false,
-        
+
         // Format bulletin
         decompresserBulletin: true,
         formatAvecPiedPage: false,
@@ -76,7 +76,7 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
         testLourd: false,
         imprimerBulletinAPartir: 0,
         imprimerBulletinJusqua: 200,
-        
+
         // Paramètres élèves
         avecPhoto: false,
         redoublant: 'ALL',
@@ -85,15 +85,15 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
         langueVivante: 'ALL',
         statut: 'AFFECTE',
         niveau: null,
-        
+
         // Certificats
         autreModeleCertificat: false,
         nomSignataire: '',
         fonctionSignataire: '',
-        
+
         // Admis
         moyenneSuperieure: 10,
-        
+
         // Moyennes par professeur
         matiere: null
     });
@@ -104,9 +104,9 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
     const { classes, loading: classesLoading } = useClassesData(refreshTrigger);
     const { periodes, loading: periodesLoading } = usePeriodesData(refreshTrigger);
     const { annees, loading: anneesLoading } = useAnneesData(refreshTrigger);
-    const { niveaux, loading: niveauxLoading } = useNiveauxData(ecoleId, refreshTrigger);
+    const { niveaux, loading: niveauxLoading } = useNiveauxData(refreshTrigger);
     const { branches, loading: branchesLoading } = useBranchesData(refreshTrigger);
-    const { matieres, loading: matieresLoading } = useMatieresData(ecoleId, parametres.classe, refreshTrigger);
+    const { matieres, loading: matieresLoading } = useMatieresData(parametres.classe, refreshTrigger);
     const { rapports, loading: rapportsLoading, error: rapportsError } = useRapportsData(niveauEnseignementId, refreshTrigger);
 
     // ===========================
@@ -218,7 +218,7 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
 
         try {
             setGenerating(true);
-            
+
             // Afficher le loader
             Swal.fire({
                 title: 'Génération en cours...',
@@ -243,9 +243,9 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                 branches,
                 matieres
             };
-            
+
             const downloadResult = await genererRapportParCode(rapport.code, parametresComplets);
-            
+
             // Fermer le loader et afficher le succès
             Swal.fire({
                 icon: 'success',
@@ -254,10 +254,10 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                 confirmButtonColor: '#27ae60',
                 background: '#ffffff'
             });
-            
+
         } catch (error) {
             console.error('Erreur lors de la génération:', error);
-            
+
             Swal.fire({
                 icon: 'error',
                 title: 'Erreur de génération',
@@ -342,28 +342,28 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                     color: #495057 !important;
                 }
             `}</style>
-            
-            <div style={{ 
-                padding: '32px', 
-                backgroundColor: '#fafbfc', 
+
+            <div style={{
+                padding: '32px',
+                backgroundColor: '#fafbfc',
                 minHeight: '100vh',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
             }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-                    
+
                     {/* En-tête */}
                     <div style={{ marginBottom: '32px', textAlign: 'left' }}>
-                        <h2 style={{ 
-                            margin: '0 0 8px 0', 
-                            color: '#2c3e50', 
+                        <h2 style={{
+                            margin: '0 0 8px 0',
+                            color: '#2c3e50',
                             fontWeight: '600',
                             fontSize: '28px',
                             letterSpacing: '-0.5px'
                         }}>
                             Configuration des Rapports
                         </h2>
-                        <Text style={{ 
-                            fontSize: '16px', 
+                        <Text style={{
+                            fontSize: '16px',
                             color: '#6c757d',
                             lineHeight: '1.5'
                         }}>
@@ -376,9 +376,9 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                         <div style={cardHeaderStyle}>
                             <FiSettings size={18} color="#495057" />
                             <span>Paramètres Obligatoires</span>
-                            <Badge 
-                                style={{ 
-                                    fontSize: '11px', 
+                            <Badge
+                                style={{
+                                    fontSize: '11px',
                                     marginLeft: 'auto',
                                     backgroundColor: '#e3f2fd',
                                     color: '#1976d2',
@@ -421,10 +421,10 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                 </Col>
                                 <Col xs={24} sm={8}>
                                     <label style={labelStyle}>Mode</label>
-                                    <div style={{ 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
-                                        gap: '12px', 
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '12px',
                                         marginTop: '8px',
                                         marginBottom: '16px'
                                     }}>
@@ -448,27 +448,27 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                             <span>Modèle de rapport par DRENA</span>
                         </div>
                         <div style={cardBodyStyle}>
-                            <RadioGroup 
-                                value={parametres.modeleDrena} 
+                            <RadioGroup
+                                value={parametres.modeleDrena}
                                 onChange={(value) => handleParametreChange('modeleDrena', value)}
-                                style={{ 
-                                    display: 'grid', 
-                                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
-                                    gap: '12px' 
+                                style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                                    gap: '12px'
                                 }}
                             >
                                 {drenaModels.map(model => (
-                                    <Radio 
-                                        key={model.key} 
+                                    <Radio
+                                        key={model.key}
                                         value={model.value}
-                                        style={{ 
+                                        style={{
                                             padding: '12px 16px',
-                                            border: parametres.modeleDrena === model.value 
-                                                ? '2px solid #4a90e2' 
+                                            border: parametres.modeleDrena === model.value
+                                                ? '2px solid #4a90e2'
                                                 : '1px solid #e9ecef',
                                             borderRadius: '8px',
-                                            backgroundColor: parametres.modeleDrena === model.value 
-                                                ? '#f8fafe' 
+                                            backgroundColor: parametres.modeleDrena === model.value
+                                                ? '#f8fafe'
                                                 : '#ffffff',
                                             fontSize: '13px',
                                             margin: 0,
@@ -477,7 +477,7 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                         }}
                                     >
                                         {model.label}
-                                    </Radio>  
+                                    </Radio>
                                 ))}
                             </RadioGroup>
                         </div>
@@ -488,9 +488,9 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                         <div style={cardHeaderStyle}>
                             <FiSettings size={18} color="#495057" />
                             <span>Paramètres Facultatifs</span>
-                            <Badge 
-                                style={{ 
-                                    fontSize: '11px', 
+                            <Badge
+                                style={{
+                                    fontSize: '11px',
                                     marginLeft: 'auto',
                                     backgroundColor: '#fff3cd',
                                     color: '#856404',
@@ -534,11 +534,11 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                     />
                                 </Col>
                                 <Col xs={24} sm={8}>
-                                    <div style={{ 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
                                         gap: '12px',
-                                        marginTop: '32px' 
+                                        marginTop: '32px'
                                     }}>
                                         <Toggle
                                             checked={parametres.formatExcel}
@@ -573,10 +573,10 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                     { key: 'testLourd', label: 'Test lourd' }
                                 ].map(({ key, label }) => (
                                     <Col key={key} xs={24} sm={12} md={8} lg={6}>
-                                        <div style={{ 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
-                                            gap: '12px', 
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '12px',
                                             marginBottom: '16px',
                                             padding: '8px 0'
                                         }}>
@@ -602,9 +602,9 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                         <div style={cardBodyStyle}>
                             <Row gutter={20}>
                                 <Col xs={24} sm={6} lg={4}>
-                                    <div style={{ 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
                                         gap: '12px',
                                         height: '40px'
                                     }}>
@@ -672,7 +672,7 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                     />
                                 </Col>
                             </Row>
-                            
+
                             <Row gutter={20} style={{ marginTop: '16px' }}>
                                 <Col xs={24} sm={24}>
                                     <label style={labelStyle}>Niveau</label>
@@ -701,11 +701,11 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                     <span>Certificats</span>
                                 </div>
                                 <div style={cardBodyStyle}>
-                                    <div style={{ 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
-                                        gap: '12px', 
-                                        marginBottom: '16px' 
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '12px',
+                                        marginBottom: '16px'
                                     }}>
                                         <Toggle
                                             checked={parametres.autreModeleCertificat}
@@ -731,7 +731,7 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                 </div>
                             </Card>
                         </Col>
-                        
+
                         <Col xs={24} lg={8}>
                             <Card style={cardStyle}>
                                 <div style={cardHeaderStyle}>
@@ -752,7 +752,7 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                 </div>
                             </Card>
                         </Col>
-                        
+
                         <Col xs={24} lg={8}>
                             <Card style={cardStyle}>
                                 <div style={cardHeaderStyle}>
@@ -786,9 +786,9 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                         <div style={cardHeaderStyle}>
                             <FiFileText size={18} color="#495057" />
                             <span>Rapports Disponibles</span>
-                            <Badge 
-                                style={{ 
-                                    fontSize: '11px', 
+                            <Badge
+                                style={{
+                                    fontSize: '11px',
                                     marginLeft: 'auto',
                                     backgroundColor: '#e8f5e8',
                                     color: '#2e7d32',
@@ -800,15 +800,15 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                         </div>
                         <div style={cardBodyStyle}>
                             {isDataLoading ? (
-                                <div style={{ 
-                                    textAlign: 'center', 
+                                <div style={{
+                                    textAlign: 'center',
                                     padding: '60px 20px',
                                     backgroundColor: '#fafbfc',
                                     borderRadius: '8px'
                                 }}>
                                     <Loader size="lg" />
-                                    <Text style={{ 
-                                        marginTop: '16px', 
+                                    <Text style={{
+                                        marginTop: '16px',
                                         fontSize: '14px',
                                         color: '#6c757d'
                                     }}>
@@ -834,9 +834,9 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                     showToolbar={true}
                                     customStyles={{
                                         container: { backgroundColor: "#ffffff" },
-                                        panel: { 
-                                            minHeight: "400px", 
-                                            border: 'none', 
+                                        panel: {
+                                            minHeight: "400px",
+                                            border: 'none',
                                             boxShadow: 'none',
                                             borderRadius: '8px'
                                         },

@@ -22,16 +22,6 @@ import { usePulsParams } from "../../hooks/useDynamicParams";
 import getFullUrl from "../../hooks/urlUtils";
 
 // ===========================
-// CONFIGURATION GLOBALE
-// ===========================
-const DEFAULT_VALUES = {
-    ANNEE_ID: 226,
-    PERIODICITE_ID: 2,
-    ECOLE_ID: 38,
-    PROFIL_PROFESSEUR_ID: 8,
-};
-
-// ===========================
 // HOOK POUR PARAMÈTRES DYNAMIQUES
 // ===========================
 /**
@@ -72,7 +62,6 @@ const useAppParams = () => {
         isReady,
 
         // Valeurs par défaut pour fallback
-        defaults: DEFAULT_VALUES,
     }), [
         dynamicEcoleId,
         dynamicAcademicYearId,
@@ -192,7 +181,6 @@ const useBranchesUrls = () => {
 
         getByEcole: () =>
             `${baseUrl}branche/list-by-ecole/${params.ecoleId}`,
-        //branche/get-by-niveau-enseignement?ecole=${params.ecoleId}
 
     }), [params, baseUrl]);
 };
@@ -241,6 +229,15 @@ const useMatieresUrls = () => {
          */
         getAllByBrancheViaClasse: (classeId) =>
             `${baseUrl}classe-matiere/get-all-by-branche-via-classe?branche=${classeId}&ecole=${params.ecoleId}`,
+
+        imprimerMatriceClasse: (classeId) =>
+            `${baseUrl}imprimer-matrice-classe/matieres-ecole-web/${params.ecoleId}/${classeId}`,
+
+        getMariereByClasse: (classeId) =>
+            `${baseUrl}personnel-matiere-classe/get-enseignant-matiere-classe?annee=${params.academicYearId}&classe=${classeId}`,
+
+        progressionSeance: (classeId, matiereId) =>
+            `${baseUrl}progression-seance/get-by-classe-matiere-annee?classe=${classeId}&matiere=${matiereId}&annee=${params.academicYearId}`,
 
     }), [params, baseUrl]);
 };
@@ -294,8 +291,8 @@ const usePersonnelUrls = () => {
          * @param {number} profId - ID du professeur
          * @param {number} ecoleId - ID de l'école
          */
-        getByProf: (anneeId, profId, ecoleId) =>
-            `${baseUrl}personnel-matiere-classe/get-by-prof?annee=${anneeId}&prof=${profId}&ecole=${ecoleId}`,
+        getByProf: (profId) =>
+            `${baseUrl}personnel-matiere-classe/get-by-prof?annee=${params.academicYearId}&prof=${profId}&ecole=${params.ecoleId}`,
 
         getClasseParProf: (personnel_id) =>
             `${baseUrl}souscription-personnel/classe-par-prof/${personnel_id}/${params.academicYearId}`,
@@ -466,8 +463,8 @@ const useElevesUrls = () => {
          * @param {number} classeId - ID de la classe
          * @param {number} anneeId - ID de l'année
          */
-        retrieveByClasseAnnee: (classeId, anneeId) =>
-            `${baseUrl}classe-eleve/retrieve-by-classe/${classeId}/${anneeId}`,
+        retrieveByClasseAnnee: (classeId) =>
+            `${baseUrl}classe-eleve/retrieve-by-classe/${classeId}/${params.academicYearId}`,
 
         imprimerFicheIdentification: (selectedYear, matricule) =>
             `${baseUrl}imprimer-Fiche-eleve/identification/${selectedYear}/${matricule}/${params.ecoleId}`,
@@ -830,7 +827,7 @@ const useInscriptionsUrls = () => {
          * @param {string} statut - Statut des inscriptions (VALIDEE par défaut)
          * @param {number} ecoleId - ID de l'école
          */
-        retrieveToAttribClasse: (anneeId, brancheId, statut = 'VALIDEE') =>
+        retrieveToAttribClasse: (brancheId, statut = 'VALIDEE') =>
             `${baseUrl}inscription/retrieve-to-attrib-classe/${params.academicYearId}/?branche=${brancheId}&statut=${statut}&ecole=${params.ecoleId}`,
 
         /**
@@ -849,7 +846,7 @@ const useInscriptionsUrls = () => {
          * @param {number} anneeId - ID de l'année
          * @param {string} typeInscription - Type d'inscription
          */
-        getAllInscriptions: (ecoleId, anneeId, typeInscription) =>
+        getAllInscriptions: (typeInscription) =>
             `${baseUrl}inscriptions/allInscription/${params.ecoleId}/${params.academicYearId}/${typeInscription}`,
 
         /**
@@ -1728,10 +1725,6 @@ const useAllApiUrls = () => {
  * @param {string} baseUrl - URL de base
  * @param {Object} queryParams - Objet contenant les paramètres de requête
  * @returns {string} URL complète avec paramètres
- * 
- * @example
- * buildUrlWithParams('classes', { ecole: 38, actif: true })
- * // Résultat: 'classes?ecole=38&actif=true'
  */
 export const buildUrlWithParams = (baseUrl, queryParams = {}) => {
     const url = new URL(baseUrl, getFullUrl());

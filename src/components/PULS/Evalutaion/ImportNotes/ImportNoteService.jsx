@@ -10,11 +10,7 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 
-// ===========================
-// CONFIGURATION GLOBALE
-// ===========================
-const DEFAULT_ECOLE_ID = 38;
-const DEFAULT_ANNEE_ID = 226;
+
 
 // Liste complète de toutes les colonnes de notes possibles
 const NOTES_COLUMNS = [

@@ -17,6 +17,7 @@ import {
 import axios from 'axios';
 import { useNiveauxBranchesData, usePeriodesData, useTypesActiviteData } from "../utils/CommonDataService";
 import { useAllApiUrls } from '../utils/apiConfig';
+import { usePulsParams } from "../../hooks/useDynamicParams";
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -26,8 +27,6 @@ const { Column, HeaderCell, Cell } = Table;
 const EvaluationPeriodeModal = ({
     show,
     evaluation,
-    anneeId,
-    ecoleId,
     onClose,
     onSave
 }) => {
@@ -38,6 +37,19 @@ const EvaluationPeriodeModal = ({
     const { periodes: rawPeriodes, loading: periodesLoading, error: periodesError } = usePeriodesData();
     const { typesActivite: rawTypesActivite, loading: typesActiviteLoading, error: typesActiviteError } = useTypesActiviteData();
     const apiUrls = useAllApiUrls();
+    const {
+            ecoleId: dynamicEcoleId,
+            personnelInfo,
+            academicYearId: dynamicAcademicYearId,
+            periodicitieId: dynamicPeriodicitieId,
+            profileId,
+            userId: dynamicUserId,
+            email,
+            isAuthenticated,
+            isInitialized,
+            isReady,
+        } = usePulsParams();
+    
 
     // Transformation des données pour s'assurer du bon format (label/value)
     const branches = React.useMemo(() => {
@@ -99,7 +111,7 @@ const EvaluationPeriodeModal = ({
 
         setLoadingEvaluations(true);
         try {
-            const response = await axios.get(apiUrls.notes.getEvalutionsByPeriodeEtBrnche(formData.periode, formData.niveau));
+            const response = await axios.get(apiUrls.notes.getEvalutionsByPeriodeEtBranche(formData.periode, formData.niveau));
             setEvaluationsEnregistrees(response.data || []);
         } catch (error) {
             console.error('Erreur lors du chargement des évaluations:', error);
@@ -107,7 +119,7 @@ const EvaluationPeriodeModal = ({
         } finally {
             setLoadingEvaluations(false);
         }
-    }, [apiUrls, anneeId, ecoleId, formData.periode, formData.niveau]);
+    }, [apiUrls, formData.periode, formData.niveau]);
 
     // ===========================
     // EFFETS
@@ -186,13 +198,13 @@ const EvaluationPeriodeModal = ({
 
             const payload = {
                 annee: {
-                    id: anneeId.toString()
+                    id: dynamicAcademicYearId.toString()
                 },
                 niveau: {
                     id: formData.niveau
                 },
                 ecole: {
-                    id: ecoleId.toString()
+                    id: dynamicEcoleId.toString()
                 },
                 numero: formData.numero,
                 periode: {
@@ -201,7 +213,7 @@ const EvaluationPeriodeModal = ({
                 typeEvaluation: {
                     id: formData.typeEvaluation
                 },
-                user: "361" // ID utilisateur à adapter
+                user: dynamicUserId // ID utilisateur à adapter
             };
 
             // Appeler la fonction onSave avec les données et les labels

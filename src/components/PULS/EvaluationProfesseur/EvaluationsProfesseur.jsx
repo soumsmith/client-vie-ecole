@@ -1,22 +1,22 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { 
-    SelectPicker, 
-    Button, 
-    Panel, 
-    Row, 
-    Col, 
-    Message, 
-    Loader, 
+import {
+    SelectPicker,
+    Button,
+    Panel,
+    Row,
+    Col,
+    Message,
+    Loader,
     Badge,
     Steps
 } from 'rsuite';
-import { 
-    FiSearch, 
-    FiRotateCcw, 
-    FiCalendar, 
-    FiUser, 
+import {
+    FiSearch,
+    FiRotateCcw,
+    FiCalendar,
+    FiUser,
     FiBarChart,
     FiPlus,
     FiTrendingUp
@@ -25,23 +25,25 @@ import {
 // Import des fonctions externalisées
 import { useCommonState } from '../../hooks/useCommonState';
 import DataTable from "../../DataTable";
-import { 
+import {
     useStatistiquesProfesseurData,
     statistiquesProfesseurTableConfig
 } from './EvaluationProfesseurService';
 
-import { 
+import {
     usePeriodesData,
     useEnseignantsData
 } from "../utils/CommonDataService";
+import GradientButton from '../../GradientButton';
+import IconBox from "../Composant/IconBox";
 
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE MODERNE
 // ===========================
-const EvaluationProfesseurFilters = ({ 
-    onSearch, 
-    onClear, 
-    loading = false, 
+const EvaluationProfesseurFilters = ({
+    onSearch,
+    onClear,
+    loading = false,
     error = null,
     selectedEnseignant,
     selectedPeriode,
@@ -51,16 +53,12 @@ const EvaluationProfesseurFilters = ({
 }) => {
     const [formError, setFormError] = useState(null);
 
-   // alert(profProfilId)
-
     const { enseignants, enseignantsLoading, enseignantsError, refetch } = useEnseignantsData(profProfilId);
 
-    console.log("enseignants==edmond", enseignants);
-
-    const { 
-        periodes, 
-        loading: periodesLoading, 
-        error: periodesError 
+    const {
+        periodes,
+        loading: periodesLoading,
+        error: periodesError
     } = usePeriodesData();
 
 
@@ -77,8 +75,8 @@ const EvaluationProfesseurFilters = ({
 
         setFormError(null);
         if (onSearch) {
-            onSearch({ 
-                enseignantId: selectedEnseignant, 
+            onSearch({
+                enseignantId: selectedEnseignant,
                 periodeId: selectedPeriode
             });
         }
@@ -93,7 +91,7 @@ const EvaluationProfesseurFilters = ({
     const hasDataError = enseignantsError || periodesError;
 
     return (
-        <div style={{ 
+        <div style={{
             background: 'white',
             borderRadius: '15px',
             padding: '25px',
@@ -102,24 +100,15 @@ const EvaluationProfesseurFilters = ({
             marginBottom: '20px'
         }}>
             {/* En-tête moderne */}
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: 12,
                 marginBottom: 25,
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    borderRadius: '10px',
-                    padding: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <FiBarChart size={18} color="white" />
-                </div>
+                <IconBox icon={FiBarChart} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Statistiques des évaluations par professeur
@@ -151,10 +140,10 @@ const EvaluationProfesseurFilters = ({
             <Row gutter={20}>
                 <Col xs={24} sm={12} md={8}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: '#475569',
                             fontSize: '14px'
                         }}>
@@ -164,7 +153,6 @@ const EvaluationProfesseurFilters = ({
                             data={enseignants}
                             value={selectedEnseignant}
                             onChange={(value) => {
-                                console.log('👨‍🏫 Enseignant sélectionné:', value);
                                 onEnseignantChange(value);
                             }}
                             placeholder="Choisir un enseignant"
@@ -178,12 +166,12 @@ const EvaluationProfesseurFilters = ({
                     </div>
                 </Col>
 
-                <Col xs={24} sm={12} md={6}>
+                <Col xs={24} sm={12} md={10}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: '#475569',
                             fontSize: '14px'
                         }}>
@@ -204,39 +192,34 @@ const EvaluationProfesseurFilters = ({
                     </div>
                 </Col>
 
-                <Col xs={24} sm={12} md={8}>
+                <Col xs={24} sm={6} md={6}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: 'transparent',
                             fontSize: '14px'
                         }}>
                             Action
                         </label>
                         <div style={{ display: 'flex', gap: 8, height: '40px' }}>
-                            <Button
-                                appearance="primary"
-                                onClick={handleSearch}
+
+                            <GradientButton
+                                icon={<FiSearch size={16} />}
+                                text="Recherche"
+                                loadingText="Chargement..."
                                 loading={loading}
                                 disabled={isDataLoading || loading || !selectedEnseignant || !selectedPeriode}
-                                style={{ 
-                                    flex: 1,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontWeight: '500'
-                                }}
-                                size="lg"
-                            >
-                                {loading ? 'Recherche...' : 'Rechercher'}
-                            </Button>
-                            
+                                onClick={handleSearch}
+                                variant="primary"
+                                style={{ flex: 1 }}
+                            />
+
                             <Button
                                 onClick={handleClear}
                                 disabled={loading}
-                                style={{ 
+                                style={{
                                     minWidth: '45px',
                                     borderRadius: '8px',
                                     border: '1px solid #e2e8f0'
@@ -245,6 +228,7 @@ const EvaluationProfesseurFilters = ({
                             >
                                 <FiRotateCcw size={16} />
                             </Button>
+
                         </div>
                     </div>
                 </Col>
@@ -252,8 +236,8 @@ const EvaluationProfesseurFilters = ({
 
             {/* Indicateur de progression */}
             <div style={{ marginTop: 15 }}>
-                <Steps 
-                    current={selectedEnseignant ? (selectedPeriode ? 2 : 1) : 0} 
+                <Steps
+                    current={selectedEnseignant ? (selectedPeriode ? 2 : 1) : 0}
                     size="small"
                     style={{ background: '#f8fafc', padding: '15px', borderRadius: '8px' }}
                 >
@@ -265,10 +249,10 @@ const EvaluationProfesseurFilters = ({
 
             {/* Loading indicator discret */}
             {isDataLoading && (
-                <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 10, 
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
                     marginTop: 15,
                     padding: '10px 15px',
                     background: '#f0f9ff',
@@ -300,9 +284,9 @@ const ProfesseurInfoCard = ({ professeurInfo, selectedEnseignantName, selectedPe
             border: '1px solid rgba(34, 197, 94, 0.15)',
             marginBottom: '20px'
         }}>
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: 15,
                 marginBottom: 15
             }}>
@@ -325,7 +309,7 @@ const ProfesseurInfoCard = ({ professeurInfo, selectedEnseignantName, selectedPe
                     </p>
                 </div>
             </div>
-            
+
             {/* Badge récapitulatif */}
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 <Badge color="blue" style={{ fontSize: '12px' }}>
@@ -380,15 +364,14 @@ const EvaluationsProfesseur = ({ profProfilId }) => {
     // GESTION DE LA RECHERCHE
     // ===========================
     const handleSearch = useCallback(async ({ enseignantId, periodeId }) => {
-        console.log('🔍 Lancement de la recherche des statistiques professeur:', { enseignantId, periodeId });
-        
+
         // Récupérer les noms pour l'affichage
         const enseignant = enseignants.find(e => e.id === enseignantId);
         const periode = periodes.find(p => p.id === periodeId);
-        
+
         setSelectedEnseignantName(enseignant?.nomComplet || 'Enseignant inconnu');
         setSelectedPeriodeName(periode?.libelle || 'Période inconnue');
-        
+
         await searchStatistiques(enseignantId, periodeId);
     }, [searchStatistiques, enseignants, periodes]);
 
@@ -454,8 +437,8 @@ const EvaluationsProfesseur = ({ profProfilId }) => {
     // RENDU DU COMPOSANT
     // ===========================
     return (
-        <div style={{ 
-             
+        <div style={{
+
             minHeight: '100vh',
             padding: '20px 0'
         }}>
@@ -468,7 +451,7 @@ const EvaluationsProfesseur = ({ profProfilId }) => {
                             onClear={handleClearSearch}
                             loading={searchLoading}
                             error={searchError}
-                            profProfilId = {profProfilId}
+                            profProfilId={profProfilId}
                             selectedEnseignant={selectedEnseignant}
                             selectedPeriode={selectedPeriode}
                             onEnseignantChange={setSelectedEnseignant}
@@ -481,7 +464,7 @@ const EvaluationsProfesseur = ({ profProfilId }) => {
                 {searchPerformed && professeurInfo && (
                     <div className="row">
                         <div className="col-lg-12">
-                            <ProfesseurInfoCard 
+                            <ProfesseurInfoCard
                                 professeurInfo={professeurInfo}
                                 selectedEnseignantName={selectedEnseignantName}
                                 selectedPeriodeName={selectedPeriodeName}
@@ -578,28 +561,28 @@ const EvaluationsProfesseur = ({ profProfilId }) => {
                                 <DataTable
                                     title="Statistiques des évaluations par professeur"
                                     subtitle="classe(s) avec statistiques"
-                                    
+
                                     data={statistiques}
                                     loading={searchLoading}
                                     error={null}
-                                    
+
                                     columns={statistiquesProfesseurTableConfig.columns}
                                     searchableFields={statistiquesProfesseurTableConfig.searchableFields}
                                     filterConfigs={statistiquesProfesseurTableConfig.filterConfigs}
                                     actions={statistiquesProfesseurTableConfig.actions}
-                                    
+
                                     onAction={handleTableActionLocal}
                                     onRefresh={handleRefresh}
-                                    
+
                                     defaultPageSize={15}
                                     pageSizeOptions={[10, 15, 25, 50]}
                                     tableHeight={600}
-                                    
+
                                     enableRefresh={true}
                                     enableCreate={false}
                                     selectable={false}
                                     rowKey="id"
-                                    
+
                                     customStyles={{
                                         container: { backgroundColor: "transparent" },
                                         panel: { minHeight: "600px", border: "none", boxShadow: "none" },
@@ -644,9 +627,6 @@ const EvaluationsProfesseur = ({ profProfilId }) => {
                     </div>
                 )}
             </div>
-
-            {/* Modal pour les actions (à implémenter selon vos besoins) */}
-            {/* Vous pouvez ajouter ici un modal similaire aux autres composants */}
         </div>
     );
 };

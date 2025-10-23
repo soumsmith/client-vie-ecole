@@ -1178,7 +1178,7 @@ const EvaluationDetail = () => {
             showPagination: true,
             showSearch: true,
             showFilters: true,
-            tableHeight: 500
+            tableHeight: 700
         };
     }, [handleNoteChange, isLocked, evaluation?.noteSur, modifiedNotes]);  // ✅ CORRECTION: Ajout de modifiedNotes dans les dépendances
 

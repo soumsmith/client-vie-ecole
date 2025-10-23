@@ -80,7 +80,7 @@ const EditMatiereModal = ({ show, matiere, onClose, onSave }) => {
             }
 
             // Charger les matières parent (utiliser l'ID de l'école de la matière)
-            const ecoleId = matiere?.ecole?.id; // Fallback vers 38 si pas d'école
+            const ecoleId = matiere?.ecole?.id; 
             const matieresResponse = await axios.get(apiUrls.matieres.listByEcole());
             if (matieresResponse.data && Array.isArray(matieresResponse.data)) {
                 const matieresData = matieresResponse.data.map(mat => ({

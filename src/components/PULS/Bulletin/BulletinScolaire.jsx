@@ -20,6 +20,16 @@ import {
   Toggle,
 } from "rsuite";
 
+import { 
+    FiSearch, 
+    FiRotateCcw, 
+    FiCalendar, 
+    FiUser, 
+    FiBarChart,
+    FiPlus,
+    FiTrendingUp
+} from 'react-icons/fi';
+
 // Import du service centralisé
 import {
   useClassesData,
@@ -38,6 +48,7 @@ import {
 } from "./BulletinService";
 import { useAllApiUrls } from '../utils/apiConfig';
 import { usePulsParams } from "../../hooks/useDynamicParams";
+import GradientButton from '../../GradientButton';
 
 // ===========================
 // COMPOSANT DE SÉLECTION (FILTRES) - VERSION LIGHT
@@ -366,19 +377,16 @@ const BulletinFilters = ({
                 Actions
               </label>
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                <Button
-                  appearance="primary"
-                  onClick={handleSearch}
+                <GradientButton
+                  icon={<FiSearch size={16} />}
+                  text="Afficher"
+                  loadingText="Chargement..."
                   loading={loading}
                   disabled={isDataLoading || loading}
-                  style={{
-                    minWidth: "120px",
-                    backgroundColor: "#3b82f6",
-                    borderColor: "#3b82f6"
-                  }}
-                >
-                  {loading ? "Chargement..." : "Afficher"}
-                </Button>
+                  onClick={handleSearch}
+                  variant="primary"
+                  style={{ flex: 1 }}
+                />
 
                 <Button
                   onClick={handleClear}
@@ -1764,8 +1772,8 @@ const BulletinScolaire = () => {
   } = useBulletinData();
 
   // Récupérer les informations complémentaires
-  const { classes } = useClassesData(38);
-  const { periodes } = usePeriodesData(2);
+  const { classes } = useClassesData();
+  const { periodes } = usePeriodesData();
 
   const handleSearch = useCallback(
     async ({ classeId, periodeId, eleveId }) => {

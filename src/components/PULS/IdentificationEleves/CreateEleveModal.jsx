@@ -3,6 +3,8 @@ import { Modal, Form, Input, SelectPicker, Button, Message, Loader, Schema, Pane
 import axios from 'axios';
 import { useAllApiUrls } from '../utils/apiConfig';
 import { useAnneeData, useBranchesData } from './EleveServiceManager';
+import { usePulsParams } from "../../hooks/useDynamicParams";
+
 
 const { StringType, NumberType } = Schema.Types;
 
@@ -46,6 +48,18 @@ const CreateEleveModal = ({ visible, onClose, onSuccess, editingEleve = null }) 
     const [loading, setLoading] = useState(false);
     const [submitError, setSubmitError] = useState(null);
     const apiUrls = useAllApiUrls();
+    const {
+        ecoleId: dynamicEcoleId,
+        personnelInfo,
+        academicYearId: dynamicAcademicYearId,
+        periodicitieId: dynamicPeriodicitieId,
+        profileId,
+        userId: dynamicUserId,
+        email,
+        isAuthenticated,
+        isInitialized,
+        isReady,
+    } = usePulsParams();
 
     // Hooks pour récupérer les données
     const { annee, loading: anneeLoading } = useAnneeData();
@@ -100,7 +114,7 @@ const CreateEleveModal = ({ visible, onClose, onSuccess, editingEleve = null }) 
                     id: annee?.id
                 },
                 ecole: {
-                    id: "38"
+                    id: dynamicEcoleId
                 }
             };
 
@@ -112,18 +126,18 @@ const CreateEleveModal = ({ visible, onClose, onSuccess, editingEleve = null }) 
             const response = editingEleve
                 ? await axios.put(apiUrl, eleveData)
                 : await axios.post(apiUrl, eleveData);
-            
+
             // Succès - réinitialiser le formulaire et fermer le modal
             handleReset();
             onSuccess(response.data);
             onClose();
-            
+
             Message.success(editingEleve ? 'Élève modifié avec succès' : 'Élève créé avec succès');
-            
+
         } catch (error) {
-            const errorMessage = error.response?.data?.message || 
-                               error.message || 
-                               `Erreur lors de ${editingEleve ? 'la modification' : 'la création'} de l'élève`;
+            const errorMessage = error.response?.data?.message ||
+                error.message ||
+                `Erreur lors de ${editingEleve ? 'la modification' : 'la création'} de l'élève`;
             setSubmitError(errorMessage);
             Message.error(errorMessage);
         } finally {
@@ -191,13 +205,13 @@ const CreateEleveModal = ({ visible, onClose, onSuccess, editingEleve = null }) 
             <Modal.Header>
                 <Modal.Title>{modalTitle}</Modal.Title>
             </Modal.Header>
-            
+
             <Modal.Body>
                 {/* En-tête avec l'année */}
                 {annee && (
-                    <div style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
                         alignItems: 'center',
                         marginBottom: 20,
                         paddingBottom: 15,
@@ -206,9 +220,9 @@ const CreateEleveModal = ({ visible, onClose, onSuccess, editingEleve = null }) 
                         <div style={{ color: '#999', fontSize: '14px' }}>
                             {annee.customLibelle || annee.libelle}
                         </div>
-                        <div style={{ 
-                            backgroundColor: '#f0f2f5', 
-                            padding: '6px 12px', 
+                        <div style={{
+                            backgroundColor: '#f0f2f5',
+                            padding: '6px 12px',
                             borderRadius: '4px',
                             fontSize: '12px',
                             fontWeight: 'bold',
@@ -221,10 +235,10 @@ const CreateEleveModal = ({ visible, onClose, onSuccess, editingEleve = null }) 
 
                 {/* Affichage des erreurs */}
                 {submitError && (
-                    <div style={{ 
-                        marginBottom: 16, 
-                        padding: 12, 
-                        backgroundColor: '#fff2f0', 
+                    <div style={{
+                        marginBottom: 16,
+                        padding: 12,
+                        backgroundColor: '#fff2f0',
                         border: '1px solid #ffccc7',
                         borderRadius: 6,
                         color: '#a8071a'
@@ -255,8 +269,8 @@ const CreateEleveModal = ({ visible, onClose, onSuccess, editingEleve = null }) 
                     {/* Matricule */}
                     <Form.Group controlId="matricule">
                         <Form.ControlLabel>Matricule*</Form.ControlLabel>
-                        <Form.Control 
-                            name="matricule" 
+                        <Form.Control
+                            name="matricule"
                             placeholder="Entrez le matricule de l'élève"
                             size="lg"
                         />
@@ -265,8 +279,8 @@ const CreateEleveModal = ({ visible, onClose, onSuccess, editingEleve = null }) 
                     {/* Nom */}
                     <Form.Group controlId="nom">
                         <Form.ControlLabel>Nom*</Form.ControlLabel>
-                        <Form.Control 
-                            name="nom" 
+                        <Form.Control
+                            name="nom"
                             placeholder="Entrez le nom de famille"
                             size="lg"
                         />
@@ -275,8 +289,8 @@ const CreateEleveModal = ({ visible, onClose, onSuccess, editingEleve = null }) 
                     {/* Prénom */}
                     <Form.Group controlId="prenom">
                         <Form.ControlLabel>Prénom*</Form.ControlLabel>
-                        <Form.Control 
-                            name="prenom" 
+                        <Form.Control
+                            name="prenom"
                             placeholder="Entrez le prénom"
                             size="lg"
                         />
@@ -336,8 +350,8 @@ const CreateEleveModal = ({ visible, onClose, onSuccess, editingEleve = null }) 
                         {/* Code interne */}
                         <Form.Group controlId="codeInterne">
                             <Form.ControlLabel>Code interne</Form.ControlLabel>
-                            <Form.Control 
-                                name="codeInterne" 
+                            <Form.Control
+                                name="codeInterne"
                                 placeholder="Code interne (optionnel)"
                                 size="lg"
                             />
@@ -346,8 +360,8 @@ const CreateEleveModal = ({ visible, onClose, onSuccess, editingEleve = null }) 
                         {/* Contact1 */}
                         <Form.Group controlId="contact1">
                             <Form.ControlLabel>Contact1</Form.ControlLabel>
-                            <Form.Control 
-                                name="contact1" 
+                            <Form.Control
+                                name="contact1"
                                 placeholder="Numéro de téléphone 1"
                                 size="lg"
                             />
@@ -357,19 +371,19 @@ const CreateEleveModal = ({ visible, onClose, onSuccess, editingEleve = null }) 
                     {/* Contact2 sur une ligne séparée */}
                     <Form.Group controlId="contact2">
                         <Form.ControlLabel>Contact2</Form.ControlLabel>
-                        <Form.Control 
-                            name="contact2" 
+                        <Form.Control
+                            name="contact2"
                             placeholder="Numéro de téléphone 2"
                             size="lg"
                         />
                     </Form.Group>
                 </Form>
             </Modal.Body>
-            
+
             <Modal.Footer>
-                <Button 
-                    onClick={handleSubmit} 
-                    appearance="primary" 
+                <Button
+                    onClick={handleSubmit}
+                    appearance="primary"
                     loading={loading}
                     disabled={isDataLoading}
                     color="green"
@@ -377,8 +391,8 @@ const CreateEleveModal = ({ visible, onClose, onSuccess, editingEleve = null }) 
                 >
                     Save
                 </Button>
-                <Button 
-                    onClick={handleCancel} 
+                <Button
+                    onClick={handleCancel}
                     appearance="subtle"
                     disabled={loading}
                     size="lg"

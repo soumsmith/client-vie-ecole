@@ -11,13 +11,6 @@ import { getFromCache, setToCache } from '../utils/cacheUtils';
 import { useAllApiUrls } from '../utils/apiConfig';
 import axios from 'axios';
 import { usePulsParams } from '../../hooks/useDynamicParams';
-// ===========================
-// CONFIGURATION GLOBALE
-// ===========================
-const DEFAULT_ECOLE_ID = 38;
-const DEFAULT_PERIODICITE_ID = 2;
-const DEFAULT_ANNEE_ID = 226;
-const DEFAULT_PROFIL_PROFESSEUR = 8;
 
 // ===========================
 // HOOK POUR RÉCUPÉRER LES ENSEIGNANTS D'UNE ÉCOLE

@@ -37,9 +37,8 @@ import MatiereCard from '../card/MatiereCard';
 import { usePulsParams } from '../../hooks/useDynamicParams';
 import getFullUrl from "../../hooks/urlUtils";
 
-const CahierDeTexteRouter = ({ 
+const CahierDeTexteRouter = ({
     primaryColor = '#3b82f6',
-    apiBaseUrl = 'http://46.105.52.105:8889/api'
 }) => {
     // Récupérer l'ID de l'utilisateur connecté dynamiquement
     const { userId } = usePulsParams();
@@ -75,18 +74,10 @@ const CahierDeTexteRouter = ({
             // Déterminer l'endpoint selon l'action
             const action = shouldLock ? 'lock' : 'unlock';
             const matiereId = matiere.id;
-            
+
             // Construire l'URL de l'API avec l'userId dynamique
             const url = `${getFullUrl()}/locks/TEXTBOOK/${matiereId}/${action}?actor=${userId}`;
-            
-            console.log('🔒 API Call:', {
-                url,
-                matiereId,
-                action,
-                shouldLock,
-                userId
-            }); // Debug amélioré
-            
+
             // Mettre à jour l'état local de manière optimiste
             setLockStates(prev => ({
                 ...prev,
@@ -135,7 +126,7 @@ const CahierDeTexteRouter = ({
             return true; // Succès
         } catch (error) {
             console.error('❌ Erreur lors du verrouillage/déverrouillage:', error);
-            
+
             // Afficher une notification d'erreur
             toaster.push(
                 <Notification type="error" header="Erreur" closable>
@@ -260,8 +251,8 @@ const CahierDeTexteRouter = ({
                             <Row gutter={16}>
                                 {filteredClasses.map((classe) => (
                                     <Col key={classe.id} xs={24} sm={12} md={8} lg={6}>
-                                        <ClassCard 
-                                            classe={classe} 
+                                        <ClassCard
+                                            classe={classe}
                                             onClick={() => handleClasseClick(classe)}
                                             borderColor="#e2e8f0"
                                             accentColor={primaryColor}
@@ -413,13 +404,13 @@ const CahierDeTexteRouter = ({
                             <Row gutter={16}>
                                 {filteredMatieres.map((matiere) => {
                                     // Utiliser l'état local en priorité, sinon la valeur du serveur
-                                    const currentLockState = lockStates.hasOwnProperty(matiere.id) 
-                                        ? lockStates[matiere.id] 
+                                    const currentLockState = lockStates.hasOwnProperty(matiere.id)
+                                        ? lockStates[matiere.id]
                                         : (matiere.isLocked ?? false);
-                                    
+
                                     return (
                                         <Col key={matiere.id} xs={24} sm={12} md={6}>
-                                            <MatiereCard 
+                                            <MatiereCard
                                                 matiere={matiere}
                                                 onOuvrirCahier={handleOuvrirCahier}
                                                 onVerrouillerCahier={handleVerrouillerCahier}

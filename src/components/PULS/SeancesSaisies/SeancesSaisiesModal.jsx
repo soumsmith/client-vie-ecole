@@ -46,7 +46,19 @@ import { usePulsParams } from "../../hooks/useDynamicParams";
 
 const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
   const { isOpen, type, selectedQuestion: seance } = modalState;
-  const { ecoleId: dynamicEcoleId, academicYearId: dynamicAcademicYearId } = usePulsParams();
+  const {
+    ecoleId: dynamicEcoleId,
+    personnelInfo,
+    academicYearId: dynamicAcademicYearId,
+    periodicitieId: dynamicPeriodicitieId,
+    profileId,
+    userId: dynamicUserId,
+    email,
+    isAuthenticated,
+    isInitialized,
+    isReady,
+  } = usePulsParams();
+
 
   const [formData, setFormData] = useState({
     classeId: null,
@@ -140,7 +152,7 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
 
     const [debutH, debutM] = heureDeb.split(':').map(Number);
     const [finH, finM] = heureFin.split(':').map(Number);
-    
+
     const debutMinutes = debutH * 60 + debutM;
     const finMinutes = finH * 60 + finM;
 
@@ -161,7 +173,7 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
   const isFormValid = useCallback(() => {
     const requiredFields = ['classeId', 'dateSeance', 'heureDeb', 'heureFin', 'matiereId', 'typeActiviteId'];
     const hasAllFields = requiredFields.every(field => formData[field] !== null && formData[field] !== '');
-    
+
     // Validation simple des heures
     let timeValid = true;
     if (formData.heureDeb && formData.heureFin) {
@@ -171,7 +183,7 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
       const finMinutes = finH * 60 + finM;
       timeValid = finMinutes > debutMinutes && (finMinutes - debutMinutes) >= 15;
     }
-    
+
     return hasAllFields && timeValid && verification.creneauDisponible;
   }, [formData, verification.creneauDisponible]);
 
@@ -208,7 +220,7 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
     // Validation des heures
     const [debutH, debutM] = debut.split(':').map(Number);
     const [finH, finM] = fin.split(':').map(Number);
-    
+
     const debutMinutes = debutH * 60 + debutM;
     const finMinutes = finH * 60 + finM;
 
@@ -283,7 +295,7 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
         error: "Erreur lors de la vérification de disponibilité"
       });
     }
-    
+
     console.log('=== FIN VÉRIFICATION DISPONIBILITÉ ===');
   }, [dynamicAcademicYearId, formData.classeId, formData.jourId, formData.heureDeb, formData.heureFin]);
 
@@ -293,14 +305,14 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
   const handleFieldChange = useCallback((field, value) => {
     setFormData(prev => {
       const newData = { ...prev, [field]: value };
-      
+
       // Reset des champs dépendants
       if (field === 'classeId') {
         newData.matiereId = null;
         newData.professeurId = null;
         newData.salleId = null;
       }
-      
+
       // Reset de la salle si les paramètres de vérification changent
       if (['classeId', 'jourId', 'heureDeb', 'heureFin'].includes(field)) {
         newData.salleId = null;
@@ -337,14 +349,14 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
   // ===========================
   // EFFECTS
   // ===========================
-  
+
   // Initialisation du formulaire
   useEffect(() => {
     if (type === "edit" && seance && isOpen) {
       console.log('=== INITIALISATION EDIT ===');
       console.log('Seance data:', seance);
       console.log('Date brute:', seance.dateSeance);
-      
+
       // Fonction helper pour nettoyer les dates
       const cleanDateString = (dateStr) => {
         if (!dateStr) return null;
@@ -353,7 +365,7 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
         }
         return dateStr;
       };
-      
+
       // Conversion de la date string en objet Date
       let dateSeanceObj = new Date();
       if (seance.dateSeance) {
@@ -388,7 +400,7 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
         noteeSur: seance.noteeSur || 0,
         generateEvaluation: seance.evaluationIndicator === 1
       });
-      
+
       console.log('=== FIN INITIALISATION EDIT ===');
     } else if (type === "create") {
       console.log('=== INITIALISATION CREATE ===');
@@ -421,22 +433,22 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
   // Vérification automatique quand les paramètres changent
   useEffect(() => {
     const { classeId, jourId, heureDeb, heureFin } = formData;
-    
+
     console.log('=== EFFECT VÉRIFICATION DÉCLENCHÉE ===');
     console.log('classeId:', classeId);
     console.log('jourId:', jourId);
     console.log('heureDeb:', heureDeb);
     console.log('heureFin:', heureFin);
-    
+
     // Nettoyer le timer précédent
     if (verificationTimerRef.current) {
       clearTimeout(verificationTimerRef.current);
     }
-    
+
     // Fonction de vérification locale
     const effectuerVerification = async () => {
       console.log('=== DÉBUT VÉRIFICATION (EFFECT) ===');
-      
+
       // Reset de l'état de vérification
       setVerification(prev => ({
         ...prev,
@@ -448,7 +460,7 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
       // Validation des heures
       const [debutH, debutM] = heureDeb.split(':').map(Number);
       const [finH, finM] = heureFin.split(':').map(Number);
-      
+
       const debutMinutes = debutH * 60 + debutM;
       const finMinutes = finH * 60 + finM;
 
@@ -473,7 +485,7 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
       }
 
       setVerification(prev => ({ ...prev, loading: true }));
-      
+
       try {
         // Utiliser la nouvelle API qui retourne directement les salles
         const result = await checkCreneauDisponibiliteSeance(
@@ -511,10 +523,10 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
           error: "Erreur lors de la vérification de disponibilité"
         });
       }
-      
+
       console.log('=== FIN VÉRIFICATION (EFFECT) ===');
     };
-    
+
     // Vérifier si tous les champs requis sont remplis
     if (classeId && jourId && heureDeb && heureFin) {
       console.log('Tous les champs remplis, démarrage du timer...');
@@ -613,7 +625,7 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
         },
         statut: "MAN",
         annee: dynamicAcademicYearId.toString(),
-        user: "361",
+        user: dynamicUserId,
         profPrincipal: null
       };
 
@@ -635,7 +647,7 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
       onClose();
     } catch (error) {
       console.error("Erreur lors de la sauvegarde:", error);
-      
+
       let errorMessage = "Une erreur inattendue est survenue.";
       if (error.response?.status === 400) {
         errorMessage = "Données invalides. Vérifiez les informations saisies.";
@@ -663,13 +675,13 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
     // Validation simple des heures pour l'affichage
     let timeValid = true;
     let timeMessage = '';
-    
+
     if (formData.heureDeb && formData.heureFin) {
       const [debutH, debutM] = formData.heureDeb.split(':').map(Number);
       const [finH, finM] = formData.heureFin.split(':').map(Number);
       const debutMinutes = debutH * 60 + debutM;
       const finMinutes = finH * 60 + finM;
-      
+
       if (finMinutes <= debutMinutes) {
         timeValid = false;
         timeMessage = "L'heure de fin doit être supérieure à l'heure de début";
@@ -921,8 +933,8 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
                               verification.loading
                                 ? "Vérification en cours..."
                                 : verification.creneauDisponible
-                                ? "Sélectionner la salle"
-                                : "Vérifiez d'abord la disponibilité du créneau"
+                                  ? "Sélectionner la salle"
+                                  : "Vérifiez d'abord la disponibilité du créneau"
                             }
                             cleanable={false}
                             disabled={isSubmitting || !verification.creneauDisponible || verification.loading}
@@ -1110,8 +1122,8 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
                 ? "Création..."
                 : "Modification..."
               : type === "create"
-              ? "Enregistrer"
-              : "Modifier"}
+                ? "Enregistrer"
+                : "Modifier"}
           </Button>
         </div>
       </Modal.Footer>

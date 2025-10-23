@@ -11,7 +11,7 @@ import {
     Loader,
     Badge,
     Steps,
-    useToaster
+    toaster
 } from 'rsuite';
 import {
     FiSearch,
@@ -34,6 +34,8 @@ import {
 
 import { usePeriodesData, useClassesData, useMatieresData } from "../utils/CommonDataService";
 import { usePulsParams } from '../../hooks/useDynamicParams';
+import GradientButton from '../../GradientButton';
+import IconBox from "../Composant/IconBox";
 
 // ===========================
 // FONCTION POUR SAUVEGARDER LES ABSENCES
@@ -83,11 +85,7 @@ const saveAbsenceToAPI = async (etudiantData, classeInfo, periodeId, academicYea
 
         console.log('💾 Sauvegarde absence - Payload:', JSON.stringify(payload, null, 2));
 
-        const response = await axios.post(apiUrl, payload, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        const response = await axios.post(apiUrl, payload);
 
         console.log('✅ Réponse API sauvegarde absence:', response.data);
         return { success: true, data: response.data };
@@ -206,16 +204,7 @@ const SearchForm = ({
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    borderRadius: '10px',
-                    padding: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <FiSearch size={18} color="white" />
-                </div>
+                <IconBox icon={FiSearch} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Recherche des Notes par Période
@@ -384,22 +373,17 @@ const SearchForm = ({
                             Action
                         </label>
                         <div style={{ display: 'flex', gap: 8, height: '40px' }}>
-                            <Button
-                                appearance="primary"
-                                onClick={handleSearch}
+
+                            <GradientButton
+                                icon={<FiSearch size={16} />}
+                                text="Recherche"
+                                loadingText="Chargement..."
                                 loading={loading}
                                 disabled={isDataLoading || loading}
-                                style={{
-                                    flex: 1,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontWeight: '500'
-                                }}
-                                size="lg"
-                            >
-                                {loading ? 'Recherche...' : 'Rechercher'}
-                            </Button>
+                                onClick={handleSearch}
+                                variant="primary"
+                                style={{ flex: 1 }}
+                            />
 
                             <Button
                                 onClick={handleClear}
@@ -1192,7 +1176,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
     const [savingAbsences, setSavingAbsences] = useState(new Set()); // Pour tracking des sauvegardes en cours
 
     // Hook pour les notifications rsuite
-    const toaster = useToaster();
 
     const TableComponent = profil === 'Fondateur' ? DataTableExtended : DataTable; // Changer de datatable en fonction du profil
 
@@ -1216,9 +1199,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
         updateStudentData,
         searchContext
     } = useNoteSearch(profil, showMatiereFilter);
-
-    console.log("-------------- etudiants ----------");
-    console.log(etudiants);
 
     // État pour stocker la période actuelle pour les appels API
     const [currentSearchParams, setCurrentSearchParams] = useState(null);
@@ -1290,7 +1270,7 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
             // Marquage comme en cours de sauvegarde
             setSavingAbsences(prev => new Set([...prev, savingKey]));
 
-            // CORRECTION : Mise à jour immédiate de l'état local via le hook
+            // Mise à jour immédiate de l'état local via le hook
             console.log('🔄 Mise à jour optimiste locale:', { [field]: parseInt(value) || 0 });
             updateStudentData(etudiantId, { [field]: parseInt(value) || 0 });
 
@@ -1362,7 +1342,8 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                 return newSet;
             });
         }
-    }, [currentSearchParams, classeInfo, dynamicAcademicYearId, etudiants, savingAbsences, updateStudentData, toaster]);
+    }, [currentSearchParams, classeInfo, dynamicAcademicYearId, etudiants, savingAbsences, updateStudentData]);
+
 
     const handleNoteChange = useCallback((etudiantId, matiereId, noteId, value) => {
         console.log('📝 Changement de note:', etudiantId, matiereId, noteId, value);

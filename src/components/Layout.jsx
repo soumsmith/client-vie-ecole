@@ -105,9 +105,6 @@ import ConsultationEcoles from './PULS/MesEcoles/ConsultationEcoles';
 import { getUserProfile } from "./hooks/userUtils";
 
 
-
-
-
 const Layout = ({ onLogout }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -131,7 +128,6 @@ const Layout = ({ onLogout }) => {
   console.log('dynamicEcoleId', dynamicEcoleId);
   console.log('dynamicAcademicYearId', dynamicAcademicYearId);
   console.log('personnelInfo==>', personnelInfo);
-
 
   const hideFilterFor = ["Professeur", "SuperAdmin"];
   const showMatiereFilter = hideFilterFor.includes(getUserProfile()); // true si Fondateur ou SuperAdmin
@@ -270,7 +266,7 @@ const Layout = ({ onLogout }) => {
       'miseAJoursInfo': '/miseAJoursInfo',
       'creerEcole': '/creerEcole',
       'consultationEcoles': '/consultationEcoles',
-      
+
       'cahierDeTexte': '/cahierDeTexte',
 
     };
@@ -471,7 +467,7 @@ const Layout = ({ onLogout }) => {
     else if (path.includes('/ouvertureSeances')) {
       items.push({ label: "Ouverture de Seances", active: true });
     }
-    
+
 
 
     // PULS - Section Inscription
@@ -618,25 +614,20 @@ const Layout = ({ onLogout }) => {
       items.push({ label: "Cahier de texte", active: true });
     }
 
-
-
-
-
-
     return items;
   };
 
-const getDashboardComponent = (id) => {
-  switch (id) {
-    case 1: return <DashboardPrimaire />;
-    case 2: return <DashboardEnseignementSecondaireGenerale />;
-    case 3: return <EnseignementSuperieur />;
-    case 4: return <DashboardNiveauMaternelle />;
-    case 5: return <EnseignementSecondaireTechnique />; //ok
-    case 6: return <BREVETDETECHNICIENBT />; //ok
-    default: return <DefaultDashboard />;
-  }
-};
+  const getDashboardComponent = (id) => {
+    switch (id) {
+      case 1: return <DashboardPrimaire />;
+      case 2: return <DashboardEnseignementSecondaireGenerale />;
+      case 3: return <EnseignementSuperieur />;
+      case 4: return <DashboardNiveauMaternelle />;
+      case 5: return <EnseignementSecondaireTechnique />; //ok
+      case 6: return <BREVETDETECHNICIENBT />; //ok
+      default: return <DefaultDashboard />;
+    }
+  };
 
 
   const userProfil = localStorage.getItem("userProfil");
@@ -725,7 +716,7 @@ const getDashboardComponent = (id) => {
           {!isMobile && (
             <LightTopBar
               pageTitle={getPageTitle()}
-              onLogout={handleLogout} 
+              onLogout={handleLogout}
               userInfo={{
                 name: personnelInfo?.nom || personnelInfo?.name || "Utilisateur",
                 role: userProfil || "Membre",
@@ -743,9 +734,9 @@ const getDashboardComponent = (id) => {
               {/* <Route path="/dashboard" element={<Dashboard />} /> */}
               {/* <Route path="/" element={<Dashboard />} /> */}
 
-             <Route path="/dashboard" element={getDashboardComponent(academicYear?.niveauEnseignement?.id)} />
+              <Route path="/dashboard" element={getDashboardComponent(academicYear?.niveauEnseignement?.id)} />
 
-              
+
               {/* {academicYear.niveauEnseignement?.id === 1 && (
                 <Route path="/dashboard" element={<renderDashboard />} />
               )}
@@ -801,10 +792,8 @@ const getDashboardComponent = (id) => {
               <Route path="/definirPeriodeEvaluation" element={<EvaluationsPeriodes />} />
               <Route path="/ouvertureSeances" element={<SeanceManagement />} />
 
-              
-
-              <Route path="/monPersonel" element={<ListePersonnel typeDeListe="listePersonnel" tableTitle ="Liste du personel" />} />
-              <Route path="/affectationProfilPersonel" element={<ListePersonnel typeDeListe="affectationPersonel" tableTitle ="Liste du personel à affecter à un profil" />} />
+              <Route path="/monPersonel" element={<ListePersonnel typeDeListe="listePersonnel" tableTitle="Liste du personel" />} />
+              <Route path="/affectationProfilPersonel" element={<ListePersonnel typeDeListe="affectationPersonel" tableTitle="Liste du personel à affecter à un profil" />} />
 
               <Route path="/saisirSeances" element={<ListeSeancesSaisies />} />
               <Route path="/listeSeances" element={<ListeSeancesSaisies />} />
@@ -839,7 +828,7 @@ const getDashboardComponent = (id) => {
                    =========================== */}
               <Route path="/profileUtilisateur" element={< ProfilUtilisateur userId={personnelInfo?.candidatDetails.candidatid} />} />
               <Route path="/loginMotDePasse" element={< ModifierMotDePasse />} />
-              <Route path="/miseAJoursInfo" element={< ModifierInfoPersonnelles  mode="edit"  userId={personnelInfo?.candidatDetails.candidatid} />} />
+              <Route path="/miseAJoursInfo" element={< ModifierInfoPersonnelles mode="edit" userId={personnelInfo?.candidatDetails.candidatid} />} />
               <Route path="/creerEcole" element={< ListeEcoles mode={"candidatEcoleInscription"} />} />
               <Route path="/consultationEcoles" element={<ConsultationEcoles />} />
 

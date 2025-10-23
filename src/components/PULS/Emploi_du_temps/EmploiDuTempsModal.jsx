@@ -41,17 +41,29 @@ import {
 import { usePulsParams } from "../../hooks/useDynamicParams";
 import { useAllApiUrls } from "../utils/apiConfig";
 
-const EmploiDuTempsModal = ({ 
-  modalState, 
-  onClose, 
-  onSave, 
-  selectedClasse, 
-  selectedDay, 
-  activitesExistantes, 
-  loadingActivites 
+const EmploiDuTempsModal = ({
+  modalState,
+  onClose,
+  onSave,
+  selectedClasse,
+  selectedDay,
+  activitesExistantes,
+  loadingActivites
 }) => {
   const { isOpen, type, selectedQuestion: activite } = modalState;
-  const { ecoleId: dynamicEcoleId, academicYearId: dynamicAcademicYearId } = usePulsParams();
+  const {
+    ecoleId: dynamicEcoleId,
+    personnelInfo,
+    academicYearId: dynamicAcademicYearId,
+    periodicitieId: dynamicPeriodicitieId,
+    profileId,
+    userId: dynamicUserId,
+    email,
+    isAuthenticated,
+    isInitialized,
+    isReady,
+  } = usePulsParams();
+
   const apiUrls = useAllApiUrls();
 
   const [formData, setFormData] = useState({
@@ -124,7 +136,7 @@ const EmploiDuTempsModal = ({
 
     const [debutH, debutM] = heureDeb.split(':').map(Number);
     const [finH, finM] = heureFin.split(':').map(Number);
-    
+
     const debutMinutes = debutH * 60 + debutM;
     const finMinutes = finH * 60 + finM;
 
@@ -143,7 +155,7 @@ const EmploiDuTempsModal = ({
     const requiredFields = ['classeId', 'jourId', 'heureDeb', 'heureFin', 'matiereId', 'salleId', 'typeActiviteId'];
     const hasAllFields = requiredFields.every(field => formData[field]);
     const timeValidation = validateTimeRange();
-    
+
     return hasAllFields && timeValidation.valid && verfication.creneauDisponible;
   }, [formData, validateTimeRange, verfication.creneauDisponible]);
 
@@ -251,7 +263,7 @@ const EmploiDuTempsModal = ({
   const verifierDisponibiliteForEdit = useCallback(async (classeId, jourId, heureDeb, heureFin, salleActuelle) => {
     console.log('=== VÉRIFICATION POUR ÉDITION ===');
     console.log('Paramètres:', { classeId, jourId, heureDeb, heureFin, salleActuelle });
-    
+
     setVerification(prev => ({ ...prev, loading: true }));
 
     try {
@@ -289,11 +301,11 @@ const EmploiDuTempsModal = ({
       console.log('Vérification terminée, salles disponibles:', sallesAvecActuelle);
     } catch (error) {
       console.error('Erreur lors de la vérification pour édition:', error);
-      
+
       // En cas d'erreur, au moins inclure la salle actuelle
       const salleActuelleObj = activite?.raw_data?.salle || activite?.salle;
       const sallesMinimal = salleActuelleObj ? [salleActuelleObj] : [];
-      
+
       setVerification({
         creneauDisponible: true, // On assume que c'est disponible en mode édition
         sallesDisponibles: sallesMinimal,
@@ -309,13 +321,13 @@ const EmploiDuTempsModal = ({
   const handleFieldChange = useCallback((field, value) => {
     setFormData(prev => {
       const newData = { ...prev, [field]: value };
-      
+
       // Reset des champs dépendants
       if (field === 'classeId') {
         newData.matiereId = null;
         newData.salleId = null;
       }
-      
+
       // Reset de la salle si les paramètres de vérification changent
       if (['classeId', 'jourId', 'heureDeb', 'heureFin'].includes(field)) {
         newData.salleId = null;
@@ -328,7 +340,7 @@ const EmploiDuTempsModal = ({
   // ===========================
   // EFFECTS - CORRIGÉS
   // ===========================
-  
+
   // Initialisation du formulaire - CORRIGÉE POUR LE PRÉ-REMPLISSAGE
   useEffect(() => {
     if (type === "edit" && activite && isOpen) {
@@ -338,18 +350,18 @@ const EmploiDuTempsModal = ({
       // Extraction des IDs depuis les différentes structures possibles
       const getIdFromField = (field) => {
         if (!field) return null;
-        
+
         // Si c'est déjà un ID (nombre)
         if (typeof field === 'number') return field;
-        
+
         // Si c'est un objet avec un ID
         if (typeof field === 'object' && field.id) return field.id;
-        
+
         // Si c'est dans raw_data
         if (activite.raw_data && activite.raw_data[field] && activite.raw_data[field].id) {
           return activite.raw_data[field].id;
         }
-        
+
         return null;
       };
 
@@ -381,7 +393,7 @@ const EmploiDuTempsModal = ({
 
     } else if (type === "create" && isOpen) {
       console.log('=== INITIALISATION MODE CRÉATION ===');
-      
+
       // PRÉ-SÉLECTION DE LA CLASSE ET DU JOUR POUR LA CRÉATION
       setFormData({
         classeId: selectedClasse?.id || null,
@@ -404,7 +416,7 @@ const EmploiDuTempsModal = ({
   // Vérification automatique - DÉCLENCHEMENT CORRIGÉ
   useEffect(() => {
     const { classeId, jourId, heureDeb, heureFin } = formData;
-    
+
     // Vérifier seulement en mode création et si tous les champs requis sont remplis
     if (type === "create" && classeId && jourId && heureDeb && heureFin) {
       console.log('Déclenchement de la vérification automatique');
@@ -469,7 +481,7 @@ const EmploiDuTempsModal = ({
         classe: { id: classe.id, libelle: null },
         salle: { id: salle.id, libelle: null },
         typeActivite: { id: typeActivite.id, libelle: null },
-        user: "361",
+        user: dynamicUserId,
         annee: dynamicAcademicYearId.toString(),
         ecole: { id: dynamicEcoleId.toString() },
         profPrincipal: null,
@@ -491,7 +503,7 @@ const EmploiDuTempsModal = ({
       onClose();
     } catch (error) {
       console.error("Erreur lors de la sauvegarde:", error);
-      
+
       let errorMessage = "Une erreur inattendue est survenue.";
       if (error.response?.status === 400) {
         errorMessage = "Données invalides. Vérifiez les informations saisies.";
@@ -529,7 +541,7 @@ const EmploiDuTempsModal = ({
   // ===========================
   const VerificationStatus = () => {
     const timeValidation = validateTimeRange();
-    
+
     if (!formData.heureDeb || !formData.heureFin) return null;
 
     if (!timeValidation.valid) {
@@ -631,10 +643,10 @@ const EmploiDuTempsModal = ({
           </Table.HeaderCell>
           <Table.Cell>
             {(rowData) => (
-              <Badge 
-                color="blue" 
-                style={{ 
-                  background: "#dbeafe", 
+              <Badge
+                color="blue"
+                style={{
+                  background: "#dbeafe",
                   color: "#1d4ed8",
                   fontWeight: "500"
                 }}
@@ -651,10 +663,10 @@ const EmploiDuTempsModal = ({
           </Table.HeaderCell>
           <Table.Cell>
             {(rowData) => (
-              <Badge 
-                color="orange" 
-                style={{ 
-                  background: "#fed7aa", 
+              <Badge
+                color="orange"
+                style={{
+                  background: "#fed7aa",
                   color: "#c2410c",
                   fontWeight: "500"
                 }}
@@ -946,8 +958,8 @@ const EmploiDuTempsModal = ({
                               verfication.loading
                                 ? "Vérification en cours..."
                                 : verfication.creneauDisponible
-                                ? "Sélectionner la salle"
-                                : "Vérifiez d'abord la disponibilité du créneau"
+                                  ? "Sélectionner la salle"
+                                  : "Vérifiez d'abord la disponibilité du créneau"
                             }
                             cleanable={false}
                             disabled={isSubmitting || !verfication.creneauDisponible || verfication.loading}
@@ -1056,8 +1068,8 @@ const EmploiDuTempsModal = ({
                 ? "Création..."
                 : "Modification..."
               : type === "create"
-              ? "Enregistrer"
-              : "Modifier"}
+                ? "Enregistrer"
+                : "Modifier"}
           </Button>
         </div>
       </Modal.Footer>

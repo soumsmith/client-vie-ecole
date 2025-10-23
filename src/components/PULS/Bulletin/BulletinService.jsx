@@ -9,162 +9,6 @@ import { getFromCache, setToCache } from "../utils/cacheUtils";
 import { useAllApiUrls } from "../utils/apiConfig";
 
 // ===========================
-// CONFIGURATION GLOBALE
-// ===========================
-const DEFAULT_ECOLE_ID = 38;
-const DEFAULT_ANNEE_ID = 226;
-const DEFAULT_PERIODICITE_ID = 2;
-
-// ===========================
-// HOOK POUR RÉCUPÉRER LES CLASSES
-// ===========================
-/**
- * Récupère la liste des classes pour une école donnée
- * @param {number} ecoleId
- * @param {number} refreshTrigger
- * @returns {object}
- */
-export const useClassesData = (
-  ecoleId = DEFAULT_ECOLE_ID,
-  refreshTrigger = 0
-) => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const apiUrls = useAllApiUrls();
-
-  const fetchClasses = useCallback(
-    async (skipCache = false) => {
-      try {
-        setLoading(true);
-        setError(null);
-        const cacheKey = `bulletin-classes-data-${ecoleId}`;
-        if (!skipCache) {
-          const cachedData = getFromCache(cacheKey);
-          if (cachedData) {
-            setData(cachedData);
-            setLoading(false);
-            return;
-          }
-        }
-        const response = await axios.get(apiUrls.classes.listByEcoleSorted());
-        const processed =
-          response.data && Array.isArray(response.data)
-            ? response.data.map((classe) => ({
-                value: classe.id,
-                label: classe.libelle,
-                id: classe.id,
-                niveau: classe.niveau || "",
-                serie: classe.serie || "",
-                raw_data: classe,
-              }))
-            : [];
-        setToCache(cacheKey, processed);
-        setData(processed);
-      } catch (err) {
-        setError({
-          message: err.message || "Erreur lors du chargement des classes",
-          type: err.name || "FetchError",
-          code: err.code || "UNKNOWN",
-        });
-      } finally {
-        setLoading(false);
-      }
-    },
-    [ecoleId, apiUrls.classes]
-  );
-
-  useEffect(() => {
-    if (ecoleId) {
-      fetchClasses(false);
-    }
-  }, [ecoleId, refreshTrigger, fetchClasses]);
-
-  return {
-    classes: data,
-    loading,
-    error,
-    refetch: () => fetchClasses(true),
-  };
-};
-
-// ===========================
-// HOOK POUR RÉCUPÉRER LES PÉRIODES
-// ===========================
-/**
- * Récupère la liste des périodes pour une périodicité donnée
- * @param {number} periodicitieId
- * @param {number} refreshTrigger
- * @returns {object}
- */
-export const usePeriodesData = (
-  periodicitieId = DEFAULT_PERIODICITE_ID,
-  refreshTrigger = 0
-) => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const apiUrls = useAllApiUrls();
-
-  const fetchPeriodes = useCallback(
-    async (skipCache = false) => {
-      try {
-        setLoading(true);
-        setError(null);
-        const cacheKey = `bulletin-periodes-data-${periodicitieId}`;
-        if (!skipCache) {
-          const cachedData = getFromCache(cacheKey);
-          if (cachedData) {
-            setData(cachedData);
-            setLoading(false);
-            return;
-          }
-        }
-        const response = await axios.get(
-          apiUrls.periodes.listByPeriodiciteId(periodicitieId)
-        );
-        const processed =
-          response.data && Array.isArray(response.data)
-            ? response.data.map((periode) => ({
-                value: periode.id,
-                label: periode.libelle,
-                id: periode.id,
-                coef: periode.coef || 1,
-                dateDebut: periode.dateDebut || "",
-                dateFin: periode.dateFin || "",
-                raw_data: periode,
-              }))
-            : [];
-        setToCache(cacheKey, processed);
-        setData(processed);
-      } catch (err) {
-        setError({
-          message: err.message || "Erreur lors du chargement des périodes",
-          type: err.name || "FetchError",
-          code: err.code || "UNKNOWN",
-        });
-      } finally {
-        setLoading(false);
-      }
-    },
-    [periodicitieId, apiUrls.periodes]
-  );
-
-  useEffect(() => {
-    if (periodicitieId) {
-      fetchPeriodes(false);
-    }
-  }, [periodicitieId, refreshTrigger, fetchPeriodes]);
-
-  return {
-    periodes: data,
-    loading,
-    error,
-    refetch: () => fetchPeriodes(true),
-  };
-};
-
-// ===========================
 // HOOK POUR RÉCUPÉRER LES ÉLÈVES D'UNE CLASSE
 // ===========================
 /**
@@ -172,15 +16,13 @@ export const usePeriodesData = (
  * @returns {object}
  */
 export const useElevesClasse = () => {
-  const [classeId, setClasseId] = useState(null);
-  const [anneeId, setAnneeId] = useState(DEFAULT_ANNEE_ID);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const apiUrls = useAllApiUrls();
 
   const fetchEleves = useCallback(
-    async (newClasseId, newAnneeId = DEFAULT_ANNEE_ID) => {
+    async (newClasseId) => {
       if (!newClasseId) {
         setData([]);
         return;
@@ -191,42 +33,42 @@ export const useElevesClasse = () => {
         setClasseId(newClasseId);
         setAnneeId(newAnneeId);
         const response = await axios.get(
-          apiUrls.eleves.retrieveByClasseAnnee(newClasseId, newAnneeId)
+          apiUrls.eleves.retrieveByClasseAnnee(newClasseId)
         );
         const processed =
           response.data && Array.isArray(response.data)
             ? response.data.map((eleveData, index) => {
-                const eleve =
-                  eleveData.inscription?.eleve || eleveData.eleve || eleveData;
-                const classe = eleveData.classe || {};
-                return {
-                  id: eleve.id || `temp-${index}`,
-                  matricule: eleve.matricule || "N/A",
-                  nom: eleve.nom || "Nom inconnu",
-                  prenom: eleve.prenom || "Prénom inconnu",
-                  sexe: eleve.sexe || "N/A",
-                  dateNaissance: eleve.dateNaissance || "",
-                  lieuNaissance: eleve.lieuNaissance || "",
-                  nationalite: eleve.nationalite || "",
-                  urlPhoto:
-                    eleve.urlPhoto || eleveData.inscription?.urlPhoto || "",
-                  tuteur: eleve.tuteur || {},
-                  classeInfo: {
-                    id: classe.id || newClasseId,
-                    libelle: classe.libelle || "",
-                    niveau: classe.branche?.niveau?.libelle || "",
-                    serie: classe.branche?.serie?.libelle || "",
-                    code: classe.code || "",
-                  },
-                  inscriptionInfo: {
-                    id: eleveData.inscription?.id || "",
-                    statut: eleveData.inscription?.statut || "",
-                    redoublant: eleveData.inscription?.redoublant || "NON",
-                    ecoleOrigine: eleveData.inscription?.ecoleOrigine || "",
-                  },
-                  raw_data: eleveData,
-                };
-              })
+              const eleve =
+                eleveData.inscription?.eleve || eleveData.eleve || eleveData;
+              const classe = eleveData.classe || {};
+              return {
+                id: eleve.id || `temp-${index}`,
+                matricule: eleve.matricule || "N/A",
+                nom: eleve.nom || "Nom inconnu",
+                prenom: eleve.prenom || "Prénom inconnu",
+                sexe: eleve.sexe || "N/A",
+                dateNaissance: eleve.dateNaissance || "",
+                lieuNaissance: eleve.lieuNaissance || "",
+                nationalite: eleve.nationalite || "",
+                urlPhoto:
+                  eleve.urlPhoto || eleveData.inscription?.urlPhoto || "",
+                tuteur: eleve.tuteur || {},
+                classeInfo: {
+                  id: classe.id || newClasseId,
+                  libelle: classe.libelle || "",
+                  niveau: classe.branche?.niveau?.libelle || "",
+                  serie: classe.branche?.serie?.libelle || "",
+                  code: classe.code || "",
+                },
+                inscriptionInfo: {
+                  id: eleveData.inscription?.id || "",
+                  statut: eleveData.inscription?.statut || "",
+                  redoublant: eleveData.inscription?.redoublant || "NON",
+                  ecoleOrigine: eleveData.inscription?.ecoleOrigine || "",
+                },
+                raw_data: eleveData,
+              };
+            })
             : [];
         setData(processed);
       } catch (err) {
@@ -337,37 +179,37 @@ export const useBulletinData = () => {
           },
           matieres: bulletinData.details
             ? bulletinData.details.map((detail, index) => {
-                // Gérer les ajustements et toggles s'ils existent
-                if (
-                  detail.adjustMoyenne !== undefined &&
-                  detail.adjustMoyenne !== null &&
-                  detail.adjustMoyenne !== 0
-                ) {
-                  adjustments[index] = parseFloat(detail.adjustMoyenne);
-                }
+              // Gérer les ajustements et toggles s'ils existent
+              if (
+                detail.adjustMoyenne !== undefined &&
+                detail.adjustMoyenne !== null &&
+                detail.adjustMoyenne !== 0
+              ) {
+                adjustments[index] = parseFloat(detail.adjustMoyenne);
+              }
 
-                if (detail.isChecked === true) {
-                  toggles[index] = true;
-                }
+              if (detail.isChecked === true) {
+                toggles[index] = true;
+              }
 
-                return {
-                  id: detail.matiereId || 0,
-                  code: detail.matiereCode || "",
-                  libelle: detail.matiereLibelle || "",
-                  coefficient: parseFloat(detail.coef || 1),
-                  moyenne: parseFloat(detail.moyenne || 0),
-                  rang: detail.rang || "",
-                  appreciation: detail.appreciation || "",
-                  categorie: detail.categorie || "",
-                  categorieMatiere: detail.categorieMatiere || "",
-                  moyCoef: parseFloat(detail.moyCoef || 0),
-                  // Nouvelles propriétés pour les ajustements
-                  adjustMoyenne: detail.adjustMoyenne || null,
-                  isChecked: detail.isChecked || false,
-                  statut: detail.statut || null,
-                  notes: [], // Peut être rempli si vous avez les détails des notes
-                };
-              })
+              return {
+                id: detail.matiereId || 0,
+                code: detail.matiereCode || "",
+                libelle: detail.matiereLibelle || "",
+                coefficient: parseFloat(detail.coef || 1),
+                moyenne: parseFloat(detail.moyenne || 0),
+                rang: detail.rang || "",
+                appreciation: detail.appreciation || "",
+                categorie: detail.categorie || "",
+                categorieMatiere: detail.categorieMatiere || "",
+                moyCoef: parseFloat(detail.moyCoef || 0),
+                // Nouvelles propriétés pour les ajustements
+                adjustMoyenne: detail.adjustMoyenne || null,
+                isChecked: detail.isChecked || false,
+                statut: detail.statut || null,
+                notes: [], // Peut être rempli si vous avez les détails des notes
+              };
+            })
             : [],
           periode: {
             id: periodeId,
@@ -385,10 +227,6 @@ export const useBulletinData = () => {
         setInitialAdjustments(adjustments);
         setInitialToggles(toggles);
         setData(processed);
-
-        console.log("📊 Données bulletin traitées:", processed);
-        console.log("🔧 Ajustements initiaux:", adjustments);
-        console.log("🎯 Toggles initiaux:", toggles);
       } catch (err) {
         console.error("❌ Erreur lors du chargement du bulletin:", err);
         setError({

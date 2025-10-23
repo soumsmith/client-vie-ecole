@@ -10,11 +10,6 @@ import { getFromCache, setToCache } from '../../utils/cacheUtils';
 import { useAllApiUrls } from '../../utils/apiConfig';
 
 // ===========================
-// CONFIGURATION GLOBALE
-// ===========================
-const DEFAULT_ANNEE_ID = 226;
-
-// ===========================
 // FONCTIONS UTILITAIRES
 // ===========================
 function formatDate(dateStr) {
@@ -379,7 +374,7 @@ export const useEvaluationLock = (evaluationId) => {
 // ===========================
 // HOOK POUR RÉCUPÉRER LES DÉTAILS DU PROFESSEUR
 // ===========================
-export const useProfesseurDetails = (matiereId, classeId, anneeId = DEFAULT_ANNEE_ID) => {
+export const useProfesseurDetails = (matiereId, classeId, anneeId) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);

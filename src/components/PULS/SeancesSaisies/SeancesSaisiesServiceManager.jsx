@@ -209,13 +209,6 @@ export const useSurveillantsData = () => {
  * Vérifier la disponibilité d'un créneau pour les séances
  * Utilise l'API spécifique aux séances avec le paramètre date
  *
- * @example
- * // Utilisation avec apiUrls (recommandé dans les composants React)
- * const apiUrls = useAllApiUrls();
- * const result = await checkCreneauDisponibiliteSeance(226, 1, 'LUNDI', '08:00', '10:00', '2024-01-15', apiUrls);
- *
- * // Utilisation sans apiUrls (fallback)
- * const result = await checkCreneauDisponibiliteSeance(226, 1, 'LUNDI', '08:00', '10:00', '2024-01-15');
  */
 export const checkCreneauDisponibiliteSeance = async (academicYearId, classe, jour, heureDeb, heureFin, dateSeance = null, apiUrls = null) => {
     console.log('=== VÉRIFICATION CRÉNEAU SÉANCE ===');

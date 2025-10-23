@@ -33,11 +33,12 @@ import {
 } from './EvaluationsPeriodesService';
 import getFullUrl from "../../hooks/urlUtils";
 import axios from 'axios';
+import IconBox from "../Composant/IconBox";
 
 // ===========================
 // EN-TÊTE AVEC STATISTIQUES
 // ===========================
-const EvaluationsStatsHeader = ({ evaluations, anneeEnCours, loading }) => {
+const EvaluationsStatsHeader = ({ evaluations, loading }) => {
     if (loading) {
         return null;
     }
@@ -65,22 +66,13 @@ const EvaluationsStatsHeader = ({ evaluations, anneeEnCours, loading }) => {
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    borderRadius: '10px',
-                    padding: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <FiCheckCircle size={18} color="white" />
-                </div>
+                <IconBox icon={FiCheckCircle} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Définition des Évaluations par Période
                     </h5>
                     <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
-                        {anneeEnCours ? `Année ${anneeEnCours.libelle}` : 'Aucune année ouverte'} • {totalEvaluations} évaluation(s) configurée(s)
+                        {totalEvaluations} évaluation(s) configurée(s)
                     </p>
                 </div>
             </div>
@@ -163,13 +155,9 @@ const EvaluationsStatsHeader = ({ evaluations, anneeEnCours, loading }) => {
 // COMPOSANT PRINCIPAL
 // ===========================
 const EvaluationsPeriodes = () => {
-    const navigate = useNavigate();
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [showModal, setShowModal] = useState(false);
     const [selectedEvaluation, setSelectedEvaluation] = useState(null);
-
-    const ECOLE_ID = 139; // ID de l'école
-    const ANNEE_ID = 385; // ID de l'année en cours
 
     // ===========================
     // HOOKS
@@ -182,11 +170,10 @@ const EvaluationsPeriodes = () => {
 
     const {
         evaluations,
-        anneeEnCours,
         loading,
         error,
         refetch
-    } = useEvaluationsPeriodesData(ANNEE_ID, ECOLE_ID, refreshTrigger);
+    } = useEvaluationsPeriodesData(refreshTrigger);
 
     // ===========================
     // GESTION DU MODAL
@@ -372,7 +359,6 @@ const EvaluationsPeriodes = () => {
                     <div className="col-lg-12">
                         <EvaluationsStatsHeader
                             evaluations={evaluations}
-                            anneeEnCours={anneeEnCours}
                             loading={loading}
                         />
                     </div>
@@ -391,7 +377,7 @@ const EvaluationsPeriodes = () => {
                         }}>
                             <DataTable
                                 title="Évaluations par Période"
-                                subtitle={`${evaluations?.length || 0} évaluation(s) configurée(s)`}
+                                subtitle={`évaluation(s) configurée(s)`}
 
                                 data={evaluations}
                                 loading={loading}
@@ -486,8 +472,6 @@ const EvaluationsPeriodes = () => {
             <EvaluationPeriodeModal
                 show={showModal}
                 evaluation={selectedEvaluation}
-                anneeId={ANNEE_ID}
-                ecoleId={ECOLE_ID}
                 onClose={closeModal}
                 onSave={handleModalSave}
             />
