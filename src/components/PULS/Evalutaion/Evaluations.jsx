@@ -176,7 +176,7 @@ const EvaluationModal = ({
                     periodeId: null,
                     classeId: currentClasseId,
                     matiereId: null,
-                    noteSur: '20',
+                    noteSur: 20,
                     date: now,
                     duree: defaultDuree
                 });
@@ -252,12 +252,6 @@ const EvaluationModal = ({
         { label: 'Composition', value: 1 },
         { label: 'Devoir', value: 2 },
         { label: 'Interrogation', value: 3 }
-    ];
-
-    const notesSurData = [
-        { label: '/10', value: '10' },
-        { label: '/20', value: '20' },
-        { label: '/100', value: '100' }
     ];
 
     return (
@@ -398,13 +392,14 @@ const EvaluationModal = ({
                             }}>
                                 Noté sur *
                             </label>
-                            <SelectPicker
-                                data={notesSurData}
+                            <InputNumber
                                 value={formData.noteSur}
                                 onChange={(value) => setFormData(prev => ({ ...prev, noteSur: value }))}
-                                placeholder="Sélectionner la note sur"
+                                placeholder="Entrer la note maximale"
                                 style={{ width: '100%' }}
-                                cleanable={false}
+                                min={1}
+                                max={1000}
+                                step={1}
                             />
                             {errors.noteSur && (
                                 <span style={{ color: '#ef4444', fontSize: '12px' }}>{errors.noteSur}</span>

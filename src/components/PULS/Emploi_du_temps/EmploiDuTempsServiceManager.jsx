@@ -355,6 +355,7 @@ export const useActivitesByClasseJour = (classeId, jourId, refreshTrigger = 0) =
     const [activites, setActivites] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+     const apiUrls = useAllApiUrls();
     const { ecoleId: dynamicEcoleId } = usePulsParams();
 
     const fetchActivites = async (skipCache = false) => {
@@ -377,9 +378,7 @@ export const useActivitesByClasseJour = (classeId, jourId, refreshTrigger = 0) =
                 }
             }
 
-            const response = await axios.get(
-                `${getFullUrl()}activite/list-by-classe-jour?annee=${dynamicEcoleId}&classe=${classeId}&jour=${jourId}`
-            );
+            const response = await axios.get(apiUrls.emploiDuTemps.getActivitesByClasseJour(classeId, jourId));
 
             const processedActivites = response.data && Array.isArray(response.data)
                 ? response.data.map(activite => ({
