@@ -1,6 +1,14 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import {
+    FiUsers,
+    FiUser,
+    FiUserCheck,
+    FiCheckCircle,
+    FiClock,
+    FiTrendingUp
+} from 'react-icons/fi';
 
 // Import des fonctions externalisées
 import PersonnelModal from './PersonnelModal';
@@ -26,8 +34,6 @@ const ListePersonnel = ({ typeDeListe, tableTitle }) => {
 
     // ===========================
     // CONFIGURATION DU TABLEAU
-    // ⚠️ CORRECTION : Suppression du code inutile qui tentait de générer dynamiquement les filterConfigs
-    // La configuration retournée par getPersonnelTableConfig contient déjà tout ce qu'il faut
     // ===========================
     const tableConfig = useMemo(() => {
         return getPersonnelTableConfig(typeDeListe);
@@ -59,19 +65,16 @@ const ListePersonnel = ({ typeDeListe, tableTitle }) => {
     const handleTableActionLocal = useCallback((actionType, item) => {
         console.log('Action locale:', actionType, 'Item:', item);
 
-        // Gestion spécifique pour l'action "créer"
         if (actionType === 'create') {
             navigate('/personnel/create');
             return;
         }
 
-        // Gestion spécifique pour l'action "télécharger"
         if (actionType === 'download' && item) {
             handleDownloadDocuments(item);
             return;
         }
 
-        // Pour les autres actions (view, edit, delete), utiliser le modal
         handleTableAction(actionType, item);
     }, [navigate, handleTableAction]);
 
@@ -96,7 +99,6 @@ const ListePersonnel = ({ typeDeListe, tableTitle }) => {
             return;
         }
 
-        // Ouvrir chaque document dans un nouvel onglet
         documents.forEach(doc => {
             if (doc.url && doc.url.trim() !== '') {
                 const fullUrl = doc.url.startsWith('http') ? doc.url : `${getFullUrl()}uploads/${doc.url}`;
@@ -115,21 +117,16 @@ const ListePersonnel = ({ typeDeListe, tableTitle }) => {
             switch (modalState.type) {
                 case 'delete':
                     console.log('Supprimer le personnel:', modalState.selectedQuestion);
-                    // Ici tu peux ajouter la logique de suppression
-                    // await deletePersonnel(modalState.selectedQuestion.id);
                     alert('Personnel supprimé avec succès !');
                     setRefreshTrigger(prev => prev + 1);
                     break;
 
                 case 'view':
                     console.log('Voir le personnel:', modalState.selectedQuestion);
-                    // Pas d'action spécifique pour la vue
                     break;
 
                 case 'edit':
                     console.log('Profils affectés au personnel:', modalState.selectedQuestion);
-                    // L'affectation des profils est gérée dans le PersonnelModal
-                    // Cette fonction sera appelée depuis le modal lors de la réussite
                     setRefreshTrigger(prev => prev + 1);
                     break;
 
@@ -182,11 +179,86 @@ const ListePersonnel = ({ typeDeListe, tableTitle }) => {
 
     const stats = getStatsPersonnel();
 
-    // Debug - Vérifier les données
-    console.log('Personnel data:', personnel);
-    console.log('Modal state:', modalState);
-    console.log('Table config:', tableConfig);
-    console.log('Filter configs:', tableConfig.filterConfigs);
+    // ===========================
+    // COMPOSANT CARTE STATISTIQUE
+    // ===========================
+    // ===========================
+    // COMPOSANT CARTE STATISTIQUE (VERSION COMPACTE)
+    // ===========================
+    const StatCard = ({ icon: Icon, value, label, gradient }) => (
+        <div className="col-md-2 mb-3 col-xs-6 col-sm-6">
+            <div
+                className="stat-card"
+                style={{
+                    background: gradient,
+                    borderRadius: '10px',
+                    padding: '16px 14px',
+                    color: 'white',
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    border: '1px solid rgba(255,255,255,0.1)'
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.12)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.08)';
+                }}
+            >
+                {/* Effet de fond décoratif */}
+                <div style={{
+                    position: 'absolute',
+                    top: '-15px',
+                    right: '-15px',
+                    opacity: '0.1',
+                }}>
+                    <Icon size={60} />
+                </div>
+
+                {/* Content */}
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '8px'
+                    }}>
+                        <div style={{
+                            backgroundColor: 'rgba(255,255,255,0.2)',
+                            borderRadius: '8px',
+                            padding: '6px',
+                            display: 'inline-flex',
+                        }}>
+                            <Icon size={18} />
+                        </div>
+                    </div>
+                    <h3 style={{
+                        margin: '0',
+                        fontSize: '24px',
+                        fontWeight: '700',
+                        letterSpacing: '-0.5px',
+                        lineHeight: '1'
+                    }}>
+                        {value}
+                    </h3>
+                    <p style={{
+                        margin: '6px 0 0 0',
+                        fontSize: '11px',
+                        opacity: '0.9',
+                        fontWeight: '500',
+                        letterSpacing: '0.2px'
+                    }}>
+                        {label}
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
 
     // ===========================
     // RENDU DU COMPOSANT
@@ -198,59 +270,43 @@ const ListePersonnel = ({ typeDeListe, tableTitle }) => {
                 STATISTIQUES RAPIDES
                 =========================== */}
             {stats && (
-                <div className="row mb-4">
-                    <div className="col-lg-12">
-                        <div className="row">
-                            <div className="col-md-2">
-                                <div className="card text-center" style={{ backgroundColor: '#3498db', color: 'white' }}>
-                                    <div className="card-body py-2">
-                                        <h5 className="mb-0">{stats.total}</h5>
-                                        <small>Total Personnel</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-md-2">
-                                <div className="card text-center" style={{ backgroundColor: '#2980b9', color: 'white' }}>
-                                    <div className="card-body py-2">
-                                        <h5 className="mb-0">{stats.hommes}</h5>
-                                        <small>Hommes</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-md-2">
-                                <div className="card text-center" style={{ backgroundColor: '#e91e63', color: 'white' }}>
-                                    <div className="card-body py-2">
-                                        <h5 className="mb-0">{stats.femmes}</h5>
-                                        <small>Femmes</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-md-2">
-                                <div className="card text-center" style={{ backgroundColor: '#27ae60', color: 'white' }}>
-                                    <div className="card-body py-2">
-                                        <h5 className="mb-0">{stats.valides}</h5>
-                                        <small>Validés</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-md-2">
-                                <div className="card text-center" style={{ backgroundColor: '#f39c12', color: 'white' }}>
-                                    <div className="card-body py-2">
-                                        <h5 className="mb-0">{stats.enAttente}</h5>
-                                        <small>En Attente</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-md-2">
-                                <div className="card text-center" style={{ backgroundColor: '#9b59b6', color: 'white' }}>
-                                    <div className="card-body py-2">
-                                        <h5 className="mb-0">{stats.experienceMoyenne}</h5>
-                                        <small>Exp. Moyenne (ans)</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div className="row mb-4" style={{ marginTop: '20px' }}>
+                    <StatCard
+                        icon={FiUsers}
+                        value={stats.total}
+                        label="Total Personnel"
+                        gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                    />
+                    <StatCard
+                        icon={FiUser}
+                        value={stats.hommes}
+                        label="Hommes"
+                        gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+                    />
+                    <StatCard
+                        icon={FiUserCheck}
+                        value={stats.femmes}
+                        label="Femmes"
+                        gradient="linear-gradient(135deg, #fa709a 0%, #fee140 100%)"
+                    />
+                    <StatCard
+                        icon={FiCheckCircle}
+                        value={stats.valides}
+                        label="Validés"
+                        gradient="linear-gradient(135deg, #30cfd0 0%, #330867 100%)"
+                    />
+                    <StatCard
+                        icon={FiClock}
+                        value={stats.enAttente}
+                        label="En Attente"
+                        gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+                    />
+                    <StatCard
+                        icon={FiTrendingUp}
+                        value={stats.experienceMoyenne}
+                        label="Exp. Moyenne (ans)"
+                        gradient="linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)"
+                    />
                 </div>
             )}
 
@@ -284,7 +340,6 @@ const ListePersonnel = ({ typeDeListe, tableTitle }) => {
                             container: { backgroundColor: "#f8f9fa" },
                             panel: { minHeight: "650px" },
                         }}
-                        // Informations de performance
                         performanceInfo={performance && (
                             <div style={{ fontSize: '11px', color: '#666', marginTop: '5px' }}>
                                 Chargé en {performance.duration}ms depuis {performance.source === 'cache' ? 'cache' : 'API'}

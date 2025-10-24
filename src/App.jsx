@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import 'rsuite/dist/rsuite.min.css';
 import Layout from './components/Layout';
 import LandingPage from './pages/LandingPage';
 import { ThemeProvider } from './contrexts/ThemeContext';
 import { UserProvider } from './contrexts/UserContext';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import './App.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -37,9 +37,9 @@ function App() {
 }
 
 function AppContent() {
-  const { 
-    ecoleId: dynamicEcoleId, 
-    personnelInfo, 
+  const {
+    ecoleId: dynamicEcoleId,
+    personnelInfo,
     academicYearId: dynamicAcademicYearId,
     profileId,
     userId,
@@ -86,20 +86,32 @@ function AppContent() {
           <Route path="/inscription/etablissement" element={<Paroti typeInscription={'etablissement'} />} />
           <Route path="/inscription/profesionel" element={<Paroti typeInscription={'professionel'} />} />
 
-          {/* <Route path="/" element={<LandingWrapper />} />*/}
+          {/* Routes protégées - accessible uniquement si authentifié */}
           <Route path="/*" element={
-            <LayoutWrapper 
-              profileId={profileId} 
-              userId={userId} 
-              email={email}
-              personnelInfo={personnelInfo}
-              isAuthenticated={isAuthenticated}
-            />
-          } /> 
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <LayoutWrapper
+                profileId={profileId}
+                userId={userId}
+                email={email}
+                personnelInfo={personnelInfo}
+                isAuthenticated={isAuthenticated}
+              />
+            </ProtectedRoute>
+          } />
         </Routes>
       </Router>
     </div>
   );
+}
+
+// Composant pour protéger les routes
+function ProtectedRoute({ isAuthenticated, children }) {
+  if (!isAuthenticated) {
+    // Rediriger vers la page d'accueil si non authentifié
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
 }
 
 function LandingWrapper() {
@@ -129,10 +141,10 @@ function LayoutWrapper({ profileId, userId }) {
   };
 
   return (
-    <Layout 
-      onLogout={handleLogout} 
-      profileId={profileId} 
-      userId={userId} 
+    <Layout
+      onLogout={handleLogout}
+      profileId={profileId}
+      userId={userId}
     />
   );
 }

@@ -36,21 +36,6 @@ export const usePersonnelData = (typeDeListe, refreshTrigger = 0) => {
       setLoading(true);
       setError(null);
       const startTime = Date.now();
-      const cacheKey = `personnel-data-${appParams.ecoleId}`;
-
-      if (!skipCache) {
-        const cachedData = getFromCache(cacheKey);
-        if (cachedData) {
-          setData(cachedData);
-          setLoading(false);
-          setPerformance({
-            duration: Date.now() - startTime,
-            source: "cache",
-            itemCount: cachedData.length,
-          });
-          return;
-        }
-      }
 
       const url = personnelUrls.getSouscriptionsByEcole();
       const response = await axios.get(url);
@@ -87,15 +72,12 @@ export const usePersonnelData = (typeDeListe, refreshTrigger = 0) => {
         statut: personnel.sous_attent_personn?.sous_attent_personn_statut || "INCONNU",
         dateCreation: personnel.sous_attent_personn?.sous_attent_personn_date_creation || "",
         dateTraitement: personnel.sous_attent_personn?.sous_attent_personn_date_traitement || "",
-        cvLien: personnel.sous_attent_personn?.sous_attent_personn_lien_cv || "",
-        pieceIdentiteLien: personnel.sous_attent_personn?.sous_attent_personn_lien_piece || "",
-        autorisationLien: personnel.sous_attent_personn?.sous_attent_personn_lien_autorisation || "",
+        cvLien: personnel.sous_attent_personn?.sous_attent_personn_lien_cv || "", //--->
+        pieceIdentiteLien: personnel.sous_attent_personn?.sous_attent_personn_lien_piece || "", //--->
+        autorisationLien: personnel.sous_attent_personn?.sous_attent_personn_lien_autorisation || "",//--->
         raw_data: personnel,
       }));
 
-      console.log("Données traitées:", processedPersonnel);
-
-      setToCache(cacheKey, processedPersonnel);
       setData(processedPersonnel);
       setPerformance({
         duration: Date.now() - startTime,
@@ -362,7 +344,7 @@ export const getPersonnelTableConfig = (typeDeListe) => {
         fixed: "right",
       },
     ],
-    
+
     searchableFields: [
       "nomComplet",
       "nom",
@@ -429,21 +411,21 @@ export const getPersonnelTableConfig = (typeDeListe) => {
     actions: [
       ...(isListePersonnel
         ? [
-            {
-              type: "view",
-              icon: <FiEye size={17} />,
-              tooltip: "Voir le détail du personnel",
-              color: "#3498db",
-            },
-          ]
+          {
+            type: "view",
+            icon: <FiEye size={17} />,
+            tooltip: "Voir le détail du personnel",
+            color: "#3498db",
+          },
+        ]
         : [
-            {
-              type: "edit",
-              icon: <FiUserCheck size={17} />,
-              tooltip: "Affecter des profils",
-              color: "#f39c12",
-            },
-          ]),
+          {
+            type: "edit",
+            icon: <FiUserCheck size={17} />,
+            tooltip: "Affecter des profils",
+            color: "#f39c12",
+          },
+        ]),
     ],
   };
 };

@@ -388,6 +388,9 @@ const usePersonnelUrls = () => {
         imprimerCertificatTravail: (ecoleId, personnelId, nomSignataire, fonctionSignataire) =>
             `${baseUrl}imprimer-perspnnel/certificat-de-travail/${params.ecoleId}/${personnelId}/${nomSignataire}/${fonctionSignataire}`,
 
+        ouvrirFichierByApi: (filename) =>
+            `${baseUrl}souscription-personnel/ouvrir-fichier/${filename}`,
+
     }), [params, baseUrl]);
 };
 
@@ -1397,8 +1400,8 @@ const useEmploiDuTempsUrls = () => {
         /**
          * Activités par classe et jour
          */
-        getActivitesByClasseJour: (annee, classe, jour) =>
-            `${baseUrl}activite/list-by-classe-jour?annee=${annee}&classe=${classe}&jour=${jour}`,
+        getActivitesByClasseJour: (classe, jour) =>
+            `${baseUrl}activite/list-by-classe-jour?annee=${params.academicYearId}&classe=${classe}&jour=${jour}`,
 
         /**
          * Sauvegarder une activité
