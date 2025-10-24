@@ -12,21 +12,10 @@ import { useAllApiUrls } from '../utils/apiConfig';
 import axios from 'axios';
 
 // ===========================
-// CONFIGURATION GLOBALE
-// ===========================
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-const DEFAULT_ECOLE_ID = 38; // ID par défaut de l'école
-
-// ===========================
 // HOOK POUR RÉCUPÉRER LA LISTE DES MATIÈRES D'ÉCOLE
 // ===========================
-/**
- * Récupère la liste complète des matières d'école
- * @param {number} refreshTrigger
- * @param {number} ecoleId - ID de l'école (optionnel, utilise 38 par défaut)
- * @returns {object}
- */
-export const useListeMatieresData = (refreshTrigger = 0, ecoleId = DEFAULT_ECOLE_ID) => {
+
+export const useListeMatieresData = (refreshTrigger = 0) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -36,18 +25,7 @@ export const useListeMatieresData = (refreshTrigger = 0, ecoleId = DEFAULT_ECOLE
         try {
             setLoading(true);
             setError(null);
-            const cacheKey = `liste-matieres-ecole-${ecoleId}`;
-            
-            // Vérifier le cache
-            if (!skipCache) {
-                const cachedData = getFromCache(cacheKey);
-                if (cachedData) {
-                    setData(cachedData);
-                    setLoading(false);
-                    return;
-                }
-            }
-
+      
             // Appel direct à l'API des matières d'école
             const response = await axios.get(apiUrls.matieres.listByEcole());
             
@@ -112,7 +90,6 @@ export const useListeMatieresData = (refreshTrigger = 0, ecoleId = DEFAULT_ECOLE
                 processedMatieres.sort((a, b) => a.ordre - b.ordre);
             }
 
-            setToCache(cacheKey, processedMatieres, CACHE_DURATION);
             setData(processedMatieres);
         } catch (err) {
             console.error('Erreur lors de la récupération des matières d\'école:', err);
@@ -126,7 +103,7 @@ export const useListeMatieresData = (refreshTrigger = 0, ecoleId = DEFAULT_ECOLE
         } finally {
             setLoading(false);
         }
-    }, [ecoleId, apiUrls.matieres]);
+    }, [apiUrls.matieres]);
 
     useEffect(() => {
         fetchMatieres(false);

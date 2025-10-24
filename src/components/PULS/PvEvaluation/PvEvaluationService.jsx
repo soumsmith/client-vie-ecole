@@ -12,10 +12,6 @@ import axios from 'axios';
 import { useAppParams } from '../utils/apiConfig';
 import getFullUrl from "../../hooks/urlUtils";
 
-// ===========================
-// CONFIGURATION GLOBALE
-// ===========================
-const DEFAULT_ANNEE_ID = 226;
 
 // ===========================
 // FONCTIONS UTILITAIRES
@@ -165,7 +161,7 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
     const apiUrls = useAllApiUrls();
     const params = useAppParams();
 
-    const searchEvaluations = useCallback(async (classeId, matiereId, periodeId, anneeId = DEFAULT_ANNEE_ID) => {
+    const searchEvaluations = useCallback(async (classeId, matiereId, periodeId) => {
         if (!classeId) {
             setError({
                 message: 'Veuillez sélectionner une classe',
@@ -197,17 +193,6 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
             setLoading(true);
             setError(null);
             setSearchPerformed(false);
-
-            const cacheKey = `pv-evaluations-${classeId}-${matiereId}-${periodeId}-${anneeId}`;
-            
-            // Vérifier le cache
-            const cachedData = getFromCache(cacheKey);
-            if (cachedData) {
-                setData(cachedData);
-                setSearchPerformed(true);
-                setLoading(false);
-                return;
-            }
 
             // Appel API
             const response = await axios.get(
@@ -271,7 +256,7 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
                         niveau: evaluation.classe?.branche?.niveau?.libelle || '',
                         
                         annee: evaluation.annee?.libelle || 'Année inconnue',
-                        annee_id: evaluation.annee?.id || anneeId,
+                        annee_id: evaluation.annee?.id,
                         annee_debut: evaluation.annee?.anneeDebut || 2024,
                         annee_statut: evaluation.annee?.statut || 'DIFFUSE',
                         
@@ -297,7 +282,6 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
                 });
             }
 
-            setToCache(cacheKey, processedEvaluations);
             setData(processedEvaluations);
             setSearchPerformed(true);
         } catch (err) {

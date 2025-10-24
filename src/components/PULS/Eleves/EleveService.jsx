@@ -6,15 +6,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Badge } from 'rsuite';
 import { FiTrash2 } from 'react-icons/fi';
-import { getFromCache, setToCache } from '../utils/cacheUtils';
 import { useAllApiUrls } from '../utils/apiConfig';
 import axios from 'axios';
-
-// ===========================
-// CONFIGURATION GLOBALE
-// ===========================
-const DEFAULT_ECOLE_ID = 139;
-const DEFAULT_ANNEE_ID = 226;
 
 // ===========================
 // FONCTION UTILITAIRE POUR FORMATAGE DES DATES
@@ -54,7 +47,7 @@ export const useElevesData = (refreshTrigger = 0) => {
     const [searchPerformed, setSearchPerformed] = useState(false);
     const apiUrls = useAllApiUrls();
 
-    const searchEleves = useCallback(async (classeId, anneeId = DEFAULT_ANNEE_ID) => {
+    const searchEleves = useCallback(async (classeId) => {
         if (!classeId) {
             setError({
                 message: 'Veuillez sélectionner une classe',
@@ -69,19 +62,8 @@ export const useElevesData = (refreshTrigger = 0) => {
             setError(null);
             setSearchPerformed(false);
 
-            const cacheKey = `eleves-classe-${classeId}-${anneeId}`;
-            
-            // Vérifier le cache
-            const cachedData = getFromCache(cacheKey);
-            if (cachedData) {
-                setData(cachedData);
-                setSearchPerformed(true);
-                setLoading(false);
-                return;
-            }
-
             // Appel direct à l'API avec la vraie URL
-            const response = await axios.get(apiUrls.eleves.retrieveByClasseAnnee(classeId, anneeId));
+            const response = await axios.get(apiUrls.eleves.retrieveByClasseAnnee(classeId));
             
             // Traitement des élèves selon la vraie structure de données
             let processedEleves = [];
@@ -159,7 +141,7 @@ export const useElevesData = (refreshTrigger = 0) => {
                         
                         // École
                         ecole: classe.ecole?.libelle || inscription.ecole?.libelle || '',
-                        ecole_id: classe.ecole?.id || inscription.ecole?.id || DEFAULT_ECOLE_ID,
+                        ecole_id: classe.ecole?.id || inscription.ecole?.id,
                         ecole_code: classe.ecole?.code || inscription.ecole?.code || '',
                         ecole_tel: classe.ecole?.tel || inscription.ecole?.tel || '',
                         ecole_signataire: classe.ecole?.nomSignataire || inscription.ecole?.nomSignataire || '',
@@ -183,7 +165,6 @@ export const useElevesData = (refreshTrigger = 0) => {
                 });
             }
 
-            setToCache(cacheKey, processedEleves);
             setData(processedEleves);
             setSearchPerformed(true);
         } catch (err) {
@@ -233,21 +214,21 @@ export const elevesTableConfig = {
             dataKey: 'numeroOrdre',
             flexGrow: 0.5,
             minWidth: 70,
-            cellType: 'custom',
-            customRenderer: (rowData) => (
-                <div style={{
-                    padding: '6px 8px',
-                    backgroundColor: '#667eea',
-                    color: 'white',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                    minWidth: '45px'
-                }}>
-                    {rowData.numeroOrdre}
-                </div>
-            ),
+            // cellType: 'custom',
+            // customRenderer: (rowData) => (
+            //     <div style={{
+            //         padding: '6px 8px',
+            //         backgroundColor: '#667eea',
+            //         color: 'white',
+            //         borderRadius: '8px',
+            //         fontSize: '12px',
+            //         fontWeight: 'bold',
+            //         textAlign: 'center',
+            //         minWidth: '45px'
+            //     }}>
+            //         {rowData.numeroOrdre}
+            //     </div>
+            // ),
             sortable: true
         },
         {
@@ -513,7 +494,7 @@ export const elevesTableConfig = {
     actions: [
         {
             type: 'remove',
-            icon: <FiTrash2 />,
+            icon: <FiTrash2 size={17} />,
             tooltip: 'Retirer l\'élève de la classe',
             color: '#ef4444',
             confirmMessage: 'Êtes-vous sûr de vouloir retirer cet élève de la classe ?'

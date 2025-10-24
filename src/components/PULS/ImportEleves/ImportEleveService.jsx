@@ -14,8 +14,6 @@ import Papa from 'papaparse';
 // ===========================
 // CONFIGURATION GLOBALE
 // ===========================
-const DEFAULT_ECOLE_ID = 38;
-const DEFAULT_ANNEE_ID = 226;
 const DEFAULT_TYPE_ACTION = 'INSCRIPTION';
 
 // Liste complète des colonnes internes
@@ -470,7 +468,7 @@ export const useImportElevesData = () => {
     /**
      * Importe les élèves sélectionnés
      */
-    const importSelectedEleves = useCallback(async (brancheId, ecoleId = DEFAULT_ECOLE_ID, anneeId = DEFAULT_ANNEE_ID) => {
+    const importSelectedEleves = useCallback(async (brancheId, ecoleId , anneeId ) => {
         try {
             setImporting(true);
             setError(null);

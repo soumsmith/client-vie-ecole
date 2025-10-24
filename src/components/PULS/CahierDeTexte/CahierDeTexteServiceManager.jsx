@@ -24,16 +24,6 @@ export const useClassesListData = (refreshTrigger = 0) => {
         try {
             setLoading(true);
             setError(null);
-            const cacheKey = `cahier-texte-classes-226`;
-
-            if (!skipCache) {
-                const cachedData = getFromCache(cacheKey);
-                if (cachedData) {
-                    setClasses(cachedData);
-                    setLoading(false);
-                    return;
-                }
-            }
 
             const response = await axios.get(apiUrls.classes.listByEcoleSorted());
 
@@ -58,7 +48,6 @@ export const useClassesListData = (refreshTrigger = 0) => {
             // Trier par ordre de niveau
             processedClasses.sort((a, b) => a.ordre - b.ordre);
 
-            setToCache(cacheKey, processedClasses);
             setClasses(processedClasses);
         } catch (err) {
             setError({
@@ -90,6 +79,7 @@ export const useMatieresByClasseData = (classeId, refreshTrigger = 0) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const { ecoleId: dynamicEcoleId } = usePulsParams();
+    const apiUrls = useAllApiUrls();
 
     const fetchMatieres = async (skipCache = false) => {
         if (!classeId) {
@@ -100,21 +90,9 @@ export const useMatieresByClasseData = (classeId, refreshTrigger = 0) => {
         try {
             setLoading(true);
             setError(null);
-            const cacheKey = `cahier-texte-matieres-${classeId}-226`;
-
-            if (!skipCache) {
-                const cachedData = getFromCache(cacheKey);
-                if (cachedData) {
-                    setMatieres(cachedData);
-                    setLoading(false);
-                    return;
-                }
-            }
 
             // Utilisation de l'API fournie
-            const response = await axios.get(
-                `${getFullUrl()}personnel-matiere-classe/get-enseignant-matiere-classe?annee=226&classe=${classeId}`
-            );
+            const response = await axios.get(apiUrls.matieres.getMariereByClasse(classeId));
 
             const processedMatieres = response.data && Array.isArray(response.data)
                 ? response.data.map(item => ({
@@ -132,11 +110,10 @@ export const useMatieresByClasseData = (classeId, refreshTrigger = 0) => {
                 : [];
 
             // Trier par nom de matière
-            processedMatieres.sort((a, b) => 
+            processedMatieres.sort((a, b) =>
                 a.matiereLibelle.localeCompare(b.matiereLibelle)
             );
 
-            setToCache(cacheKey, processedMatieres, 300000); // Cache 5 minutes
             setMatieres(processedMatieres);
         } catch (err) {
             setError({
@@ -169,6 +146,8 @@ export const useCahierDeTexteData = (classeId, matiereId, refreshTrigger = 0) =>
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const { ecoleId: dynamicEcoleId } = usePulsParams();
+    const apiUrls = useAllApiUrls();
+
 
     const fetchCahierData = async (skipCache = false) => {
         if (!classeId || !matiereId) {
@@ -179,21 +158,8 @@ export const useCahierDeTexteData = (classeId, matiereId, refreshTrigger = 0) =>
         try {
             setLoading(true);
             setError(null);
-            const cacheKey = `cahier-texte-detail-${classeId}-${matiereId}-226`;
-
-            if (!skipCache) {
-                const cachedData = getFromCache(cacheKey);
-                if (cachedData) {
-                    setCahierData(cachedData);
-                    setLoading(false);
-                    return;
-                }
-            }
-
-            // API maintenant prête
-            const response = await axios.get(
-                `${getFullUrl()}progression-seance/get-by-classe-matiere-annee?classe=${classeId}&matiere=${matiereId}&annee=226`
-            );
+         
+            const response = await axios.get(apiUrls.matieres.progressionSeance(classeId, matiereId));
 
             const processedData = response.data && Array.isArray(response.data)
                 ? response.data.map(item => ({
@@ -206,7 +172,7 @@ export const useCahierDeTexteData = (classeId, matiereId, refreshTrigger = 0) =>
                     position: item.position,
                     detailProgressions: item.detailProgressions || [],
                     fullDetailProgressions: item.fullDetailProgressions || [],
-                    
+
                     // Propriétés calculées pour l'affichage
                     date: item.seanceDto?.date ? new Date(item.seanceDto.date).toLocaleDateString('fr-FR') : 'Non définie',
                     dateComplete: item.seanceDto?.date,
@@ -214,7 +180,7 @@ export const useCahierDeTexteData = (classeId, matiereId, refreshTrigger = 0) =>
                     classe: item.seanceDto?.classeLibelle || 'Non définie',
                     matiere: item.seanceDto?.matiereLibelle || 'Non définie',
                     professeur: item.seanceDto?.profNomPrenom || 'Non défini',
-                    
+
                     // Leçons abordées formatées
                     lecons: item.fullDetailProgressions?.map(prog => ({
                         titre: prog.titre,
@@ -226,17 +192,16 @@ export const useCahierDeTexteData = (classeId, matiereId, refreshTrigger = 0) =>
                         nbreSeance: prog.nbreSeance,
                         heure: prog.heure
                     })) || [],
-                    
+
                     raw_data: item
                 }))
                 : [];
 
             // Trier par date décroissante (plus récent en premier)
-            processedData.sort((a, b) => 
+            processedData.sort((a, b) =>
                 new Date(b.dateComplete) - new Date(a.dateComplete)
             );
 
-            setToCache(cacheKey, processedData, 300000); // Cache 5 minutes
             setCahierData(processedData);
         } catch (err) {
             setError({
@@ -306,10 +271,10 @@ export const saveCahierSeance = async (seanceData, apiUrls) => {
         // );
 
         // Simulation pour le développement
-        return { 
-            success: true, 
-            id: Date.now(), 
-            message: 'Séance sauvegardée avec succès' 
+        return {
+            success: true,
+            id: Date.now(),
+            message: 'Séance sauvegardée avec succès'
         };
     } catch (error) {
         console.error('Erreur lors de la sauvegarde:', error);
@@ -342,10 +307,10 @@ export const deleteCahierSeance = async (seanceId, apiUrls) => {
  */
 export const clearCahierDeTexteCache = () => {
     // Supprimer tous les caches liés aux cahiers de texte
-    const cacheKeys = Object.keys(localStorage).filter(key => 
+    const cacheKeys = Object.keys(localStorage).filter(key =>
         key.startsWith('cahier-texte-')
     );
-    
+
     cacheKeys.forEach(key => {
         localStorage.removeItem(key);
     });
@@ -355,10 +320,10 @@ export const clearCahierDeTexteCache = () => {
  * Vider le cache d'une classe spécifique pour les cahiers de texte
  */
 export const clearClasseCahierCache = (classeId) => {
-    const cacheKeys = Object.keys(localStorage).filter(key => 
+    const cacheKeys = Object.keys(localStorage).filter(key =>
         key.includes(`cahier-texte-`) && key.includes(`-${classeId}-`)
     );
-    
+
     cacheKeys.forEach(key => {
         localStorage.removeItem(key);
     });
@@ -382,7 +347,7 @@ export const useCahierStatistiques = (classeId, matiereId) => {
         setStats({
             totalSeances: 35,
             seancesEffectuees: 12,
-            progression: Math.round((12/35) * 100),
+            progression: Math.round((12 / 35) * 100),
             derniereMiseAJour: new Date().toISOString().split('T')[0]
         });
     }, [classeId, matiereId]);
@@ -415,7 +380,7 @@ export const cahierSeancesTableConfig = {
             dataKey: 'contenu',
             flexGrow: 2,
             cellRenderer: (value) => (
-                <div style={{ 
+                <div style={{
                     maxWidth: '300px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -430,7 +395,7 @@ export const cahierSeancesTableConfig = {
             dataKey: 'devoirs',
             flexGrow: 1,
             cellRenderer: (value) => (
-                <div style={{ 
+                <div style={{
                     maxWidth: '200px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',

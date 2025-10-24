@@ -54,12 +54,10 @@ const ProfesseurDetailModal = ({ visible, onClose, professeurData, onDataLoad })
             
             const fetchProfesseurDetail = async () => {
                 try {
-                    const ecoleId = 139;
-                    const anneeId = 226;
                     const profId = professeurData.personnel_id;
                     
                     const response = await axios.get(
-                        apiUrls.personnel.getByProf(anneeId, profId, ecoleId)
+                        apiUrls.personnel.getByProf(profId)
                     );
                     
                     if (response.data && Array.isArray(response.data)) {

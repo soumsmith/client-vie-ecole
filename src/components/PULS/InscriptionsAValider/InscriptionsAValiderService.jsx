@@ -14,8 +14,6 @@ import axios from 'axios';
 // ===========================
 // CONFIGURATION GLOBALE
 // ===========================
-const DEFAULT_ECOLE_ID = 38;
-const DEFAULT_ANNEE_ID = 226;
 const DEFAULT_TYPE_INSCRIPTION = 'INSCRIPTION';
 
 // ===========================
@@ -34,7 +32,7 @@ const formatDate = (dateString) => {
         return date.toLocaleDateString('fr-FR', {
             day: '2-digit',
             month: '2-digit',
-            year: 'numeric'
+            year: '2-digit'
         });
     } catch (error) {
         return 'Date invalide';
@@ -71,8 +69,6 @@ const formatPhone = (phone) => {
  * @returns {object}
  */
 export const useInscriptionsAValiderData = (
-    ecoleId = DEFAULT_ECOLE_ID, 
-    anneeId = DEFAULT_ANNEE_ID, 
     typeInscription = DEFAULT_TYPE_INSCRIPTION,
     refreshTrigger = 0
 ) => {
@@ -85,21 +81,9 @@ export const useInscriptionsAValiderData = (
         try {
             setLoading(true);
             setError(null);
-            const cacheKey = `inscriptions-a-valider-${ecoleId}-${anneeId}-${typeInscription}`;
-            
-            // Vérifier le cache
-            if (!skipCache) {
-                const cachedData = getFromCache(cacheKey);
-                if (cachedData) {
-                    setData(cachedData);
-                    setLoading(false);
-                    return;
-                }
-            }
-
             // Appel direct à l'API
-            const response = await axios.get(apiUrls.inscriptions.getAllInscriptions(ecoleId, anneeId, typeInscription));
-            
+            const response = await axios.get(apiUrls.inscriptions.getAllInscriptions(typeInscription));
+
             // Traitement des données d'inscriptions selon la vraie structure
             let processedInscriptions = [];
             if (response.data && Array.isArray(response.data)) {
@@ -111,10 +95,10 @@ export const useInscriptionsAValiderData = (
 
                     // Formatage du statut d'inscription
                     const statutInscription = inscription.inscriptions_status || 'INCONNU';
-                    const statutDisplay = statutInscription === 'VALIDEE' ? 'Validée' : 
-                                         statutInscription === 'EN_ATTENTE' ? 'En attente' : 
-                                         statutInscription === 'REFUSEE' ? 'Refusée' : 
-                                         statutInscription === 'EN_COURS' ? 'En cours' : statutInscription;
+                    const statutDisplay = statutInscription === 'VALIDEE' ? 'Validée' :
+                        statutInscription === 'EN_ATTENTE' ? 'En attente' :
+                            statutInscription === 'REFUSEE' ? 'Refusée' :
+                                statutInscription === 'EN_COURS' ? 'En cours' : statutInscription;
 
                     // Déterminer la priorité de traitement
                     const priorite = inscription.inscriptions_processus === 'EN_COURS' && inscription.inscriptions_status !== 'VALIDEE' ? 'HAUTE' : 'NORMALE';
@@ -129,7 +113,7 @@ export const useInscriptionsAValiderData = (
                         nom: inscription.nomEleve || 'Nom inconnu',
                         prenom: inscription.prenomEleve || 'Prénom inconnu',
                         nomComplet: `${inscription.nomEleve || 'Nom'} ${inscription.prenomEleve || 'Prénom'}`,
-                        
+
                         // Informations personnelles
                         genre: genre,
                         genre_display: genre_display,
@@ -138,15 +122,15 @@ export const useInscriptionsAValiderData = (
                         dateNaissance_display: formatDate(inscription.date_naissanceEleve),
                         lieuNaissance: inscription.lieu_naissance || 'Non renseigné',
                         nationalite: inscription.nationalite || 'Non renseignée',
-                        
+
                         // Photo
                         urlPhoto: inscription.cheminphoto || '',
                         hasPhoto: !!(inscription.cheminphoto),
-                        
+
                         // Informations de classe/branche
                         classe: inscription.brancheLibelle || 'Classe inconnue',
                         branche_id: inscription.brancheid || null,
-                        
+
                         // Informations d'inscription - FOCUS PRINCIPAL
                         inscription_id: inscription.idEleveInscrit || null,
                         inscription_statut: statutInscription,
@@ -154,36 +138,36 @@ export const useInscriptionsAValiderData = (
                         inscription_type: inscription.inscriptions_type || 'INSCRIPTION',
                         inscription_processus: inscription.inscriptions_processus || 'EN_COURS',
                         inscription_statut_eleve: inscription.inscriptions_statut_eleve || 'NON_AFFECTE',
-                        
+
                         // Spécifique à la validation
                         priorite: priorite,
                         priorite_display: priorite === 'HAUTE' ? 'Haute' : 'Normale',
                         jours_attente: joursAttente,
                         jours_attente_display: `${joursAttente} jour(s)`,
-                        
+
                         // Informations académiques
                         redoublant: inscription.inscriptions_redoublant || 'NON',
                         redoublant_display: inscription.inscriptions_redoublant === 'OUI' ? 'Redoublant' : 'Non redoublant',
                         boursier: inscription.inscriptions_boursier || '',
                         boursier_display: inscription.inscriptions_boursier ? 'Boursier' : 'Non boursier',
                         langue_vivante: inscription.inscriptions_langue_vivante || '',
-                        
+
                         // Régime
                         demi_pension: inscription.demi_pension || false,
                         demi_pension_display: inscription.demi_pension ? 'Demi-pensionnaire' : 'Externe',
                         internes: inscription.internes || false,
                         externes: inscription.externes || true,
-                        
+
                         // Origine et statuts
                         ecole_origine: inscription.ecole_origine || 'Non renseignée',
                         ivoirien: inscription.ivoirien || false,
                         etranger_africain: inscription.etranger_africain || false,
                         etranger_non_africain: inscription.etranger_non_africain || false,
-                        
+
                         // Handicap
                         autre_handicap: inscription.autre_handicap || 'NON',
                         handicap_display: inscription.autre_handicap === 'OUI' ? 'Oui' : 'Non',
-                        
+
                         // Prise en charge
                         prise_en_charge: inscription.prise_en_charge || false,
                         prise_en_charge_display: inscription.prise_en_charge ? 'Oui' : 'Non',
@@ -191,7 +175,7 @@ export const useInscriptionsAValiderData = (
                         nom_prenom_pers_en_charge: inscription.nom_prenom_pers_en_charge || '',
                         profession_pers_en_charge: inscription.profession_pers_en_charge || '',
                         tel_pers_en_charge: formatPhone(inscription.tel1_pers_en_charge),
-                        
+
                         // Informations des parents
                         nom_prenoms_pere: inscription.nom_prenoms_pere || 'Non renseigné',
                         profession_pere: inscription.profession_pere || 'Non renseignée',
@@ -199,33 +183,32 @@ export const useInscriptionsAValiderData = (
                         nom_prenoms_mere: inscription.nom_prenoms_mere || 'Non renseigné',
                         profession_mere: inscription.profession_mere || 'Non renseignée',
                         tel_mere: formatPhone(inscription.tel1_mere),
-                        
+
                         // Contact principal (priorité : père, mère, personne en charge)
                         contact_principal: inscription.tel1_pere || inscription.tel1_mere || inscription.tel1_pers_en_charge || 'Non renseigné',
                         contact_principal_format: formatPhone(inscription.tel1_pere || inscription.tel1_mere || inscription.tel1_pers_en_charge),
-                        
+
                         // Numéro d'ordre
                         numeroOrdre: index + 1,
-                        
+
                         // Affichage optimisé pour validation
                         display_name: `${inscription.nomEleve || 'Nom'} ${inscription.prenomEleve || 'Prénom'}`,
                         display_details: `${inscription.matriculeEleve || 'MAT'} • ${genre_short} • ${formatDate(inscription.date_naissanceEleve)}`,
                         display_status: `${statutDisplay} • ${inscription.inscriptions_processus || 'EN_COURS'}`,
                         display_validation: `${statutDisplay} • ${joursAttente}j d'attente`,
                         display_parents: `👨 ${inscription.nom_prenoms_pere || 'N/A'} • 👩 ${inscription.nom_prenoms_mere || 'N/A'}`,
-                        
+
                         // Indicateurs de validation
                         needs_validation: statutInscription !== 'VALIDEE' && statutInscription !== 'REFUSEE',
                         can_validate: inscription.inscriptions_processus === 'EN_COURS',
                         is_complete: !!(inscription.nomEleve && inscription.prenomEleve && inscription.date_naissanceEleve),
-                        
+
                         // Données brutes pour debug
                         raw_data: inscription
                     };
                 });
             }
 
-            setToCache(cacheKey, processedInscriptions);
             setData(processedInscriptions);
         } catch (err) {
             console.error('Erreur lors de la récupération des inscriptions à valider:', err);
@@ -280,7 +263,7 @@ export const inscriptionsAValiderTableConfig = {
             // ),
             sortable: true
         },
-        
+
         {
             title: 'Matricule',
             dataKey: 'matricule',
@@ -288,7 +271,7 @@ export const inscriptionsAValiderTableConfig = {
             minWidth: 100,
             cellType: 'custom',
             customRenderer: (rowData) => (
-                <div style={{ 
+                <div style={{
                     fontFamily: 'monospace',
                     fontSize: '12px',
                     fontWeight: '600',
@@ -312,8 +295,8 @@ export const inscriptionsAValiderTableConfig = {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     {/* Photo du candidat si disponible */}
                     {rowData.hasPhoto && (
-                        <img 
-                            src={rowData.urlPhoto} 
+                        <img
+                            src={rowData.urlPhoto}
                             alt={rowData.nomComplet}
                             style={{
                                 width: '36px',
@@ -344,8 +327,8 @@ export const inscriptionsAValiderTableConfig = {
                         </div>
                     )}
                     <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ 
-                            fontWeight: '600', 
+                        <div style={{
+                            fontWeight: '600',
                             color: '#1e293b',
                             fontSize: '14px',
                             marginBottom: '2px',
@@ -355,15 +338,15 @@ export const inscriptionsAValiderTableConfig = {
                         }}>
                             {rowData.nomComplet}
                         </div>
-                        <div style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
                             gap: '8px',
-                            fontSize: '11px', 
+                            fontSize: '11px',
                             color: '#64748b',
                             flexWrap: 'wrap'
                         }}>
-                            <span style={{ 
+                            <span style={{
                                 padding: '1px 4px',
                                 backgroundColor: rowData.genre_short === 'M' ? '#dbeafe' : '#fce7f3',
                                 color: rowData.genre_short === 'M' ? '#2563eb' : '#ec4899',
@@ -388,8 +371,8 @@ export const inscriptionsAValiderTableConfig = {
             cellType: 'custom',
             customRenderer: (rowData) => (
                 <div>
-                    <div style={{ 
-                        fontWeight: '600', 
+                    <div style={{
+                        fontWeight: '600',
                         color: '#1e293b',
                         fontSize: '13px',
                         marginBottom: '2px'
@@ -397,8 +380,8 @@ export const inscriptionsAValiderTableConfig = {
                         {rowData.classe}
                     </div>
                     {rowData.langue_vivante && (
-                        <div style={{ 
-                            fontSize: '10px', 
+                        <div style={{
+                            fontSize: '10px',
                             color: '#64748b',
                             padding: '1px 4px',
                             backgroundColor: '#f0f9ff',
@@ -422,12 +405,12 @@ export const inscriptionsAValiderTableConfig = {
                 <div>
                     <div style={{
                         padding: '3px 6px',
-                        backgroundColor: rowData.inscription_statut === 'VALIDEE' ? '#dcfce7' : 
-                                        rowData.inscription_statut === 'EN_ATTENTE' ? '#fef3c7' : 
-                                        rowData.inscription_statut === 'EN_COURS' ? '#dbeafe' : '#fee2e2',
-                        color: rowData.inscription_statut === 'VALIDEE' ? '#16a34a' : 
-                               rowData.inscription_statut === 'EN_ATTENTE' ? '#d97706' : 
-                               rowData.inscription_statut === 'EN_COURS' ? '#2563eb' : '#dc2626',
+                        backgroundColor: rowData.inscription_statut === 'VALIDEE' ? '#dcfce7' :
+                            rowData.inscription_statut === 'EN_ATTENTE' ? '#fef3c7' :
+                                rowData.inscription_statut === 'EN_COURS' ? '#dbeafe' : '#fee2e2',
+                        color: rowData.inscription_statut === 'VALIDEE' ? '#16a34a' :
+                            rowData.inscription_statut === 'EN_ATTENTE' ? '#d97706' :
+                                rowData.inscription_statut === 'EN_COURS' ? '#2563eb' : '#dc2626',
                         borderRadius: '4px',
                         fontSize: '11px',
                         fontWeight: '500',
@@ -436,7 +419,7 @@ export const inscriptionsAValiderTableConfig = {
                     }}>
                         {rowData.inscription_statut_display}
                     </div>
-                    
+
                     <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                         <span style={{
                             padding: '1px 4px',
@@ -447,7 +430,7 @@ export const inscriptionsAValiderTableConfig = {
                         }}>
                             {rowData.inscription_processus}
                         </span>
-                        
+
                         <span style={{
                             padding: '1px 4px',
                             backgroundColor: '#fef3c7',
@@ -493,7 +476,7 @@ export const inscriptionsAValiderTableConfig = {
             customRenderer: (rowData) => (
                 <div>
                     {/* Contact principal */}
-                    <div style={{ 
+                    <div style={{
                         fontSize: '12px',
                         color: '#1e293b',
                         marginBottom: '4px',
@@ -504,7 +487,7 @@ export const inscriptionsAValiderTableConfig = {
                         <FiPhone size={11} color="#10b981" />
                         <span style={{ fontWeight: '500' }}>{rowData.contact_principal_format}</span>
                     </div>
-                    
+
                     {/* Informations parents condensées */}
                     <div style={{ fontSize: '10px', color: '#64748b' }} className='d-flex gap-2'>
                         {rowData.tel_pere !== 'Non renseigné' && (
@@ -526,7 +509,7 @@ export const inscriptionsAValiderTableConfig = {
             cellType: 'custom',
             customRenderer: (rowData) => (
                 <div>
-                    <div style={{ 
+                    <div style={{
                         fontSize: '11px',
                         fontWeight: '500',
                         color: '#1e293b',
@@ -534,7 +517,7 @@ export const inscriptionsAValiderTableConfig = {
                     }}>
                         {rowData.ecole_origine}
                     </div>
-                    <div style={{ 
+                    <div style={{
                         fontSize: '10px',
                         color: '#64748b',
                         display: 'flex',
@@ -667,7 +650,7 @@ export const inscriptionsAValiderTableConfig = {
         // },
         {
             type: 'view',
-            icon: <FiEye size={17}  />,
+            icon: <FiEye size={17} />,
             tooltip: 'Voir le dossier complet',
             color: '#3498db'
         },

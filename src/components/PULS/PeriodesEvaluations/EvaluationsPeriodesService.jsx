@@ -6,50 +6,26 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Badge } from 'rsuite';
 import { FiEdit, FiTrash2, FiCheckCircle, FiCalendar } from 'react-icons/fi';
-import { getFromCache, setToCache } from '../utils/cacheUtils';
 import axios from 'axios';
-import getFullUrl from "../../hooks/urlUtils";
-
-// ===========================
-// CONFIGURATION GLOBALE
-// ===========================
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+import { useAllApiUrls } from '../utils/apiConfig';
 
 // ===========================
 // HOOK POUR RÉCUPÉRER LES DONNÉES
 // ===========================
-export const useEvaluationsPeriodesData = (anneeId, ecoleId, refreshTrigger = 0) => {
+export const useEvaluationsPeriodesData = (refreshTrigger = 0) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [anneeEnCours, setAnneeEnCours] = useState(null);
+    const apiUrls = useAllApiUrls();
 
     const fetchEvaluations = useCallback(async (skipCache = false) => {
         try {
             setLoading(true);
             setError(null);
-            const cacheKey = `evaluations-periodes-data-${anneeId}-${ecoleId}`;
-            
-            // Vérifier le cache
-            if (!skipCache) {
-                const cachedData = getFromCache(cacheKey);
-                if (cachedData) {
-                    setData(cachedData.evaluations);
-                    setAnneeEnCours(cachedData.anneeEnCours);
-                    setLoading(false);
-                    return;
-                }
-            }
 
             // Récupérer d'abord les périodes pour connaître les IDs
-            const periodesResponse = await axios.get(
-                `${getFullUrl()}/periodes/list-by-periodicite?id=2`
-            );
-            
-            // Récupérer les niveaux
-            const niveauxResponse = await axios.get(
-                `${getFullUrl()}/branche/get-by-niveau-enseignement?ecole=${ecoleId}`
-            );
+            const periodesResponse = await axios.get(apiUrls.periodes.listByPeriodicite());
+            const niveauxResponse = await axios.get(apiUrls.branches.getByNiveauEnseignement());
 
             // Extraire les IDs uniques de niveaux
             const niveauxUniques = {};
@@ -64,14 +40,12 @@ export const useEvaluationsPeriodesData = (anneeId, ecoleId, refreshTrigger = 0)
 
             // Récupérer toutes les évaluations pour chaque combinaison période/niveau
             const allEvaluations = [];
-            
+
             for (const periode of periodesResponse.data) {
                 for (const niveauId in niveauxUniques) {
                     try {
-                        const response = await axios.get(
-                            `${getFullUrl()}/evaluation-periode/get-by-annee-ecole-periode-niveau/${anneeId}/${ecoleId}/${periode.id}/${niveauId}`
-                        );
-                        
+                        const response = await axios.get(apiUrls.notes.getEvalutionsByPeriodeEtBranche(periode.id, niveauId));
+
                         if (response.data && Array.isArray(response.data)) {
                             allEvaluations.push(...response.data);
                         }
@@ -86,44 +60,44 @@ export const useEvaluationsPeriodesData = (anneeId, ecoleId, refreshTrigger = 0)
             const processedEvaluations = allEvaluations.map((evaluation, index) => {
                 return {
                     id: evaluation.id || `eval-${index}`,
-                    
+
                     // Année
                     annee_id: evaluation.annee?.id || anneeId,
                     annee_libelle: evaluation.annee?.libelle || '',
-                    
+
                     // Période
                     periode_id: evaluation.periode?.id || null,
                     periode_libelle: evaluation.periode?.libelle || 'Non définie',
                     periode_niveau: evaluation.periode?.niveau || 0,
                     periode_coef: evaluation.periode?.coef || '1.0',
-                    
+
                     // Niveau
                     niveau_id: evaluation.niveau?.id || null,
                     niveau_libelle: evaluation.niveau?.libelle || 'Non défini',
                     niveau_code: evaluation.niveau?.code || '',
                     niveau_ordre: evaluation.niveau?.ordre || 0,
-                    
+
                     // Type d'évaluation
                     typeEvaluation_id: evaluation.typeEvaluation?.id || null,
                     typeEvaluation_libelle: evaluation.typeEvaluation?.libelle || 'Non défini',
-                    
+
                     // Numéro de l'évaluation
                     numero: evaluation.numero || 0,
-                    
+
                     // École
                     ecole_id: evaluation.ecole?.id || ecoleId,
                     ecole_libelle: evaluation.ecole?.libelle || '',
-                    
+
                     // Utilisateur
                     user: evaluation.user || '',
-                    
+
                     // Affichage optimisé
                     display_periode: evaluation.periode?.libelle || 'Non définie',
                     display_niveau: evaluation.niveau?.libelle || 'Non défini',
                     display_type: evaluation.typeEvaluation?.libelle || 'Non défini',
                     display_numero: `#${evaluation.numero || 0}`,
                     display_full: `${evaluation.periode?.libelle || 'N/A'} - ${evaluation.niveau?.libelle || 'N/A'} - ${evaluation.typeEvaluation?.libelle || 'N/A'} #${evaluation.numero || 0}`,
-                    
+
                     // Données brutes
                     raw_data: evaluation
                 };
@@ -139,21 +113,7 @@ export const useEvaluationsPeriodesData = (anneeId, ecoleId, refreshTrigger = 0)
                 }
                 return a.numero - b.numero;
             });
-
-            // Déterminer l'année en cours (mock - à adapter selon vos besoins)
-            const currentYear = {
-                id: anneeId,
-                libelle: '2024-2025' // À récupérer depuis l'API si nécessaire
-            };
-
-            const cacheData = {
-                evaluations: processedEvaluations,
-                anneeEnCours: currentYear
-            };
-            
-            setToCache(cacheKey, cacheData, CACHE_DURATION);
             setData(processedEvaluations);
-            setAnneeEnCours(currentYear);
         } catch (err) {
             console.error('Erreur lors de la récupération des évaluations:', err);
             setError({
@@ -165,17 +125,14 @@ export const useEvaluationsPeriodesData = (anneeId, ecoleId, refreshTrigger = 0)
         } finally {
             setLoading(false);
         }
-    }, [anneeId, ecoleId]);
+    }, []);
 
     useEffect(() => {
-        if (anneeId && ecoleId) {
-            fetchEvaluations(false);
-        }
-    }, [anneeId, ecoleId, refreshTrigger, fetchEvaluations]);
+        fetchEvaluations(false);
+    }, [refreshTrigger, fetchEvaluations]);
 
     return {
         evaluations: data,
-        anneeEnCours,
         loading,
         error,
         refetch: () => fetchEvaluations(true)
@@ -209,15 +166,15 @@ export const evaluationsPeriodesTableConfig = {
                         <FiCalendar size={16} color="#0369a1" />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ 
-                            fontWeight: '600', 
+                        <div style={{
+                            fontWeight: '600',
                             color: '#1e293b',
                             fontSize: '13px'
                         }}>
                             {rowData.periode_libelle}
                         </div>
-                        <div style={{ 
-                            fontSize: '11px', 
+                        <div style={{
+                            fontSize: '11px',
                             color: '#64748b'
                         }}>
                             Niveau {rowData.periode_niveau} • Coef. {rowData.periode_coef}
@@ -235,7 +192,7 @@ export const evaluationsPeriodesTableConfig = {
             cellType: 'custom',
             customRenderer: (rowData) => (
                 <div>
-                    <div style={{ 
+                    <div style={{
                         fontSize: '13px',
                         fontWeight: '500',
                         color: '#475569',
@@ -243,7 +200,7 @@ export const evaluationsPeriodesTableConfig = {
                     }}>
                         {rowData.niveau_libelle}
                     </div>
-                    <div style={{ 
+                    <div style={{
                         fontSize: '11px',
                         color: '#94a3b8',
                         display: 'flex',
@@ -326,7 +283,7 @@ export const evaluationsPeriodesTableConfig = {
             fixed: 'right'
         }
     ],
-    
+
     filterConfigs: [
         {
             field: 'periode_libelle',
@@ -357,7 +314,7 @@ export const evaluationsPeriodesTableConfig = {
             tagColor: 'orange'
         }
     ],
-    
+
     searchableFields: [
         'periode_libelle',
         'niveau_libelle',
@@ -365,7 +322,7 @@ export const evaluationsPeriodesTableConfig = {
         'niveau_code',
         'display_full'
     ],
-    
+
     actions: [
         {
             type: 'edit',
@@ -380,7 +337,7 @@ export const evaluationsPeriodesTableConfig = {
             color: '#e74c3c'
         }
     ],
-    
+
     // Configuration supplémentaire
     defaultSortField: 'periode_niveau',
     defaultSortOrder: 'asc',

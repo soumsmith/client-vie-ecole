@@ -379,7 +379,7 @@ const InscriptionsAValider = () => {
         loading,
         error,
         refetch
-    } = useInscriptionsAValiderData(38, 226, 'INSCRIPTION', refreshTrigger);
+    } = useInscriptionsAValiderData('INSCRIPTION', refreshTrigger);
 
     // ===========================
     // GESTION DU TABLEAU ET NAVIGATION

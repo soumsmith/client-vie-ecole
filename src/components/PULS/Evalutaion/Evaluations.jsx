@@ -43,6 +43,10 @@ import {
     usePeriodesData
 } from "../utils/CommonDataService";
 import { useAllApiUrls } from "../utils/apiConfig";
+import { usePulsParams } from "../../hooks/useDynamicParams";
+import IconBox from "../Composant/IconBox";
+import GradientButton from '../../GradientButton';
+
 
 // ===========================
 // 🎨 CONFIGURATION SWEETALERT2 PERSONNALISÉE
@@ -102,6 +106,9 @@ const EvaluationModal = ({
     const { periodes } = usePeriodesData();
     const { classes } = useClassesData();
 
+
+
+
     const {
         matieres,
         loading: matieresLoading,
@@ -157,7 +164,7 @@ const EvaluationModal = ({
             } else {
                 // Mode création
                 console.log('✨ Mode CRÉATION - Initialisation avec classe:', currentClasseId);
-                
+
                 const now = new Date();
                 const defaultDuree = new Date();
                 defaultDuree.setHours(2);
@@ -575,16 +582,7 @@ const EvaluationFilters = ({
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    borderRadius: '10px',
-                    padding: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <FiCalendar size={18} color="white" />
-                </div>
+                <IconBox icon={FiCalendar} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Recherche des Évaluations
@@ -719,22 +717,16 @@ const EvaluationFilters = ({
                             Action
                         </label>
                         <div style={{ display: 'flex', gap: 8, height: '40px' }}>
-                            <Button
-                                appearance="primary"
-                                onClick={handleSearch}
+                            <GradientButton
+                                icon={<FiSearch size={16} />}
+                                text="Rechercher"
+                                loadingText="Chargement..."
                                 loading={loading}
                                 disabled={isDataLoading || loading}
-                                style={{
-                                    flex: 1,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontWeight: '500'
-                                }}
-                                size="lg"
-                            >
-                                {loading ? 'Recherche...' : 'Rechercher'}
-                            </Button>
+                                onClick={handleSearch}
+                                variant="primary"
+                                style={{ flex: 1 }}
+                            />
 
                             <Button
                                 onClick={handleClear}
@@ -801,8 +793,6 @@ const Evaluations = () => {
     const apiUrls = useAllApiUrls();
 
     // ⚠️ TODO: Récupérer ces valeurs depuis le contexte utilisateur
-    const CURRENT_USER_ID = "361"; // À remplacer par la vraie valeur
-    const CURRENT_ANNEE_ID = "385"; // À remplacer par la vraie valeur
 
     const {
         modalState,
@@ -818,6 +808,20 @@ const Evaluations = () => {
         searchEvaluations,
         clearResults
     } = useEvaluationsData();
+
+    const {
+        ecoleId: dynamicEcoleId,
+        personnelInfo,
+        academicYearId: dynamicAcademicYearId,
+        periodicitieId: dynamicPeriodicitieId,
+        profileId,
+        userId: dynamicUserId,
+        email,
+        isAuthenticated,
+        isInitialized,
+        isReady,
+    } = usePulsParams();
+
 
     // ===========================
     // ✅ GESTION CRÉATION D'ÉVALUATION
@@ -869,9 +873,9 @@ const Evaluations = () => {
                     libelle: ""
                 },
                 annee: {
-                    id: CURRENT_ANNEE_ID
+                    id: dynamicAcademicYearId
                 },
-                user: CURRENT_USER_ID
+                user: dynamicUserId
             };
 
             console.log('📤 Payload envoyé:', payload);
@@ -896,11 +900,11 @@ const Evaluations = () => {
         } catch (error) {
             console.error('❌ Erreur lors de la création:', error);
             await showErrorAlert(
-                error.response?.data?.message || 
+                error.response?.data?.message ||
                 'Une erreur est survenue lors de la création de l\'évaluation'
             );
         }
-    }, [selectedClasse, selectedMatiere, selectedPeriode, searchEvaluations, apiUrls.evaluations, CURRENT_USER_ID, CURRENT_ANNEE_ID]);
+    }, [selectedClasse, selectedMatiere, selectedPeriode, searchEvaluations, apiUrls.evaluations, dynamicUserId, dynamicAcademicYearId]);
 
     // ===========================
     // ✅ GESTION MODIFICATION D'ÉVALUATION
@@ -966,7 +970,7 @@ const Evaluations = () => {
         } catch (error) {
             console.error('❌ Erreur lors de la modification:', error);
             await showErrorAlert(
-                error.response?.data?.message || 
+                error.response?.data?.message ||
                 'Une erreur est survenue lors de la modification de l\'évaluation'
             );
         }
@@ -993,7 +997,7 @@ const Evaluations = () => {
 
             // Appel DELETE à l'API
             const response = await axios.delete(
-                `${apiUrls.evaluations.deleteEvaluation(evaluationId, CURRENT_USER_ID)}`
+                `${apiUrls.evaluations.deleteEvaluation(evaluationId, dynamicUserId)}`
             );
 
             console.log('✅ Suppression réussie:', response.data);
@@ -1008,11 +1012,11 @@ const Evaluations = () => {
         } catch (error) {
             console.error('❌ Erreur lors de la suppression:', error);
             await showErrorAlert(
-                error.response?.data?.message || 
+                error.response?.data?.message ||
                 'Une erreur est survenue lors de la suppression de l\'évaluation'
             );
         }
-    }, [selectedClasse, selectedMatiere, selectedPeriode, searchEvaluations, apiUrls.evaluations, CURRENT_USER_ID]);
+    }, [selectedClasse, selectedMatiere, selectedPeriode, searchEvaluations, apiUrls.evaluations, dynamicUserId]);
 
     // ===========================
     // ✅ TOGGLE PEC AVEC CONFIRMATION
@@ -1071,7 +1075,7 @@ const Evaluations = () => {
         } catch (error) {
             console.error('❌ Erreur lors de la mise à jour PEC:', error);
             await showErrorAlert(
-                error.response?.data?.message || 
+                error.response?.data?.message ||
                 'Une erreur est survenue lors de la mise à jour du PEC'
             );
         }
@@ -1343,8 +1347,8 @@ const Evaluations = () => {
                 onSave={modalMode === 'create' ? handleCreateSave : handleModificationSave}
                 mode={modalMode}
                 currentClasseId={selectedClasse}
-                currentUserId={CURRENT_USER_ID}
-                currentAnneeId={CURRENT_ANNEE_ID}
+                currentUserId={dynamicUserId}
+                currentAnneeId={dynamicAcademicYearId}
             />
 
             {modalState.isOpen && (

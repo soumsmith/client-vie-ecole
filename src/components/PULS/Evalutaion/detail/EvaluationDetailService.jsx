@@ -10,27 +10,22 @@ import { getFromCache, setToCache } from '../../utils/cacheUtils';
 import { useAllApiUrls } from '../../utils/apiConfig';
 
 // ===========================
-// CONFIGURATION GLOBALE
-// ===========================
-const DEFAULT_ANNEE_ID = 226;
-
-// ===========================
 // FONCTIONS UTILITAIRES
 // ===========================
 function formatDate(dateStr) {
-  if (!dateStr) return "";
+    if (!dateStr) return "";
 
-  // Supprimer les crochets [UTC] et espaces éventuels
-  const cleanDate = dateStr.replace(/\[.*\]/, "");
+    // Supprimer les crochets [UTC] et espaces éventuels
+    const cleanDate = dateStr.replace(/\[.*\]/, "");
 
-  const date = new Date(cleanDate);
-  if (isNaN(date)) return "Date invalide";
+    const date = new Date(cleanDate);
+    if (isNaN(date)) return "Date invalide";
 
-  return date.toLocaleDateString("fr-FR", {
-    year: "2-digit",//"numeric",
-    month: "2-digit", //"long",
-    day: "numeric",
-  });
+    return date.toLocaleDateString("fr-FR", {
+        year: "2-digit",//"numeric",
+        month: "2-digit", //"long",
+        day: "2-digit",
+    });
 }
 
 
@@ -337,11 +332,10 @@ export const useEvaluationLock = (evaluationId) => {
 
     const checkLock = useCallback(async (id) => {
         if (!id) return;
-        
+
         try {
             setLoading(true);
             setError(null);
-           
 
             const response = await axios.get(apiUrls.evaluations.isLocked(id));
 
@@ -380,7 +374,7 @@ export const useEvaluationLock = (evaluationId) => {
 // ===========================
 // HOOK POUR RÉCUPÉRER LES DÉTAILS DU PROFESSEUR
 // ===========================
-export const useProfesseurDetails = (matiereId, classeId, anneeId = DEFAULT_ANNEE_ID) => {
+export const useProfesseurDetails = (matiereId, classeId, anneeId) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -608,7 +602,7 @@ export const notesTableConfig = {
         onPecChange: null   // Sera défini dans le composant
     },
     // Configuration du tableau
-    defaultSortField: 'eleve.nomComplet',
+    // defaultSortField: eleve.nomComplet,
     defaultSortOrder: 'asc',
     pageSize: 20,
     showPagination: true,

@@ -15,7 +15,7 @@ import { getFromCache, setToCache, clearCache } from '../utils/cacheUtils';
  * @param {number} ecoleId
  * @returns {object}
  */
-export const useAnneeData = (ecoleId = 38) => {
+export const useAnneeData = () => {
     const [annee, setAnnee] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -25,17 +25,7 @@ export const useAnneeData = (ecoleId = 38) => {
         try {
             setLoading(true);
             setError(null);
-            const cacheKey = `annee-data-${ecoleId}`;
-
-            const cachedData = getFromCache(cacheKey);
-            if (cachedData) {
-                setAnnee(cachedData);
-                setLoading(false);
-                return;
-            }
-
             const response = await axios.get(apiUrls.annees.getMainByEcole());
-            setToCache(cacheKey, response.data);
             setAnnee(response.data);
         } catch (err) {
             setError({
@@ -163,7 +153,7 @@ export const useElevesData = (statut = 'EN_ATTENTE', typeInscription = 'INSCRIPT
  * @param {number} ecoleId
  * @returns {object}
  */
-export const useBranchesData = (ecoleId = 38) => {
+export const useBranchesData = () => {
     const [branches, setBranches] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -173,15 +163,6 @@ export const useBranchesData = (ecoleId = 38) => {
         setLoading(true);
         setError(null);
         try {
-            const cacheKey = `branches-data-${ecoleId}`;
-            const cachedData = getFromCache(cacheKey);
-
-            if (cachedData) {
-                setBranches(cachedData);
-                setLoading(false);
-                return;
-            }
-
             const response = await axios.get(apiUrls.branches.getByNiveauEnseignement());
             const formattedBranches = (response.data || []).map(branche => ({
                 label: `${branche.libelle} - ${branche.serie?.libelle || 'N/A'}`,
@@ -189,7 +170,6 @@ export const useBranchesData = (ecoleId = 38) => {
                 raw_data: branche
             }));
 
-            setToCache(cacheKey, formattedBranches);
             setBranches(formattedBranches);
         } catch (err) {
             setError(err);

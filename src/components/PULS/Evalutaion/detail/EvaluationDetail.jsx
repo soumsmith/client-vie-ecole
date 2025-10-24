@@ -110,13 +110,17 @@ const showLoadingToast = (message) => {
 
 // ===========================
 // COMPOSANT POUR LES CELLULES ÉDITABLES - INPUT NUMBER POUR NOTES
+// ✅ CORRECTION: Ajout de modifiedNotes pour surbrillance
 // ===========================
-const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur }) => {
+const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur, modifiedNotes }) => {
     const [value, setValue] = useState(rowData.note || 0);
     const [isLoading, setIsLoading] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
-    const [previousValue, setPreviousValue] = useState(rowData.note || 0); // Pour restaurer si annulation
+    const [previousValue, setPreviousValue] = useState(rowData.note || 0);
     const inputRef = React.useRef(null);
+
+    // ✅ Vérifier si cette note a été modifiée
+    const isModified = modifiedNotes && modifiedNotes.has(rowData.id);
 
     // Mettre à jour l'état local quand les données changent
     React.useEffect(() => {
@@ -138,16 +142,13 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur }) => {
     const handleFocus = (e) => {
         console.log('🎯 Focus sur input pour:', rowData.eleve?.nomComplet);
         setIsFocused(true);
-        setPreviousValue(value); // Sauvegarder la valeur actuelle
-        
-        // Sélectionner tout le texte pour permettre l'écrasement immédiat
+        setPreviousValue(value);
         e.target.select();
     };
 
     const handleBlur = async () => {
         setIsFocused(false);
         
-        // Si l'input est vide, restaurer la valeur précédente
         if (value === '' || value === null || value === undefined) {
             console.log('⏭️ Input vide, restauration de la valeur précédente:', previousValue);
             setValue(previousValue);
@@ -164,7 +165,6 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur }) => {
             eleve: rowData.eleve?.nomComplet
         });
         
-        // Si la valeur n'a pas changé, ne rien faire
         if (newValue === (rowData.note || 0)) {
             console.log('⏭️ Valeur identique, pas de stockage');
             return;
@@ -188,13 +188,11 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur }) => {
                 await onNoteChange(rowData.id, newValue, newPec, 'note');
             }
 
-            // Message d'information (pas de succès car pas encore sauvegardé)
             console.log('✅ Modification stockée en attente de sauvegarde');
 
         } catch (error) {
             console.error('❌ Erreur lors du stockage:', error);
             showErrorToast('Erreur lors du stockage de la modification');
-            // Restaurer la valeur précédente en cas d'erreur
             setValue(previousValue);
         } finally {
             setIsLoading(false);
@@ -206,7 +204,6 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur }) => {
         if (e.key === 'Enter') {
             e.target.blur();
         } else if (e.key === 'Escape') {
-            // Annuler la modification et restaurer la valeur précédente
             console.log('🚫 Annulation - Restauration de:', previousValue);
             setValue(previousValue);
             e.target.blur();
@@ -215,14 +212,14 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur }) => {
 
     const maxNote = parseFloat(noteSur) || 20;
 
-    // 🔍 Debug: afficher l'état
     console.log('🎯 EditableNoteCell rendu:', {
         eleve: rowData.eleve?.nomComplet,
         note: value,
         isLocked,
         isLoading,
         noteSur,
-        maxNote
+        maxNote,
+        isModified
     });
 
     if (isLocked) {
@@ -259,10 +256,7 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur }) => {
                 value={value}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                onFocus={() => {
-                    console.log('🎯 Focus sur input pour:', rowData.eleve?.nomComplet);
-                    setIsFocused(true);
-                }}
+                onFocus={handleFocus}
                 onKeyPress={handleKeyPress}
                 min={0}
                 max={maxNote}
@@ -271,15 +265,29 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur }) => {
                 style={{
                     width: '70px',
                     padding: '6px 8px',
-                    border: isFocused ? '2px solid #3b82f6' : '1px solid #d1d5db',
+                    // ✅ CORRECTION: Ajout du style pour les notes modifiées
+                    border: isModified 
+                        ? '2px solid #f59e0b' 
+                        : isFocused 
+                            ? '2px solid #3b82f6' 
+                            : '1px solid #d1d5db',
                     borderRadius: '6px',
                     textAlign: 'center',
                     fontSize: '13px',
                     fontWeight: '500',
                     outline: 'none',
                     transition: 'all 0.2s ease',
-                    backgroundColor: isLoading ? '#f1f5f9' : 'white',
-                    boxShadow: isFocused ? '0 0 0 3px rgba(59, 130, 246, 0.1)' : 'none'
+                    // ✅ CORRECTION: Surbrillance orange pour les notes modifiées
+                    backgroundColor: isModified 
+                        ? '#fef3c7' 
+                        : isLoading 
+                            ? '#f1f5f9' 
+                            : 'white',
+                    boxShadow: isModified 
+                        ? '0 0 0 3px rgba(245, 158, 11, 0.15)' 
+                        : isFocused 
+                            ? '0 0 0 3px rgba(59, 130, 246, 0.1)' 
+                            : 'none'
                 }}
             />
             <span style={{
@@ -307,12 +315,12 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur }) => {
 
 // ===========================
 // COMPOSANT SWITCH PEC - AFFICHAGE SELON VALEUR
+// ✅ CORRECTION: Ajout du badge "M" quand le switch est activé
 // ===========================
 const EditablePecCell = ({ rowData, onPecChange, isLocked }) => {
     const [isActive, setIsActive] = useState(rowData.pec === 1);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Mettre à jour l'état local quand les données changent
     React.useEffect(() => {
         setIsActive(rowData.pec === 1);
     }, [rowData.pec]);
@@ -324,7 +332,6 @@ const EditablePecCell = ({ rowData, onPecChange, isLocked }) => {
         setIsLoading(true);
 
         try {
-            // Optimistic update
             setIsActive(newValue);
 
             if (onPecChange) {
@@ -335,7 +342,6 @@ const EditablePecCell = ({ rowData, onPecChange, isLocked }) => {
 
         } catch (error) {
             console.error('❌ Erreur lors de la mise à jour PEC:', error);
-            // Restaurer la valeur précédente en cas d'erreur
             setIsActive(!newValue);
             await showErrorToast('Erreur lors de la mise à jour du PEC');
         } finally {
@@ -392,6 +398,22 @@ const EditablePecCell = ({ rowData, onPecChange, isLocked }) => {
             }}>
                 {isActive ? 'OUI' : 'NON'}
             </span>
+
+            {/* ✅ CORRECTION: Badge "M" affiché uniquement si le switch est activé */}
+            {isActive && (
+                <Badge 
+                    color="cyan" 
+                    style={{ 
+                        fontSize: '10px',
+                        fontWeight: '700',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        marginLeft: '4px'
+                    }}
+                >
+                    M
+                </Badge>
+            )}
 
             {/* Indicateur de chargement */}
             {isLoading && (
@@ -631,7 +653,7 @@ const EvaluationDetail = () => {
     const apiUrls = useAllApiUrls();
 
     const [refreshTrigger, setRefreshTrigger] = useState(0);
-    const [modifiedNotes, setModifiedNotes] = useState(new Map()); // Pour tracker les modifications
+    const [modifiedNotes, setModifiedNotes] = useState(new Map());
     const [isSaving, setIsSaving] = useState(false);
 
     // ===========================
@@ -668,7 +690,6 @@ const EvaluationDetail = () => {
     // ===========================
     const isLocked = lockInfo?.isLocked || false;
 
-    // 🔍 Debug: Afficher les informations de l'évaluation
     useEffect(() => {
         if (evaluation) {
             console.log('📊 Évaluation chargée:', {
@@ -692,7 +713,6 @@ const EvaluationDetail = () => {
             console.log('💾 Sauvegarde de la note - Début:', { noteId, newNote, newPec, changeType });
             console.log('📊 Évaluation disponible:', evaluation);
 
-            // ✅ Extraire matiereId et classeId depuis l'évaluation
             const matiereId = evaluation?.matiereEcole?.id;
             const classeId = evaluation?.classe?.id;
 
@@ -723,12 +743,10 @@ const EvaluationDetail = () => {
                 method: 'PUT'
             });
 
-            // ✅ Appel API pour sauvegarder avec matiereId et classeId
             const response = await axios.put(apiUrl, payload);
 
             console.log('✅ Note sauvegardée avec succès:', response.data);
 
-            // Mettre à jour localement
             await updateNote(noteId, newNote, newPec);
 
             return response.data;
@@ -753,7 +771,6 @@ const EvaluationDetail = () => {
         try {
             console.log('🔄 Changement détecté:', { noteId, newNote, newPec, changeType });
 
-            // ✅ Stocker la modification localement
             setModifiedNotes(prev => {
                 const updated = new Map(prev);
                 updated.set(noteId, {
@@ -765,7 +782,6 @@ const EvaluationDetail = () => {
                 return updated;
             });
 
-            // Mettre à jour l'affichage localement
             await updateNote(noteId, newNote, newPec);
 
             console.log('✅ Modification stockée localement');
@@ -802,109 +818,56 @@ const EvaluationDetail = () => {
     // ===========================
     const handleExportExcel = useCallback(() => {
         try {
-            console.log('📊 Début de l\'export Excel...');
-
-            // Préparer les données pour l'export
-            const dataToExport = processedNotes.map((note, index) => ({
+            const exportData = processedNotes.map((note, index) => ({
                 'N°': index + 1,
                 'Matricule': note.matricule,
-                'Nom': note.eleve?.nom || '',
-                'Prénom': note.eleve?.prenom || '',
+                'Nom complet': note.nomComplet,
                 'Sexe': note.sexe,
-                'Note': note.note || 0,
-                'Note sur': evaluation?.noteSur || '20',
+                'Note': note.note,
+                'Note sur': evaluation?.noteSur,
                 'PEC': note.pec === 1 ? 'OUI' : 'NON',
-                'Redoublant': note.redoublant,
-                'Statut': (() => {
-                    const noteVal = parseFloat(note.note);
-                    const noteSur = parseFloat(evaluation?.noteSur || '10');
-                    if (isNaN(noteVal)) return 'Non noté';
-                    const pourcentage = (noteVal / noteSur) * 100;
-                    if (pourcentage >= 85) return 'Excellent';
-                    if (pourcentage >= 70) return 'Bien';
-                    if (pourcentage >= 50) return 'Passable';
-                    return 'Insuffisant';
-                })()
+                'Redoublant': note.redoublant
             }));
 
-            // Créer le workbook
+            const ws = XLSX.utils.json_to_sheet(exportData);
             const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.json_to_sheet(dataToExport);
+            XLSX.utils.book_append_sheet(wb, ws, "Notes");
 
-            // Définir la largeur des colonnes
-            ws['!cols'] = [
-                { wch: 5 },  // N°
-                { wch: 15 }, // Matricule
-                { wch: 20 }, // Nom
-                { wch: 20 }, // Prénom
-                { wch: 10 }, // Sexe
-                { wch: 8 },  // Note
-                { wch: 10 }, // Note sur
-                { wch: 8 },  // PEC
-                { wch: 12 }, // Redoublant
-                { wch: 15 }  // Statut
-            ];
-
-            // Ajouter la feuille au workbook
-            XLSX.utils.book_append_sheet(wb, ws, 'Notes');
-
-            // Générer le nom du fichier
-            const fileName = `Notes_${evaluation?.type?.libelle}_${evaluation?.classe?.libelle}_${evaluation?.matiereEcole?.libelle}_${evaluation?.dateFormatted}.xlsx`.replace(/\s+/g, '_');
-
-            // Télécharger le fichier
+            const fileName = `Notes_${evaluation?.classe?.libelle}_${evaluation?.matiereEcole?.libelle}_${evaluation?.type?.libelle}.xlsx`;
             XLSX.writeFile(wb, fileName);
 
             showSuccessToast('Export Excel réussi !');
-            console.log('✅ Export Excel terminé:', fileName);
-
         } catch (error) {
-            console.error('❌ Erreur lors de l\'export Excel:', error);
+            console.error('Erreur lors de l\'export Excel:', error);
             showErrorToast('Erreur lors de l\'export Excel');
         }
     }, [processedNotes, evaluation]);
 
     // ===========================
     // 💾 FONCTION POUR SAUVEGARDER TOUTES LES MODIFICATIONS
+    // ✅ CORRECTION: Structure correcte avec id, note, pec, statut dans le bon ordre
     // ===========================
     const handleSaveAll = useCallback(async () => {
         if (modifiedNotes.size === 0) {
-            showErrorToast('Aucune modification à enregistrer');
+            await showErrorToast('Aucune modification à enregistrer');
             return;
         }
 
-        // Demander confirmation
-        const result = await Swal.fire({
-            title: 'Confirmer l\'enregistrement',
-            text: `Voulez-vous enregistrer les modifications pour ${processedNotes.length} élève(s) ?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#667eea',
-            cancelButtonColor: '#94a3b8',
-            confirmButtonText: 'Oui, enregistrer',
-            cancelButtonText: 'Annuler',
-            reverseButtons: true
-        });
-
-        if (!result.isConfirmed) return;
-
         try {
             setIsSaving(true);
-            showLoadingToast('Enregistrement en cours...');
+            showLoadingToast('Enregistrement des notes en cours...');
 
-            console.log('💾 Début de l\'enregistrement...');
+            console.log('💾 Début de l\'enregistrement de toutes les notes');
             console.log('📝 Nombre de modifications:', modifiedNotes.size);
-            console.log('📊 Total d\'élèves:', processedNotes.length);
+            console.log('📝 Modifications:', Array.from(modifiedNotes.entries()));
 
-            // ✅ Générer la date/heure actuelle au format UTC
             const currentDateUTC = new Date().toISOString().replace('.000Z', 'Z[UTC]');
             console.log('🕐 Date de sauvegarde:', currentDateUTC);
 
-            // ✅ Utiliser les données RAW de l'API et juste mettre à jour note/pec
+            // ✅ CORRECTION: Construction du payload avec la bonne structure
             const payload = notes.map(noteData => {
-                // Vérifier si cette note a été modifiée
                 const modification = modifiedNotes.get(noteData.id);
                 
-                // Utiliser la valeur modifiée si elle existe, sinon la valeur originale
                 const finalNote = modification ? modification.note : (noteData.note || 0);
                 const finalPec = modification ? modification.pec : (noteData.pec || 0);
 
@@ -915,30 +878,31 @@ const EvaluationDetail = () => {
                     final: { note: finalNote, pec: finalPec }
                 });
 
-                // ✅ SOLUTION : Utiliser raw_data et juste modifier note/pec/dates
+                // ✅ SOLUTION CORRIGÉE: Construction avec le bon ordre des éléments
                 if (noteData.raw_data) {
-                    // Copier les données brutes
                     const noteCopy = JSON.parse(JSON.stringify(noteData.raw_data));
                     
-                    // Mettre à jour les champs modifiés
                     noteCopy.note = finalNote;
                     noteCopy.pec = finalPec;
-                    noteCopy.dateCreation = currentDateUTC;
-                    noteCopy.dateUpdate = currentDateUTC;
+                    noteCopy.statut = "M";  // ✅ Ajout du statut
+                    // noteCopy.dateCreation = currentDateUTC;
+                    // noteCopy.dateUpdate = currentDateUTC;
                     
                     return noteCopy;
                 }
 
-                // ✅ Fallback si pas de raw_data : construire manuellement
+                // ✅ CORRECTION du Fallback: Structure correcte avec le bon ordre
                 console.warn('⚠️ Pas de raw_data pour:', noteData.eleve?.nomComplet);
                 return {
                     classeEleve: noteData.classeEleve,
-                    dateCreation: currentDateUTC,
-                    dateUpdate: currentDateUTC,
                     evaluation: evaluation,
                     id: noteData.id || 0,
+                    // ✅ Après l'id, on ajoute note, pec, statut dans le bon ordre
                     note: finalNote,
-                    pec: finalPec
+                    pec: finalPec,
+                    statut: "M",  // ✅ Ajout du statut "M"
+                    dateCreation: currentDateUTC,
+                    dateUpdate: currentDateUTC
                 };
             });
 
@@ -946,10 +910,16 @@ const EvaluationDetail = () => {
                 nombreElements: payload.length,
                 dateEnregistrement: currentDateUTC,
                 premierElement: payload[0],
-                deuxiemeElement: payload[1] || null
+                deuxiemeElement: payload[1] || null,
+                structureVerifiee: {
+                    hasId: payload[0]?.id !== undefined,
+                    hasNote: payload[0]?.note !== undefined,
+                    hasPec: payload[0]?.pec !== undefined,
+                    hasStatut: payload[0]?.statut !== undefined,
+                    ordreCorrect: Object.keys(payload[0] || {})
+                }
             });
 
-            // Appel API
             const response = await axios.post(
                 apiUrls.notes.handleNotes(),
                 payload
@@ -960,10 +930,8 @@ const EvaluationDetail = () => {
             Swal.close();
             await showSuccessToast(`Toutes les notes ont été enregistrées avec succès !`);
 
-            // Vider les modifications
             setModifiedNotes(new Map());
 
-            // Rafraîchir les données
             await refetchNotes();
             await refetchEvaluation();
 
@@ -988,6 +956,7 @@ const EvaluationDetail = () => {
     }, [modifiedNotes, notes, processedNotes, evaluation, apiUrls, refetchNotes, refetchEvaluation]);
 
     // Configuration DataTable avec customRenderer intégrés
+    // ✅ CORRECTION: Passer modifiedNotes au composant EditableNoteCell
     const tableConfig = React.useMemo(() => {
         return {
             columns: [
@@ -1093,6 +1062,7 @@ const EvaluationDetail = () => {
                                 onNoteChange={handleNoteChange}
                                 isLocked={isLocked}
                                 noteSur={evaluation?.noteSur}
+                                modifiedNotes={modifiedNotes}  // ✅ CORRECTION: Passage de modifiedNotes
                             />
                         );
                     },
@@ -1208,9 +1178,9 @@ const EvaluationDetail = () => {
             showPagination: true,
             showSearch: true,
             showFilters: true,
-            tableHeight: 500
+            tableHeight: 700
         };
-    }, [handleNoteChange, isLocked, evaluation?.noteSur]);
+    }, [handleNoteChange, isLocked, evaluation?.noteSur, modifiedNotes]);  // ✅ CORRECTION: Ajout de modifiedNotes dans les dépendances
 
     const [showModificationModal, setShowModificationModal] = useState(false);
 
@@ -1300,204 +1270,153 @@ const EvaluationDetail = () => {
                                     >
                                         Retour
                                     </Button>
-                                    <Divider vertical />
                                     <div>
-                                        <h4 style={{ margin: 0, color: '#1e293b', fontWeight: '600' }}>
-                                            Évaluation N° {evaluation.numero} du {evaluation.dateFormatted}
+                                        <h4 style={{ margin: 0, color: '#1e293b', fontWeight: '700' }}>
+                                            📝 {evaluation.type?.libelle} - {evaluation.matiereEcole?.libelle}
                                         </h4>
-                                        <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
-                                            {evaluation.type?.libelle} • {evaluation.matiereEcole?.libelle} • {evaluation.classe?.libelle}
+                                        <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '14px' }}>
+                                            {evaluation.classe?.libelle} • Code: {evaluation.code}
                                         </p>
                                     </div>
                                 </div>
 
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                    {isLocked ? (
-                                        <Badge color="red" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                                            <FiLock size={14} /> Verrouillé
-                                        </Badge>
-                                    ) : (
-                                        <Badge color="green" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                                            <FiUnlock size={14} /> Modifiable
-                                        </Badge>
-                                    )}
-
-                                    <Whisper
-                                        placement="top"
-                                        speaker={<Tooltip>Actualiser les données</Tooltip>}
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <Button
+                                        appearance="ghost"
+                                        startIcon={<FiRefreshCw />}
+                                        onClick={handleRefresh}
+                                        style={{ borderRadius: '8px' }}
                                     >
-                                        <IconButton
-                                            icon={<FiRefreshCw />}
-                                            onClick={handleRefresh}
-                                            size="sm"
-                                            style={{ borderRadius: '6px' }}
-                                        />
-                                    </Whisper>
+                                        Actualiser
+                                    </Button>
+                                    {/* <Button
+                                        appearance="primary"
+                                        startIcon={<FiEdit />}
+                                        onClick={() => setShowModificationModal(true)}
+                                        style={{
+                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                            border: 'none',
+                                            borderRadius: '8px'
+                                        }}
+                                    >
+                                        Modifier l'évaluation
+                                    </Button> */}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Informations détaillées */}
-                <div className="row mb-4 d-flex align-items-stretch">
-                    <div className="col-lg-8 d-flex">
+                {/* Informations de l'évaluation */}
+                <div className="row mb-4">
+                    <div className="col-md-8">
                         <Panel
-                            className="flex-fill"
-                            header="Détails de l'évaluation"
+                            header={
+                                <span style={{
+                                    fontSize: '16px',
+                                    fontWeight: '600',
+                                    color: '#1e293b'
+                                }}>
+                                    ℹ️ Informations générales
+                                </span>
+                            }
                             shaded
                             style={{
                                 background: 'white',
                                 borderRadius: '15px',
                                 boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
                                 border: '1px solid rgba(102, 126, 234, 0.1)',
+                                height: '100%'
                             }}
                         >
-                            <Row gutter={20}>
-                                <Col xs={24} sm={12}>
-                                    <div style={{ marginBottom: 15 }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
-                                            <FiBookOpen color="#3b82f6" />
-                                            <strong>Classe :</strong>
-                                        </div>
-                                        <div style={{ color: '#64748b', fontSize: '14px' }}>
-                                            {evaluation.classe?.libelle}
-                                        </div>
+                            <div className="mt-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
+                                <div>
+                                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>
+                                        Type
                                     </div>
+                                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>
+                                        {evaluation.type?.libelle}
+                                    </div>
+                                </div>
 
-                                    <div style={{ marginBottom: 15 }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
-                                            <FiCalendar color="#10b981" />
-                                            <strong>Période :</strong>
-                                        </div>
-                                        <div style={{ color: '#64748b', fontSize: '14px' }}>
-                                            {evaluation.periode?.libelle}
-                                        </div>
+                                <div>
+                                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>
+                                        Période
                                     </div>
+                                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>
+                                        {evaluation.periode?.libelle}
+                                    </div>
+                                </div>
 
-                                    <div style={{ marginBottom: 15 }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
-                                            <FiClock color="#f59e0b" />
-                                            <strong>Durée :</strong>
-                                        </div>
-                                        <div style={{ color: '#64748b', fontSize: '14px' }}>
-                                            {evaluation.dureeFormatted}
-                                        </div>
+                                <div>
+                                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>
+                                        Matière
                                     </div>
-                                </Col>
+                                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>
+                                        {evaluation.matiereEcole?.libelle}
+                                    </div>
+                                </div>
 
-                                <Col xs={24} sm={12}>
-                                    <div style={{ marginBottom: 15 }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
-                                            <FiCalendar color="#8b5cf6" />
-                                            <strong>Date de l'évaluation :</strong>
-                                        </div>
-                                        <div style={{ color: '#64748b', fontSize: '14px' }}>
-                                            {evaluation.dateFormatted} • {evaluation.timeFormatted}
-                                        </div>
+                                <div>
+                                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>
+                                        Classe
                                     </div>
+                                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>
+                                        {evaluation.classe?.libelle}
+                                    </div>
+                                </div>
 
-                                    <div style={{ marginBottom: 15 }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
-                                            <FiBarChart color="#ef4444" />
-                                            <strong>Heure :</strong>
-                                        </div>
-                                        <div style={{ color: '#64748b', fontSize: '14px' }}>
-                                            {evaluation.heure || evaluation.timeFormatted}
-                                        </div>
+                                <div>
+                                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>
+                                        Date limite de saisie
                                     </div>
+                                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>
+                                        {lockInfo?.dateLimiteFormatted}
+                                    </div>
+                                </div>
 
-                                    <div style={{ marginBottom: 15 }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
-                                            <strong>Date limite de saisie :</strong>
-                                        </div>
-                                        <div style={{
-                                            color: isLocked ? '#ef4444' : '#22c55e',
-                                            fontSize: '14px',
-                                            fontWeight: '500'
-                                        }}>
-                                            {lockInfo?.dateLimiteFormatted || 'Non définie'}
-                                        </div>
+                                <div>
+                                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>
+                                        Noté sur
                                     </div>
-                                </Col>
-                            </Row>
+                                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>
+                                        {evaluation.noteSur}
+                                    </div>
+                                </div>
+                            </div>
                         </Panel>
                     </div>
 
-                    <div className="col-lg-4 d-flex">
-                        {professeur && (
-                            <Panel
-                                className="flex-fill"
-                                header="Professeur"
-                                shaded
-                                style={{
-                                    background: 'white',
-                                    borderRadius: '15px',
-                                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                                    border: '1px solid rgba(102, 126, 234, 0.1)',
-                                    marginBottom: '20px'
-                                }}
-                            >
-                                {professeurLoading ? (
-                                    <Loader size="sm" content="Chargement..." />
-                                ) : (
-                                    <div style={{ textAlign: 'center' }}>
-                                        <Avatar
-                                            size="lg"
-                                            style={{
-                                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                                marginBottom: 10
-                                            }}
-                                        >
-                                            <FiUser size={24} color="white" />
-                                        </Avatar>
-                                        <div style={{ fontWeight: '600', color: '#1e293b', marginBottom: 5 }}>
-                                            {professeur.nomComplet}
-                                        </div>
-                                        <div style={{ color: '#64748b', fontSize: '12px', marginBottom: 10 }}>
-                                            {professeur.fonction?.libelle}
-                                        </div>
-                                        {professeur.contact && (
-                                            <div
-                                                style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    gap: 5,
-                                                    color: '#64748b',
-                                                    fontSize: '12px'
-                                                }}
-                                            >
-                                                <FiPhone size={12} />
-                                                {professeur.contact}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </Panel>
-                        )}
-
+                    <div className="col-md-4">
                         <Panel
-                            header="Statistiques"
-                            className="flex-fill"
+                            header={
+                                <span style={{
+                                    fontSize: '16px',
+                                    fontWeight: '600',
+                                    color: '#1e293b'
+                                }}>
+                                    📊 Statistiques
+                                </span>
+                            }
                             shaded
                             style={{
                                 background: 'white',
                                 borderRadius: '15px',
                                 boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                                border: '1px solid rgba(102, 126, 234, 0.1)'
+                                border: '1px solid rgba(102, 126, 234, 0.1)',
+                                height: '100%'
                             }}
                         >
-                            <div className="mt-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
-                                <div style={{ textAlign: 'center', padding: '10px', background: '#f0f9ff', borderRadius: '8px' }}>
-                                    <div style={{ fontSize: '18px', fontWeight: '600', color: '#0369a1' }}>
+                            <div className="mt-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px' }}>
+                                <div style={{ textAlign: 'center', padding: '10px', background: '#eff6ff', borderRadius: '8px' }}>
+                                    <div style={{ fontSize: '18px', fontWeight: '600', color: '#3b82f6' }}>
                                         {stats.moyenne}
                                     </div>
                                     <div style={{ fontSize: '12px', color: '#64748b' }}>Moyenne</div>
                                 </div>
 
                                 <div style={{ textAlign: 'center', padding: '10px', background: '#f0fdf4', borderRadius: '8px' }}>
-                                    <div style={{ fontSize: '18px', fontWeight: '600', color: '#16a34a' }}>
+                                    <div style={{ fontSize: '18px', fontWeight: '600', color: '#22c55e' }}>
                                         {stats.nombreNotes}
                                     </div>
                                     <div style={{ fontSize: '12px', color: '#64748b' }}>Notes saisies</div>
@@ -1612,7 +1531,7 @@ const EvaluationDetail = () => {
                             ) : (
                                 <DataTable
                                     title=""
-                                    subtitle={`${processedNotes.length} élève(s)`}
+                                    subtitle={`élève(s)`}
                                     data={processedNotes}
                                     loading={notesLoading}
                                     error={null}
@@ -1670,35 +1589,6 @@ const EvaluationDetail = () => {
                                         </div>
                                         <div style={{ fontSize: '12px', color: '#991b1b', marginTop: '4px' }}>
                                             ℹ️ Vous pouvez consulter et faire défiler les notes, mais pas les modifier.
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Message d'information pour la saisie */}
-                            {!isLocked && (
-                                <div style={{
-                                    marginTop: '15px',
-                                    padding: '15px',
-                                    background: '#f0f9ff',
-                                    border: '1px solid #bae6fd',
-                                    borderRadius: '8px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '10px'
-                                }}>
-                                    <FiSave color="#0369a1" size={18} />
-                                    <div>
-                                        <div style={{ fontWeight: '600', color: '#0369a1', marginBottom: '4px' }}>
-                                            💡 Mode saisie actif
-                                        </div>
-                                        <div style={{ fontSize: '13px', color: '#0c4a6e' }}>
-                                            • <strong>Cliquez sur un champ</strong> : Le texte est automatiquement sélectionné pour une saisie rapide<br />
-                                            • <strong>Entrée</strong> : Valider la saisie<br />
-                                            • <strong>Échap (Esc)</strong> : Annuler la modification<br />
-                                            • Une note saisie active automatiquement le PEC<br />
-                                            • Les modifications sont stockées localement<br />
-                                            • <strong>Cliquez sur "Enregistrer" pour sauvegarder toutes les modifications</strong>
                                         </div>
                                     </div>
                                 </div>

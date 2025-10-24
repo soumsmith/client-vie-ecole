@@ -158,9 +158,9 @@ const LightTopBar = ({
     };
 
     // Essayer de récupérer depuis localStorage, sinon utiliser les données de démo
-    const academicYear = sessionStorage.getItem('academicYearMain');
+    const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
     if (academicYear) {
-      setAcademicData(JSON.parse(academicYear));
+      setAcademicData(academicYear);
     } else {
       setAcademicData(mockData);
     }
@@ -217,7 +217,7 @@ const LightTopBar = ({
     {
       icon: "🏫",
       label: "École",
-      value: sessionStorage.getItem('schoolLabel') || "Lycée Moderne",
+      value: localStorage.getItem('schoolLabel') || "Lycée Moderne",
       bgColor: "primary"
     },
     academicData && {

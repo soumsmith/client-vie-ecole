@@ -50,7 +50,7 @@
         },
         "dateCreation": "2025-09-20T18:57:54Z[UTC]",
         "dateUpdate": "2025-09-20T18:57:54Z[UTC]",
-        "id": 61747,
+        "id": 61755,
         "inscription": {
             "afecte": "AFFECTE",
             "annee": {
@@ -121,18 +121,18 @@
                 "tel": "0789353025"
             },
             "eleve": {
-                "dateNaissance": "2014-08-08",
-                "id": 40305,
-                "lieuNaissance": "COCODY",
-                "matricule": "25396607E",
+                "dateNaissance": "2014-04-02",
+                "id": 40348,
+                "lieuNaissance": "ABOBO",
+                "matricule": "25127040K",
                 "nationalite": "OUI",
-                "nom": "BAH",
-                "prenom": "AICHATOU ADJOUA NOURA MARIE MATHILDE",
-                "sexe": "FEMININ"
+                "nom": "AKINLOYE",
+                "prenom": "MOUHANMED AWAL OKIKI OLA",
+                "sexe": "MASCULIN"
             },
             "etranger_africain": false,
             "etranger_non_africain": false,
-            "id": 74694,
+            "id": 74702,
             "ivoirien": true,
             "lv2": "",
             "redoublant": "NON",
@@ -305,7 +305,7 @@
         "user": "165"
     },
     "id": 0,
-    "note": 15,
+    "note": 5,
     "pec": 1,
     "statut": "M"
 }

@@ -27,6 +27,8 @@ import {
 } from "./apiConfig";
 
 
+
+
 // ===========================
 // CONFIGURATION GLOBALE
 // ===========================
@@ -182,16 +184,6 @@ export const useClassesData = (refreshTrigger = 0) => {
       try {
         setLoading(true);
         setError(null);
-        const cacheKey = `common-classes-data-${appParams.ecoleId}`;
-
-        if (!skipCache) {
-          const cachedData = getFromCache(cacheKey);
-          if (cachedData) {
-            setData(cachedData);
-            setLoading(false);
-            return;
-          }
-        }
 
         let response;
         let url;
@@ -235,7 +227,6 @@ export const useClassesData = (refreshTrigger = 0) => {
           }
         }
 
-        setToCache(cacheKey, processed, CACHE_DURATION);
         setData(processed);
       } catch (err) {
         console.error("Erreur lors de la récupération des classes:", err);
@@ -358,7 +349,7 @@ export const useNiveauxData = (ecoleId = null, refreshTrigger = 0) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const apiUrls = useAllApiUrls();
   const appParams = useAppParams();
   const niveauxUrls = useNiveauxUrls();
   const finalEcoleId = ecoleId || appParams.ecoleId;
@@ -368,18 +359,8 @@ export const useNiveauxData = (ecoleId = null, refreshTrigger = 0) => {
       try {
         setLoading(true);
         setError(null);
-        const cacheKey = `common-niveaux-data-${finalEcoleId}`;
 
-        if (!skipCache) {
-          const cachedData = getFromCache(cacheKey);
-          if (cachedData) {
-            setData(cachedData);
-            setLoading(false);
-            return;
-          }
-        }
-
-        const url = niveauxUrls.getVisibleByBranche(finalEcoleId);
+        const url = apiUrls.niveaux.getVisibleByBranche();
         const response = await axios.get(url);
 
         const processed =
@@ -430,28 +411,28 @@ export const useNiveauxData = (ecoleId = null, refreshTrigger = 0) => {
 };
 
 export const useTypesActiviteData = () => {
-    const [typesActivite, setTypesActivite] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const apiUrls = useAllApiUrls();
+  const [typesActivite, setTypesActivite] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const apiUrls = useAllApiUrls();
 
-    const fetchTypesActivite = async () => {
-        try {
-            setLoading(true);
-            const response = await axios.get(apiUrls.emploiDuTemps.getTypesActiviteByEcole());
-            setTypesActivite(response.data || []);
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const fetchTypesActivite = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(apiUrls.emploiDuTemps.getTypesActiviteByEcole());
+      setTypesActivite(response.data || []);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    useEffect(() => {
-        fetchTypesActivite();
-    }, []);
+  useEffect(() => {
+    fetchTypesActivite();
+  }, []);
 
-    return { typesActivite, loading, error, refetch: fetchTypesActivite };
+  return { typesActivite, loading, error, refetch: fetchTypesActivite };
 };
 
 // ===========================
@@ -769,12 +750,7 @@ export const useMatieresData = (
 
   // Fonction fetchMatieres exposée publiquement pour usage manuel
   const fetchMatieres = useCallback(
-    async (targetClasseId, targetEcoleId = finalEcoleId, skipCache = false) => {
-      console.log("🔄 fetchMatieres appelé avec:", {
-        targetClasseId,
-        targetEcoleId,
-        skipCache,
-      });
+    async (targetClasseId, skipCache = false) => {
 
       if (!targetClasseId) {
         console.log("❌ Pas de classe fournie, nettoyage des matières");
@@ -788,7 +764,7 @@ export const useMatieresData = (
         setLoading(true);
         setError(null);
 
-        const cacheKey = `common-matieres-data-${targetClasseId}-${targetEcoleId}`;
+        const cacheKey = `common-matieres-data-${targetClasseId}`;
         console.log("🔍 Utilisation de la clé de cache:", cacheKey);
 
         // Vérification du cache
@@ -814,7 +790,7 @@ export const useMatieresData = (
           url = personnelUrls.getMatiereClasseByProfClasse(targetClasseId);
           response = await axios.get(url);
         } else if (userProfile === "Fondateur") {
-          url = matieresUrls.getAllByBrancheViaClasse(targetClasseId, targetEcoleId);
+          url = matieresUrls.getAllByBrancheViaClasse(targetClasseId);
           response = await axios.get(url);
         }
 
@@ -913,7 +889,7 @@ export const useMatieresData = (
 // ===========================
 // HOOK POUR RÉCUPÉRER LES PÉRIODES
 // ===========================
-export const usePeriodesData = (periodicitieId = null, refreshTrigger = 0) => {
+export const usePeriodesData = (refreshTrigger = 0) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -1384,20 +1360,7 @@ export const useEnseignantsData = (profProfilId, refreshTrigger = 0) => {
       try {
         setLoading(true);
         setError(null);
-        const cacheKey = `common-enseignants-data-${appParams.ecoleId}`;
-
-        // Vérifier le cache
-        if (!skipCache) {
-          const cachedData = getFromCache(cacheKey);
-          if (cachedData) {
-            setData(cachedData);
-            setLoading(false);
-            return;
-          }
-        }
-
-
-
+ 
         const url = apiUrls.personnel.getByEcoleAndProfil(profProfilId || appParams.profileId
         );
         const response = await axios.get(url);
@@ -1429,7 +1392,7 @@ export const useEnseignantsData = (profProfilId, refreshTrigger = 0) => {
               ecole_id: enseignant.ecole?.id || appParams.ecoleId,
               ecole_libelle: enseignant.ecole?.libelle || "",
               ecole_code: enseignant.ecole?.code || "",
-              profil_id: enseignant.profil?.id || appParams.defaults.PROFIL_PROFESSEUR_ID,
+              profil_id: enseignant.profil?.id,
               profil_libelle: enseignant.profil?.libelle || "Professeur",
               dateCreation: enseignant.dateCreation || "",
               dateUpdate: enseignant.dateUpdate || "",
@@ -1456,7 +1419,6 @@ export const useEnseignantsData = (profProfilId, refreshTrigger = 0) => {
           return a.prenom.localeCompare(b.prenom);
         });
 
-        setToCache(cacheKey, processedEnseignants, CACHE_DURATION);
         setData(processedEnseignants);
       } catch (err) {
         console.error("Erreur lors de la récupération des enseignants:", err);
@@ -1535,7 +1497,7 @@ export const useEssentialData = (ecoleId = null) => {
  * Récupère les données de base pour une école (classes, niveaux, branches)
  */
 export const useBaseData = (ecoleId = null) => {
-  const classes = useClassesData(ecoleId);
+  const classes = useClassesData();
   const niveaux = useNiveauxData(ecoleId);
   const branches = useNiveauxBranchesData(ecoleId);
 
@@ -1620,270 +1582,7 @@ const formatDuree = (minutes) => {
   return `${hours}h${mins.toString().padStart(2, "0")}`;
 };
 
-// ===========================
-// HOOK PRINCIPAL POUR LES ÉVALUATIONS
-// ===========================
-export const useEvaluationsDataByFilters = (refreshTrigger = 0) => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [searchPerformed, setSearchPerformed] = useState(false);
 
-  const evaluationsUrls = useEvaluationsUrls();
-
-  const searchEvaluations = useCallback(
-    async (
-      classeId,
-      matiereId = null,
-      periodeId = null,
-      anneeId = null
-    ) => {
-      if (!classeId) {
-        setError({
-          message: "Veuillez sélectionner une classe",
-          type: "ValidationError",
-          code: "MISSING_CLASSE",
-        });
-        return;
-      }
-
-      try {
-        setLoading(true);
-        setError(null);
-        setSearchPerformed(false);
-
-        const appParams = useAppParams();
-        const finalAnneeId = anneeId || appParams.academicYearId;
-
-        // Construction de la clé de cache
-        const cacheKey = `evaluations-filters-${classeId}-${matiereId || "all"
-          }-${periodeId || "all"}-${finalAnneeId}`;
-
-        // Vérifier le cache d'abord
-        const cachedData = getFromCache(cacheKey);
-        if (cachedData) {
-          console.log(
-            "📦 Données évaluations trouvées en cache:",
-            cachedData.length
-          );
-          setData(cachedData);
-          setSearchPerformed(true);
-          setLoading(false);
-          return;
-        }
-
-        console.log("🔍 Recherche évaluations avec filtres:", {
-          classeId,
-          matiereId,
-          periodeId,
-          anneeId: finalAnneeId,
-        });
-
-        // Construction de l'URL avec les filtres
-        const url = evaluationsUrls.getByFilters({
-          classe_id: classeId,
-          annee_id: finalAnneeId,
-          matiere_id: matiereId,
-          periode_id: periodeId,
-        });
-
-        const response = await axios.get(url);
-        console.log("📡 Réponse API évaluations:", response.data);
-
-        // Traitement des évaluations
-        let processedEvaluations = [];
-        if (response.data && Array.isArray(response.data)) {
-          processedEvaluations = response.data.map((evaluation, index) => {
-            const typeMapping = {
-              1: "Composition",
-              2: "Devoir",
-              3: "Interrogation",
-            };
-
-            const type_display =
-              typeMapping[evaluation.type_id] || `Type ${evaluation.type_id}`;
-
-            return {
-              // IDs et codes
-              id: evaluation.id || `eval-${index}`,
-              code:
-                evaluation.code || `EVAL${String(index + 1).padStart(4, "0")}`,
-
-              // Informations de base
-              type: type_display,
-              type_id: evaluation.type_id,
-
-              // Matière
-              matiere: evaluation.matiere?.libelle || "Matière inconnue",
-              matiere_id: evaluation.matiere?.id || matiereId,
-              matiere_code: evaluation.matiere?.code || "",
-
-              // Classe
-              classe: evaluation.classe?.libelle || "Classe inconnue",
-              classe_id: evaluation.classe?.id || classeId,
-              classe_code: evaluation.classe?.code || "",
-
-              // Période
-              periode: evaluation.periode?.libelle || "Période inconnue",
-              periode_id: evaluation.periode?.id || periodeId,
-
-              // École
-              ecole: evaluation.ecole?.libelle || "",
-              ecole_id: evaluation.ecole?.id || appParams.ecoleId,
-              ecole_code: evaluation.ecole?.code || "",
-
-              // Année
-              annee: evaluation.annee?.libelle || "Année inconnue",
-              annee_id: evaluation.annee?.id || finalAnneeId,
-
-              // Date et durée
-              date: evaluation.date || "",
-              date_display: formatDate(evaluation.date),
-              duree: evaluation.duree || 0,
-              duree_raw: evaluation.duree || 0,
-              duree_display: formatDuree(evaluation.duree),
-
-              // Configuration de notation
-              noteSur: evaluation.noteSur || "20",
-              coefficient: evaluation.coefficient || 1,
-
-              // Statuts
-              statut: evaluation.statut || "ACTIVE",
-              statut_display:
-                evaluation.statut === "ACTIVE"
-                  ? "Active"
-                  : evaluation.statut || "Active",
-
-              // Informations de création
-              dateCreation: evaluation.dateCreation || "",
-              dateCreation_display: formatDate(evaluation.dateCreation),
-              dateUpdate: evaluation.dateUpdate || "",
-
-              // Statistiques (si disponibles dans l'API)
-              nombreEleves: evaluation.nombreEleves || 0,
-              nombreNotesRenseignees: evaluation.nombreNotesRenseignees || 0,
-              moyenneClasse: evaluation.moyenneClasse || null,
-
-              // Affichage optimisé
-              display_title: `${type_display} - ${evaluation.matiere?.libelle || "Matière"
-                }`,
-              display_subtitle: `${evaluation.classe?.libelle || "Classe"
-                } • ${formatDate(evaluation.date)}`,
-              display_details: `/${evaluation.noteSur || 20} • ${formatDuree(
-                evaluation.duree
-              )}`,
-
-              // Données brutes pour debug
-              raw_data: evaluation,
-            };
-          });
-
-          // Tri par date décroissante (plus récentes en premier)
-          processedEvaluations.sort((a, b) => {
-            if (!a.date && !b.date) return 0;
-            if (!a.date) return 1;
-            if (!b.date) return -1;
-            return new Date(b.date) - new Date(a.date);
-          });
-        }
-
-        console.log("✅ Évaluations traitées:", processedEvaluations.length);
-
-        // Mise en cache et mise à jour de l'état
-        setToCache(cacheKey, processedEvaluations);
-        setData(processedEvaluations);
-        setSearchPerformed(true);
-      } catch (err) {
-        console.error(
-          "❌ Erreur lors de la récupération des évaluations:",
-          err
-        );
-        setError({
-          message:
-            err.response?.data?.message ||
-            err.message ||
-            "Erreur lors de la recherche des évaluations",
-          type: err.name || "SearchError",
-          code: err.response?.status || err.code || "UNKNOWN",
-          details: err.response?.data,
-          url: err.config?.url,
-        });
-        setData([]);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [evaluationsUrls]
-  );
-
-  const clearEvaluations = useCallback(() => {
-    setData([]);
-    setError(null);
-    setSearchPerformed(false);
-    setLoading(false);
-  }, []);
-
-  const refetchEvaluations = useCallback(
-    (
-      classeId,
-      matiereId = null,
-      periodeId = null,
-      anneeId = null
-    ) => {
-      searchEvaluations(classeId, matiereId, periodeId, anneeId);
-    },
-    [searchEvaluations]
-  );
-
-  const getEvaluationByCode = useCallback(
-    (evaluationCode) => {
-      return data.find((evaluation) => evaluation.code === evaluationCode);
-    },
-    [data]
-  );
-
-  return {
-    evaluations: data,
-    loading,
-    error,
-    searchPerformed,
-    searchEvaluations,
-    clearEvaluations,
-    refetchEvaluations,
-    getEvaluationByCode,
-    totalEvaluations: data.length,
-  };
-};
-
-// ===========================
-// HOOK SIMPLIFIÉ POUR LES ÉVALUATIONS D'UNE CLASSE
-// ===========================
-export const useClasseEvaluations = (classeId = null, autoFetch = true) => {
-  const {
-    evaluations,
-    loading,
-    error,
-    searchPerformed,
-    searchEvaluations,
-    clearEvaluations,
-  } = useEvaluationsDataByFilters();
-
-  useEffect(() => {
-    if (autoFetch && classeId) {
-      searchEvaluations(classeId);
-    }
-  }, [classeId, autoFetch, searchEvaluations]);
-
-  return {
-    evaluations,
-    loading,
-    error,
-    searchPerformed,
-    fetchEvaluations: (matiereId, periodeId) =>
-      searchEvaluations(classeId, matiereId, periodeId),
-    clearEvaluations,
-  };
-};
 
 // ===========================
 // ALIAS POUR COMPATIBILITÉ

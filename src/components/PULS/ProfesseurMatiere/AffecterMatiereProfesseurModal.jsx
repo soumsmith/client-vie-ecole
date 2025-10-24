@@ -141,7 +141,7 @@ const useClasseAffectationsData = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const fetchAffectations = useCallback(async (classeId, anneeId = 226) => {
+    const fetchAffectations = useCallback(async (classeId) => {
         if (!classeId) {
             setData([]);
             return;

@@ -12,6 +12,7 @@ import { useAllApiUrls } from '../utils/apiConfig';
 import getFullUrl from "../../hooks/urlUtils";
 import { getFromCache, setToCache, clearCache } from '../utils/cacheUtils';
 
+
 /**
  * Hook pour récupérer la liste des classes
  */
@@ -131,7 +132,7 @@ export const usePeriodesData = (refreshTrigger = 0) => {
 /**
  * Hook pour récupérer la liste des années scolaires
  */
-export const useAnneesData = (ecoleId = 38, refreshTrigger = 0) => {
+export const useAnneesData = (refreshTrigger = 0) => {
     const [annees, setAnnees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -192,27 +193,18 @@ export const useAnneesData = (ecoleId = 38, refreshTrigger = 0) => {
 /**
  * Hook pour récupérer la liste des niveaux
  */
-export const useNiveauxData = (ecoleId = 38, refreshTrigger = 0) => {
+export const useNiveauxData = (refreshTrigger = 0) => {
     const [niveaux, setNiveaux] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const apiUrls = useAllApiUrls();
 
     const fetchNiveaux = async (skipCache = false) => {
         try {
             setLoading(true);
             setError(null);
-            const cacheKey = `niveaux-${ecoleId}`;
+            const response = await axios.get(apiUrls.branches.getByNiveauEnseignement());
 
-            if (!skipCache) {
-                const cachedData = getFromCache(cacheKey);
-                if (cachedData) {
-                    setNiveaux(cachedData);
-                    setLoading(false);
-                    return;
-                }
-            }
-
-            const response = await axios.get(`${getFullUrl()}branche/get-by-niveau-enseignement?ecole=${ecoleId}`);
             const formattedNiveaux = (response.data || []).map(niveau => ({
                 label: `${niveau.niveau?.libelle || niveau.libelle} - ${niveau.serie?.libelle || ''}`,
                 value: niveau.id,
@@ -222,7 +214,6 @@ export const useNiveauxData = (ecoleId = 38, refreshTrigger = 0) => {
                 raw_data: niveau
             }));
 
-            setToCache(cacheKey, formattedNiveaux);
             setNiveaux(formattedNiveaux);
         } catch (err) {
             setError({
@@ -236,7 +227,7 @@ export const useNiveauxData = (ecoleId = 38, refreshTrigger = 0) => {
 
     useEffect(() => {
         fetchNiveaux(false);
-    }, [ecoleId, refreshTrigger]);
+    }, [refreshTrigger]);
 
     return {
         niveaux,
@@ -255,22 +246,10 @@ export const useBranchesData = (refreshTrigger = 0) => {
     const [error, setError] = useState(null);
     const apiUrls = useAllApiUrls();
 
-
     const fetchBranches = async (skipCache = false) => {
         try {
             setLoading(true);
             setError(null);
-            const cacheKey = `branches-rapport-ecoleId`;
-
-            if (!skipCache) {
-                const cachedData = getFromCache(cacheKey);
-                if (cachedData) {
-                    setBranches(cachedData);
-                    setLoading(false);
-                    return;
-                }
-            }
-
             const response = await axios.get(apiUrls.branches.getByNiveauEnseignement());
             const formattedBranches = (response.data || []).map(branche => ({
                 label: branche.libelle,
@@ -279,7 +258,6 @@ export const useBranchesData = (refreshTrigger = 0) => {
                 raw_data: branche
             }));
 
-            setToCache(cacheKey, formattedBranches);
             setBranches(formattedBranches);
         } catch (err) {
             setError({
@@ -306,10 +284,11 @@ export const useBranchesData = (refreshTrigger = 0) => {
 /**
  * Hook pour récupérer la liste des matières par classe
  */
-export const useMatieresData = (ecoleId = 38, classeId = null, refreshTrigger = 0) => {
+export const useMatieresData = (classeId = null, refreshTrigger = 0) => {
     const [matieres, setMatieres] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const apiUrls = useAllApiUrls();
 
     const fetchMatieres = async (skipCache = false) => {
         if (!classeId) {
@@ -321,18 +300,7 @@ export const useMatieresData = (ecoleId = 38, classeId = null, refreshTrigger = 
         try {
             setLoading(true);
             setError(null);
-            const cacheKey = `matieres-${ecoleId}-${classeId}`;
-
-            if (!skipCache) {
-                const cachedData = getFromCache(cacheKey);
-                if (cachedData) {
-                    setMatieres(cachedData);
-                    setLoading(false);
-                    return;
-                }
-            }
-
-            const response = await axios.get(`${getFullUrl()}imprimer-matrice-classe/matieres-ecole-web/${ecoleId}/${classeId}`);
+            const response = await axios.get(apiUrls.matieres.imprimerMatriceClasse(classeId));
             const formattedMatieres = (response.data || []).map(matiere => ({
                 label: matiere.libelle,
                 value: matiere.id,
@@ -340,7 +308,6 @@ export const useMatieresData = (ecoleId = 38, classeId = null, refreshTrigger = 
                 raw_data: matiere
             }));
 
-            setToCache(cacheKey, formattedMatieres);
             setMatieres(formattedMatieres);
         } catch (err) {
             setError({
@@ -354,7 +321,7 @@ export const useMatieresData = (ecoleId = 38, classeId = null, refreshTrigger = 
 
     useEffect(() => {
         fetchMatieres(false);
-    }, [ecoleId, classeId, refreshTrigger]);
+    }, [classeId, refreshTrigger]);
 
     return {
         matieres,
@@ -485,7 +452,6 @@ const rapportFunctions = {
         });
 
         // URL exacte selon l'exemple fourni
-        // imprimer-bulletin-list/spider-bulletin/38/Premier%20Trimestre/Ann%C3%A9e%202024%20-%202025/48166/true/2/true/true/true/true/false/true/false/false/false/false
         const url = `${getFullUrl()}imprimer-bulletin-list/spider-bulletin/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}/true/${niveauEnseignementId}/true/true/true/true/false/true/false/false/false/false`;
 
         return downloadFile(url, `Bulletin_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
@@ -1072,7 +1038,7 @@ export const rapportsTableConfig = {
     actions: [
         {
             type: 'generate',
-            icon: <FiFileText />,
+            icon: <FiFileText size={17} />,
             tooltip: 'Générer le rapport',
             color: '#4a90e2',
             label: 'Générer'
