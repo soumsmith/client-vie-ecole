@@ -78,20 +78,10 @@ export const useListeElevesClasseData = (refreshTrigger = 0) => {
         try {
             setLoading(true);
             setError(null);
-            const cacheKey = `liste-eleves-classe-${dynamicEcoleId}-${dynamicAcademicYearId}`;
-
-            // Vérifier le cache
-            if (!skipCache) {
-                const cachedData = getFromCache(cacheKey);
-                if (cachedData) {
-                    setData(cachedData);
-                    setLoading(false);
-                    return;
-                }
-            }
+          
 
             // Appel direct à l'API
-            const response = await axios.get(apiUrls.inscriptions.listEleveClasse(dynamicEcoleId, dynamicAcademicYearId));
+            const response = await axios.get(apiUrls.inscriptions.listEleveClasse());
 
             // Traitement des données d'élèves selon la vraie structure
             let processedEleves = [];
@@ -196,7 +186,6 @@ export const useListeElevesClasseData = (refreshTrigger = 0) => {
                 });
             }
 
-            setToCache(cacheKey, processedEleves);
             setData(processedEleves);
         } catch (err) {
             console.error('Erreur lors de la récupération de la liste des élèves:', err);
@@ -210,7 +199,7 @@ export const useListeElevesClasseData = (refreshTrigger = 0) => {
         } finally {
             setLoading(false);
         }
-    }, [dynamicEcoleId, dynamicAcademicYearId, apiUrls.inscriptions]);
+    }, [apiUrls.inscriptions]);
 
     useEffect(() => {
         fetchEleves(false);

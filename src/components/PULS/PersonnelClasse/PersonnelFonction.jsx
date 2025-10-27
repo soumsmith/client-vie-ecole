@@ -39,6 +39,7 @@ import {
     personnelFonctionTableConfig
 } from './PersonnelFonctionService';
 import GradientButton from '../../GradientButton';
+import IconBox from "../Composant/IconBox";
 
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE MODERNE
@@ -102,7 +103,7 @@ const PersonnelFonctionFilters = ({
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
+                {/* <div style={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     borderRadius: '10px',
                     padding: '8px',
@@ -111,7 +112,8 @@ const PersonnelFonctionFilters = ({
                     justifyContent: 'center'
                 }}>
                     <FiUserCheck size={18} color="white" />
-                </div>
+                </div> */}
+                <IconBox icon={FiUserCheck} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Affectations Personnel par Fonction
@@ -299,7 +301,7 @@ const PersonnelFonctionStatsHeader = ({ affectations, loading, selectedFonctionI
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
+                {/* <div style={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     borderRadius: '10px',
                     padding: '8px',
@@ -308,7 +310,8 @@ const PersonnelFonctionStatsHeader = ({ affectations, loading, selectedFonctionI
                     justifyContent: 'center'
                 }}>
                     <FiUsers size={18} color="white" />
-                </div>
+                </div> */}
+                <IconBox icon={FiUsers} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Affectations - {selectedFonctionInfo?.libelle || 'Fonction'}

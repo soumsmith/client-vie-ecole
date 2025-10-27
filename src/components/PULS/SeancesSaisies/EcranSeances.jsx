@@ -28,14 +28,14 @@ import {
 
 
 // Hook pour récupérer les statistiques
-const useStatistiquesSeances = (anneeId, ecoleId) => {
+const useStatistiquesSeances = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const apiUrls = useAllApiUrls();
 
     const fetchStatistiques = useCallback(async () => {
-        if (!anneeId || !ecoleId) return;
+        // if (!anneeId || !ecoleId) return;
 
         try {
             setLoading(true);
@@ -44,33 +44,15 @@ const useStatistiquesSeances = (anneeId, ecoleId) => {
             // Simulation de l'API - remplacez par votre URL réelle
             const response = await axios.get(apiUrls.seances.getStatSceanceEcole());
 
-
-            if (!response.ok) throw new Error('Erreur lors du chargement');
-
-            const result = await response.json();
-            setData(result);
+            setData(response.data);
         } catch (err) {
             setError(err.message);
             // Données de démonstration en cas d'erreur
-            setData({
-                ecoleId: ecoleId,
-                ecoleLibelle: "COLLEGE PRIVE BKB",
-                searchLevel: "ECOLE",
-                totalAppelGeneral: 468,
-                totalAppelGeneralEffectue: 2,
-                totalAppelJour: 0,
-                totalAppelJourEffectue: 0,
-                totalCTGeneral: 468,
-                totalCTGeneralEffectue: 4,
-                totalCTJour: 0,
-                totalCTJourEffectue: 0,
-                totalGeneral: 311,
-                totalJour: 0
-            });
+
         } finally {
             setLoading(false);
         }
-    }, [anneeId, ecoleId]);
+    }, []);
 
     useEffect(() => {
         fetchStatistiques();
@@ -89,6 +71,8 @@ const useSeancesData = () => {
         limit: 10,
         total: 0
     });
+    const apiUrls = useAllApiUrls();
+
 
     const fetchSeances = useCallback(async (dateDebut, dateFin, page = 0, rows = 10, classeId = null, matiereId = null) => {
         try {

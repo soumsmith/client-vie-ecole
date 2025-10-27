@@ -35,6 +35,8 @@ import {
 } from './SeanceService';
 import { useClassesData } from "../../utils/CommonDataService";
 import { usePulsParams } from '../../../hooks/useDynamicParams';
+import GradientButton from '../../../GradientButton';
+import IconBox from "../../Composant/IconBox";
 
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE
@@ -92,16 +94,8 @@ const SearchForm = ({ onSearch, onClear, loading = false, error = null }) => {
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    borderRadius: '10px',
-                    padding: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <FiSearch size={18} color="white" />
-                </div>
+               
+                <IconBox icon={FiSearch} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Recherche des Séances
@@ -182,22 +176,17 @@ const SearchForm = ({ onSearch, onClear, loading = false, error = null }) => {
                             Action
                         </label>
                         <div style={{ display: 'flex', gap: 8, height: '40px' }}>
-                            <Button
-                                appearance="primary"
-                                onClick={handleSearch}
+                            
+                            <GradientButton
+                                icon={<FiSearch size={16} />}
+                                text="Recherche"
+                                loadingText="Chargement..."
                                 loading={loading}
                                 disabled={classesLoading || loading}
-                                style={{
-                                    flex: 1,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontWeight: '500'
-                                }}
-                                size="lg"
-                            >
-                                {loading ? 'Recherche...' : 'Rechercher'}
-                            </Button>
+                                onClick={handleSearch}
+                                variant="primary"
+                                style={{ flex: 1 }}
+                            />
 
                             <Button
                                 onClick={handleClear}

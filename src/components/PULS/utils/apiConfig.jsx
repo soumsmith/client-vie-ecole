@@ -881,7 +881,7 @@ const useInscriptionsUrls = () => {
          * @param {number} ecoleId - ID de l'école
          * @param {number} anneeId - ID de l'année
          */
-        listEleveClasse: (ecoleId, anneeId) =>
+        listEleveClasse: () =>
             `${baseUrl}inscriptions/list-eleve-classe/${params.ecoleId}/${params.academicYearId}`,
 
     }), [params, baseUrl]);
@@ -1176,7 +1176,6 @@ const useSeancesUrls = () => {
             `${baseUrl}seances/stat-seance-by-annee-and-ecole?annee=${params.academicYearId}&ecole=${params.ecoleId}`,
 
         getSceanceEcoleByDate: (
-            ecoleId,
             dateDebutStr,
             dateFinStr,
             page,
@@ -1184,7 +1183,7 @@ const useSeancesUrls = () => {
             classeId,
             matiereId
         ) => {
-            let url = `${baseUrl}seances/seances-dto-by-ecole-and-date?ecole=${ecoleId}&dateDebut=${dateDebutStr}&dateFin=${dateFinStr}&page=${page}&rows=${rows}`;
+            let url = `${baseUrl}seances/seances-dto-by-ecole-and-criteria?ecole=${params.ecoleId}&dateDebut=${dateDebutStr}&dateFin=${dateFinStr}&page=${page}&rows=${rows}`;
 
             if (classeId) url += `&classe=${classeId}`;
             if (matiereId) url += `&matiere=${matiereId}`;

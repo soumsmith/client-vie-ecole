@@ -1,18 +1,18 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { 
-    Button, 
-    Panel, 
-    Row, 
-    Col, 
-    Message, 
-    Loader, 
+import {
+    Button,
+    Panel,
+    Row,
+    Col,
+    Message,
+    Loader,
     Badge
 } from 'rsuite';
-import { 
-    FiBookOpen, 
-    FiGrid, 
+import {
+    FiBookOpen,
+    FiGrid,
     FiPlus,
     FiRefreshCw,
     FiDownload,
@@ -28,6 +28,7 @@ import { useListeMatieresData, listematieresTableConfig } from './ListeMatieresS
 // Import du modal de modification
 import EditMatiereModal from './EditMatiereModal';
 import IconBox from "../Composant/IconBox";
+import GradientButton from '../../GradientButton';
 
 
 // ===========================
@@ -57,7 +58,7 @@ const MatieresStatsHeader = ({ matieres, loading }) => {
     const matieresPEC = matieres.filter(m => m.is_pec_active).length;
     const matieresBonus = matieres.filter(m => m.is_bonus_active).length;
     const matieresAcademiques = matieres.filter(m => m.is_academic).length;
-    
+
     // Répartition par type
     const typesUniques = [...new Set(matieres.map(m => m.type))];
     const typeStats = typesUniques.map(type => ({
@@ -79,15 +80,15 @@ const MatieresStatsHeader = ({ matieres, loading }) => {
             marginBottom: '20px'
         }}>
             {/* En-tête */}
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: 12,
                 marginBottom: 20,
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                
+
                 <IconBox icon={FiBookOpen} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
@@ -207,9 +208,9 @@ const MatieresStatsHeader = ({ matieres, loading }) => {
             {/* Badges informatifs des types */}
             <div style={{ marginTop: 15, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {typeStats.slice(0, 6).map((typeStat, index) => (
-                    <Badge 
-                        key={typeStat.type} 
-                        color={['green', 'blue', 'orange', 'violet', 'cyan', 'red'][index % 6]} 
+                    <Badge
+                        key={typeStat.type}
+                        color={['green', 'blue', 'orange', 'violet', 'cyan', 'red'][index % 6]}
                         style={{ fontSize: '11px' }}
                     >
                         {typeStat.count} {typeStat.display}
@@ -291,10 +292,10 @@ const ListeMatieres = () => {
 
     const handleSaveEditModal = useCallback(async (data) => {
         console.log('Matière modifiée:', data);
-        
+
         // Actualiser les données après modification
         setRefreshTrigger(prev => prev + 1);
-        
+
         // Fermer le modal
         handleCloseEditModal();
     }, [handleCloseEditModal]);
@@ -359,8 +360,8 @@ const ListeMatieres = () => {
     // RENDU DU COMPOSANT
     // ===========================
     return (
-        <div style={{ 
-             
+        <div style={{
+
             minHeight: '100vh',
             padding: '20px 0'
         }}>
@@ -406,9 +407,9 @@ const ListeMatieres = () => {
                                 </div>
                                 <Button
                                     appearance="primary"
-                                    style={{ 
+                                    style={{
                                         marginLeft: 'auto',
-                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                        // background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                         border: 'none'
                                     }}
                                     startIcon={<FiRefreshCw />}
@@ -416,6 +417,15 @@ const ListeMatieres = () => {
                                 >
                                     Réessayer
                                 </Button>
+                                {/* <GradientButton
+                                    icon={<FiRefreshCw size={16} />}
+                                    text="Réessayer"
+                                    loadingText="Chargement..."
+                                    loading={loading}
+                                    onClick={handleRefresh}
+                                    variant="primary"
+                                    style={{ flex: 1, display :'inline'}}
+                                /> */}
                             </div>
                         </div>
                     </div>
@@ -435,35 +445,35 @@ const ListeMatieres = () => {
                                 <DataTable
                                     title="Liste des Matières d'École"
                                     subtitle="matière(s) configurée(s)"
-                                    
+
                                     data={matieres}
                                     loading={loading}
                                     error={null}
-                                    
+
                                     columns={listematieresTableConfig.columns}
                                     searchableFields={listematieresTableConfig.searchableFields}
                                     filterConfigs={listematieresTableConfig.filterConfigs}
                                     actions={listematieresTableConfig.actions}
-                                    
+
                                     onAction={handleTableActionLocal}
                                     onRefresh={handleRefresh}
                                     onCreateNew={handleCreateMatiere}
-                                    
+
                                     defaultPageSize={listematieresTableConfig.pageSize}
                                     pageSizeOptions={[10, 15, 25, 50]}
                                     tableHeight={650}
-                                    
+
                                     enableRefresh={true}
                                     enableCreate={false}
                                     createButtonText="Nouvelle Matière"
                                     selectable={false}
                                     rowKey="id"
-                                    
+
                                     customStyles={{
                                         container: { backgroundColor: "transparent" },
                                         panel: { minHeight: "650px", border: "none", boxShadow: "none" },
                                     }}
-                                    
+
                                     // Boutons d'action supplémentaires
                                     extraActions={[
                                         {
@@ -518,7 +528,7 @@ const ListeMatieres = () => {
                                 </p>
                                 <Button
                                     appearance="primary"
-                                    style={{ 
+                                    style={{
                                         marginTop: 15,
                                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                         border: 'none'
