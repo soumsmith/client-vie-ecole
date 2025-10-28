@@ -551,7 +551,7 @@ const EditMatiereModal = ({ show, matiere, onClose, onSave }) => {
                                             value={formData.matiereParentId}
                                             onChange={(value) => handleInputChange('matiereParentId', value)}
                                             placeholder="Sélectionner la matière parent"
-                                            disabled={isSubmitting || isLoadingData}
+                                            disabled={true} //isSubmitting || isLoadingData
                                             loading={isLoadingData}
                                             style={{ width: '100%' }}
                                             cleanable={true}
