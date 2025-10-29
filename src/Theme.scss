@@ -465,6 +465,13 @@ $niveaux: (
         justify-content: center;
     }
 
+    // Dashboard Head Card - NOUVEAU
+    .dashboard-head-card-#{$niveau} {
+        background: linear-gradient(90deg, #{$primary} 0%, #{$bg} 100%) !important;
+        color: var(--text-color) !important;
+        border-radius: 8px !important;
+    }
+
     // Ouverture Année Scolaire
     .OuvertureAnneeScolaire-#{$niveau},
     .OuvertureAnneeScolaire-niveauEnseignement-#{$niveau} {
@@ -1317,6 +1324,8 @@ $niveaux: (
         }
     }
 }
+
+
 
 // Statistics cards (4 cartes en haut)
 .landing-stats-grid {

@@ -87,6 +87,8 @@ const useClassesUrls = () => {
     const params = useAppParams();
     const baseUrl = getFullUrl();
 
+    console.log("je suis marie syntiche", params);
+
     return useMemo(() => ({
 
         /**
@@ -99,8 +101,11 @@ const useClassesUrls = () => {
         /**
          * Liste des classes par école (triées) (utilise automatiquement l'école de l'utilisateur connecté)
          */
-        listByEcoleSorted: () =>
+        allListEcoleSorted: () =>
             `${baseUrl}classes/list-by-ecole-sorted?ecole=${params.ecoleId}`,
+
+        listByEcoleSorted: () =>
+            `${baseUrl}classes/get-classe-dto-by-user-type?annee=${params.academicYearId}&ecole=${params.ecoleId}&personnel=${params.personnelInfo.personnelConnecteDetail.personnelid}&profil=${params.profileId}`,
 
         /**
          * Liste de toutes les classes populées par école (utilise automatiquement l'école de l'utilisateur connecté)

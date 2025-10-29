@@ -373,6 +373,12 @@
   justify-content: center;
 }
 
+.dashboard-head-card-undefined {
+  background: linear-gradient(90deg, #1d4ed8 0%, #0f172a 100%) !important;
+  color: var(--text-color) !important;
+  border-radius: 8px !important;
+}
+
 .OuvertureAnneeScolaire-undefined,
 .OuvertureAnneeScolaire-niveauEnseignement-undefined {
   background: linear-gradient(90deg, #1d4ed8 0%, #1e40af 100%) !important;
@@ -413,6 +419,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.dashboard-head-card-EnseignementMaternelle {
+  background: linear-gradient(90deg, #ff6ab4 0%, #31316b 100%) !important;
+  color: var(--text-color) !important;
+  border-radius: 8px !important;
 }
 
 .OuvertureAnneeScolaire-EnseignementMaternelle,
@@ -457,6 +469,12 @@
   justify-content: center;
 }
 
+.dashboard-head-card-EnseignementPrimaire {
+  background: linear-gradient(90deg, #544d94 0%, #202024 100%) !important;
+  color: var(--text-color) !important;
+  border-radius: 8px !important;
+}
+
 .OuvertureAnneeScolaire-EnseignementPrimaire,
 .OuvertureAnneeScolaire-niveauEnseignement-EnseignementPrimaire {
   background: linear-gradient(90deg, #544d94 0%, #433d75 100%) !important;
@@ -497,6 +515,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.dashboard-head-card-EnseignementSecondaireGénérale {
+  background: linear-gradient(90deg, #82bc42 0%, #202126 100%) !important;
+  color: var(--text-color) !important;
+  border-radius: 8px !important;
 }
 
 .OuvertureAnneeScolaire-EnseignementSecondaireGénérale,
@@ -541,6 +565,12 @@
   justify-content: center;
 }
 
+.dashboard-head-card-EnseignementSecondaireTechnique {
+  background: linear-gradient(90deg, #8b7355 0%, #000 100%) !important;
+  color: var(--text-color) !important;
+  border-radius: 8px !important;
+}
+
 .OuvertureAnneeScolaire-EnseignementSecondaireTechnique,
 .OuvertureAnneeScolaire-niveauEnseignement-EnseignementSecondaireTechnique {
   background: linear-gradient(90deg, #8b7355 0%, #725e45 100%) !important;
@@ -583,6 +613,12 @@
   justify-content: center;
 }
 
+.dashboard-head-card-ENSEIGNEMENTSUPERIEUR {
+  background: linear-gradient(90deg, #8f44ad 0%, #202126 100%) !important;
+  color: var(--text-color) !important;
+  border-radius: 8px !important;
+}
+
 .OuvertureAnneeScolaire-ENSEIGNEMENTSUPERIEUR,
 .OuvertureAnneeScolaire-niveauEnseignement-ENSEIGNEMENTSUPERIEUR {
   background: linear-gradient(90deg, #8f44ad 0%, #7a3a94 100%) !important;
@@ -623,6 +659,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.dashboard-head-card-BREVETDETECHNICIENBT {
+  background: linear-gradient(90deg, #3072f1 0%, #04183f 100%) !important;
+  color: var(--text-color) !important;
+  border-radius: 8px !important;
 }
 
 .OuvertureAnneeScolaire-BREVETDETECHNICIENBT,

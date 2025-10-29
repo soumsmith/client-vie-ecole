@@ -11,10 +11,10 @@ import useLoginData from './Menu/useLoginData';
 import LightTopBar from './LightTopBar';
 
 import Sidebar from './Sidebar';
-import Dashboard from './Dashboard';
+import Dashboard from './PULS/TableauDeBord/Dashboard';
 import DashboardEnseignementSecondaireGenerale from './DashboardEnseignementSecondaireGenerale';
 import DashboardPrimaire from './DashboardPrimaire';
-import BREVETDETECHNICIENBT from './BREVETDETECHNICIENBT';
+import BREVETDETECHNICIENBT from './PULS/TableauDeBord/BREVETDETECHNICIENBT';
 import EnseignementSuperieur from './EnseignementSuperieur';
 import EnseignementSecondaireTechnique from './EnseignementSecondaireTechnique';
 
@@ -734,7 +734,15 @@ const Layout = ({ onLogout }) => {
               {/* <Route path="/dashboard" element={<Dashboard />} /> */}
               {/* <Route path="/" element={<Dashboard />} /> */}
 
-              <Route path="/dashboard" element={getDashboardComponent(academicYear?.niveauEnseignement?.id)} />
+              {getUserProfile() === "Professeur" && (
+                <Route path="/dashboard" element={<Dashboard />} />
+              )}
+
+              {getUserProfile() != "Professeur" && (
+                <Route path="/dashboard" element={getDashboardComponent(academicYear?.niveauEnseignement?.id)} />
+              )}
+
+
 
 
               {/* {academicYear.niveauEnseignement?.id === 1 && (
