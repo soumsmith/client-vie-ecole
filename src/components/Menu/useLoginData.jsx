@@ -837,8 +837,11 @@ const useLoginData = (config) => {
                 data === "Admin" ||
                 data === "Educateur" ||
                 data === "Directeur des études(DE)" ||
-                data === "Mot de passe correct!"
+                data === "Mot de passe correct!"||
+                data === "Ce compte a expiré!" // Nouvelle ajout
             );
+
+            // 
 
             if (isSuccess) {
                 console.log('✅ Connexion réussie !');

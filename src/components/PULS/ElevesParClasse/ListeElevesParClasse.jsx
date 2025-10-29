@@ -30,6 +30,7 @@ import { useListeElevesClasseData, listeElevesClasseTableConfig } from './ListeE
 // Import des modals d'InscriptionsAValider - EXACTEMENT LES MÊMES
 import EleveDetailsModal from '../InscriptionsAValider/EleveDetailsModal';
 import PrintModal from '../InscriptionsAValider/PrintModal';
+import IconBox from "../Composant/IconBox";
 
 // ===========================
 // MODAL DE VALIDATION/REFUS - COPIÉ EXACTEMENT DEPUIS InscriptionsAValider
@@ -171,7 +172,7 @@ const ElevesStatsHeader = ({ eleves, loading }) => {
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
+                {/* <div style={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     borderRadius: '10px',
                     padding: '8px',
@@ -180,7 +181,8 @@ const ElevesStatsHeader = ({ eleves, loading }) => {
                     justifyContent: 'center'
                 }}>
                     <FiUsers size={18} color="white" />
-                </div>
+                </div> */}
+                <IconBox icon={FiUsers} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Statistique de la liste des Élèves

@@ -22,6 +22,7 @@ import {
 import axios from 'axios';
 import { useAllApiUrls } from '../utils/apiConfig';
 import { Input, Radio, Checkbox } from 'rsuite';
+import IconBox from "../Composant/IconBox";
 
 const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
     const [activeTab, setActiveTab] = useState('validation');
@@ -443,7 +444,7 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                     fontSize: '18px',
                     fontWeight: '600'
                 }}>
-                    <div style={{
+                    {/* <div style={{
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         borderRadius: '8px',
                         padding: '8px',
@@ -452,7 +453,8 @@ const EleveDetailsModal = ({ show, inscription, onClose, onSave }) => {
                         justifyContent: 'center'
                     }}>
                         <FiUser size={18} color="white" />
-                    </div>
+                    </div> */}
+                    <IconBox icon={FiUser} />
                     Détails de l'élève - {inscription.nomComplet}
                 </Modal.Title>
             </Modal.Header>

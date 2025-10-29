@@ -498,7 +498,7 @@ const ModalAffectationEleves = ({
                                         flexDirection: 'column'
                                     }}
                                 >
-                                    <InputGroup style={{ marginBottom: '12px' }}>
+                                    <InputGroup className='mt-3' style={{ marginBottom: '12px' }}>
                                         <InputGroup.Addon>
                                             <FiSearch />
                                         </InputGroup.Addon>
@@ -614,7 +614,7 @@ const ModalAffectationEleves = ({
                                         flexDirection: 'column'
                                     }}
                                 >
-                                    <InputGroup style={{ marginBottom: '12px' }}>
+                                    <InputGroup className='mt-3' style={{ marginBottom: '12px' }}>
                                         <InputGroup.Addon>
                                             <FiSearch />
                                         </InputGroup.Addon>

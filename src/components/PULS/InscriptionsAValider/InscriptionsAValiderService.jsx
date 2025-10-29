@@ -222,11 +222,11 @@ export const useInscriptionsAValiderData = (
         } finally {
             setLoading(false);
         }
-    }, [ecoleId, anneeId, typeInscription]);
+    }, [typeInscription]);
 
     useEffect(() => {
         fetchInscriptions(false);
-    }, [ecoleId, anneeId, typeInscription, refreshTrigger, fetchInscriptions]);
+    }, [typeInscription, refreshTrigger, fetchInscriptions]);
 
     return {
         inscriptions: data,

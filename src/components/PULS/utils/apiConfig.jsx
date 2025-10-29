@@ -87,6 +87,8 @@ const useClassesUrls = () => {
     const params = useAppParams();
     const baseUrl = getFullUrl();
 
+    console.log("je suis marie syntiche", params);
+
     return useMemo(() => ({
 
         /**
@@ -99,8 +101,11 @@ const useClassesUrls = () => {
         /**
          * Liste des classes par école (triées) (utilise automatiquement l'école de l'utilisateur connecté)
          */
-        listByEcoleSorted: () =>
+        allListEcoleSorted: () =>
             `${baseUrl}classes/list-by-ecole-sorted?ecole=${params.ecoleId}`,
+
+        listByEcoleSorted: () =>
+            `${baseUrl}classes/get-classe-dto-by-user-type?annee=${params.academicYearId}&ecole=${params.ecoleId}&personnel=${params.personnelInfo.personnelConnecteDetail.personnelid}&profil=${params.profileId}`,
 
         /**
          * Liste de toutes les classes populées par école (utilise automatiquement l'école de l'utilisateur connecté)
@@ -881,7 +886,7 @@ const useInscriptionsUrls = () => {
          * @param {number} ecoleId - ID de l'école
          * @param {number} anneeId - ID de l'année
          */
-        listEleveClasse: (ecoleId, anneeId) =>
+        listEleveClasse: () =>
             `${baseUrl}inscriptions/list-eleve-classe/${params.ecoleId}/${params.academicYearId}`,
 
     }), [params, baseUrl]);
@@ -1176,7 +1181,6 @@ const useSeancesUrls = () => {
             `${baseUrl}seances/stat-seance-by-annee-and-ecole?annee=${params.academicYearId}&ecole=${params.ecoleId}`,
 
         getSceanceEcoleByDate: (
-            ecoleId,
             dateDebutStr,
             dateFinStr,
             page,
@@ -1184,7 +1188,7 @@ const useSeancesUrls = () => {
             classeId,
             matiereId
         ) => {
-            let url = `${baseUrl}seances/seances-dto-by-ecole-and-date?ecole=${ecoleId}&dateDebut=${dateDebutStr}&dateFin=${dateFinStr}&page=${page}&rows=${rows}`;
+            let url = `${baseUrl}seances/seances-dto-by-ecole-and-criteria?ecole=${params.ecoleId}&dateDebut=${dateDebutStr}&dateFin=${dateFinStr}&page=${page}&rows=${rows}`;
 
             if (classeId) url += `&classe=${classeId}`;
             if (matiereId) url += `&matiere=${matiereId}`;

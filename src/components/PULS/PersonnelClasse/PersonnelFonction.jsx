@@ -1,24 +1,24 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { 
-    SelectPicker, 
-    Button, 
-    Panel, 
-    Row, 
-    Col, 
-    Message, 
-    Loader, 
+import {
+    SelectPicker,
+    Button,
+    Panel,
+    Row,
+    Col,
+    Message,
+    Loader,
     Badge,
     Steps,
     Modal,
     Notification,
     toaster
 } from 'rsuite';
-import { 
-    FiSearch, 
-    FiRotateCcw, 
-    FiUser, 
+import {
+    FiSearch,
+    FiRotateCcw,
+    FiUser,
     FiUsers,
     FiBookOpen,
     FiPlus,
@@ -33,30 +33,31 @@ import {
 import { useCommonState } from '../../hooks/useCommonState';
 import DataTable from "../../DataTable";
 import AffecterClassePersonnelModal from './AffecterClassePersonnelModal'; // Nouveau modal
-import { 
-    useFonctionsData, 
+import {
+    useFonctionsData,
     usePersonnelFonctionData,
     personnelFonctionTableConfig
 } from './PersonnelFonctionService';
 import GradientButton from '../../GradientButton';
+import IconBox from "../Composant/IconBox";
 
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE MODERNE
 // ===========================
-const PersonnelFonctionFilters = ({ 
-    onSearch, 
-    onClear, 
-    loading = false, 
+const PersonnelFonctionFilters = ({
+    onSearch,
+    onClear,
+    loading = false,
     error = null,
     selectedFonction,
     onFonctionChange
 }) => {
     const [formError, setFormError] = useState(null);
 
-    const { 
-        fonctions, 
-        loading: fonctionsLoading, 
-        error: fonctionsError 
+    const {
+        fonctions,
+        loading: fonctionsLoading,
+        error: fonctionsError
     } = useFonctionsData();
 
     const handleSearch = useCallback(() => {
@@ -85,7 +86,7 @@ const PersonnelFonctionFilters = ({
     }));
 
     return (
-        <div style={{ 
+        <div style={{
             background: 'white',
             borderRadius: '15px',
             padding: '25px',
@@ -94,15 +95,15 @@ const PersonnelFonctionFilters = ({
             marginBottom: '20px'
         }}>
             {/* En-tête moderne */}
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: 12,
                 marginBottom: 25,
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
+                {/* <div style={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     borderRadius: '10px',
                     padding: '8px',
@@ -111,7 +112,8 @@ const PersonnelFonctionFilters = ({
                     justifyContent: 'center'
                 }}>
                     <FiUserCheck size={18} color="white" />
-                </div>
+                </div> */}
+                <IconBox icon={FiUserCheck} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Affectations Personnel par Fonction
@@ -143,10 +145,10 @@ const PersonnelFonctionFilters = ({
             <Row gutter={20}>
                 <Col xs={24} sm={16} md={14}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: '#475569',
                             fontSize: '14px'
                         }}>
@@ -171,10 +173,10 @@ const PersonnelFonctionFilters = ({
 
                 <Col xs={24} sm={8} md={6}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: 'transparent',
                             fontSize: '14px'
                         }}>
@@ -192,11 +194,11 @@ const PersonnelFonctionFilters = ({
                                 variant="primary"
                                 style={{ flex: 1 }}
                             />
-                            
+
                             <Button
                                 onClick={handleClear}
                                 disabled={loading}
-                                style={{ 
+                                style={{
                                     minWidth: '45px',
                                     borderRadius: '8px',
                                     border: '1px solid #e2e8f0'
@@ -212,8 +214,8 @@ const PersonnelFonctionFilters = ({
 
             {/* Indicateur de progression */}
             <div style={{ marginTop: 15 }}>
-                <Steps 
-                    current={selectedFonction ? 1 : 0} 
+                <Steps
+                    current={selectedFonction ? 1 : 0}
                     size="small"
                     style={{ background: '#f8fafc', padding: '15px', borderRadius: '8px' }}
                 >
@@ -224,10 +226,10 @@ const PersonnelFonctionFilters = ({
 
             {/* Loading indicator discret */}
             {isDataLoading && (
-                <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 10, 
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
                     marginTop: 15,
                     padding: '10px 15px',
                     background: '#f0f9ff',
@@ -270,14 +272,14 @@ const PersonnelFonctionStatsHeader = ({ affectations, loading, selectedFonctionI
     const totalAffectations = affectations.length;
     const personnelsUniques = [...new Set(affectations.map(a => a.personnel_id))].length;
     const classesAffectees = [...new Set(affectations.map(a => a.classe_id))].length;
-    
+
     // Répartition par genre
     const masculins = affectations.filter(a => a.personnel_sexe === 'MASCULIN').length;
     const feminins = affectations.filter(a => a.personnel_sexe === 'FEMININ').length;
-    
+
     // Types de fonctions représentés
     const typesFonctions = [...new Set(affectations.map(a => a.typeFonction).filter(Boolean))];
-    
+
     // Niveaux d'enseignement
     const niveauxEnseignement = [...new Set(affectations.map(a => a.niveauEnseignement_libelle).filter(Boolean))];
 
@@ -291,15 +293,15 @@ const PersonnelFonctionStatsHeader = ({ affectations, loading, selectedFonctionI
             marginBottom: '20px'
         }}>
             {/* En-tête */}
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: 12,
                 marginBottom: 20,
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
+                {/* <div style={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     borderRadius: '10px',
                     padding: '8px',
@@ -308,7 +310,8 @@ const PersonnelFonctionStatsHeader = ({ affectations, loading, selectedFonctionI
                     justifyContent: 'center'
                 }}>
                     <FiUsers size={18} color="white" />
-                </div>
+                </div> */}
+                <IconBox icon={FiUsers} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Affectations - {selectedFonctionInfo?.libelle || 'Fonction'}
@@ -393,9 +396,9 @@ const PersonnelFonctionStatsHeader = ({ affectations, loading, selectedFonctionI
             {/* Badges informatifs */}
             <div style={{ marginTop: 15, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {typesFonctions.slice(0, 3).map((type, index) => (
-                    <Badge 
-                        key={type} 
-                        color={['green', 'blue', 'orange'][index % 3]} 
+                    <Badge
+                        key={type}
+                        color={['green', 'blue', 'orange'][index % 3]}
                         style={{ fontSize: '11px' }}
                     >
                         {type}
@@ -450,11 +453,11 @@ const PersonnelFonction = () => {
     // ===========================
     const handleSearch = useCallback(async ({ fonctionId }) => {
         console.log('🔍 Lancement de la recherche des affectations:', { fonctionId });
-        
+
         // Récupérer les infos de la fonction sélectionnée
         const fonctionInfo = fonctions.find(f => f.id === fonctionId);
         setSelectedFonctionInfo(fonctionInfo);
-        
+
         await searchAffectations(fonctionId);
     }, [searchAffectations, fonctions]);
 
@@ -471,23 +474,23 @@ const PersonnelFonction = () => {
     const handleTableActionLocal = useCallback((actionType, item) => {
         console.log('Action:', actionType, 'Item:', item);
 
-        switch(actionType) {
+        switch (actionType) {
             case 'edit':
                 if (item && item.id) {
                     navigate(`/personnel/affectations/edit/${item.id}`);
                 }
                 break;
-                
+
             case 'view':
                 if (item && item.personnel_id) {
                     navigate(`/personnel/profile/${item.personnel_id}`);
                 }
                 break;
-                
+
             case 'create':
                 setAffectationModalVisible(true);
                 break;
-                
+
             default:
                 handleTableAction(actionType, item);
                 break;
@@ -510,7 +513,7 @@ const PersonnelFonction = () => {
         if (selectedFonction && searchPerformed) {
             searchAffectations(selectedFonction);
         }
-        
+
         // Notification de succès
         Notification.success({
             title: 'Affectation créée avec succès',
@@ -547,8 +550,8 @@ const PersonnelFonction = () => {
     // RENDU DU COMPOSANT
     // ===========================
     return (
-        <div style={{ 
-             
+        <div style={{
+
             minHeight: '100vh',
             padding: '20px 0'
         }}>
@@ -571,7 +574,7 @@ const PersonnelFonction = () => {
                 {searchPerformed && (
                     <div className="row">
                         <div className="col-lg-12">
-                            <PersonnelFonctionStatsHeader 
+                            <PersonnelFonctionStatsHeader
                                 affectations={affectations}
                                 loading={searchLoading}
                                 selectedFonctionInfo={selectedFonctionInfo}
@@ -668,35 +671,35 @@ const PersonnelFonction = () => {
                                 <DataTable
                                     title="Affectations Personnel par Fonction"
                                     subtitle="affectation(s) trouvée(s)"
-                                    
+
                                     data={affectations}
                                     loading={searchLoading}
                                     error={null}
-                                    
+
                                     columns={personnelFonctionTableConfig.columns}
                                     searchableFields={personnelFonctionTableConfig.searchableFields}
                                     filterConfigs={personnelFonctionTableConfig.filterConfigs}
                                     actions={personnelFonctionTableConfig.actions}
-                                    
+
                                     onAction={handleTableActionLocal}
                                     onRefresh={handleRefresh}
                                     onCreateNew={handleCreateAffectation}
-                                    
+
                                     defaultPageSize={personnelFonctionTableConfig.pageSize}
                                     pageSizeOptions={[10, 15, 25, 50]}
                                     tableHeight={650}
-                                    
+
                                     enableRefresh={true}
                                     enableCreate={true}
                                     createButtonText="Nouvelle Affectation"
                                     selectable={false}
                                     rowKey="id"
-                                    
+
                                     customStyles={{
                                         container: { backgroundColor: "transparent" },
                                         panel: { minHeight: "650px", border: "none", boxShadow: "none" },
                                     }}
-                                    
+
                                     // Boutons d'action supplémentaires
                                     extraActions={[
                                         {
@@ -744,7 +747,7 @@ const PersonnelFonction = () => {
                                 </p>
                                 <Button
                                     appearance="primary"
-                                    style={{ 
+                                    style={{
                                         marginTop: 15,
                                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                         border: 'none'

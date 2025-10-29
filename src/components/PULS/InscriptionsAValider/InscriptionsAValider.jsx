@@ -33,6 +33,7 @@ import {
 // Import des composants modaux séparés
 import EleveDetailsModal from './EleveDetailsModal';
 import PrintModal from './PrintModal';
+import IconBox from "../Composant/IconBox";
 
 // ===========================
 // COMPOSANT D'EN-TÊTE AVEC STATISTIQUES DE VALIDATION
@@ -93,7 +94,7 @@ const InscriptionsStatsHeader = ({ inscriptions, loading }) => {
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <div style={{
+                {/* <div style={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     borderRadius: '10px',
                     padding: '8px',
@@ -102,7 +103,8 @@ const InscriptionsStatsHeader = ({ inscriptions, loading }) => {
                     justifyContent: 'center'
                 }}>
                     <FiCheckCircle size={18} color="white" />
-                </div>
+                </div> */}
+                <IconBox icon={FiCheckCircle} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Inscriptions à Valider

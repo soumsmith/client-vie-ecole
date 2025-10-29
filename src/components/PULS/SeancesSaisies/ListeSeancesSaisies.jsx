@@ -12,10 +12,10 @@ import {
     clearSeancesSaisiesCache
 } from './SeancesSaisiesServiceManager';
 import { usePulsParams } from '../../hooks/useDynamicParams';
+import { getUserProfile } from "../../hooks/userUtils";
 
 const ListeSeancesSaisies = () => {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
-    const { ecoleId: dynamicEcoleId } = usePulsParams();
 
     // ===========================
     // ÉTAT DU MODAL
@@ -254,7 +254,7 @@ const ListeSeancesSaisies = () => {
                         pageSizeOptions={[10, 15, 25, 50]}
                         tableHeight={650}
                         enableRefresh={true}
-                        enableCreate={true}
+                        enableCreate={getUserProfile() != 'Professeur' ? true : false}
                         createButtonText="Nouvelle Séance"
                         selectable={true}
                         rowKey="id"
