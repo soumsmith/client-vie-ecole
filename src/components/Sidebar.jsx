@@ -577,7 +577,7 @@ const allMenuSections = [
         eventKey: "importerEleves",
         icon: "DocPassIcon",
         title: "Importer des Elèves",
-        profiles: ["admin", "manager"],
+        profiles: ["admin", "manager", "DE", "Educateur", "Fondateur"],
       },
       // Identification Elèves
       {
@@ -585,7 +585,7 @@ const allMenuSections = [
         eventKey: "identificationEleves",
         icon: "DocPassIcon",
         title: "Identification Elèves",
-        profiles: ["admin", "manager"],
+        profiles: ["admin", "manager", "DE", "Educateur", "Fondateur"],
       },
       // Inscription à Valider
       {
