@@ -19,10 +19,29 @@ export const useSeanceSearch = () => {
     /**
      * Recherche les séances par date et classe
      */
-    const searchSeances = async (date, classeId) => {
-        if (!date || !classeId) {
+    const searchSeances = async (date, classeId, filterByClasse = false, ecoleId = null) => {
+        if (!date) {
             setError({
-                message: 'Veuillez sélectionner une date et une classe',
+                message: 'Veuillez sélectionner une date',
+                type: 'ValidationError',
+                code: 'MISSING_PARAMS'
+            });
+            return;
+        }
+
+        // Validation selon le mode de filtre
+        if (filterByClasse && !classeId) {
+            setError({
+                message: 'Veuillez sélectionner une classe',
+                type: 'ValidationError',
+                code: 'MISSING_PARAMS'
+            });
+            return;
+        }
+
+        if (!filterByClasse && !ecoleId) {
+            setError({
+                message: 'L\'identifiant de l\'école est requis',
                 type: 'ValidationError',
                 code: 'MISSING_PARAMS'
             });
@@ -35,15 +54,17 @@ export const useSeanceSearch = () => {
             setSearchPerformed(false);
 
             const baseUrl = getFullUrl();
-            const apiUrl = `${baseUrl}seances/get-distinct-list-date-classe?date=${date}&classe=${classeId}`;
-            
-            console.log('🔗 URL API séances:', apiUrl);
+
+            // Construction de l'URL selon le mode de filtre
+            const apiUrl = filterByClasse
+                ? `${baseUrl}seances/get-distinct-list-date-classe?date=${date}&classe=${classeId}`
+                : `${baseUrl}seances/get-distinct-list-date?date=${date}&ecole=${ecoleId}`;
+
 
             const response = await axios.get(apiUrl);
-            console.log('📥 Données API séances:', response.data);
 
             // Transformation des données
-            const processedSeances = Array.isArray(response.data) 
+            const processedSeances = Array.isArray(response.data)
                 ? response.data.map((item, index) => ({
                     id: `seance-${index}`,
                     classeId: item[0],
@@ -111,7 +132,7 @@ export const useSeanceDetails = () => {
 
             const baseUrl = getFullUrl();
             const apiUrl = `${baseUrl}seances/get-list-date-classe-statut?date=${date}&classe=${classeId}&statut=${statut}`;
-            
+
             console.log('🔗 URL API détails séance:', apiUrl);
 
             const response = await axios.get(apiUrl);
@@ -204,7 +225,7 @@ export const useSeanceGeneration = () => {
 
             const baseUrl = getFullUrl();
             const apiUrl = `${baseUrl}seances/generate-seances?date=${date}&classe=${classeId}&annee=${anneeId}`;
-            
+
             console.log('🔗 URL API génération séances:', apiUrl);
 
             const response = await axios.get(apiUrl);
@@ -248,22 +269,7 @@ export const useSeanceGeneration = () => {
     };
 };
 
-// ===========================
-// FONCTIONS UTILITAIRES
-// ===========================
 
-/**
- * Formate une date pour l'affichage
- */
-export const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-};
 
 /**
  * Retourne une couleur selon le statut

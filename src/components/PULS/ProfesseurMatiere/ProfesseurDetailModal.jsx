@@ -290,10 +290,7 @@ const ProfesseurDetailModal = ({ visible, onClose, professeurData, onDataLoad })
                 </div>
             </Modal.Header>
 
-            <Modal.Body style={{ 
-                padding: '32px 24px', 
-                background: '#fafafa'
-            }}>
+            <Modal.Body >
                 {loading ? (
                     <div style={{ 
                         display: 'flex', 

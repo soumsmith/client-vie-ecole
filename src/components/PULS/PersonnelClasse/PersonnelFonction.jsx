@@ -513,14 +513,6 @@ const PersonnelFonction = () => {
         if (selectedFonction && searchPerformed) {
             searchAffectations(selectedFonction);
         }
-
-        // Notification de succès
-        Notification.success({
-            title: 'Affectation créée avec succès',
-            description: 'La nouvelle affectation classe-personnel a été enregistrée.',
-            placement: 'topEnd',
-            duration: 4500,
-        });
     }, [selectedFonction, searchPerformed, searchAffectations]);
 
     // ===========================

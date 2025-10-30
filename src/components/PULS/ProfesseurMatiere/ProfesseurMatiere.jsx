@@ -1,24 +1,24 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { 
-    SelectPicker, 
-    Button, 
-    Panel, 
-    Row, 
-    Col, 
-    Message, 
-    Loader, 
+import {
+    SelectPicker,
+    Button,
+    Panel,
+    Row,
+    Col,
+    Message,
+    Loader,
     Badge,
     Steps,
     Modal,
     Notification,
     toaster
 } from 'rsuite';
-import { 
-    FiSearch, 
-    FiRotateCcw, 
-    FiUser, 
+import {
+    FiSearch,
+    FiRotateCcw,
+    FiUser,
     FiUsers,
     FiBookOpen,
     FiPlus,
@@ -36,7 +36,7 @@ import { useCommonState } from '../../hooks/useCommonState';
 import DataTable from "../../DataTable";
 import AffecterMatiereProfesseurModal from './AffecterMatiereProfesseurModal';
 import ProfesseurDetailModal from './ProfesseurDetailModal';
-import { 
+import {
     useProfesseurMatiereData,
     professeurMatiereTableConfig
 } from './ProfesseurMatiereService';
@@ -44,14 +44,16 @@ import { useMatieresEcoleData } from "../utils/CommonDataService";
 import { useAllApiUrls } from '../utils/apiConfig';
 import { getUserProfile } from "../../hooks/userUtils";
 import IconBox from "../Composant/IconBox";
+import StatistiquesProfesseurMatiere from './StatistiquesProfesseurMatiere';
+
 
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE MODERNE
 // ===========================
-const ProfesseurMatiereFilters = ({ 
-    onSearch, 
-    onClear, 
-    loading = false, 
+const ProfesseurMatiereFilters = ({
+    onSearch,
+    onClear,
+    loading = false,
     error = null,
     selectedMatiere,
     onMatiereChange
@@ -88,7 +90,7 @@ const ProfesseurMatiereFilters = ({
     }));
 
     return (
-        <div style={{ 
+        <div style={{
             background: 'white',
             borderRadius: '15px',
             padding: '25px',
@@ -97,9 +99,9 @@ const ProfesseurMatiereFilters = ({
             marginBottom: '20px'
         }}>
             {/* En-tête moderne */}
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: 12,
                 marginBottom: 25,
                 paddingBottom: 15,
@@ -137,10 +139,10 @@ const ProfesseurMatiereFilters = ({
             <Row gutter={20}>
                 <Col xs={24} sm={16} md={14}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: '#475569',
                             fontSize: '14px'
                         }}>
@@ -165,10 +167,10 @@ const ProfesseurMatiereFilters = ({
 
                 <Col xs={24} sm={8} md={6}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ 
-                            display: 'block', 
-                            marginBottom: 8, 
-                            fontWeight: '500', 
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
                             color: 'transparent',
                             fontSize: '14px'
                         }}>
@@ -180,7 +182,7 @@ const ProfesseurMatiereFilters = ({
                                 onClick={handleSearch}
                                 loading={loading}
                                 disabled={isDataLoading || loading || !selectedMatiere}
-                                style={{ 
+                                style={{
                                     flex: 1,
                                     //background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                     border: 'none',
@@ -192,11 +194,11 @@ const ProfesseurMatiereFilters = ({
                             >
                                 {loading ? 'Chargement...' : 'Afficher'}
                             </Button>
-                            
+
                             <Button
                                 onClick={handleClear}
                                 disabled={loading}
-                                style={{ 
+                                style={{
                                     minWidth: '45px',
                                     borderRadius: '8px',
                                     border: '1px solid #e2e8f0'
@@ -212,8 +214,8 @@ const ProfesseurMatiereFilters = ({
 
             {/* Indicateur de progression */}
             <div style={{ marginTop: 15 }}>
-                <Steps 
-                    current={selectedMatiere ? 1 : 0} 
+                <Steps
+                    current={selectedMatiere ? 1 : 0}
                     size="small"
                     style={{ background: '#f8fafc', padding: '15px', borderRadius: '8px' }}
                 >
@@ -224,10 +226,10 @@ const ProfesseurMatiereFilters = ({
 
             {/* Loading indicator discret */}
             {isDataLoading && (
-                <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 10, 
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
                     marginTop: 15,
                     padding: '10px 15px',
                     background: '#f0f9ff',
@@ -271,11 +273,11 @@ const ProfesseurMatiereStatsHeader = ({ affectations, loading, selectedMatiereIn
     const professeurs = affectations.filter(a => a.isProfesseur).length;
     const autresPersonnels = totalAffectations - professeurs;
     const classesAffectees = [...new Set(affectations.map(a => a.classe_id))].length;
-    
+
     // Répartition par genre
     const masculins = affectations.filter(a => a.personnel_sexe === 'MASCULIN').length;
     const feminins = affectations.filter(a => a.personnel_sexe === 'FEMININ').length;
-    
+
     // Fonctions représentées
     const fonctions = [...new Set(affectations.map(a => a.fonction_libelle))];
 
@@ -289,9 +291,9 @@ const ProfesseurMatiereStatsHeader = ({ affectations, loading, selectedMatiereIn
             marginBottom: '20px'
         }}>
             {/* En-tête */}
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: 12,
                 marginBottom: 20,
                 paddingBottom: 15,
@@ -391,9 +393,9 @@ const ProfesseurMatiereStatsHeader = ({ affectations, loading, selectedMatiereIn
             {/* Badges informatifs */}
             <div style={{ marginTop: 15, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {fonctions.slice(0, 4).map((fonction, index) => (
-                    <Badge 
-                        key={fonction} 
-                        color={['green', 'blue', 'orange', 'violet'][index % 4]} 
+                    <Badge
+                        key={fonction}
+                        color={['green', 'blue', 'orange', 'violet'][index % 4]}
                         style={{ fontSize: '11px' }}
                     >
                         {fonction}
@@ -422,7 +424,7 @@ const ProfesseurMatiere = () => {
     const [selectedMatiereInfo, setSelectedMatiereInfo] = useState(null);
     const [affectationModalVisible, setAffectationModalVisible] = useState(false);
     const apiUrls = useAllApiUrls();
-    
+
     // États pour le modal de détail
     const [detailModalVisible, setDetailModalVisible] = useState(false);
     const [selectedProfesseur, setSelectedProfesseur] = useState(null);
@@ -452,8 +454,19 @@ const ProfesseurMatiere = () => {
     // GESTION DE LA SUPPRESSION
     // ===========================
     const handleDeleteAffectation = useCallback(async (affectation) => {
+        console.log('🗑️ [DELETE] Début de la suppression:', affectation);
+        
         try {
+            // Vérification de l'objet affectation
+            if (!affectation || !affectation.id) {
+                console.error('❌ [DELETE] Affectation invalide:', affectation);
+                throw new Error('Affectation invalide ou ID manquant');
+            }
+
+            console.log('✅ [DELETE] Affectation valide, ID:', affectation.id);
+
             // Demande de confirmation
+            console.log('🔔 [DELETE] Affichage de la confirmation...');
             const result = await Swal.fire({
                 title: 'Confirmer la suppression',
                 html: `
@@ -479,9 +492,14 @@ const ProfesseurMatiere = () => {
                 }
             });
 
+            console.log('🔔 [DELETE] Résultat confirmation:', result.isConfirmed);
+
             if (!result.isConfirmed) {
+                console.log('❌ [DELETE] Suppression annulée par l\'utilisateur');
                 return;
             }
+
+            console.log('✅ [DELETE] Confirmation OK, début de la suppression...');
 
             // Affichage du loading pendant la suppression
             Swal.fire({
@@ -501,27 +519,41 @@ const ProfesseurMatiere = () => {
                 }
             });
 
+            // Vérification de l'URL de l'API
+            console.log('🔍 [DELETE] Vérification de apiUrls.personnel:', apiUrls.personnel);
+            
+            if (!apiUrls.personnel || !apiUrls.personnel.deleteByStatus) {
+                console.error('❌ [DELETE] apiUrls.personnel.deleteByStatus n\'existe pas!');
+                throw new Error('Configuration API manquante pour la suppression');
+            }
+
+            const deleteUrl = apiUrls.personnel.deleteByStatus();
+            console.log('🌐 [DELETE] URL de suppression:', deleteUrl);
+
+            if (!deleteUrl) {
+                console.error('❌ [DELETE] L\'URL de suppression est vide!');
+                throw new Error('URL de suppression invalide');
+            }
+
             // Préparer les données pour l'API
             const deleteData = {
                 id: affectation.id,
                 status: 'DELETED',
-                updatedBy: 'USER_CURRENT', // À adapter selon votre système d'authentification
+                updatedBy: 'USER_CURRENT',
                 updatedDate: new Date().toISOString()
             };
 
-            // Appel API pour supprimer
-            const response = await axios.put(
-                apiUrls.personnel.deleteByStatus(),
-                deleteData,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    timeout: 10000
-                }
-            );
+            console.log('📦 [DELETE] Données à envoyer:', deleteData);
+            console.log('🚀 [DELETE] Envoi de la requête PUT vers:', deleteUrl);
 
-            if (response.status === 200) {
+            // Appel API pour supprimer
+            const response = await axios.put(deleteUrl, deleteData);
+
+            console.log('✅ [DELETE] Réponse reçue:', response.status, response.data);
+
+            if (response.status === 200 || response.status === 204) {
+                console.log('🎉 [DELETE] Suppression réussie!');
+                
                 await Swal.fire({
                     icon: 'success',
                     title: 'Affectation supprimée !',
@@ -536,19 +568,34 @@ const ProfesseurMatiere = () => {
                 });
 
                 // Actualiser les données
+                console.log('🔄 [DELETE] Actualisation des données...');
                 if (selectedMatiere && searchPerformed) {
-                    searchAffectations(selectedMatiere);
+                    await searchAffectations(selectedMatiere);
+                    console.log('✅ [DELETE] Données actualisées');
+                } else {
+                    console.log('⚠️ [DELETE] Pas de matière sélectionnée, pas d\'actualisation');
                 }
             } else {
+                console.error('❌ [DELETE] Statut de réponse inattendu:', response.status);
                 throw new Error(`Réponse inattendue du serveur: ${response.status}`);
             }
 
         } catch (error) {
-            console.error('Erreur lors de la suppression de l\'affectation:', error);
+            console.error('💥 [DELETE] ERREUR CAPTURÉE:', error);
+            console.error('💥 [DELETE] Type d\'erreur:', error.constructor.name);
+            console.error('💥 [DELETE] Message:', error.message);
+            console.error('💥 [DELETE] Stack:', error.stack);
+
+            // Fermer le modal de loading si ouvert
+            Swal.close();
 
             let errorMessage = 'Une erreur inattendue est survenue lors de la suppression.';
-            
+
             if (error.response) {
+                console.error('💥 [DELETE] Erreur response:', error.response);
+                console.error('💥 [DELETE] Status:', error.response.status);
+                console.error('💥 [DELETE] Data:', error.response.data);
+                
                 if (error.response.status === 400) {
                     errorMessage = 'Impossible de supprimer cette affectation. Données invalides.';
                 } else if (error.response.status === 401) {
@@ -563,9 +610,14 @@ const ProfesseurMatiere = () => {
                     errorMessage = `Erreur serveur: ${error.response.status} - ${error.response.data?.message || 'Erreur inconnue'}`;
                 }
             } else if (error.request) {
+                console.error('💥 [DELETE] Erreur request (pas de réponse):', error.request);
                 errorMessage = 'Impossible de contacter le serveur. Vérifiez votre connexion internet.';
             } else if (error.code === 'ECONNABORTED') {
+                console.error('💥 [DELETE] Timeout');
                 errorMessage = 'La requête a expiré. Le serveur met trop de temps à répondre.';
+            } else {
+                console.error('💥 [DELETE] Autre erreur:', error.message);
+                errorMessage = `Erreur: ${error.message}`;
             }
 
             await Swal.fire({
@@ -583,11 +635,11 @@ const ProfesseurMatiere = () => {
     // ===========================
     const handleSearch = useCallback(async ({ matiereId }) => {
         console.log('🔍 Lancement de la recherche des affectations:', { matiereId });
-        
+
         // Récupérer les infos de la matière sélectionnée
         const matiereInfo = matieres.find(m => m.id === matiereId);
         setSelectedMatiereInfo(matiereInfo);
-        
+
         await searchAffectations(matiereId);
     }, [searchAffectations, matieres]);
 
@@ -604,13 +656,13 @@ const ProfesseurMatiere = () => {
     const handleTableActionLocal = useCallback((actionType, item) => {
         console.log('Action:', actionType, 'Item:', item);
 
-        switch(actionType) {
+        switch (actionType) {
             case 'edit':
                 if (item && item.id) {
                     navigate(`/professeurs/affectations/edit/${item.id}`);
                 }
                 break;
-                
+
             case 'view':
                 if (item && item.personnel_id) {
                     console.log('📊 Ouverture du modal détail pour le professeur:', item.personnel_nomComplet);
@@ -625,11 +677,11 @@ const ProfesseurMatiere = () => {
                     handleDeleteAffectation(item);
                 }
                 break;
-                
+
             case 'create':
                 setAffectationModalVisible(true);
                 break;
-                
+
             default:
                 handleTableAction(actionType, item);
                 break;
@@ -652,14 +704,6 @@ const ProfesseurMatiere = () => {
         if (selectedMatiere && searchPerformed) {
             searchAffectations(selectedMatiere);
         }
-        
-        // Notification de succès
-        Notification.success({
-            title: 'Affectation créée avec succès',
-            description: 'La nouvelle affectation matière-professeur a été enregistrée.',
-            placement: 'topEnd',
-            duration: 4500,
-        });
     }, [selectedMatiere, searchPerformed, searchAffectations]);
 
     // ===========================
@@ -702,8 +746,8 @@ const ProfesseurMatiere = () => {
     // RENDU DU COMPOSANT
     // ===========================
     return (
-        <div style={{ 
-             
+        <div style={{
+
             minHeight: '100vh',
             padding: '20px 0'
         }}>
@@ -723,7 +767,7 @@ const ProfesseurMatiere = () => {
                 </div>
 
                 {/* En-tête avec statistiques */}
-                {searchPerformed && (
+                {/* {searchPerformed && (
                     <div className="row">
                         <div className="col-lg-12">
                             <ProfesseurMatiereStatsHeader 
@@ -733,7 +777,19 @@ const ProfesseurMatiere = () => {
                             />
                         </div>
                     </div>
+                )} */}
+
+                {searchPerformed && affectations?.length > 0 && !searchLoading && (
+                    <div className="row">
+                        <div className="col-lg-12">
+                            <StatistiquesProfesseurMatiere
+                                affectations={affectations}
+                                selectedMatiereInfo={selectedMatiereInfo}
+                            />
+                        </div>
+                    </div>
                 )}
+
 
                 {/* Message d'information moderne */}
                 {!searchPerformed && !searchLoading && (
@@ -823,35 +879,35 @@ const ProfesseurMatiere = () => {
                                 <DataTable
                                     title="Affectations Professeur - Matière"
                                     subtitle="affectation(s) trouvée(s)"
-                                    
+
                                     data={affectations}
                                     loading={searchLoading}
                                     error={null}
-                                    
+
                                     columns={professeurMatiereTableConfig.columns}
                                     searchableFields={professeurMatiereTableConfig.searchableFields}
                                     filterConfigs={professeurMatiereTableConfig.filterConfigs}
                                     actions={professeurMatiereTableConfig.actions}
-                                    
+
                                     onAction={handleTableActionLocal}
                                     onRefresh={handleRefresh}
                                     onCreateNew={handleCreateAffectation}
-                                    
+
                                     defaultPageSize={professeurMatiereTableConfig.pageSize}
                                     pageSizeOptions={[10, 15, 25, 50]}
-                                    tableHeight={650}
-                                    
+                                    tableHeight={850}
+
                                     enableRefresh={true}
                                     enableCreate={true}
                                     createButtonText="Nouvelle Affectation"
                                     selectable={false}
                                     rowKey="id"
-                                    
+
                                     customStyles={{
                                         container: { backgroundColor: "transparent" },
                                         panel: { minHeight: "650px", border: "none", boxShadow: "none" },
                                     }}
-                                    
+
                                     // Boutons d'action supplémentaires
                                     extraActions={[
                                         {
@@ -899,7 +955,7 @@ const ProfesseurMatiere = () => {
                                 </p>
                                 <Button
                                     appearance="primary"
-                                    style={{ 
+                                    style={{
                                         marginTop: 15,
                                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                         border: 'none'

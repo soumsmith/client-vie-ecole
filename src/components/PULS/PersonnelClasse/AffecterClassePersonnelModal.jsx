@@ -243,8 +243,8 @@ const AffecterClassePersonnelModal = ({ visible, onClose, onSuccess }) => {
             return;
         }
 
-        if (!selectedProfesseur || !selectedEducateur) {
-            Message.error('Veuillez sélectionner un professeur principal et un éducateur');
+        if (!selectedProfesseur) {
+            Message.error('Veuillez sélectionner un professeur principal');
             return;
         }
 
@@ -252,19 +252,71 @@ const AffecterClassePersonnelModal = ({ visible, onClose, onSuccess }) => {
             setLoading(true);
             setSubmitError(null);
 
-            // Préparer les données d'affectation
-            const affectationData = {
-                classeId: selectedClasse,
-                professeurId: selectedProfesseur,
-                educateurId: selectedEducateur,
-                anneeId: dynamicAcademicYearId,
-                ecoleId: dynamicEcoleId
-            };
+            // Récupérer les informations complètes de la classe sélectionnée
+            const classeInfo = classes.find(c => c.value === selectedClasse)?.raw_data;
+            
+            // Récupérer les informations complètes du professeur sélectionné
+            const professeurInfo = professeurs.find(p => p.value === selectedProfesseur)?.raw_data;
+
+            // Tableau des affectations à envoyer
+            const affectations = [];
+
+            // Ajouter l'affectation du professeur principal
+            if (professeurInfo) {
+                affectations.push({
+                    annee: {
+                        id: dynamicAcademicYearId?.toString()
+                    },
+                    user: dynamicEcoleId?.toString(), // À adapter selon votre logique (ID utilisateur connecté)
+                    typeFonction: "PPRINC",
+                    personnel: {
+                        id: professeurInfo.id,
+                        nom: professeurInfo.nom || "",
+                        prenom: professeurInfo.prenom || "",
+                        fonction: {
+                            code: professeurInfo.fonction?.code || "01"
+                        }
+                    },
+                    classe: {
+                        id: classeInfo?.id,
+                        code: classeInfo?.code || "",
+                        libelle: classeInfo?.libelle || ""
+                    }
+                });
+            }
+
+            // Ajouter l'affectation de l'éducateur si sélectionné
+            if (selectedEducateur) {
+                const educateurInfo = educateurs.find(e => e.value === selectedEducateur)?.raw_data;
+                
+                if (educateurInfo) {
+                    affectations.push({
+                        annee: {
+                            id: dynamicAcademicYearId?.toString()
+                        },
+                        user: dynamicEcoleId?.toString(), // À adapter selon votre logique
+                        typeFonction: "EDUC",
+                        personnel: {
+                            id: educateurInfo.id,
+                            nom: educateurInfo.nom || "",
+                            prenom: educateurInfo.prenom || "",
+                            fonction: {
+                                code: educateurInfo.fonction?.code || "02"
+                            }
+                        },
+                        classe: {
+                            id: classeInfo?.id,
+                            code: classeInfo?.code || "",
+                            libelle: classeInfo?.libelle || ""
+                        }
+                    });
+                }
+            }
 
             // Appel API pour enregistrer l'affectation
             const response = await axios.post(
                 apiUrls.affectations.affecterClassePersonnel(),
-                affectationData
+                affectations
             );
 
             // Succès
@@ -435,14 +487,14 @@ const AffecterClassePersonnelModal = ({ visible, onClose, onSuccess }) => {
 
                     {/* Sélection de l'éducateur */}
                     <Form.Group controlId="educateur">
-                        <Form.ControlLabel>Éducateur *</Form.ControlLabel>
+                        <Form.ControlLabel>Éducateur (optionnel)</Form.ControlLabel>
                         <SelectPicker
                             data={educateurs}
                             value={selectedEducateur}
                             onChange={setSelectedEducateur}
                             placeholder="Sélectionner un éducateur"
                             searchable
-                            cleanable={false}
+                            cleanable={true}
                             loading={educateursLoading}
                             disabled={!selectedClasse || educateursLoading}
                             style={{ width: '100%' }}
@@ -582,7 +634,7 @@ const AffecterClassePersonnelModal = ({ visible, onClose, onSuccess }) => {
                     onClick={handleSubmit}
                     appearance="primary"
                     loading={loading}
-                    disabled={isDataLoading || !selectedClasse || !selectedProfesseur || !selectedEducateur}
+                    disabled={isDataLoading || !selectedClasse || !selectedProfesseur}
                     color="green"
                     size="lg"
                 >

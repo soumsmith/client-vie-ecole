@@ -24,8 +24,8 @@ export const useSeancesSaisiesData = (refreshTrigger = 0) => {
     const [performance, setPerformance] = useState(null);
     const apiUrls = useAllApiUrls();
 
-    const { 
-        ecoleId: dynamicEcoleId, 
+    const {
+        ecoleId: dynamicEcoleId,
         academicYearId: dynamicAcademicYearId,
     } = usePulsParams();
 
@@ -34,29 +34,14 @@ export const useSeancesSaisiesData = (refreshTrigger = 0) => {
             setLoading(true);
             setError(null);
             const startTime = Date.now();
-            const cacheKey = `seances-saisies-${dynamicEcoleId}-${dynamicAcademicYearId}`;
-            
-            if (!skipCache) {
-                const cachedData = getFromCache(cacheKey);
-                if (cachedData) {
-                    setData(cachedData);
-                    setLoading(false);
-                    setPerformance({
-                        duration: Date.now() - startTime,
-                        source: 'cache',
-                        itemCount: cachedData.length
-                    });
-                    return;
-                }
-            }
 
             const response = await axios.get(
-                apiUrls.seances.getListStatut(dynamicAcademicYearId, 'MAN', dynamicEcoleId)
+                apiUrls.seances.getListStatut('MAN')
             );
-            
+
             // Transformation du retour API en array si c'est un objet unique
             const rawData = Array.isArray(response.data) ? response.data : [response.data];
-            
+
             const processedSeances = rawData.map(seance => {
                 // Fonction helper pour nettoyer les dates de l'API
                 const cleanDate = (dateString) => {
@@ -69,7 +54,7 @@ export const useSeancesSaisiesData = (refreshTrigger = 0) => {
                 };
 
                 const cleanedDate = cleanDate(seance.dateSeance);
-                
+
                 return {
                     id: seance.id,
                     classe: seance.classe?.libelle || 'Non définie',
@@ -100,7 +85,6 @@ export const useSeancesSaisiesData = (refreshTrigger = 0) => {
                 };
             });
 
-            setToCache(cacheKey, processedSeances);
             setData(processedSeances);
             setPerformance({
                 duration: Date.now() - startTime,
@@ -145,8 +129,6 @@ export const useProfesseursByClasse = (classeId) => {
     const [error, setError] = useState(null);
     const apiUrls = useAllApiUrls();
 
-    const { academicYearId: dynamicAcademicYearId } = usePulsParams();
-
     const fetchProfesseurs = async () => {
         if (!classeId) {
             setProfesseurs([]);
@@ -156,7 +138,7 @@ export const useProfesseursByClasse = (classeId) => {
         try {
             setLoading(true);
             const response = await axios.get(
-                apiUrls.affectations.getProfesseurByClasse(classeId, dynamicAcademicYearId)
+                apiUrls.affectations.getProfesseurByClasse(classeId)
             );
             setProfesseurs(response.data || []);
         } catch (err) {
@@ -168,7 +150,7 @@ export const useProfesseursByClasse = (classeId) => {
 
     useEffect(() => {
         fetchProfesseurs();
-    }, [classeId, dynamicAcademicYearId]);
+    }, [classeId]);
 
     return { professeurs, loading, error, refetch: fetchProfesseurs };
 };
@@ -210,7 +192,19 @@ export const useSurveillantsData = () => {
  * Utilise l'API spécifique aux séances avec le paramètre date
  *
  */
-export const checkCreneauDisponibiliteSeance = async (academicYearId, classe, jour, heureDeb, heureFin, dateSeance = null, apiUrls = null) => {
+/**
+ * Vérifier la disponibilité d'un créneau pour les séances
+ * Utilise l'API spécifique aux séances avec le paramètre date
+ */
+export const checkCreneauDisponibiliteSeance = async (
+    apiUrls,  // ✅ Ajouté comme paramètre
+    academicYearId, 
+    classe, 
+    jour, 
+    heureDeb, 
+    heureFin, 
+    dateSeance = null
+) => {
     console.log('=== VÉRIFICATION CRÉNEAU SÉANCE ===');
     console.log('academicYearId:', academicYearId);
     console.log('classe:', classe);
@@ -219,6 +213,9 @@ export const checkCreneauDisponibiliteSeance = async (academicYearId, classe, jo
     console.log('heureFin:', heureFin);
     console.log('dateSeance:', dateSeance);
     console.log('==================================');
+    
+    // ❌ SUPPRIMEZ CETTE LIGNE
+    // const apiUrls = useAllApiUrls();
 
     try {
         // Formater la date au format YYYY-MM-DD
@@ -249,26 +246,26 @@ export const checkCreneauDisponibiliteSeance = async (academicYearId, classe, jo
 
         const response = await axios.get(url);
         console.log('Réponse vérification séance:', response.data);
-        
+
         // Si on a des salles disponibles, c'est que le créneau est disponible
         const sallesDisponibles = response.data || [];
         const disponible = sallesDisponibles.length > 0;
-        
+
         console.log('Nombre de salles disponibles:', sallesDisponibles.length);
         console.log('Créneau disponible:', disponible);
-        
+
         return {
             disponible,
             salles: sallesDisponibles
         };
     } catch (error) {
         console.error('Erreur lors de la vérification du créneau séance:', error);
-        
+
         if (error.response) {
             console.error('Statut de l\'erreur:', error.response.status);
             console.error('Données de l\'erreur:', error.response.data);
         }
-        
+
         return {
             disponible: false,
             salles: []
@@ -279,12 +276,9 @@ export const checkCreneauDisponibiliteSeance = async (academicYearId, classe, jo
 /**
  * Sauvegarder une séance
  */
-export const saveSeance = async (seanceData, apiUrls = null) => {
+export const saveSeance = async (seanceData, apiUrls) => {  // ✅ Ajouté apiUrls comme paramètre requis
     try {
-        console.log('=== DONNÉES SÉANCE À SAUVEGARDER ===');
-        console.log(JSON.stringify(seanceData, null, 2));
-        console.log('===================================');
-        
+
         const url = apiUrls.seances.saveAndDisplay();
 
         const response = await axios.post(
@@ -298,20 +292,21 @@ export const saveSeance = async (seanceData, apiUrls = null) => {
                 timeout: 10000
             }
         );
-        
+
         console.log('Réponse de sauvegarde séance:', response.data);
         return response.data;
     } catch (error) {
         console.error('Erreur lors de la sauvegarde séance:', error);
-        
+
         if (error.response) {
             console.error('Statut d\'erreur sauvegarde séance:', error.response.status);
             console.error('Données d\'erreur sauvegarde séance:', error.response.data);
         }
-        
+
         throw error;
     }
 };
+
 
 /**
  * Supprimer une séance
@@ -319,7 +314,7 @@ export const saveSeance = async (seanceData, apiUrls = null) => {
 export const deleteSeance = async (seanceId, apiUrls = null) => {
     try {
         console.log('Suppression de la séance ID:', seanceId);
-        
+
         const url = apiUrls.seances.delete(seanceId);
 
         const response = await axios.delete(
@@ -328,7 +323,7 @@ export const deleteSeance = async (seanceId, apiUrls = null) => {
                 timeout: 10000
             }
         );
-        
+
         console.log('Réponse de suppression séance:', response.data);
         return response.data;
     } catch (error) {
@@ -345,10 +340,10 @@ export const clearSeancesSaisiesCache = () => {
 };
 
 // Import des hooks existants de l'emploi du temps
-export { 
-    useClassesData, 
-    useJoursData, 
-    useTypesActiviteData, 
+export {
+    useClassesData,
+    useJoursData,
+    useTypesActiviteData,
     useMatieresByClasse
 } from '../Emploi_du_temps/EmploiDuTempsServiceManager';
 
@@ -363,22 +358,22 @@ export const seancesSaisiesTableConfig = {
             sortable: true,
             cellRenderer: (value) => {
                 if (!value) return 'Non définie';
-                
+
                 try {
                     // Nettoyer le format de date de l'API qui peut avoir [UTC] à la fin
                     let cleanDateString = value;
                     if (typeof value === 'string' && value.includes('[UTC]')) {
                         cleanDateString = value.replace('[UTC]', '');
                     }
-                    
+
                     const date = new Date(cleanDateString);
-                    
+
                     // Vérifier si la date est valide
                     if (isNaN(date.getTime())) {
                         console.warn('Date invalide:', value);
                         return 'Date invalide';
                     }
-                    
+
                     return (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <FiCalendar size={14} style={{ color: '#6366f1' }} />
@@ -425,12 +420,12 @@ export const seancesSaisiesTableConfig = {
                     'Devoir': { color: 'red' },
                     'Évaluation': { color: 'orange' }
                 };
-                
+
                 const config = typeConfig[value] || { color: 'blue' };
-                
+
                 return (
-                    <Tag 
-                        color={config.color} 
+                    <Tag
+                        color={config.color}
                         size="md"
                     >
                         {value}
@@ -471,10 +466,10 @@ export const seancesSaisiesTableConfig = {
             minWidth: 150,
             sortable: true,
             cellRenderer: (value) => (
-                <Tag 
-                    color="blue" 
+                <Tag
+                    color="blue"
                     size="md"
-                    style={{ 
+                    style={{
                         backgroundColor: '#f0f9ff',
                         color: '#1e40af',
                         border: '1px solid #bfdbfe'

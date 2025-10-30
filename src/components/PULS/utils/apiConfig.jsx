@@ -86,9 +86,6 @@ const useAppParams = () => {
 const useClassesUrls = () => {
     const params = useAppParams();
     const baseUrl = getFullUrl();
-
-    console.log("je suis marie syntiche", params);
-
     return useMemo(() => ({
 
         /**
@@ -366,6 +363,11 @@ const usePersonnelUrls = () => {
          */
         updateSouscriptionStatut: (personnelId) =>
             `${baseUrl}souscription-personnel/${personnelId}/statut`,
+
+        deleteByStatus: () =>
+            `${baseUrl}personnel-matiere-classe/delete-by-status/`,
+
+        
 
         /**
          * Récupère le personnel par fonction (utilise automatiquement l'école de l'utilisateur connecté)
@@ -975,13 +977,15 @@ const useAffectationsUrls = () => {
          * Affecte un personnel à une classe
          */
         affecterClassePersonnel: () =>
-            `${baseUrl}personnel-matiere-classe/affecter-classe-personnel`,
+            `${baseUrl}personnel-matiere-classe/saveAndDisplayList`,
+
+        // affecterClassePersonnel: () =>
+        //     `${baseUrl}personnel-matiere-classe/affecter-classe-personnel`,
 
         /**
          * Affecte une matière à un professeur
          */
         affecterMatiereProfesseur: () =>
-            //`${baseUrl}personnel-matiere-classe/affecter-matiere-professeur`,
             `${baseUrl}personnel-matiere-classe/saveAndDisplay`,
 
         getProfesseur: () =>
