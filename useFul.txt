@@ -1,2 +1,2 @@
-docker build . -t soumsmith/pouls-pro:202510262156
+docker build . -t soumsmith/pouls-pro:202510292045
 docker build . -t soumsmith/pouls-pro:202510171000
