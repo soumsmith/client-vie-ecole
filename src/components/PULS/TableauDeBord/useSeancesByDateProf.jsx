@@ -42,7 +42,7 @@ export const useSeancesByDateProf = (professorId, date = null, refreshTrigger = 
             setLoading(true);
             setError(null);
 
-            const dateFormatted = "2025-10-28"; //"2025-10-28"; // date || formatDate(new Date())
+            const dateFormatted = date || formatDate(new Date()); //"2025-10-28"; // date || formatDate(new Date())
             const url = `${getFullUrl()}seances/get-list-date-prof?date=${dateFormatted}&prof=${professorId}`;
 
             console.log('📅 Récupération des séances:', url);

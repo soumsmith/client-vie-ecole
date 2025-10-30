@@ -782,7 +782,7 @@ const DataTable = ({
                   appearance="primary"
                   startIcon={<PlusIcon />}
                   onClick={handleCreateClick}
-                   className={`datatable-add-btn-${academicYear.niveauEnseignement?.libelle.replace(/[\s()]/g, '')} datatable-add-btn-niveauEnseignement-${academicYear.niveauEnseignement?.id}`} 
+                   className={`datatable-add-btn-${academicYear?.niveauEnseignement?.libelle.replace(/[\s()]/g, '')} datatable-add-btn-niveauEnseignement-${academicYear?.niveauEnseignement?.id}`} 
                 >
                   {createButtonText}
                 </Button>
