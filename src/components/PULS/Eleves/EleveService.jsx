@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Badge } from 'rsuite';
-import { FiTrash2 } from 'react-icons/fi';
+import { FiCornerUpLeft } from 'react-icons/fi';
 import { useAllApiUrls } from '../utils/apiConfig';
 import axios from 'axios';
 
@@ -64,7 +64,7 @@ export const useElevesData = (refreshTrigger = 0) => {
 
             // Appel direct à l'API avec la vraie URL
             const response = await axios.get(apiUrls.eleves.retrieveByClasseAnnee(classeId));
-            
+
             // Traitement des élèves selon la vraie structure de données
             let processedEleves = [];
             if (response.data && Array.isArray(response.data)) {
@@ -73,7 +73,7 @@ export const useElevesData = (refreshTrigger = 0) => {
                     const eleve = item.inscription?.eleve || {};
                     const inscription = item.inscription || {};
                     const classe = item.classe || {};
-                    
+
                     // Formatage du genre
                     const genre = eleve.sexe || 'Non spécifié';
                     const genre_display = genre === 'MASCULIN' ? 'Masculin' : genre === 'FEMININ' ? 'Féminin' : 'Non spécifié';
@@ -93,31 +93,31 @@ export const useElevesData = (refreshTrigger = 0) => {
                         dateNaissance_display: formatDate(eleve.dateNaissance),
                         lieuNaissance: eleve.lieuNaissance || 'Non renseigné',
                         nationalite: eleve.nationalite || 'Non renseignée',
-                        
+
                         // Informations de contact (pas toujours présentes dans cette structure)
                         telephone: 'Non renseigné',
                         email: 'Non renseigné',
                         adresse: 'Non renseignée',
-                        
+
                         // Informations de classe
                         classe_id: classe.id || classeId,
                         classe: classe.libelle || 'Classe inconnue',
                         classe_code: classe.code || '',
                         classe_effectif: classe.effectif || 0,
-                        
+
                         // Informations de branche
                         branche: classe.branche?.libelle || '',
                         niveau: classe.branche?.niveau?.libelle || '',
                         serie: classe.branche?.serie?.libelle || '',
                         filiere: classe.branche?.filiere?.libelle || '',
-                        
+
                         // Numéro d'ordre dans la classe
                         numeroOrdre: index + 1,
-                        
+
                         // Statut de l'élève
                         statut: item.statut || 'ACTIF',
                         statut_display: item.statut === 'ACTIF' ? 'Actif' : item.statut || 'Actif',
-                        
+
                         // Informations d'inscription
                         inscription_id: inscription.id || '',
                         inscription_statut: inscription.statut || '',
@@ -128,37 +128,37 @@ export const useElevesData = (refreshTrigger = 0) => {
                         demi_pension: inscription.demi_pension || false,
                         demi_pension_display: inscription.demi_pension ? 'Demi-pensionnaire' : 'Externe',
                         lv2: inscription.lv2 || '',
-                        
+
                         // Informations administratives
                         dateInscription: inscription.dateCreation || item.dateCreation || '',
                         dateInscription_display: formatDate(inscription.dateCreation || item.dateCreation),
                         dateCreation: item.dateCreation || '',
                         dateUpdate: item.dateUpdate || '',
-                        
+
                         // Année scolaire
                         annee: inscription.annee?.libelle || 'Année inconnue',
                         annee_id: inscription.annee?.id || anneeId,
-                        
+
                         // École
                         ecole: classe.ecole?.libelle || inscription.ecole?.libelle || '',
                         ecole_id: classe.ecole?.id || inscription.ecole?.id,
                         ecole_code: classe.ecole?.code || inscription.ecole?.code || '',
                         ecole_tel: classe.ecole?.tel || inscription.ecole?.tel || '',
                         ecole_signataire: classe.ecole?.nomSignataire || inscription.ecole?.nomSignataire || '',
-                        
+
                         // Photo de l'élève
                         urlPhoto: eleve.urlPhoto || inscription.urlPhoto || '',
                         hasPhoto: !!(eleve.urlPhoto || inscription.urlPhoto),
-                        
+
                         // Informations parents/tuteurs (pas disponibles dans cette structure)
                         tuteur: 'Non renseigné',
                         tuteur_telephone: 'Non renseigné',
-                        
+
                         // Affichage optimisé
                         display_name: `${eleve.nom || 'Nom'} ${eleve.prenom || 'Prénom'}`,
                         display_details: `${eleve.matricule || 'MAT'} • ${genre_short} • ${formatDate(eleve.dateNaissance)}`,
                         display_status: `${item.statut === 'ACTIF' ? '✅' : '❌'} ${item.statut || 'ACTIF'}`,
-                        
+
                         // Données brutes pour debug
                         raw_data: item
                     };
@@ -238,7 +238,7 @@ export const elevesTableConfig = {
             minWidth: 100,
             cellType: 'custom',
             customRenderer: (rowData) => (
-                <div style={{ 
+                <div style={{
                     fontFamily: 'monospace',
                     fontSize: '13px',
                     fontWeight: '600',
@@ -262,8 +262,8 @@ export const elevesTableConfig = {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     {/* Photo de l'élève si disponible */}
                     {rowData.hasPhoto && (
-                        <img 
-                            src={rowData.urlPhoto} 
+                        <img
+                            src={rowData.urlPhoto}
                             alt={rowData.nomComplet}
                             style={{
                                 width: '32px',
@@ -278,22 +278,22 @@ export const elevesTableConfig = {
                         />
                     )}
                     <div>
-                        <div style={{ 
-                            fontWeight: '600', 
+                        <div style={{
+                            fontWeight: '600',
                             color: '#1e293b',
                             fontSize: '14px',
                             marginBottom: '2px'
                         }}>
                             {rowData.nomComplet}
                         </div>
-                        <div style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
                             gap: '8px',
-                            fontSize: '12px', 
+                            fontSize: '12px',
                             color: '#64748b'
                         }}>
-                            <span style={{ 
+                            <span style={{
                                 padding: '2px 6px',
                                 backgroundColor: rowData.genre_short === 'M' ? '#dbeafe' : '#fce7f3',
                                 color: rowData.genre_short === 'M' ? '#2563eb' : '#ec4899',
@@ -317,7 +317,7 @@ export const elevesTableConfig = {
             minWidth: 120,
             cellType: 'custom',
             customRenderer: (rowData) => (
-                <div style={{ 
+                <div style={{
                     fontSize: '13px',
                     color: '#475569'
                 }}>
@@ -334,7 +334,7 @@ export const elevesTableConfig = {
             cellType: 'custom',
             customRenderer: (rowData) => (
                 <div>
-                    <div style={{ 
+                    <div style={{
                         fontSize: '12px',
                         marginBottom: '4px'
                     }}>
@@ -363,7 +363,7 @@ export const elevesTableConfig = {
                             </span>
                         )}
                     </div>
-                    <div style={{ 
+                    <div style={{
                         fontSize: '11px',
                         color: '#64748b'
                     }}>
@@ -391,9 +391,9 @@ export const elevesTableConfig = {
                     'Suspendu': { bg: '#fee2e2', text: '#dc2626', border: '#ef4444' },
                     'Transféré': { bg: '#e0e7ff', text: '#4f46e5', border: '#6366f1' }
                 };
-                
+
                 const colors = colorMap[rowData.statut_display] || colorMap['Actif'];
-                
+
                 return (
                     <div style={{
                         padding: '4px 8px',
@@ -494,7 +494,7 @@ export const elevesTableConfig = {
     actions: [
         {
             type: 'remove',
-            icon: <FiTrash2 size={17} />,
+            icon: <FiCornerUpLeft size={27} className='action-delete-icone-style' />,
             tooltip: 'Retirer l\'élève de la classe',
             color: '#ef4444',
             confirmMessage: 'Êtes-vous sûr de vouloir retirer cet élève de la classe ?'

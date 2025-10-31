@@ -43,6 +43,9 @@ import {
   checkCreneauDisponibiliteSeance,
 } from "./SeancesSaisiesServiceManager";
 import { usePulsParams } from "../../hooks/useDynamicParams";
+import VerificationStatus from '../Composant/VerificationStatus';
+import { useAllApiUrls } from '../utils/apiConfig';
+
 
 const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
   const { isOpen, type, selectedQuestion: seance } = modalState;
@@ -59,6 +62,7 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
     isReady,
   } = usePulsParams();
 
+  const apiUrls = useAllApiUrls();
 
   const [formData, setFormData] = useState({
     classeId: null,
@@ -187,117 +191,6 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
     return hasAllFields && timeValid && verification.creneauDisponible;
   }, [formData, verification.creneauDisponible]);
 
-  // ===========================
-  // VÉRIFICATION DE DISPONIBILITÉ
-  // ===========================
-  const verifierDisponibilite = useCallback(async (classeId = null, jourId = null, heureDeb = null, heureFin = null) => {
-    // Utiliser les paramètres fournis ou ceux du formData
-    const classe = classeId || formData.classeId;
-    const jour = jourId || formData.jourId;
-    const debut = heureDeb || formData.heureDeb;
-    const fin = heureFin || formData.heureFin;
-
-    console.log('=== DÉBUT VÉRIFICATION DISPONIBILITÉ ===');
-    console.log('classeId:', classe);
-    console.log('jourId:', jour);
-    console.log('heureDeb:', debut);
-    console.log('heureFin:', fin);
-
-    // Reset de l'état de vérification
-    setVerification(prev => ({
-      ...prev,
-      creneauDisponible: null,
-      sallesDisponibles: [],
-      error: null
-    }));
-
-    // Vérification des prérequis
-    if (!classe || !jour || !debut || !fin) {
-      console.log('Champs manquants pour la vérification');
-      return;
-    }
-
-    // Validation des heures
-    const [debutH, debutM] = debut.split(':').map(Number);
-    const [finH, finM] = fin.split(':').map(Number);
-
-    const debutMinutes = debutH * 60 + debutM;
-    const finMinutes = finH * 60 + finM;
-
-    if (finMinutes <= debutMinutes) {
-      console.log('Validation des heures échouée: heure de fin <= heure de début');
-      setVerification(prev => ({
-        ...prev,
-        creneauDisponible: false,
-        error: "L'heure de fin doit être supérieure à l'heure de début"
-      }));
-      return;
-    }
-
-    if (finMinutes - debutMinutes < 15) {
-      console.log('Validation des heures échouée: durée < 15 minutes');
-      setVerification(prev => ({
-        ...prev,
-        creneauDisponible: false,
-        error: "Il doit y avoir au moins 15 minutes entre le début et la fin"
-      }));
-      return;
-    }
-
-    setVerification(prev => ({ ...prev, loading: true }));
-    console.log('Début de la vérification API...');
-
-    try {
-      // Vérifier la disponibilité du créneau
-      const disponible = await checkCreneauDisponibiliteSeance(
-        dynamicAcademicYearId,
-        classe,
-        jour,
-        debut,
-        fin
-      );
-
-      console.log('Résultat disponibilité:', disponible);
-
-      if (disponible) {
-        // Si disponible, récupérer les salles
-        console.log('Récupération des salles disponibles...');
-        const salles = await getSallesDisponibles(
-          dynamicAcademicYearId,
-          classe,
-          jour,
-          debut,
-          fin
-        );
-
-        console.log('Salles récupérées:', salles);
-
-        setVerification({
-          creneauDisponible: true,
-          sallesDisponibles: salles,
-          loading: false,
-          error: null
-        });
-      } else {
-        setVerification({
-          creneauDisponible: false,
-          sallesDisponibles: [],
-          loading: false,
-          error: "Ce créneau n'est pas disponible"
-        });
-      }
-    } catch (error) {
-      console.error('Erreur lors de la vérification:', error);
-      setVerification({
-        creneauDisponible: false,
-        sallesDisponibles: [],
-        loading: false,
-        error: "Erreur lors de la vérification de disponibilité"
-      });
-    }
-
-    console.log('=== FIN VÉRIFICATION DISPONIBILITÉ ===');
-  }, [dynamicAcademicYearId, formData.classeId, formData.jourId, formData.heureDeb, formData.heureFin]);
 
   // ===========================
   // GESTION DES CHANGEMENTS
@@ -316,21 +209,6 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
       // Reset de la salle si les paramètres de vérification changent
       if (['classeId', 'jourId', 'heureDeb', 'heureFin'].includes(field)) {
         newData.salleId = null;
-      }
-
-      // Calculer automatiquement le jour en fonction de la date
-      if (field === 'dateSeance' && value) {
-        const jourIndex = value.getDay(); // 0 = Dimanche, 1 = Lundi, etc.
-        const jourMapping = {
-          0: 7, // Dimanche
-          1: 1, // Lundi
-          2: 2, // Mardi
-          3: 3, // Mercredi
-          4: 4, // Jeudi
-          5: 5, // Vendredi
-          6: 6  // Samedi
-        };
-        newData.jourId = jourMapping[jourIndex];
       }
 
       return newData;
@@ -404,10 +282,22 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
       console.log('=== FIN INITIALISATION EDIT ===');
     } else if (type === "create") {
       console.log('=== INITIALISATION CREATE ===');
+      const now = new Date();
+      const jourIndex = now.getDay();
+      const jourMapping = {
+        0: 7, // Dimanche
+        1: 1, // Lundi
+        2: 2, // Mardi
+        3: 3, // Mercredi
+        4: 4, // Jeudi
+        5: 5, // Vendredi
+        6: 6  // Samedi
+      };
+
       setFormData({
         classeId: null,
-        dateSeance: new Date(),
-        jourId: null,
+        dateSeance: now,
+        jourId: jourMapping[jourIndex], // Calculer automatiquement le jour
         heureDeb: "",
         heureFin: "",
         matiereId: null,
@@ -415,10 +305,10 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
         surveillantId: null,
         salleId: null,
         typeActiviteId: null,
-        duree: "00:15", // Format heure par défaut
+        duree: "00:15",
         periode: null,
         noteeSur: 0,
-        generateEvaluation: true // Coché par défaut
+        generateEvaluation: true
       });
       setVerification({
         creneauDisponible: null,
@@ -429,6 +319,32 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
       console.log('=== FIN INITIALISATION CREATE ===');
     }
   }, [type, seance, isOpen]);
+
+  // Synchronisation automatique du jourId avec la dateSeance
+  useEffect(() => {
+    if (formData.dateSeance && formData.dateSeance instanceof Date && !isNaN(formData.dateSeance.getTime())) {
+      const jourIndex = formData.dateSeance.getDay();
+      const jourMapping = {
+        0: 7, // Dimanche
+        1: 1, // Lundi
+        2: 2, // Mardi
+        3: 3, // Mercredi
+        4: 4, // Jeudi
+        5: 5, // Vendredi
+        6: 6  // Samedi
+      };
+      const calculatedJourId = jourMapping[jourIndex];
+
+      // Ne mettre à jour que si le jourId calculé est différent
+      if (formData.jourId !== calculatedJourId) {
+        console.log('=== SYNCHRONISATION JOUR ===');
+        console.log('Date:', formData.dateSeance);
+        console.log('Jour Index:', jourIndex);
+        console.log('Jour calculé:', calculatedJourId);
+        setFormData(prev => ({ ...prev, jourId: calculatedJourId }));
+      }
+    }
+  }, [formData.dateSeance]);
 
   // Vérification automatique quand les paramètres changent
   useEffect(() => {
@@ -489,6 +405,7 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
       try {
         // Utiliser la nouvelle API qui retourne directement les salles
         const result = await checkCreneauDisponibiliteSeance(
+          apiUrls,  // ✅ Ajouté
           dynamicAcademicYearId,
           classeId,
           jourId,
@@ -529,13 +446,18 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
 
     // Vérifier si tous les champs requis sont remplis
     if (classeId && jourId && heureDeb && heureFin) {
-      console.log('Tous les champs remplis, démarrage du timer...');
+      console.log('✅ Tous les champs remplis, démarrage du timer...');
       verificationTimerRef.current = setTimeout(() => {
-        console.log('Timer expiré, lancement de la vérification');
+        console.log('⏰ Timer expiré, lancement de la vérification');
         effectuerVerification();
       }, 500);
     } else {
-      console.log('Champs manquants, reset de la vérification');
+      console.log('❌ Champs manquants, reset de la vérification');
+      console.log('  - classeId:', classeId ? '✓' : '✗');
+      console.log('  - jourId:', jourId ? '✓' : '✗');
+      console.log('  - heureDeb:', heureDeb ? '✓' : '✗');
+      console.log('  - heureFin:', heureFin ? '✓' : '✗');
+
       setVerification({
         creneauDisponible: null,
         sallesDisponibles: [],
@@ -547,11 +469,11 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
     // Nettoyage au démontage
     return () => {
       if (verificationTimerRef.current) {
-        console.log('Nettoyage du timer');
+        console.log('🧹 Nettoyage du timer');
         clearTimeout(verificationTimerRef.current);
       }
     };
-  }, [formData.classeId, formData.jourId, formData.heureDeb, formData.heureFin, formData.dateSeance, dynamicAcademicYearId]);
+  }, [formData.classeId, formData.jourId, formData.heureDeb, formData.heureFin, formData.dateSeance, dynamicAcademicYearId, apiUrls]);
 
   // ===========================
   // SAUVEGARDE
@@ -633,7 +555,8 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
         seanceData.id = seance.id;
       }
 
-      const response = await saveSeance(seanceData);
+      // ✅ PASSEZ apiUrls comme deuxième paramètre
+      const response = await saveSeance(seanceData, apiUrls);
 
       await Swal.fire({
         icon: "success",
@@ -665,89 +588,6 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
       setIsSubmitting(false);
     }
   };
-
-  // ===========================
-  // COMPOSANT DE STATUT DE VÉRIFICATION
-  // ===========================
-  const VerificationStatus = () => {
-    if (!formData.heureDeb || !formData.heureFin) return null;
-
-    // Validation simple des heures pour l'affichage
-    let timeValid = true;
-    let timeMessage = '';
-
-    if (formData.heureDeb && formData.heureFin) {
-      const [debutH, debutM] = formData.heureDeb.split(':').map(Number);
-      const [finH, finM] = formData.heureFin.split(':').map(Number);
-      const debutMinutes = debutH * 60 + debutM;
-      const finMinutes = finH * 60 + finM;
-
-      if (finMinutes <= debutMinutes) {
-        timeValid = false;
-        timeMessage = "L'heure de fin doit être supérieure à l'heure de début";
-      } else if (finMinutes - debutMinutes < 15) {
-        timeValid = false;
-        timeMessage = "Il doit y avoir au moins 15 minutes entre le début et la fin";
-      }
-    }
-
-    if (!timeValid) {
-      return (
-        <Message type="warning" showIcon style={{ marginBottom: 16 }}>
-          <FiAlertTriangle style={{ marginRight: 8 }} />
-          {timeMessage}
-        </Message>
-      );
-    }
-
-    if (verification.loading) {
-      return (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          padding: 12,
-          background: '#f0f9ff',
-          border: '1px solid #bae6fd',
-          borderRadius: 8,
-          marginBottom: 16
-        }}>
-          <Loader size="xs" />
-          <Text style={{ color: '#0369a1' }}>Vérification de la disponibilité...</Text>
-        </div>
-      );
-    }
-
-    if (verification.error) {
-      return (
-        <Message type="error" showIcon style={{ marginBottom: 16, marginTop: 16 }}>
-          <FiAlertTriangle style={{ marginRight: 8 }} />
-          {verification.error}
-        </Message>
-      );
-    }
-
-    if (verification.creneauDisponible === true) {
-      return (
-        <Message type="success" showIcon style={{ marginBottom: 16, marginTop: 16 }}>
-          <FiCheck style={{ marginRight: 8 }} />
-          Créneau disponible • {verification.sallesDisponibles.length} salle(s) disponible(s)
-        </Message>
-      );
-    }
-
-    if (verification.creneauDisponible === false) {
-      return (
-        <Message type="error" showIcon style={{ marginBottom: 16, marginTop: 16 }}>
-          <FiX style={{ marginRight: 8 }} />
-          Créneau indisponible
-        </Message>
-      );
-    }
-
-    return null;
-  };
-
   // ===========================
   // RENDU DU COMPOSANT
   // ===========================
@@ -889,7 +729,12 @@ const SeancesSaisiesModal = ({ modalState, onClose, onSave }) => {
                     </Row>
 
                     {/* Statut de vérification */}
-                    <VerificationStatus />
+                    <VerificationStatus
+                      formData={formData}
+                      verification={verification}
+                      validateTimeRange={validateTimeRange}
+                      successMessage="Créneau disponible"
+                    />
 
                     <Row gutter={16}>
                       <Col xs={8}>

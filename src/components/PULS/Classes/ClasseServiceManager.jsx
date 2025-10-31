@@ -328,35 +328,26 @@ export const classesTableConfig = {
             dynamic: true,  // ✓ Génère automatiquement "Visible" et "Masquée"
             tagColor: 'red'
         },
-        // {
-        //     field: 'effectif',
-        //     label: 'Effectif',
-        //     placeholder: 'Tous les effectifs',
-        //     type: 'range',
-        //     min: 0,
-        //     max: 100,
-        //     tagColor: 'cyan'
-        // }
     ],
     
     actions: [
-        {
-            type: 'view',
-            icon: <FiEye size={17} />,
-            tooltip: 'Voir la classe',
-            color: '#3498db'
-        },
+        // {
+        //     type: 'view',
+        //     icon: <FiEye size={17} />,
+        //     tooltip: 'Voir la classe',
+        //     color: '#3498db'
+        // },
         {
             type: 'edit',
             icon: <FiEdit size={17} />,
             tooltip: 'Modifier la classe',
             color: '#f39c12'
         },
-        {
-            type: 'delete',
-            icon: <FiTrash2 size={17} />,
-            tooltip: 'Supprimer la classe',
-            color: '#e74c3c'
-        }
+        // {
+        //     type: 'delete',
+        //     icon: <FiTrash2 size={17} />,
+        //     tooltip: 'Supprimer la classe',
+        //     color: '#e74c3c'
+        // }
     ]
 };

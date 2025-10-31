@@ -67,6 +67,58 @@ const getCouleurTypeMatiere = (type) => {
   return couleurs[type] || couleurs.autre;
 };
 
+
+// ===========================
+// FONCTIONS UTILITAIRES
+// ===========================
+
+/**
+ * Formate une date pour l'affichage
+ */
+export const formatDateInDayMonthYear = (dateString) => {
+    if (!dateString) return '';
+
+    try {
+        // Nettoyer la chaîne en retirant [UTC] ou autres suffixes
+        const cleanDate = dateString.replace(/\[.*?\]/g, '');
+
+        const date = new Date(cleanDate);
+
+        if (isNaN(date.getTime())) {
+            return dateString;
+        }
+
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+
+        return `${day}/${month}/${year}`;
+    } catch (error) {
+        console.error("Erreur formatDate:", error);
+        return dateString;
+    }
+};
+
+// ===========================
+// FONCTIONS UTILITAIRES POUR FORMATAGE DES DATES
+// ===========================
+const formatDate = (dateString) => {
+  if (!dateString) return "Non définie";
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "Date invalide";
+    return date.toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch (error) {
+    return "Date invalide";
+  }
+};
+
 // ===========================
 // HOOK POUR RÉCUPÉRER LES CLASSES PAR BRANCHE
 // ===========================
@@ -163,6 +215,47 @@ export const useClassesByBrancheData = (ecoleId = null, refreshTrigger = 0) => {
     fetchClasses,
     clearClasses,
   };
+};
+
+export const useProfesseursByClasse = (classeId) => {
+    const [professeursData, setProfesseursData] = useState([]); // Renommé
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const appParams = useAppParams();
+    const apiUrls = useAllApiUrls();
+
+    const fetchProfesseurs = async () => {
+        if (!classeId) {
+            setProfesseursData([]);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await axios.get(
+                apiUrls.affectations.getProfesseurByClasse(classeId),
+                {
+                    params: {
+                        classe: classeId,
+                        annee: appParams.anneeScolaireId
+                    }
+                }
+            );
+            // Assurez-vous d'extraire correctement les données
+            setProfesseursData(response.data || []);
+        } catch (err) {
+            setError(err);
+            setProfesseursData([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchProfesseurs();
+    }, [classeId]);
+
+    return { professeursData, loading, error, refetch: fetchProfesseurs }; // Renommé ici aussi
 };
 
 // ===========================
@@ -1551,25 +1644,7 @@ export const useCompletDataByEcole = (ecoleId = null) => {
   };
 };
 
-// ===========================
-// FONCTIONS UTILITAIRES POUR FORMATAGE DES DATES
-// ===========================
-const formatDate = (dateString) => {
-  if (!dateString) return "Non définie";
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return "Date invalide";
-    return date.toLocaleDateString("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch (error) {
-    return "Date invalide";
-  }
-};
+
 
 const formatDuree = (minutes) => {
   if (!minutes || minutes === 0) return "Non définie";

@@ -140,6 +140,7 @@ const useClasseAffectationsData = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const apiUrls = useAllApiUrls();
 
     const fetchAffectations = useCallback(async (classeId) => {
         if (!classeId) {
@@ -220,12 +221,10 @@ const AffecterMatiereProfesseurModal = ({ visible, onClose, onSuccess }) => {
         try {
             setLoading(true);
 
-            // Récupérer les données complètes des objets sélectionnés
             const selectedClasseData = classes.find(classe => classe.value === selectedClasse)?.raw_data;
             const selectedMatiereData = matieres.find(matiere => matiere.value === selectedMatiere)?.raw_data;
             const selectedProfesseurData = professeurs.find(professeur => professeur.value === selectedProfesseur)?.raw_data;
 
-            // Construire l'objet avec le nouveau format
             const affectationData = {
                 matiere: {
                     id: selectedMatiereData?.id || selectedMatiere,
@@ -248,6 +247,8 @@ const AffecterMatiereProfesseurModal = ({ visible, onClose, onSuccess }) => {
                 user: String(personnelInfo?.id || personnelInfo?.userId)
             };
 
+            console.log('📤 Envoi des données:', affectationData); // DEBUG
+
             const response = await axios.post(
                 apiUrls.affectations.affecterMatiereProfesseur(),
                 affectationData,
@@ -259,7 +260,10 @@ const AffecterMatiereProfesseurModal = ({ visible, onClose, onSuccess }) => {
                 }
             );
 
-            if (response.status === 200 || response.status === 201) {
+            console.log('✅ Réponse API:', response.status, response.data); // DEBUG
+
+            // ✅ CORRECTION : Accepter tous les codes 2xx
+            if (response.status >= 200 && response.status < 300) {
                 await Swal.fire({
                     icon: 'success',
                     title: 'Affectation créée !',
@@ -270,14 +274,20 @@ const AffecterMatiereProfesseurModal = ({ visible, onClose, onSuccess }) => {
                 });
 
                 handleReset();
-                onSuccess(response.data);
+
+                // ✅ Vérifier que onSuccess existe avant de l'appeler
+                if (typeof onSuccess === 'function') {
+                    onSuccess(response.data);
+                }
+
                 onClose();
             } else {
                 throw new Error(`Réponse inattendue du serveur: ${response.status}`);
             }
 
         } catch (error) {
-            console.error('Erreur lors de la création de l\'affectation:', error);
+            console.error('❌ Erreur complète:', error); // DEBUG
+            console.error('❌ Réponse erreur:', error.response); // DEBUG
 
             let errorMessage = 'Une erreur inattendue est survenue lors de la création.';
 
@@ -297,6 +307,9 @@ const AffecterMatiereProfesseurModal = ({ visible, onClose, onSuccess }) => {
                 errorMessage = 'Impossible de contacter le serveur. Vérifiez votre connexion internet.';
             } else if (error.code === 'ECONNABORTED') {
                 errorMessage = 'La requête a expiré. Le serveur met trop de temps à répondre.';
+            } else {
+                // ✅ Afficher l'erreur exacte pour debug
+                errorMessage = `Erreur: ${error.message}`;
             }
 
             await Swal.fire({
@@ -309,7 +322,6 @@ const AffecterMatiereProfesseurModal = ({ visible, onClose, onSuccess }) => {
             setLoading(false);
         }
     };
-
     const handleCancel = () => {
         handleReset();
         onClose();

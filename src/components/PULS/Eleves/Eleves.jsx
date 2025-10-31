@@ -37,6 +37,8 @@ import { useNiveauxBranchesData, useClassesByBrancheData } from "../utils/Common
 import ModalAffectationEleves from './ModalAffectationEleves';
 import GradientButton from '../../GradientButton';
 import IconBox from "../Composant/IconBox";
+import StatistiquesEleves from './Statistiqueseleves';
+
 
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE MODERNE
@@ -616,6 +618,17 @@ const Eleves = () => {
                         </div>
                     </div>
                 )}
+
+                {searchPerformed && eleves?.length > 0 && (
+    <div className="row mb-4">
+        <div className="col-lg-12">
+            <StatistiquesEleves 
+                eleves={eleves} 
+                classeInfo={selectedClasseInfo}
+            />
+        </div>
+    </div>
+)}
 
                 {/* DataTable avec style amélioré */}
                 {searchPerformed && (

@@ -86,7 +86,6 @@ const getRangBadgeColor = (rang) => {
 
 /**
  * Composant DataTable générique et réutilisable avec support mode étudiant
- * VERSION ÉTENDUE - Support d'affichage par étudiant avec notes expandables
  */
 const DataTable = ({
   // ==================== CONFIGURATION DE BASE ====================
@@ -99,11 +98,8 @@ const DataTable = ({
   error = null,
 
   // ==================== NOUVELLE CONFIGURATION POUR MODE ÉTUDIANT ====================
-  /** Mode d'affichage: 'classic' ou 'student' */
   displayMode = 'classic',
-  /** Callback pour les changements d'absences (mode étudiant) */
   onAbsenceChange = () => {},
-  /** Callback pour les changements de notes (mode étudiant) */
   onNoteChange = () => {},
 
   // ==================== CONFIGURATION DES COLONNES ====================
@@ -132,10 +128,13 @@ const DataTable = ({
   enableRefresh = true,
   enableCreate = true,
   createButtonText = "Nouveau",
+  startIcon = <PlusIcon />,
   minTableWidth = 1000,
+  createButtonLoading = false, // 👈 AJOUT
 
   // ==================== CALLBACKS ====================
   onRefresh = () => {},
+  onCreateClick = null, // 👈 AJOUT - Callback direct pour le bouton créer
 
   // ==================== STYLES PERSONNALISÉS ====================
   customStyles = {},
@@ -151,13 +150,13 @@ const DataTable = ({
   const [limit, setLimit] = useState(defaultPageSize);
   const [page, setPage] = useState(1);
 
-  // État pour les lignes expandables (mode étudiant)
   const [expandedRows, setExpandedRows] = useState({});
   const [expandedMatieres, setExpandedMatieres] = useState({});
+const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
 
   const tableWidth = useTableDimensions(minTableWidth);
 
-  // ==================== LOGIQUE D'EXPANSION (MODE ÉTUDIANT) ====================
+  // ==================== LOGIQUE D'EXPANSION ====================
   const toggleRowExpansion = useCallback((rowId) => {
     setExpandedRows(prev => ({
       ...prev,
@@ -420,17 +419,26 @@ const DataTable = ({
     onRefresh();
   }, [onRefresh]);
 
+  // ==================== GESTIONNAIRE CORRIGÉ POUR LE BOUTON CRÉER ====================
   const handleCreateClick = useCallback((event) => {
     event.preventDefault();
     event.stopPropagation();
-    handleAction('create', null, event);
-  }, [handleAction]);
+    
+    console.log('🎯 DataTable - Clic sur bouton créer');
+    console.log('📋 onCreateClick disponible:', !!onCreateClick);
+    
+    // Priorité à onCreateClick si fourni, sinon utiliser onAction
+    if (onCreateClick) {
+      console.log('✅ Appel de onCreateClick');
+      onCreateClick(event);
+    } else {
+      console.log('⚠️ Fallback sur onAction');
+      handleAction('create', null, event);
+    }
+  }, [onCreateClick, handleAction]);
 
   // ==================== COMPOSANTS SPÉCIAUX POUR MODE ÉTUDIANT ====================
 
-  /**
-   * Cellule d'expansion pour les étudiants
-   */
   const StudentExpandCell = useCallback(({ rowData, ...props }) => {
     const isExpanded = expandedRows[rowData[rowKey]];
     
@@ -449,9 +457,6 @@ const DataTable = ({
     );
   }, [expandedRows, rowKey, toggleRowExpansion]);
 
-  /**
-   * Cellule Photo seule pour étudiant
-   */
   const StudentPhotoCell = useCallback(({ rowData, ...props }) => {
     const [imageError, setImageError] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
@@ -527,7 +532,6 @@ const DataTable = ({
               justifyContent: 'center',
               fontSize: '18px',
               fontWeight: 'bold'
-              
             }}>
               {getInitials(rowData.nom, rowData.prenom)}
             </div>
@@ -537,9 +541,6 @@ const DataTable = ({
     );
   }, []);
 
-  /**
-   * Cellule Nom et Prénom pour étudiant
-   */
   const StudentNameCell = useCallback(({ rowData, ...props }) => {
     return (
       <div {...props} style={{ padding: '8px' }}>
@@ -551,7 +552,7 @@ const DataTable = ({
             marginBottom: '4px',
             whiteSpace: 'nowrap' 
           }}>
-              {String(rowData.nom).replace(/['"]/g, '').trim()} 
+            {String(rowData.nom).replace(/['"]/g, '').trim()} 
           </div>
           <div style={{ 
             fontSize: '13px', 
@@ -559,16 +560,12 @@ const DataTable = ({
             fontWeight: 'bold', 
           }}>
             {String(rowData.prenom).replace(/['"]/g, '').trim()}
-             {/* {rowData.prenom} */}
           </div>
         </div>
       </div>
     );
   }, []);
 
-  /**
-   * Cellule Absences avec inputs
-   */
   const StudentAbsenceCell = useCallback(({ rowData, field, ...props }) => {
     const [value, setValue] = useState(rowData[field] || 0);
 
@@ -590,9 +587,6 @@ const DataTable = ({
     );
   }, [rowKey, onAbsenceChange]);
 
-  /**
-   * Rendu des notes détaillées (ligne expandable)
-   */
   const renderStudentExpandedContent = useCallback((etudiant) => {
     if (!expandedRows[etudiant[rowKey]] || !etudiant.matieres) return null;
 
@@ -607,7 +601,7 @@ const DataTable = ({
             <div className="table-responsive">
               <table className="table table-bordered table-sm">
                 <thead className="table-light">
-                  <tr >
+                  <tr>
                     <th style={{ width: '50px' }}></th>
                     <th style={{ width: '400px' }}>MATIERE</th>
                     <th style={{ width: '600px' }}>NOTES</th>
@@ -620,7 +614,6 @@ const DataTable = ({
                 <tbody>
                   {etudiant.matieres?.map((matiere, index) => (
                     <React.Fragment key={matiere.id || index}>
-                      {/* Ligne principale de la matière */}
                       <tr>
                         <td>
                           <IconButton
@@ -647,11 +640,7 @@ const DataTable = ({
                         <td>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '60px' }}>
                             {matiere.notes?.slice(0, 6).map((note, noteIndex) => (
-                              <span
-                                // key={noteIndex}
-                                // color={getNoteColor(note.note, note.noteSur)}
-                                style={{ fontSize: '0.8em' }}
-                              >
+                              <span key={noteIndex} style={{ fontSize: '0.8em' }}>
                                 {note.note}/{note.noteSur}
                               </span>
                             ))}
@@ -664,7 +653,6 @@ const DataTable = ({
                         </td>
                         <td className="text-center">
                           {matiere.coefficient}
-                          {/* <Badge color="blue"></Badge> */}
                         </td>
                         <td className="text-center">
                           <Badge 
@@ -674,22 +662,15 @@ const DataTable = ({
                             {parseFloat(matiere.moyenne).toFixed(2)}
                           </Badge>
                         </td>
-                        <td className="text-center ">
+                        <td className="text-center">
                           {matiere.rang}
                           <sup>{parseInt(matiere.rang) === 1 ? 'er' : 'ème'}</sup>
                         </td>
-
                         <td className='fw-bold'>
-                          {/* <Badge 
-                            color={getAppreciationColor(matiere.appreciation)}
-                            style={{ fontSize: '0.8em' }}
-                          > */}
-                            {matiere.appreciation}
-                          {/* </Badge> */}
+                          {matiere.appreciation}
                         </td>
-                      </tr >
+                      </tr>
 
-                      {/* Ligne détaillée des notes (collapsible) */}
                       {expandedMatieres[`${etudiant[rowKey]}-${matiere.id}`] && matiere.notes?.length > 0 && (
                         <tr>
                           <td></td>
@@ -790,7 +771,6 @@ const DataTable = ({
     return ({ rowData, ...props }) => {
       const cellValue = getCellValue(rowData, column);
 
-      // Mode étudiant - cellules spéciales
       if (displayMode === 'student') {
         if (column.cellType === 'student-photo') {
           return <StudentPhotoCell rowData={rowData} {...props}/>;
@@ -806,7 +786,6 @@ const DataTable = ({
         }
       }
 
-      // Utiliser les cellRenderer personnalisés s'ils existent
       if (cellRenderer && column.cellType && cellRenderer[column.cellType]) {
         return (
           <Cell {...props}>
@@ -815,7 +794,6 @@ const DataTable = ({
         );
       }
 
-      // Types de cellules standards (votre code existant)
       switch (column.cellType) {
         case 'avatar':
           return (
@@ -935,7 +913,7 @@ const DataTable = ({
           );
       }
     };
-  }, [getCellValue, actions, handleActionButtonClick, displayMode, cellRenderer]);
+  }, [getCellValue, actions, handleActionButtonClick, displayMode, cellRenderer, StudentPhotoCell, StudentNameCell, StudentAbsenceCell]);
 
   const SelectionCell = useCallback(({ rowData, ...props }) => {
     return (
@@ -988,7 +966,6 @@ const DataTable = ({
     return String(value);
   }, [filterConfigs]);
 
-  // ==================== STYLES POUR LE SCROLL RESPONSIVE ====================
   const tableContainerStyle = {
     width: '100%',
     overflowX: 'auto',
@@ -1044,9 +1021,12 @@ const DataTable = ({
               {enableCreate && (
                 <Button
                   appearance="primary"
-                  startIcon={<PlusIcon />}
+                  startIcon={startIcon}
                   onClick={handleCreateClick}
-                  style={{ backgroundColor: '#667eea', border: 'none' }}
+                  loading={createButtonLoading} // 👈 AJOUT
+                  disabled={createButtonLoading || loading} // 👈 AJOUT
+                  className={`datatable-add-btn-${academicYear?.niveauEnseignement?.libelle.replace(/[\s()]/g, '')} datatable-add-btn-niveauEnseignement-${academicYear?.niveauEnseignement?.id}`} 
+
                 >
                   {createButtonText}
                 </Button>
@@ -1061,7 +1041,7 @@ const DataTable = ({
           ...customStyles.panel
         }}
       >
-        {/* ==================== BARRE DE FILTRES ==================== */}
+        {/* Barre de filtres */}
         {(searchableFields.length > 0 || filterConfigs.length > 0) && (
           <div style={{ marginBottom: '20px' }} className='mt-4'>
             <FlexboxGrid justify="start" align="middle" style={{ gap: '16px', flexWrap: 'wrap' }}>
@@ -1096,7 +1076,7 @@ const DataTable = ({
           </div>
         )}
 
-        {/* ==================== TAGS DE FILTRES ACTIFS ==================== */}
+        {/* Tags de filtres actifs */}
         {(searchTerm || Object.keys(activeFilters).length > 0) && (
           <div style={{ marginBottom: '16px' }}>
             <TagGroup>
@@ -1127,7 +1107,7 @@ const DataTable = ({
           </div>
         )}
 
-        {/* ==================== INFORMATIONS DE SÉLECTION ==================== */}
+        {/* Informations de sélection */}
         {selectable && selectedIds.length > 0 && (
           <div style={{
             marginBottom: '16px',
@@ -1159,39 +1139,37 @@ const DataTable = ({
           </div>
         )}
 
-        {/* ==================== TABLEAU PRINCIPAL AVEC SUPPORT MODE ÉTUDIANT ==================== */}
+        {/* Tableau principal */}
         <div style={tableContainerStyle}>
           {displayMode === 'student' ? (
-            // MODE ÉTUDIANT - Table personnalisée avec expansion
             <div id='notesEtMoyennes' style={{ border: '1px solid #e9ecef', borderRadius: '8px' }}>
               <table className="table table-hover mb-0" style={{ tableLayout: 'fixed' }}>
-              <thead className="table-light">
-                <tr style={{ height: '50px' }}>
-                  <th className="align-middle" style={{ width: '50px' }}></th>
-                  {selectable && <th className="align-middle" style={{ width: '50px' }}>
-                    <Checkbox
-                      indeterminate={isSomePageSelected && !isAllPageSelected}
-                      checked={isAllPageSelected}
-                      onChange={(value, checked) => handleSelectAllPage(checked)}
-                    />
-                  </th>}
-                  {columns.map((column, index) => (
-                    <th 
-                      key={column.dataKey || index} 
-                      className='photo-etidiant align-middle'  
-                      style={{ 
-                        width: column.minWidth || 50
-                      }}
-                    >
-                      {column.title}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+                <thead className="table-light">
+                  <tr style={{ height: '50px' }}>
+                    <th className="align-middle" style={{ width: '50px' }}></th>
+                    {selectable && <th className="align-middle" style={{ width: '50px' }}>
+                      <Checkbox
+                        indeterminate={isSomePageSelected && !isAllPageSelected}
+                        checked={isAllPageSelected}
+                        onChange={(value, checked) => handleSelectAllPage(checked)}
+                      />
+                    </th>}
+                    {columns.map((column, index) => (
+                      <th 
+                        key={column.dataKey || index} 
+                        className='photo-etidiant align-middle'  
+                        style={{ 
+                          width: column.minWidth || 50
+                        }}
+                      >
+                        {column.title}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
                 <tbody>
                   {paginatedData.map((etudiant, rowIndex) => (
                     <React.Fragment key={etudiant[rowKey] || rowIndex}>
-                      {/* Ligne principale étudiant */}
                       <tr style={{ cursor: 'pointer', height: '80px' }}>
                         <td style={{ verticalAlign: 'middle' }}>
                           <IconButton
@@ -1219,7 +1197,6 @@ const DataTable = ({
                         })}
                       </tr>
                       
-                      {/* Ligne expandable avec détails */}
                       {renderStudentExpandedContent(etudiant)}
                     </React.Fragment>
                   ))}
@@ -1227,7 +1204,6 @@ const DataTable = ({
               </table>
             </div>
           ) : (
-            // MODE CLASSIQUE - Table RSuite standard
             <Table
               height={tableHeight}
               width={tableWidth}
@@ -1276,7 +1252,7 @@ const DataTable = ({
           )}
         </div>
 
-        {/* ==================== PAGINATION ==================== */}
+        {/* Pagination */}
         <div style={{
           padding: '20px 0',
           display: 'flex',

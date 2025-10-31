@@ -11,7 +11,8 @@ import {
     Badge,
     Modal,
     useToaster,
-    DatePicker
+    DatePicker,
+    Toggle
 } from 'rsuite';
 import {
     FiSearch,
@@ -19,7 +20,9 @@ import {
     FiCalendar,
     FiList,
     FiPlusCircle,
-    FiInfo
+    FiInfo,
+    FiTrash2,
+    FiEdit
 } from 'react-icons/fi';
 
 // Import des hooks et services
@@ -28,12 +31,11 @@ import {
     useSeanceSearch,
     useSeanceDetails,
     useSeanceGeneration,
-    formatDate,
     getStatutColor,
     getStatutLabel,
     formatHeureRange
 } from './SeanceService';
-import { useClassesData } from "../../utils/CommonDataService";
+import { useClassesData, formatDateInDayMonthYear } from "../../utils/CommonDataService";
 import { usePulsParams } from '../../../hooks/useDynamicParams';
 import GradientButton from '../../../GradientButton';
 import IconBox from "../../Composant/IconBox";
@@ -44,6 +46,7 @@ import IconBox from "../../Composant/IconBox";
 const SearchForm = ({ onSearch, onClear, loading = false, error = null }) => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedClasse, setSelectedClasse] = useState(null);
+    const [filterByClasse, setFilterByClasse] = useState(false); // Switch state
     const [formError, setFormError] = useState(null);
 
     const {
@@ -58,7 +61,8 @@ const SearchForm = ({ onSearch, onClear, loading = false, error = null }) => {
             return;
         }
 
-        if (!selectedClasse) {
+        // Validation selon le switch
+        if (filterByClasse && !selectedClasse) {
             setFormError('Veuillez sélectionner une classe');
             return;
         }
@@ -66,16 +70,29 @@ const SearchForm = ({ onSearch, onClear, loading = false, error = null }) => {
         setFormError(null);
         if (onSearch) {
             const formattedDate = selectedDate.toISOString().split('T')[0];
-            onSearch({ date: formattedDate, classeId: selectedClasse });
+            onSearch({
+                date: formattedDate,
+                classeId: selectedClasse,
+                filterByClasse: filterByClasse
+            });
         }
-    }, [selectedDate, selectedClasse, onSearch]);
+    }, [selectedDate, selectedClasse, filterByClasse, onSearch]);
 
     const handleClear = useCallback(() => {
         setSelectedDate(new Date());
         setSelectedClasse(null);
+        setFilterByClasse(false);
         setFormError(null);
         if (onClear) onClear();
     }, [onClear]);
+
+    // Handler pour le toggle
+    const handleToggleChange = (checked) => {
+        setFilterByClasse(checked);
+        if (!checked) {
+            setSelectedClasse(null); // Reset classe si on désactive
+        }
+    };
 
     return (
         <div style={{
@@ -94,14 +111,13 @@ const SearchForm = ({ onSearch, onClear, loading = false, error = null }) => {
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-               
                 <IconBox icon={FiSearch} />
                 <div>
                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                         Recherche des Séances
                     </h5>
                     <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
-                        Sélectionnez une date et une classe pour afficher les séances
+                        Sélectionnez une date {filterByClasse ? 'et une classe' : 'pour afficher les séances'}
                     </p>
                 </div>
             </div>
@@ -129,7 +145,7 @@ const SearchForm = ({ onSearch, onClear, loading = false, error = null }) => {
                         <DatePicker
                             value={selectedDate}
                             onChange={setSelectedDate}
-                            format="dd-MM-yyyy"
+                            format="dd/MM/yyyy"
                             placeholder="Sélectionner une date"
                             style={{ width: '100%' }}
                             size="lg"
@@ -140,27 +156,75 @@ const SearchForm = ({ onSearch, onClear, loading = false, error = null }) => {
 
                 <Col xs={24} sm={12} md={10}>
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{
-                            display: 'block',
-                            marginBottom: 8,
-                            fontWeight: '500',
-                            color: '#475569',
-                            fontSize: '14px'
+                        {/* ⭐ NOUVEAU: Label avec Toggle intégré */}
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginBottom: 8
                         }}>
-                            Classe *
-                        </label>
+                            <label style={{
+                                fontWeight: '500',
+                                color: '#475569',
+                                fontSize: '14px',
+                                margin: 0
+                            }}>
+                                Classe {filterByClasse && <span style={{ color: '#ef4444' }}>*</span>}
+                            </label>
+
+                            {/* ⭐ COMPOSANT TOGGLE DE RSUITE */}
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 10,
+                                transition: 'all 0.3s'
+                            }}>
+                                <span className="me-1" style={{
+                                    fontSize: '13px',
+                                    color: filterByClasse ? '#1e40af' : '#64748b',
+                                    fontWeight: '500',
+                                    transition: 'color 0.3s'
+                                }}>
+                                    {filterByClasse ? 'Activé' : 'Désactivé'}
+                                </span>
+                                <Toggle
+                                    checked={filterByClasse}
+                                    onChange={handleToggleChange}
+                                    checkedChildren="ON"
+                                    unCheckedChildren="OFF"
+                                    size="sm"
+                                    disabled={loading}
+                                />
+                            </div>
+                        </div>
+
                         <SelectPicker
                             data={classes}
                             value={selectedClasse}
                             onChange={setSelectedClasse}
-                            placeholder="Choisir une classe"
+                            placeholder={filterByClasse ? "Choisir une classe" : "Filtre par classe désactivé"}
                             searchable
                             style={{ width: '100%' }}
                             loading={classesLoading}
-                            disabled={classesLoading || loading}
+                            disabled={!filterByClasse || classesLoading || loading}
                             cleanable={false}
                             size="lg"
                         />
+
+                        {/* Info bulle optionnelle */}
+                        {!filterByClasse && (
+                            <div style={{
+                                marginTop: 6,
+                                fontSize: '12px',
+                                color: '#64748b',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 5
+                            }}>
+                                <FiInfo size={14} />
+                                <span>Recherche par école (toutes les classes)</span>
+                            </div>
+                        )}
                     </div>
                 </Col>
 
@@ -176,7 +240,6 @@ const SearchForm = ({ onSearch, onClear, loading = false, error = null }) => {
                             Action
                         </label>
                         <div style={{ display: 'flex', gap: 8, height: '40px' }}>
-                            
                             <GradientButton
                                 icon={<FiSearch size={16} />}
                                 text="Recherche"
@@ -221,39 +284,22 @@ const SeanceDetailsModal = ({ open, onClose, seance, details, loading }) => {
         >
             <Modal.Body style={{ padding: 0 }}>
                 {/* En-tête élégant */}
-                <div style={{
-                    padding: '30px',
-                    background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
-                    borderBottom: '1px solid #e2e8f0'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
-                        <div style={{
-                            width: '48px',
-                            height: '48px',
-                            borderRadius: '12px',
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: '0 4px 12px rgba(102, 126, 234, 0.2)'
-                        }}>
-                            <FiInfo size={24} color="white" />
-                        </div>
-                        <div>
-                            <h5 style={{ margin: 0, color: '#1e293b', fontWeight: '600', fontSize: '18px' }}>
-                                Détails des séances générées
-                            </h5>
-                            <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
-                                Vue d'ensemble des séances programmées
-                            </p>
-                        </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
+                    <IconBox icon={FiInfo} size={24} />
+                    <div>
+                        <h5 style={{ margin: 0, color: '#1e293b', fontWeight: '600', fontSize: '18px' }}>
+                            Détails des séances générées
+                        </h5>
+                        <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
+                            Vue d'ensemble des séances programmées
+                        </p>
                     </div>
                 </div>
 
                 <div style={{ padding: '30px' }}>
                     {loading ? (
-                        <div style={{ 
-                            textAlign: 'center', 
+                        <div style={{
+                            textAlign: 'center',
                             padding: '60px 20px',
                             display: 'flex',
                             flexDirection: 'column',
@@ -284,7 +330,7 @@ const SeanceDetailsModal = ({ open, onClose, seance, details, loading }) => {
                                                     Date
                                                 </div>
                                                 <div style={{ fontWeight: '600', color: '#1e293b', fontSize: '14px' }}>
-                                                    {formatDate(seance?.dateSeance)}
+                                                    {formatDateInDayMonthYear(seance?.dateSeance)}
                                                 </div>
                                             </div>
                                         </div>
@@ -330,7 +376,7 @@ const SeanceDetailsModal = ({ open, onClose, seance, details, loading }) => {
                                                 background: index % 2 === 0 ? 'white' : '#fafafa',
                                                 transition: 'background 0.2s'
                                             }}>
-                                                <td style={tdStyle}>{formatDate(detail.dateSeance)}</td>
+                                                <td style={tdStyle}>{formatDateInDayMonthYear(detail.dateSeance)}</td>
                                                 <td style={tdStyle}>{detail.classe?.libelle || 'N/A'}</td>
                                                 <td style={tdStyle}>
                                                     <span style={{
@@ -362,28 +408,9 @@ const SeanceDetailsModal = ({ open, onClose, seance, details, loading }) => {
                                                 </td>
                                                 <td style={tdStyle}>
                                                     <div style={{ display: 'flex', gap: 5 }}>
-                                                        <Button
-                                                            size="xs"
-                                                            appearance="ghost"
-                                                            style={{ 
-                                                                color: '#f59e0b',
-                                                                padding: '4px 8px',
-                                                                minWidth: 'auto'
-                                                            }}
-                                                        >
-                                                            ✏️
-                                                        </Button>
-                                                        <Button
-                                                            size="xs"
-                                                            appearance="ghost"
-                                                            style={{ 
-                                                                color: '#ef4444',
-                                                                padding: '4px 8px',
-                                                                minWidth: 'auto'
-                                                            }}
-                                                        >
-                                                            🗑️
-                                                        </Button>
+                                                        <FiEdit appearance="ghost" size={17} className="me-2" style={{ color: '#f59e0b', }} />
+                                                        <FiTrash2 appearance="ghost" size={17} style={{ color: '#ef4444', }} />
+
                                                     </div>
                                                 </td>
                                             </tr>
@@ -393,8 +420,8 @@ const SeanceDetailsModal = ({ open, onClose, seance, details, loading }) => {
                             </div>
                         </div>
                     ) : (
-                        <div style={{ 
-                            textAlign: 'center', 
+                        <div style={{
+                            textAlign: 'center',
                             padding: '60px 20px',
                             display: 'flex',
                             flexDirection: 'column',
@@ -422,14 +449,11 @@ const SeanceDetailsModal = ({ open, onClose, seance, details, loading }) => {
 
                 {/* Footer simple */}
                 <div style={{
-                    padding: '20px 30px',
-                    borderTop: '1px solid #e2e8f0',
-                    background: '#fafafa',
                     display: 'flex',
                     justifyContent: 'flex-end'
                 }}>
-                    <Button 
-                        onClick={onClose} 
+                    <Button
+                        onClick={onClose}
                         style={{
                             borderRadius: '8px',
                             padding: '8px 24px'
@@ -481,7 +505,7 @@ const OuvertureSeanceModal = ({ open, onClose, onGenerate }) => {
         }
 
         setGenerating(true);
-        const formattedDate = selectedDate.toISOString().split('T')[0];
+        const formattedDate = selectedDate ? selectedDate.toLocaleDateString('fr-FR') : null;
         await onGenerate(formattedDate, selectedClasse);
         setGenerating(false);
     };
@@ -611,8 +635,8 @@ const OuvertureSeanceModal = ({ open, onClose, onGenerate }) => {
                     display: 'flex',
                     justifyContent: 'center'
                 }}>
-                    <Button 
-                        onClick={onClose} 
+                    <Button
+                        onClick={onClose}
                         appearance="subtle"
                         style={{
                             borderRadius: '8px',
@@ -652,7 +676,7 @@ const RecapitulatifModal = ({ open, onClose, result }) => {
                             width: '48px',
                             height: '48px',
                             borderRadius: '12px',
-                            background: result.success 
+                            background: result.success
                                 ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
                                 : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                             display: 'flex',
@@ -718,7 +742,7 @@ const RecapitulatifModal = ({ open, onClose, result }) => {
                                                 {msg.title || 'Information'}
                                             </div>
                                         </div>
-                                        <Badge 
+                                        <Badge
                                             color={getMessageTypeBadgeColor(msg.type)}
                                             style={{ fontSize: '11px' }}
                                         >
@@ -796,7 +820,7 @@ const RecapitulatifModal = ({ open, onClose, result }) => {
 
 // Fonctions utilitaires pour le modal récapitulatif
 const getMessageTypeIcon = (type) => {
-    switch(type?.toLowerCase()) {
+    switch (type?.toLowerCase()) {
         case 'success': return '✓';
         case 'error': return '✕';
         case 'warning': return '⚠';
@@ -806,21 +830,21 @@ const getMessageTypeIcon = (type) => {
 };
 
 const getMessageTypeColor = (type) => {
-    switch(type?.toLowerCase()) {
-        case 'success': 
+    switch (type?.toLowerCase()) {
+        case 'success':
             return { bg: '#dcfce7', border: '#86efac' };
-        case 'error': 
+        case 'error':
             return { bg: '#fee2e2', border: '#fca5a5' };
-        case 'warning': 
+        case 'warning':
             return { bg: '#fef3c7', border: '#fcd34d' };
         case 'info':
-        default: 
+        default:
             return { bg: '#dbeafe', border: '#93c5fd' };
     }
 };
 
 const getMessageTypeBadgeColor = (type) => {
-    switch(type?.toLowerCase()) {
+    switch (type?.toLowerCase()) {
         case 'success': return 'green';
         case 'error': return 'red';
         case 'warning': return 'orange';
@@ -834,7 +858,7 @@ const getMessageTypeBadgeColor = (type) => {
 // ===========================
 const SeanceManagement = () => {
     const toaster = useToaster();
-    const { academicYearId } = usePulsParams();
+    const { academicYearId, ecoleId } = usePulsParams(); // Ajout de ecoleId
 
     // Hooks de recherche et génération
     const {
@@ -871,8 +895,15 @@ const SeanceManagement = () => {
     const handleSearch = useCallback(async (params) => {
         console.log('🔍 Recherche séances:', params);
         setCurrentSearchParams(params);
-        await searchSeances(params.date, params.classeId);
-    }, [searchSeances]);
+
+        // Appel avec les bons paramètres selon le mode
+        await searchSeances(
+            params.date,
+            params.classeId,
+            params.filterByClasse,
+            ecoleId // Passage de l'ecoleId
+        );
+    }, [searchSeances, ecoleId]);
 
     const handleClearSearch = useCallback(() => {
         clearResults();
@@ -894,9 +925,9 @@ const SeanceManagement = () => {
     // Gestion de la génération
     const handleGenerate = useCallback(async (date, classeId) => {
         console.log('🔄 Génération séances:', { date, classeId, academicYearId });
-        
+
         const result = await generateSeances(date, classeId, academicYearId);
-        
+
         if (result && result.success) {
             toaster.push(
                 <Message type="success" showIcon closable>
@@ -905,10 +936,10 @@ const SeanceManagement = () => {
                 </Message>,
                 { placement: 'topEnd', duration: 4000 }
             );
-            
+
             setShowOuvertureModal(false);
             setShowRecapModal(true);
-            
+
             // Rafraîchir la liste si on a les paramètres
             if (currentSearchParams) {
                 await searchSeances(currentSearchParams.date, currentSearchParams.classeId);
@@ -933,7 +964,10 @@ const SeanceManagement = () => {
             minWidth: 120,
             sortable: true,
             cellType: 'custom',
-            customRenderer: (rowData, value) => formatDate(value)
+            customRenderer: (rowData, value) => {
+                console.log('rowData:', rowData, 'value:', value);
+                return formatDateInDayMonthYear(rowData.dateSeance || value);
+            }
         },
         {
             title: 'Classe',
@@ -964,20 +998,15 @@ const SeanceManagement = () => {
             customRenderer: (rowData) => (
                 <div style={{ display: 'flex', gap: 5 }}>
                     <Button
+                        className=" me-3"
                         size="xs"
                         appearance="primary"
                         style={{ background: '#3b82f6' }}
                         onClick={() => handleShowDetails(rowData)}
                     >
-                        <FiList /> Détails
+                        <FiList className=" me-2" /> Détails
                     </Button>
-                    <Button
-                        size="xs"
-                        appearance="ghost"
-                        style={{ color: '#ef4444' }}
-                    >
-                        🗑️
-                    </Button>
+                    <FiTrash2 size={17} style={{ color: '#ef4444' }} disabled={true} />
                 </div>
             )
         }

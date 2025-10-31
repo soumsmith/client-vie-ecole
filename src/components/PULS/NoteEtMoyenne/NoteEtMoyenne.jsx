@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import Swal from 'sweetalert2'; // 👈 IMPORT SWAL
 import {
     SelectPicker,
     Button,
@@ -18,13 +19,14 @@ import {
     FiRotateCcw,
     FiBook,
     FiUsers,
+    FiSave,
     FiBarChart
 } from 'react-icons/fi';
 import axios from 'axios';
 import getFullUrl from "../../hooks/urlUtils";
 
 // Import des fonctions externalisées
-import DataTable from "../../DataTable"; // Utilisation de la DataTable étendue
+import DataTable from "../../DataTable";
 import DataTableExtended from "../../DataTable2";
 import {
     useNoteSearch,
@@ -38,6 +40,30 @@ import GradientButton from '../../GradientButton';
 import IconBox from "../Composant/IconBox";
 
 // ===========================
+// FONCTION POUR SAUVEGARDER LE BULLETIN
+// ===========================
+const saveBulletinToAPI = async (anneeId, periodeId, classeId) => {
+    try {
+        const baseUrl = getFullUrl();
+        const apiUrl = `${baseUrl}bulletin/handle-save?annee=${anneeId}&periode=${periodeId}&classe=${classeId}`;
+
+        console.log('📋 Sauvegarde bulletin - URL:', apiUrl);
+
+        const response = await axios.get(apiUrl);
+
+        console.log('✅ Réponse API sauvegarde bulletin:', response.data);
+        return { success: true, data: response.data };
+
+    } catch (error) {
+        console.error('❌ Erreur sauvegarde bulletin:', error);
+        return {
+            success: false,
+            error: error.response?.data?.message || error.message || 'Erreur lors de la sauvegarde du bulletin'
+        };
+    }
+};
+
+// ===========================
 // FONCTION POUR SAUVEGARDER LES ABSENCES
 // ===========================
 const saveAbsenceToAPI = async (etudiantData, classeInfo, periodeId, academicYearId, field, value) => {
@@ -45,7 +71,6 @@ const saveAbsenceToAPI = async (etudiantData, classeInfo, periodeId, academicYea
         const baseUrl = getFullUrl();
         const apiUrl = `${baseUrl}absence-eleve/save-list-process`;
 
-        // Construction du payload selon le format demandé
         const payload = [{
             eleve: {
                 id: etudiantData.id,
@@ -68,16 +93,13 @@ const saveAbsenceToAPI = async (etudiantData, classeInfo, periodeId, academicYea
             isClassed: etudiantData.isClassed || "O"
         }];
 
-        // Ajout des champs d'absence selon le type
         if (field === 'absencesJustifiees') {
             payload[0].absJustifiee = parseInt(value) || 0;
-            // Conserver la valeur existante pour l'autre type d'absence
             if (etudiantData.absencesNonJustifiees > 0) {
                 payload[0].absNonJustifiee = parseInt(etudiantData.absencesNonJustifiees) || 0;
             }
         } else if (field === 'absencesNonJustifiees') {
             payload[0].absNonJustifiee = parseInt(value) || 0;
-            // Conserver la valeur existante pour l'autre type d'absence
             if (etudiantData.absencesJustifiees > 0) {
                 payload[0].absJustifiee = parseInt(etudiantData.absencesJustifiees) || 0;
             }
@@ -100,7 +122,7 @@ const saveAbsenceToAPI = async (etudiantData, classeInfo, periodeId, academicYea
 };
 
 // ===========================
-// COMPOSANT DE FORMULAIRE DE RECHERCHE AMÉLIORÉ (INCHANGÉ)
+// COMPOSANT DE FORMULAIRE DE RECHERCHE
 // ===========================
 const SearchForm = ({
     onSearch,
@@ -126,15 +148,13 @@ const SearchForm = ({
         error: periodesError
     } = usePeriodesData();
 
-    // Hook conditionnel pour les matières
     const {
         matieres,
         loading: matieresLoading,
         error: matieresError,
         fetchMatieres,
         clearMatieres
-    } = useMatieresData(); // Mode manuel
-
+    } = useMatieresData();
 
     useEffect(() => {
         if (showMatiereFilter && selectedClasse && fetchMatieres) {
@@ -159,15 +179,13 @@ const SearchForm = ({
 
         setFormError(null);
         if (onSearch) {
-            // Construction des paramètres de recherche
             const searchParams = {
                 classeId: selectedClasse,
                 periodeId: selectedPeriode
             };
 
-            // Ajout conditionnel de la matière si le filtre est activé
             if (showMatiereFilter) {
-                searchParams.matiereId = selectedMatiere; // null si rien n'est sélectionné
+                searchParams.matiereId = selectedMatiere;
             }
 
             console.log('🔍 Paramètres de recherche:', searchParams);
@@ -195,7 +213,6 @@ const SearchForm = ({
             border: '1px solid rgba(102, 126, 234, 0.1)',
             marginBottom: '20px'
         }}>
-            {/* En-tête moderne */}
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -223,7 +240,6 @@ const SearchForm = ({
                 </div>
             </div>
 
-            {/* Messages d'erreur compacts */}
             {hasDataError && (
                 <div style={{ marginBottom: 20 }}>
                     <Message type="error" showIcon style={{ background: '#fef2f2', border: '1px solid #fecaca' }}>
@@ -240,7 +256,6 @@ const SearchForm = ({
                 </div>
             )}
 
-            {/* Formulaire adaptatif */}
             <Row gutter={20}>
                 <Col xs={24} sm={12} md={showMatiereFilter ? 8 : 10}>
                     <div style={{ marginBottom: 20 }}>
@@ -259,7 +274,6 @@ const SearchForm = ({
                             onChange={(value) => {
                                 console.log('🏫 Classe sélectionnée:', value);
                                 setSelectedClasse(value);
-                                // Réinitialiser la matière quand on change de classe
                                 if (showMatiereFilter) {
                                     console.log('🔄 Réinitialisation de la matière');
                                     setSelectedMatiere(null);
@@ -276,7 +290,6 @@ const SearchForm = ({
                     </div>
                 </Col>
 
-                {/* Filtre matière conditionnel */}
                 {showMatiereFilter && (
                     <Col xs={24} sm={12} md={8}>
                         <div style={{ marginBottom: 20 }}>
@@ -373,7 +386,6 @@ const SearchForm = ({
                             Action
                         </label>
                         <div style={{ display: 'flex', gap: 8, height: '40px' }}>
-
                             <GradientButton
                                 icon={<FiSearch size={16} />}
                                 text="Recherche"
@@ -402,7 +414,6 @@ const SearchForm = ({
                 </Col>
             </Row>
 
-            {/* Indicateur de progression adaptatif */}
             <div style={{ marginTop: 15 }}>
                 <Steps
                     current={
@@ -423,7 +434,6 @@ const SearchForm = ({
                 </Steps>
             </div>
 
-            {/* Indicateur de contexte */}
             {showMatiereFilter && selectedClasse && (
                 <div style={{
                     marginTop: 15,
@@ -451,7 +461,6 @@ const SearchForm = ({
                 </div>
             )}
 
-            {/* Loading indicator discret */}
             {isDataLoading && (
                 <div style={{
                     display: 'flex',
@@ -474,7 +483,7 @@ const SearchForm = ({
 };
 
 // ===========================
-// COMPOSANT STATISTIQUES ENRICHI (INCHANGÉ)
+// COMPOSANT STATISTIQUES
 // ===========================
 const StatsPanel = ({ stats, classeInfo, searchContext }) => {
     if (!stats || !classeInfo) return null;
@@ -533,7 +542,6 @@ const StatsPanel = ({ stats, classeInfo, searchContext }) => {
             border: '1px solid rgba(102, 126, 234, 0.1)',
             marginBottom: '20px'
         }}>
-            {/* En-tête enrichi */}
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -575,7 +583,6 @@ const StatsPanel = ({ stats, classeInfo, searchContext }) => {
                 </div>
             </div>
 
-            {/* Grille des statistiques */}
             <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
@@ -593,12 +600,12 @@ const StatsPanel = ({ stats, classeInfo, searchContext }) => {
                             cursor: 'default'
                         }}
                         onMouseEnter={(e) => {
-                            e.target.style.transform = 'translateY(-2px)';
-                            e.target.style.boxShadow = `0 8px 25px ${stat.color}15`;
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow = `0 8px 25px ${stat.color}15`;
                         }}
                         onMouseLeave={(e) => {
-                            e.target.style.transform = 'translateY(0)';
-                            e.target.style.boxShadow = 'none';
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'none';
                         }}
                     >
                         <div style={{
@@ -629,7 +636,6 @@ const StatsPanel = ({ stats, classeInfo, searchContext }) => {
                 ))}
             </div>
 
-            {/* Barre de progression pour les admis */}
             <div style={{
                 marginTop: 20,
                 padding: '15px',
@@ -673,15 +679,12 @@ const StatsPanel = ({ stats, classeInfo, searchContext }) => {
 };
 
 // ===========================
-// CONFIGURATION DES COLONNES POUR MODE ÉTUDIANT (INCHANGÉ)
+// CONFIGURATION DES COLONNES POUR MODE ÉTUDIANT
 // ===========================
 const getStudentTableColumns = (profil) => {
     const columns = [];
 
     if (profil === 'Professeur') {
-        // ORDRE DEMANDÉ : Matricule, Photo, Matière, Note, Coefficient, Moyenne générale, Rang, Appréciation, Classé
-
-        // 1. MATRICULE
         columns.push({
             title: 'Matricule',
             dataKey: 'matricule',
@@ -702,7 +705,6 @@ const getStudentTableColumns = (profil) => {
             )
         });
 
-        // 2. PHOTO
         columns.push({
             title: 'Photo',
             dataKey: 'urlPhoto',
@@ -744,7 +746,6 @@ const getStudentTableColumns = (profil) => {
             )
         });
 
-        // 3. NOM ET PRÉNOM (ajouté pour clarté)
         columns.push({
             title: 'Nom & Prénom',
             dataKey: 'nom',
@@ -776,7 +777,6 @@ const getStudentTableColumns = (profil) => {
             )
         });
 
-        // 4. MATIÈRES
         columns.push({
             title: 'Matières',
             dataKey: 'matieres',
@@ -829,7 +829,6 @@ const getStudentTableColumns = (profil) => {
             }
         });
 
-        // 5. NOTES
         columns.push({
             title: 'Notes',
             dataKey: 'matieres',
@@ -877,7 +876,6 @@ const getStudentTableColumns = (profil) => {
                                         {matiere.notes.map((note, noteIndex) => (
                                             <span
                                                 key={noteIndex}
-                                                color={getNoteColor(note.note, note.noteSur)}
                                                 style={{ fontSize: '12px', marginRight: '5px' }}
                                             >
                                                 {note.note}/{note.noteSur}
@@ -900,7 +898,6 @@ const getStudentTableColumns = (profil) => {
             }
         });
 
-        // 6. COEFFICIENTS
         columns.push({
             title: 'Coefficients',
             dataKey: 'matieres',
@@ -940,7 +937,6 @@ const getStudentTableColumns = (profil) => {
                                 border: '1px solid #fbbf24',
                                 textAlign: 'center'
                             }}>
-
                                 <Badge color="yellow" style={{ fontSize: '10px' }}>
                                     Coef: {matiere.coefficient || 1}
                                 </Badge>
@@ -951,7 +947,6 @@ const getStudentTableColumns = (profil) => {
             }
         });
 
-        // 7. MOYENNE GÉNÉRALE
         columns.push({
             title: 'Moy. Coéf',
             dataKey: 'moyenneGenerale',
@@ -971,7 +966,6 @@ const getStudentTableColumns = (profil) => {
             )
         });
 
-        // 8. RANG
         columns.push({
             title: 'Rang',
             dataKey: 'rang',
@@ -997,7 +991,6 @@ const getStudentTableColumns = (profil) => {
             }
         });
 
-        // 9. APPRÉCIATION
         columns.push({
             title: 'Appréciation',
             dataKey: 'appreciation',
@@ -1006,20 +999,11 @@ const getStudentTableColumns = (profil) => {
             sortable: true,
             cellType: 'custom',
             customRenderer: (rowData, value) => (
-                <div style={{
-                    // maxWidth: '80px',
-                    // overflow: 'hidden',
-                    // textOverflow: 'ellipsis',
-                    // whiteSpace: 'nowrap'
-                }}>
+                <div>
                     <Badge
                         color={getAppreciationColor(value)}
-                        style={{
-                            fontSize: '12px',
-                            // overflow: 'hidden',
-                            // textOverflow: 'ellipsis'
-                        }}
-                        title={value} // Tooltip pour voir le texte complet
+                        style={{ fontSize: '12px' }}
+                        title={value}
                     >
                         {value || 'Non définie'}
                     </Badge>
@@ -1027,7 +1011,6 @@ const getStudentTableColumns = (profil) => {
             )
         });
 
-        // 10. CLASSÉ
         columns.push({
             title: 'Classé',
             dataKey: 'isClassed',
@@ -1045,7 +1028,6 @@ const getStudentTableColumns = (profil) => {
         });
 
     } else {
-        // Pour les autres profils : configuration normale (inchangée)
         columns.push({
             title: 'Photo',
             dataKey: 'urlPhoto',
@@ -1065,7 +1047,6 @@ const getStudentTableColumns = (profil) => {
             sortable: true
         });
 
-        // Colonnes communes pour les autres profils
         columns.push(
             {
                 title: 'Matricule',
@@ -1127,7 +1108,6 @@ const getStudentTableColumns = (profil) => {
             }
         );
 
-        // Ajout conditionnel des colonnes d'absence
         columns.push(
             {
                 title: 'Abs. Just.',
@@ -1147,7 +1127,6 @@ const getStudentTableColumns = (profil) => {
             }
         );
 
-        // Dernière colonne pour les autres profils
         columns.push({
             title: 'Est classé',
             dataKey: 'isClassed',
@@ -1166,20 +1145,17 @@ const getStudentTableColumns = (profil) => {
     return columns;
 };
 
-
 // ===========================
-// COMPOSANT PRINCIPAL MODIFIÉ AVEC API D'ABSENCE
+// COMPOSANT PRINCIPAL
 // ===========================
 const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
     const navigate = useNavigate();
     const [refreshTrigger, setRefreshTrigger] = useState(0);
-    const [savingAbsences, setSavingAbsences] = useState(new Set()); // Pour tracking des sauvegardes en cours
+    const [savingAbsences, setSavingAbsences] = useState(new Set());
+    const [savingBulletin, setSavingBulletin] = useState(false);
 
-    // Hook pour les notifications rsuite
+    const TableComponent = profil === 'Fondateur' ? DataTableExtended : DataTable;
 
-    const TableComponent = profil === 'Fondateur' ? DataTableExtended : DataTable; // Changer de datatable en fonction du profil
-
-    // Récupération des paramètres dynamiques
     const {
         periodicitieId: dynamicPeriodicitieId,
         personnelInfo: personnelInfo,
@@ -1187,7 +1163,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
         ecoleId: dynamicEcoleId
     } = usePulsParams();
 
-    // Hook modifié pour prendre en compte showMatiereFilter
     const {
         etudiants,
         classeInfo,
@@ -1200,10 +1175,8 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
         searchContext
     } = useNoteSearch(profil, showMatiereFilter);
 
-    // État pour stocker la période actuelle pour les appels API
     const [currentSearchParams, setCurrentSearchParams] = useState(null);
 
-    // Fonction handleSearch modifiée pour passer le matiereId
     const handleSearch = useCallback(async (params) => {
         console.log('🔍 Lancement de la recherche avec paramètres:', {
             ...params,
@@ -1211,10 +1184,8 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
             context: 'NoteEtMoyenne'
         });
 
-        // Stockage des paramètres pour les appels d'absence
         setCurrentSearchParams(params);
 
-        // Appel modifié pour inclure le matiereId
         await searchNotes(
             params.classeId,
             params.periodeId,
@@ -1229,12 +1200,333 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
     }, [clearResults]);
 
     // ===========================
-    // FONCTION CORRIGÉE POUR GÉRER LES ABSENCES AVEC API
+    // FONCTION POUR SAUVEGARDER LE BULLETIN
+    // ===========================
+    const handleSaveBulletin = useCallback(async () => {
+        console.log('🎯 Clic sur Enregistrer Bulletin');
+
+        // Vérification des prérequis
+        if (!currentSearchParams || !classeInfo || !dynamicAcademicYearId) {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: 'Impossible de sauvegarder : informations manquantes (classe, période ou année académique)',
+                confirmButtonColor: '#3b82f6'
+            });
+            return;
+        }
+
+        // Confirmation avec SweetAlert2
+        const result = await Swal.fire({
+            title: 'Confirmer la sauvegarde ?',
+            html: `
+            <div style="
+                background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+                border-radius: 16px;
+                padding: 24px;
+                margin: 20px 0;
+                border: 1px solid #e2e8f0;
+            ">
+                <!-- En-tête avec icône -->
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin-bottom: 20px;
+                    padding-bottom: 16px;
+                    border-bottom: 2px solid #e2e8f0;
+                ">
+                    <div style="
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        border-radius: 12px;
+                        padding: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-width: 48px;
+                        height: 48px;
+                    ">
+                        <span style="font-size: 24px;">📋</span>
+                    </div>
+                    <div style="text-align: left; flex: 1;">
+                        <h3 style="
+                            margin: 0;
+                            font-size: 16px;
+                            font-weight: 600;
+                            color: #334155;
+                        ">Récapitulatif de la sauvegarde</h3>
+                        <p style="
+                            margin: 4px 0 0 0;
+                            font-size: 13px;
+                            color: #64748b;
+                        ">Vérifiez les informations ci-dessous</p>
+                    </div>
+                </div>
+
+                <!-- Informations détaillées -->
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Classe -->
+                    <div style="
+                        background: white;
+                        border-radius: 10px;
+                        padding: 14px 16px;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        border: 1px solid #e2e8f0;
+                        transition: all 0.3s ease;
+                    ">
+                        <div style="
+                            background: #eff6ff;
+                            border-radius: 8px;
+                            padding: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            min-width: 36px;
+                            height: 36px;
+                        ">
+                            <span style="font-size: 18px;">🏫</span>
+                        </div>
+                        <div style="text-align: left; flex: 1;">
+                            <p style="
+                                margin: 0;
+                                font-size: 12px;
+                                color: #64748b;
+                                font-weight: 500;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            ">Classe</p>
+                            <p style="
+                                margin: 4px 0 0 0;
+                                font-size: 15px;
+                                color: #1e293b;
+                                font-weight: 600;
+                            ">${classeInfo.libelle}</p>
+                        </div>
+                    </div>
+
+                    <!-- Période 
+                    <div style="
+                        background: white;
+                        border-radius: 10px;
+                        padding: 14px 16px;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        border: 1px solid #e2e8f0;
+                    ">
+                        <div style="
+                            background: #f0fdf4;
+                            border-radius: 8px;
+                            padding: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            min-width: 36px;
+                            height: 36px;
+                        ">
+                            <span style="font-size: 18px;">📅</span>
+                        </div>
+                        <div style="text-align: left; flex: 1;">
+                            <p style="
+                                margin: 0;
+                                font-size: 12px;
+                                color: #64748b;
+                                font-weight: 500;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            ">Période</p>
+                            <p style="
+                                margin: 4px 0 0 0;
+                                font-size: 15px;
+                                color: #1e293b;
+                                font-weight: 600;
+                            ">${currentSearchParams.periodeId}</p>
+                        </div>
+                    </div>
+
+                     Année académique 
+                    <div style="
+                        background: white;
+                        border-radius: 10px;
+                        padding: 14px 16px;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        border: 1px solid #e2e8f0;
+                    ">
+                        <div style="
+                            background: #fef3c7;
+                            border-radius: 8px;
+                            padding: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            min-width: 36px;
+                            height: 36px;
+                        ">
+                            <span style="font-size: 18px;">📚</span>
+                        </div>
+                        <div style="text-align: left; flex: 1;">
+                            <p style="
+                                margin: 0;
+                                font-size: 12px;
+                                color: #64748b;
+                                font-weight: 500;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            ">Année académique</p>
+                            <p style="
+                                margin: 4px 0 0 0;
+                                font-size: 15px;
+                                color: #1e293b;
+                                font-weight: 600;
+                            ">${dynamicAcademicYearId}</p>
+                        </div>
+                    </div>-->
+
+                    ${etudiants?.length ? `
+                    <!-- Nombre d'étudiants -->
+                    <div style="
+                        background: white;
+                        border-radius: 10px;
+                        padding: 14px 16px;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        border: 1px solid #e2e8f0;
+                    ">
+                        <div style="
+                            background: #ecfeff;
+                            border-radius: 8px;
+                            padding: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            min-width: 36px;
+                            height: 36px;
+                        ">
+                            <span style="font-size: 18px;">👥</span>
+                        </div>
+                        <div style="text-align: left; flex: 1;">
+                            <p style="
+                                margin: 0;
+                                font-size: 12px;
+                                color: #64748b;
+                                font-weight: 500;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            ">Nombre d'étudiants</p>
+                            <p style="
+                                margin: 4px 0 0 0;
+                                font-size: 15px;
+                                color: #1e293b;
+                                font-weight: 600;
+                            ">${etudiants.length} étudiant${etudiants.length > 1 ? 's' : ''}</p>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+
+            <!-- Message de confirmation -->
+            <div style="
+                background: #fef3c7;
+                border-left: 4px solid #f59e0b;
+                border-radius: 8px;
+                padding: 16px 20px;
+                margin: 20px 0 0 0;
+            ">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 24px;">⚠️</span>
+                    <p style="
+                        margin: 0;
+                        color: #78350f;
+                        font-size: 14px;
+                        font-weight: 500;
+                        line-height: 1.5;
+                        text-align: left;
+                    ">
+                        Cette action va <strong>enregistrer définitivement</strong> le bulletin pour cette classe. 
+                        Voulez-vous continuer ?
+                    </p>
+                </div>
+            </div>
+        `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'Oui, enregistrer',
+            cancelButtonText: 'Annuler',
+            reverseButtons: true
+        });
+
+        if (!result.isConfirmed) {
+            console.log('❌ Utilisateur a annulé');
+            return;
+        }
+
+        try {
+            setSavingBulletin(true);
+
+            console.log('📤 Envoi de la requête API...');
+
+            const saveResult = await saveBulletinToAPI(
+                dynamicAcademicYearId,
+                currentSearchParams.periodeId,
+                classeInfo.id
+            );
+
+            if (saveResult.success) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Succès !',
+                    text: 'Le bulletin a été enregistré avec succès',
+                    confirmButtonColor: '#10b981',
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+
+                toaster.push(
+                    <Message type="success" showIcon closable>
+                        <strong>Bulletin enregistré</strong><br />
+                        Le bulletin de la classe {classeInfo.libelle} a été sauvegardé
+                    </Message>,
+                    { placement: 'topEnd', duration: 5000 }
+                );
+
+            } else {
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur de sauvegarde',
+                    text: saveResult.error || 'Une erreur est survenue lors de l\'enregistrement du bulletin',
+                    confirmButtonColor: '#ef4444'
+                });
+            }
+
+        } catch (error) {
+            console.error('❌ Erreur inattendue:', error);
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Erreur inattendue',
+                text: 'Une erreur s\'est produite lors de la sauvegarde du bulletin',
+                confirmButtonColor: '#ef4444'
+            });
+
+        } finally {
+            setSavingBulletin(false);
+        }
+    }, [currentSearchParams, classeInfo, dynamicAcademicYearId, etudiants]);
+
+    // ===========================
+    // FONCTION POUR GÉRER LES ABSENCES
     // ===========================
     const handleAbsenceChange = useCallback(async (etudiantId, field, value) => {
         console.log('📝 Changement d\'absence pour étudiant:', etudiantId, field, value);
 
-        // Vérification des prérequis
         if (!currentSearchParams || !classeInfo || !dynamicAcademicYearId) {
             toaster.push(
                 <Message type="error" showIcon closable>
@@ -1246,7 +1538,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
             return;
         }
 
-        // Recherche de l'étudiant dans la liste
         const etudiant = etudiants.find(e => e.id === etudiantId);
         if (!etudiant) {
             toaster.push(
@@ -1259,7 +1550,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
             return;
         }
 
-        // Prévention des appels multiples
         const savingKey = `${etudiantId}-${field}`;
         if (savingAbsences.has(savingKey)) {
             console.log('⏳ Sauvegarde déjà en cours pour:', savingKey);
@@ -1267,14 +1557,11 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
         }
 
         try {
-            // Marquage comme en cours de sauvegarde
             setSavingAbsences(prev => new Set([...prev, savingKey]));
 
-            // Mise à jour immédiate de l'état local via le hook
             console.log('🔄 Mise à jour optimiste locale:', { [field]: parseInt(value) || 0 });
             updateStudentData(etudiantId, { [field]: parseInt(value) || 0 });
 
-            // Notification de début de sauvegarde
             toaster.push(
                 <Message type="info" showIcon closable>
                     <strong>Sauvegarde en cours...</strong><br />
@@ -1283,7 +1570,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                 { placement: 'topEnd', duration: 3000 }
             );
 
-            // Appel API avec les données mises à jour
             const etudiantUpdated = { ...etudiant, [field]: parseInt(value) || 0 };
             const result = await saveAbsenceToAPI(
                 etudiantUpdated,
@@ -1295,7 +1581,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
             );
 
             if (result.success) {
-                // Succès
                 toaster.push(
                     <Message type="success" showIcon closable>
                         <strong>Succès !</strong><br />
@@ -1306,10 +1591,7 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
 
                 console.log('✅ Absence sauvegardée avec succès:', result.data);
             } else {
-                // Échec - annuler la mise à jour optimiste
                 console.error('❌ Échec sauvegarde absence:', result.error);
-
-                // Restaurer l'ancienne valeur
                 updateStudentData(etudiantId, { [field]: etudiant[field] });
 
                 toaster.push(
@@ -1323,8 +1605,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
 
         } catch (error) {
             console.error('❌ Erreur inattendue lors de la sauvegarde:', error);
-
-            // Restaurer l'ancienne valeur en cas d'erreur
             updateStudentData(etudiantId, { [field]: etudiant[field] });
 
             toaster.push(
@@ -1335,7 +1615,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                 { placement: 'topEnd', duration: 6000 }
             );
         } finally {
-            // Retrait du marquage de sauvegarde en cours
             setSavingAbsences(prev => {
                 const newSet = new Set([...prev]);
                 newSet.delete(savingKey);
@@ -1344,10 +1623,8 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
         }
     }, [currentSearchParams, classeInfo, dynamicAcademicYearId, etudiants, savingAbsences, updateStudentData]);
 
-
     const handleNoteChange = useCallback((etudiantId, matiereId, noteId, value) => {
         console.log('📝 Changement de note:', etudiantId, matiereId, noteId, value);
-        // Ici vous pouvez ajouter la logique pour sauvegarder les notes
     }, []);
 
     const handleRefresh = useCallback(() => {
@@ -1370,7 +1647,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
 
     const globalStats = calculateGlobalStats();
 
-    // Configuration des filtres
     const filterConfigs = [
         {
             field: 'sexe',
@@ -1402,13 +1678,8 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
     const searchableFields = ['nom', 'prenom', 'matricule', 'sexe'];
 
     return (
-        <div style={{
-
-            minHeight: '100vh',
-            padding: '20px 0'
-        }}>
+        <div style={{ minHeight: '100vh', padding: '20px 0' }}>
             <div className="container-fluid">
-                {/* Formulaire de recherche amélioré */}
                 <div className="row">
                     <div className="col-lg-12">
                         <SearchForm
@@ -1421,7 +1692,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                     </div>
                 </div>
 
-                {/* Statistiques enrichies */}
                 {searchPerformed && globalStats && classeInfo && (
                     <div className="row">
                         <div className="col-lg-12">
@@ -1434,7 +1704,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                     </div>
                 )}
 
-                {/* Message d'information adaptatif */}
                 {!searchPerformed && !searchLoading && (
                     <div className="row mb-4">
                         <div className="col-lg-12">
@@ -1479,7 +1748,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                     </div>
                 )}
 
-                {/* Erreur de recherche enrichie */}
                 {searchError && (
                     <div className="row mb-4">
                         <div className="col-lg-12">
@@ -1511,7 +1779,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                                     </div>
                                 </div>
 
-                                {/* Informations de debug si disponibles */}
                                 {searchError.context && (
                                     <div style={{
                                         background: '#f8fafc',
@@ -1529,7 +1796,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                     </div>
                 )}
 
-                {/* DataTable avec style amélioré */}
                 {searchPerformed && (
                     <div className="row">
                         <div className="col-lg-12">
@@ -1541,45 +1807,30 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                                 overflow: 'hidden'
                             }}>
                                 <TableComponent
-                                    // Configuration de base
                                     title={`Notes et Moyennes par Étudiant${showMatiereFilter ? ' (Mode Filtré)' : ''}`}
                                     subtitle="étudiant(s)"
-
-                                    // Mode étudiant
                                     displayMode="student"
-
-                                    // Données
                                     data={etudiants}
                                     loading={searchLoading}
                                     error={null}
-
-                                    // Configuration des colonnes
                                     columns={getStudentTableColumns(profil)}
-
-                                    // Configuration des filtres
                                     searchableFields={searchableFields}
                                     filterConfigs={filterConfigs}
-
-                                    // Pagination
                                     defaultPageSize={20}
                                     pageSizeOptions={[10, 20, 50]}
                                     tableHeight={700}
-
-                                    // Actions et callbacks
                                     onRefresh={handleRefresh}
                                     onAbsenceChange={handleAbsenceChange}
                                     onNoteChange={handleNoteChange}
-
-                                    // Configuration additionnelle
                                     enableRefresh={false}
-                                    enableCreate={false}
+                                    enableCreate={true}
+                                    createButtonText="Enregistrer Bulletin"
+                                    startIcon={<FiSave />}
+                                    onCreateClick={handleSaveBulletin}
+                                    createButtonLoading={savingBulletin}
                                     selectable={false}
                                     rowKey="id"
-
-                                    // Largeur minimale pour scroll horizontal
                                     minTableWidth={1300}
-
-                                    // Rendu personnalisé pour les badges de notes
                                     cellRenderer={{
                                         note: (value, rowData) => (
                                             <Badge
@@ -1598,8 +1849,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                                             </Badge>
                                         )
                                     }}
-
-                                    // Styles personnalisés
                                     customStyles={{
                                         container: { backgroundColor: "transparent" },
                                         panel: { minHeight: "600px", border: "none", boxShadow: "none" },
@@ -1610,7 +1859,6 @@ const NoteEtMoyenne = ({ profil, showMatiereFilter = false }) => {
                     </div>
                 )}
 
-                {/* Aucun résultat - style moderne */}
                 {searchPerformed && etudiants?.length === 0 && !searchLoading && (
                     <div className="row">
                         <div className="col-lg-12">

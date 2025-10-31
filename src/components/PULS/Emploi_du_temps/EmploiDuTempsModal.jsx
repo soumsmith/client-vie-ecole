@@ -40,6 +40,8 @@ import {
 } from "./EmploiDuTempsServiceManager";
 import { usePulsParams } from "../../hooks/useDynamicParams";
 import { useAllApiUrls } from "../utils/apiConfig";
+import VerificationStatus from '../Composant/VerificationStatus';
+
 
 const EmploiDuTempsModal = ({
   modalState,
@@ -536,70 +538,6 @@ const EmploiDuTempsModal = ({
     return jour?.libelle || 'Jour sélectionné';
   };
 
-  // ===========================
-  // COMPOSANT DE STATUT DE VÉRIFICATION
-  // ===========================
-  const VerificationStatus = () => {
-    const timeValidation = validateTimeRange();
-
-    if (!formData.heureDeb || !formData.heureFin) return null;
-
-    if (!timeValidation.valid) {
-      return (
-        <Message type="warning" showIcon style={{ marginBottom: 16 }}>
-          <FiAlertTriangle style={{ marginRight: 8 }} />
-          {timeValidation.message}
-        </Message>
-      );
-    }
-
-    if (verfication.loading) {
-      return (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          padding: 12,
-          background: '#f0f9ff',
-          border: '1px solid #bae6fd',
-          borderRadius: 8,
-          marginBottom: 16
-        }}>
-          <Loader size="xs" />
-          <Text style={{ color: '#0369a1' }}>Vérification de la disponibilité...</Text>
-        </div>
-      );
-    }
-
-    if (verfication.error) {
-      return (
-        <Message type="error" showIcon style={{ marginBottom: 16, marginTop: 16 }}>
-          <FiAlertTriangle style={{ marginRight: 8 }} />
-          {verfication.error}
-        </Message>
-      );
-    }
-
-    if (verfication.creneauDisponible === true) {
-      return (
-        <Message type="success" showIcon style={{ marginBottom: 16, marginTop: 16 }}>
-          <FiCheck style={{ marginRight: 8 }} />
-          Plage horaire disponible • {verfication.sallesDisponibles.length} salle(s) disponible(s)
-        </Message>
-      );
-    }
-
-    if (verfication.creneauDisponible === false) {
-      return (
-        <Message type="error" showIcon style={{ marginBottom: 16, marginTop: 16 }}>
-          <FiX style={{ marginRight: 8 }} />
-          Plage horaire indisponible
-        </Message>
-      );
-    }
-
-    return null;
-  };
 
   // ===========================
   // COMPOSANT TABLE DES ACTIVITÉS EXISTANTES
@@ -907,7 +845,12 @@ const EmploiDuTempsModal = ({
                     </Row>
 
                     {/* Statut de vérification */}
-                    <VerificationStatus />
+                    <VerificationStatus
+                      formData={formData}
+                      verification={verfication}
+                      validateTimeRange={validateTimeRange}
+                      successMessage="Plage horaire disponible"
+                    />
 
                     <Row gutter={16}>
                       <Col xs={24}>

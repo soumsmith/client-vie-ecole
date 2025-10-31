@@ -119,10 +119,9 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur, modifiedNo
     const [previousValue, setPreviousValue] = useState(rowData.note || 0);
     const inputRef = React.useRef(null);
 
-    // ✅ Vérifier si cette note a été modifiée
     const isModified = modifiedNotes && modifiedNotes.has(rowData.id);
+    const maxNote = parseFloat(noteSur) || 20;
 
-    // Mettre à jour l'état local quand les données changent
     React.useEffect(() => {
         console.log('🔄 Mise à jour note pour:', rowData.eleve?.nomComplet, 'Note:', rowData.note);
         setValue(rowData.note || 0);
@@ -131,10 +130,17 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur, modifiedNo
 
     const handleChange = (e) => {
         const newValue = e.target.value === '' ? '' : e.target.value;
-        console.log('✏️ Changement dans input:', { 
-            ancien: value, 
+
+        // ✅ Validation : bloquer si la valeur dépasse noteSur
+        if (newValue !== '' && parseFloat(newValue) > maxNote) {
+            console.log('⚠️ Valeur trop élevée, max autorisé:', maxNote);
+            return; // Ne pas mettre à jour l'état
+        }
+
+        console.log('✏️ Changement dans input:', {
+            ancien: value,
             nouveau: newValue,
-            eleve: rowData.eleve?.nomComplet 
+            eleve: rowData.eleve?.nomComplet
         });
         setValue(newValue);
     };
@@ -148,15 +154,43 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur, modifiedNo
 
     const handleBlur = async () => {
         setIsFocused(false);
-        
+
+        // ✅ Si l'input est vide, on met 0
         if (value === '' || value === null || value === undefined) {
-            console.log('⏭️ Input vide, restauration de la valeur précédente:', previousValue);
-            setValue(previousValue);
+            console.log('⏭️ Input vide, mise à 0');
+            setValue(0);
+
+            // Si la note originale n'était pas 0, on stocke le changement
+            if (rowData.note !== 0) {
+                setIsLoading(true);
+                try {
+                    const newPec = 0; // Note à 0 = pas de PEC
+
+                    if (onNoteChange) {
+                        await onNoteChange(rowData.id, 0, newPec, 'note');
+                    }
+                    console.log('✅ Note mise à 0');
+                } catch (error) {
+                    console.error('❌ Erreur lors du stockage:', error);
+                    showErrorToast('Erreur lors du stockage de la modification');
+                    setValue(previousValue);
+                } finally {
+                    setIsLoading(false);
+                }
+            }
             return;
         }
 
         const newValue = parseFloat(value) || 0;
-        
+
+        // ✅ Validation supplémentaire au blur (filet de sécurité)
+        if (newValue > maxNote) {
+            console.log('⚠️ Valeur trop élevée lors du blur, restauration à:', previousValue);
+            setValue(previousValue);
+            showErrorToast(`La note ne peut pas dépasser ${noteSur}`);
+            return;
+        }
+
         console.log('🔍 Blur détecté:', {
             valeurActuelle: value,
             valeurParsée: newValue,
@@ -164,7 +198,7 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur, modifiedNo
             estIdentique: newValue === (rowData.note || 0),
             eleve: rowData.eleve?.nomComplet
         });
-        
+
         if (newValue === (rowData.note || 0)) {
             console.log('⏭️ Valeur identique, pas de stockage');
             return;
@@ -174,7 +208,6 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur, modifiedNo
         console.log('📝 Stockage de la modification...');
 
         try {
-            // ✅ Activer automatiquement le PEC si une note est saisie
             const newPec = newValue > 0 ? 1 : rowData.pec;
 
             console.log('📝 Paramètres de stockage:', {
@@ -209,8 +242,6 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur, modifiedNo
             e.target.blur();
         }
     };
-
-    const maxNote = parseFloat(noteSur) || 20;
 
     console.log('🎯 EditableNoteCell rendu:', {
         eleve: rowData.eleve?.nomComplet,
@@ -265,11 +296,10 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur, modifiedNo
                 style={{
                     width: '70px',
                     padding: '6px 8px',
-                    // ✅ CORRECTION: Ajout du style pour les notes modifiées
-                    border: isModified 
-                        ? '2px solid #f59e0b' 
-                        : isFocused 
-                            ? '2px solid #3b82f6' 
+                    border: isModified
+                        ? '2px solid #f59e0b'
+                        : isFocused
+                            ? '2px solid #3b82f6'
                             : '1px solid #d1d5db',
                     borderRadius: '6px',
                     textAlign: 'center',
@@ -277,16 +307,15 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur, modifiedNo
                     fontWeight: '500',
                     outline: 'none',
                     transition: 'all 0.2s ease',
-                    // ✅ CORRECTION: Surbrillance orange pour les notes modifiées
-                    backgroundColor: isModified 
-                        ? '#fef3c7' 
-                        : isLoading 
-                            ? '#f1f5f9' 
+                    backgroundColor: isModified
+                        ? '#fef3c7'
+                        : isLoading
+                            ? '#f1f5f9'
                             : 'white',
-                    boxShadow: isModified 
-                        ? '0 0 0 3px rgba(245, 158, 11, 0.15)' 
-                        : isFocused 
-                            ? '0 0 0 3px rgba(59, 130, 246, 0.1)' 
+                    boxShadow: isModified
+                        ? '0 0 0 3px rgba(245, 158, 11, 0.15)'
+                        : isFocused
+                            ? '0 0 0 3px rgba(59, 130, 246, 0.1)'
                             : 'none'
                 }}
             />
@@ -297,8 +326,7 @@ const EditableNoteCell = ({ rowData, onNoteChange, isLocked, noteSur, modifiedNo
             }}>
                 /{noteSur}
             </span>
-            
-            {/* Indicateur de chargement */}
+
             {isLoading && (
                 <div style={{
                     position: 'absolute',
@@ -401,9 +429,9 @@ const EditablePecCell = ({ rowData, onPecChange, isLocked }) => {
 
             {/* ✅ CORRECTION: Badge "M" affiché uniquement si le switch est activé */}
             {isActive && (
-                <Badge 
-                    color="cyan" 
-                    style={{ 
+                <Badge
+                    color="cyan"
+                    style={{
                         fontSize: '10px',
                         fontWeight: '700',
                         padding: '2px 6px',
@@ -716,8 +744,8 @@ const EvaluationDetail = () => {
             const matiereId = evaluation?.matiereEcole?.id;
             const classeId = evaluation?.classe?.id;
 
-            console.log('🔍 IDs extraits:', { 
-                matiereId, 
+            console.log('🔍 IDs extraits:', {
+                matiereId,
                 classeId,
                 matiereEcole: evaluation?.matiereEcole,
                 classe: evaluation?.classe
@@ -736,7 +764,7 @@ const EvaluationDetail = () => {
             };
 
             const apiUrl = apiUrls.notes.update(matiereId, classeId);
-            
+
             console.log('📤 Envoi vers API:', {
                 url: apiUrl,
                 payload,
@@ -867,7 +895,7 @@ const EvaluationDetail = () => {
             // ✅ CORRECTION: Construction du payload avec la bonne structure
             const payload = notes.map(noteData => {
                 const modification = modifiedNotes.get(noteData.id);
-                
+
                 const finalNote = modification ? modification.note : (noteData.note || 0);
                 const finalPec = modification ? modification.pec : (noteData.pec || 0);
 
@@ -881,13 +909,13 @@ const EvaluationDetail = () => {
                 // ✅ SOLUTION CORRIGÉE: Construction avec le bon ordre des éléments
                 if (noteData.raw_data) {
                     const noteCopy = JSON.parse(JSON.stringify(noteData.raw_data));
-                    
+
                     noteCopy.note = finalNote;
                     noteCopy.pec = finalPec;
                     noteCopy.statut = "M";  // ✅ Ajout du statut
                     // noteCopy.dateCreation = currentDateUTC;
                     // noteCopy.dateUpdate = currentDateUTC;
-                    
+
                     return noteCopy;
                 }
 
@@ -947,7 +975,7 @@ const EvaluationDetail = () => {
 
             Swal.close();
             await showErrorToast(
-                error.response?.data?.message || 
+                error.response?.data?.message ||
                 'Erreur lors de l\'enregistrement des notes'
             );
         } finally {
@@ -1467,7 +1495,7 @@ const EvaluationDetail = () => {
                                             </Badge>
                                         )}
                                     </span>
-                                    
+
                                     {/* Boutons d'action */}
                                     <div style={{ display: 'flex', gap: '10px' }}>
                                         {/* Bouton Export Excel */}
@@ -1492,8 +1520,8 @@ const EvaluationDetail = () => {
                                             <Button
                                                 appearance="primary"
                                                 style={{
-                                                    background: modifiedNotes.size > 0 
-                                                        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+                                                    background: modifiedNotes.size > 0
+                                                        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                                                         : '#94a3b8',
                                                     border: 'none',
                                                     display: 'flex',

@@ -14,7 +14,6 @@ import {
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-
 import { useNiveauxBranchesData, useLanguesData, useProfesseursByClasse } from "../utils/CommonDataService";
 import { useClassesUrls, useMatieresUrls, useAppParams } from '../utils/apiConfig';
 
@@ -33,8 +32,7 @@ const model = Schema.Model({
         .min(0, 'L\'effectif doit être positif'),
     branche: NumberType()
         .isRequired('La branche est obligatoire'),
-    // langueVivante: NumberType()
-    //     .isRequired('La langue vivante est obligatoire')
+    // langueVivante est optionnel
 });
 
 const notifySuccess = (title = 'Succès', text = '') =>
@@ -43,7 +41,17 @@ const notifySuccess = (title = 'Succès', text = '') =>
 const notifyError = (title = 'Erreur', text = '') =>
     Swal.fire({ icon: 'error', title, text, confirmButtonText: 'OK' });
 
-const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
+/**
+ * Modal unifié pour la création et modification de classe
+ * @param {boolean} visible - Visibilité du modal
+ * @param {function} onClose - Fonction de fermeture
+ * @param {function} onSuccess - Fonction appelée en cas de succès
+ * @param {object|null} selectedClass - Classe sélectionnée (null = mode création)
+ */
+const ClassModal = ({ visible, onClose, onSuccess, selectedClass = null }) => {
+    // Déterminer le mode : création ou modification
+    const isEditMode = selectedClass !== null && selectedClass !== undefined;
+
     const [formValue, setFormValue] = useState({
         code: '',
         libelle: '',
@@ -55,19 +63,19 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
     const [formError, setFormError] = useState({});
     const [loading, setLoading] = useState(false);
     const [submitError, setSubmitError] = useState(null);
-    //   const [langues, setLangues] = useState([]);
-    const [languesLoading, setLanguesLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('professeurs');
     const [emploiTempsData] = useState([]);
 
     const appParams = useAppParams();
     const classesUrls = useClassesUrls();
-    const languesUrls = useMatieresUrls();
 
     const { branches, loading: branchesLoading } = useNiveauxBranchesData();
-    const { langues, loading: languesLoadingVivante } = useLanguesData();
+    const { langues, loading: languesLoading } = useLanguesData();
 
-    const { professeursData, loading: professeursLoading } = useProfesseursByClasse(selectedClass?.id);
+    // Charger les professeurs uniquement en mode modification
+    const { professeursData, loading: professeursLoading } = useProfesseursByClasse(
+        isEditMode ? selectedClass?.id : null
+    );
 
     // Transformer les données pour le tableau
     const formattedProfesseurs = React.useMemo(() => {
@@ -81,9 +89,9 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
         }));
     }, [professeursData]);
 
-
+    // Charger les données de la classe en mode modification
     useEffect(() => {
-        if (visible && selectedClass) {
+        if (visible && isEditMode && selectedClass) {
             setFormValue({
                 code: selectedClass.code || '',
                 libelle: selectedClass.libelle || '',
@@ -95,10 +103,11 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
             setSubmitError(null);
             setFormError({});
         }
-    }, [visible, selectedClass]);
+    }, [visible, isEditMode, selectedClass]);
 
+    // Réinitialiser le formulaire quand le modal se ferme ou en mode création
     useEffect(() => {
-        if (!visible) {
+        if (!visible || (!isEditMode && visible)) {
             setFormValue({
                 code: '',
                 libelle: '',
@@ -111,68 +120,110 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
             setSubmitError(null);
             setActiveTab('professeurs');
         }
-    }, [visible]);
+    }, [visible, isEditMode]);
 
     const handleCheck = useCallback((formError) => {
         setFormError(formError);
     }, []);
 
     const handleSubmit = async () => {
-    // validation RSuite
-    if (!model.check(formValue)) {
-        notifyError('Erreur', 'Veuillez corriger les erreurs du formulaire');
-        return;
-    }
-
-    if (!selectedClass?.id) {
-        notifyError('Erreur', 'Aucune classe sélectionnée pour la modification');
-        return;
-    }
-
-    try {
-        setLoading(true);
-        setSubmitError(null);
-
-        // Trouver la branche complète depuis les données branches
-        const brancheComplete = branches.find(b => b.value === formValue.branche);
-        
-        // Trouver la langue vivante complète depuis les données langues
-        const langueComplete = formValue.langueVivante 
-            ? langues.find(l => l.value === formValue.langueVivante) 
-            : null;
-
-        const classeData = {
-            ...selectedClass, // Garder toutes les propriétés existantes
-            code: formValue.code,
-            libelle: formValue.libelle,
-            effectif: formValue.effectif || 0,
-            visible: formValue.visible ? 1 : 0,
-            annee: appParams.anneeScolaireId,
-            branche: brancheComplete?.originalData || selectedClass.branche, // Utiliser la branche complète
-            langueVivante: langueComplete?.originalData || (formValue.langueVivante ? selectedClass.langueVivante : null),
-            ecole: selectedClass.ecole || { id: appParams.ecoleId },
-            profPrincipal: selectedClass.profPrincipal || null
-        };
-
-        const url = classesUrls.updateClasse();
-        const response = await axios.post(url, classeData);
-
-        if (typeof onSuccess === 'function') {
-            onSuccess(response.data);
+        // Validation RSuite
+        if (!model.check(formValue)) {
+            notifyError('Erreur', 'Veuillez corriger les erreurs du formulaire');
+            return;
         }
-        onClose();
 
-        notifySuccess('Classe modifiée', 'Classe modifiée avec succès');
-    } catch (error) {
-        const errorMessage = error.response?.data?.message ||
-            error.message ||
-            'Erreur lors de la modification de la classe';
-        setSubmitError(errorMessage);
-        notifyError('Erreur', errorMessage);
-    } finally {
-        setLoading(false);
-    }
-};
+        // Validation spécifique en mode modification
+        if (isEditMode && !selectedClass?.id) {
+            notifyError('Erreur', 'Aucune classe sélectionnée pour la modification');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setSubmitError(null);
+
+            let classeData;
+            let url;
+
+            if (isEditMode) {
+                // MODE MODIFICATION - Conserver toute la structure existante
+                classeData = {
+                    ...selectedClass, // Garder toutes les propriétés existantes
+                    code: formValue.code,
+                    libelle: formValue.libelle,
+                    effectif: formValue.effectif || 0,
+                    visible: formValue.visible ? 1 : 0,
+                    annee: appParams.anneeScolaireId,
+                    // Pour la branche, on garde la structure complète si elle existe
+                    branche: selectedClass.branche ? {
+                        ...selectedClass.branche,
+                        id: formValue.branche
+                    } : {
+                        id: formValue.branche,
+                        code: "",
+                        libelle: ""
+                    },
+                    // Pour la langue vivante
+                    langueVivante: formValue.langueVivante ? {
+                        id: formValue.langueVivante,
+                        code: selectedClass.langueVivante?.code || "",
+                        libelle: selectedClass.langueVivante?.libelle || "Selectionner la langue"
+                    } : null,
+                    ecole: selectedClass.ecole || { id: appParams.ecoleId },
+                    profPrincipal: selectedClass.profPrincipal || null
+                };
+                url = classesUrls.updateClasse();
+            } else {
+                // MODE CRÉATION - Structure simplifiée
+                classeData = {
+                    annee: appParams.anneeScolaireId,
+                    branche: {
+                        id: formValue.branche,
+                        code: "",
+                        libelle: ""
+                    },
+                    code: formValue.code,
+                    id: Math.floor(Math.random() * 100000).toString(), // ID temporaire
+                    langueVivante: formValue.langueVivante ? {
+                        id: formValue.langueVivante,
+                        code: "",
+                        libelle: "Selectionner la langue"
+                    } : null,
+                    libelle: formValue.libelle,
+                    profPrincipal: null,
+                    ecole: {
+                        id: appParams.ecoleId
+                    },
+                    visible: formValue.visible ? 1 : 0,
+                    effectif: formValue.effectif || 0
+                };
+                url = classesUrls.saveClasse();
+            }
+
+            const response = await axios.post(url, classeData);
+
+            // Succès
+            if (typeof onSuccess === 'function') {
+                onSuccess(response.data);
+            }
+            onClose();
+
+            const successMessage = isEditMode 
+                ? 'Classe modifiée avec succès' 
+                : 'Classe créée avec succès';
+            notifySuccess(successMessage);
+
+        } catch (error) {
+            const errorMessage = error.response?.data?.message ||
+                error.message ||
+                `Erreur lors de ${isEditMode ? 'la modification' : 'la création'} de la classe`;
+            setSubmitError(errorMessage);
+            notifyError('Erreur', errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleCancel = () => {
         onClose();
@@ -184,9 +235,9 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
                 return (
                     <div style={{ height: '480px' }}>
                         <Table
-                            data={formattedProfesseurs}  // Utilisez les données formatées
+                            data={formattedProfesseurs}
                             height={480}
-                            loading={professeursLoading}  // Ajoutez le loading
+                            loading={professeursLoading}
                             locale={{ emptyMessage: 'Aucune donnée trouvée' }}
                         >
                             <Column width={150} align="left" fixed>
@@ -242,10 +293,18 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
     const isDataLoading = branchesLoading || languesLoading;
 
     return (
-        <Modal open={visible} onClose={handleCancel} size="lg" style={{ top: 20 }}>
+        <Modal 
+            open={visible} 
+            onClose={handleCancel} 
+            size={isEditMode ? "lg" : "md"} 
+            style={{ top: 20 }}
+        >
             <Modal.Header>
                 <Modal.Title>
-                    Modifier la classe {selectedClass?.code ? `"${selectedClass.code}"` : ''}
+                    {isEditMode 
+                        ? `Modifier la classe ${selectedClass?.code ? `"${selectedClass.code}"` : ''}`
+                        : 'Créer une nouvelle classe'
+                    }
                 </Modal.Title>
             </Modal.Header>
 
@@ -263,8 +322,13 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
                     </div>
                 )}
 
-                <div style={{ display: 'flex', gap: '20px', minHeight: '500px' }}>
-                    <div style={{ flex: '0 0 45%' }}>
+                <div style={{ 
+                    display: 'flex', 
+                    gap: '20px', 
+                    minHeight: isEditMode ? '500px' : 'auto' 
+                }}>
+                    {/* FORMULAIRE */}
+                    <div style={{ flex: isEditMode ? '0 0 45%' : '1' }}>
                         {isDataLoading && (
                             <div style={{ textAlign: 'center', padding: 20 }}>
                                 <Loader size="lg" />
@@ -324,11 +388,11 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
                                     data={langues}
                                     placeholder="Sélectionner la langue"
                                     searchable
-                                    cleanable={false}
+                                    cleanable={true}
                                     loading={languesLoading}
                                     style={{ width: '100%' }}
                                 />
-                                <Form.HelpText>La langue vivante 2 enseignée</Form.HelpText>
+                                <Form.HelpText>La langue vivante 2 enseignée (optionnel)</Form.HelpText>
                             </Form.Group>
 
                             <Form.Group controlId="visible">
@@ -348,24 +412,46 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
                         </Form>
                     </div>
 
-                    <div style={{ flex: '1', borderLeft: '1px solid #e5e5ea', paddingLeft: '20px' }}>
-                        <Nav appearance="tabs" activeKey={activeTab} onSelect={setActiveTab} style={{ marginBottom: '15px' }}>
-                            <Nav.Item eventKey="professeurs">Liste des professeurs</Nav.Item>
-                            <Nav.Item eventKey="emploiTemps">Emploi du temps</Nav.Item>
-                        </Nav>
+                    {/* TABLEAUX (Uniquement en mode modification) */}
+                    {isEditMode && (
+                        <div style={{ 
+                            flex: '1', 
+                            borderLeft: '1px solid #e5e5ea', 
+                            paddingLeft: '20px' 
+                        }}>
+                            <Nav 
+                                appearance="tabs" 
+                                activeKey={activeTab} 
+                                onSelect={setActiveTab} 
+                                style={{ marginBottom: '15px' }}
+                            >
+                                <Nav.Item eventKey="professeurs">Liste des professeurs</Nav.Item>
+                                <Nav.Item eventKey="emploiTemps">Emploi du temps</Nav.Item>
+                            </Nav>
 
-                        <Panel bordered style={{ height: '100%', overflow: 'hidden' }}>
-                            {renderTabContent()}
-                        </Panel>
-                    </div>
+                            <Panel bordered style={{ height: '100%', overflow: 'hidden' }}>
+                                {renderTabContent()}
+                            </Panel>
+                        </div>
+                    )}
                 </div>
             </Modal.Body>
 
             <Modal.Footer>
-                <Button onClick={handleSubmit} appearance="primary" loading={loading} disabled={isDataLoading} color="blue">
+                <Button 
+                    onClick={handleSubmit} 
+                    appearance="primary" 
+                    loading={loading} 
+                    disabled={isDataLoading} 
+                    color={isEditMode ? "blue" : "green"}
+                >
                     Enregistrer
                 </Button>
-                <Button onClick={handleCancel} appearance="subtle" disabled={loading}>
+                <Button 
+                    onClick={handleCancel} 
+                    appearance="subtle" 
+                    disabled={loading}
+                >
                     Annuler
                 </Button>
             </Modal.Footer>
@@ -373,4 +459,4 @@ const EditClassModal = ({ visible, onClose, onSuccess, selectedClass }) => {
     );
 };
 
-export default EditClassModal;
+export default ClassModal;

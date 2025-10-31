@@ -6,16 +6,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 // Import des fonctions externalisées
 import { useCommonState } from '../../hooks/useCommonState';
 import QuestionModal from '../Panier/QuestionModal';
-import CreateClassModal from './CreateClassModal';
-import EditClassModal from './EditClassModal'; // Nouveau modal de modification
+import ClassModal from './ClassModal.jsx'; // Modal unifié
 import DataTable from "../../DataTable";
 import { useClassesData, classesTableConfig, clearClassesCache } from './ClasseServiceManager';
 
 const ListeClasses = () => {
     const navigate = useNavigate();
     const [refreshTrigger, setRefreshTrigger] = useState(0);
-    const [createModalVisible, setCreateModalVisible] = useState(false);
-    const [editModalVisible, setEditModalVisible] = useState(false);
+    const [classModalVisible, setClassModalVisible] = useState(false);
     const [selectedClassForEdit, setSelectedClassForEdit] = useState(null);
 
     // ===========================
@@ -42,49 +40,25 @@ const ListeClasses = () => {
         // Gestion spécifique pour l'action "modifier"
         if (actionType === 'edit' && item && item.id) {
             setSelectedClassForEdit(item);
-            setEditModalVisible(true);
+            setClassModalVisible(true);
             return;
         }
 
         // Gestion spécifique pour l'action "créer" - ouvrir le modal
         if (actionType === 'create') {
-            setCreateModalVisible(true);
+            setSelectedClassForEdit(null); // Important: null pour mode création
+            setClassModalVisible(true);
             return;
         }
 
-        // Pour les autres actions (delete, view, etc.), utiliser le modal existant
         handleTableAction(actionType, item);
     }, [handleTableAction]);
 
     // ===========================
-    // GESTION DU MODAL DE CRÉATION
+    // GESTION DU MODAL UNIFIÉ
     // ===========================
 
-    const handleCreateSuccess = useCallback((newClass) => {
-        // Vider le cache pour forcer le rechargement
-        clearClassesCache();
-
-        // Actualiser les données
-        setRefreshTrigger(prev => prev + 1);
-
-        // Afficher une notification de succès
-        // Notification.success({
-        //     title: 'Classe créée avec succès',
-        //     description: `La classe "${newClass.libelle}" a été créée avec succès.`,
-        //     placement: 'topEnd',
-        //     duration: 4500,
-        // });
-    }, []);
-
-    const handleCreateModalClose = useCallback(() => {
-        setCreateModalVisible(false);
-    }, []);
-
-    // ===========================
-    // GESTION DU MODAL DE MODIFICATION
-    // ===========================
-
-    const handleEditSuccess = useCallback((updatedClass) => {
+    const handleClassModalSuccess = useCallback((classData) => {
         // Vider le cache pour forcer le rechargement
         clearClassesCache();
 
@@ -93,18 +67,10 @@ const ListeClasses = () => {
 
         // Réinitialiser la sélection
         setSelectedClassForEdit(null);
-
-        // Afficher une notification de succès
-        // Notification.success({
-        //     title: 'Classe modifiée avec succès',
-        //     description: `La classe "${updatedClass.libelle || updatedClass.code}" a été modifiée avec succès.`,
-        //     placement: 'topEnd',
-        //     duration: 4500,
-        // });
     }, []);
 
-    const handleEditModalClose = useCallback(() => {
-        setEditModalVisible(false);
+    const handleClassModalClose = useCallback(() => {
+        setClassModalVisible(false);
         setSelectedClassForEdit(null);
     }, []);
 
@@ -125,18 +91,6 @@ const ListeClasses = () => {
 
                     // Actualiser les données après suppression
                     setRefreshTrigger(prev => prev + 1);
-
-                    // Notification de succès
-                    // Notification.success({
-                    //     title: 'Classe supprimée',
-                    //     description: 'La classe a été supprimée avec succès.',
-                    //     placement: 'topEnd',
-                    //     duration: 3000,
-                    // });
-                    break;
-
-                case 'view':
-                    console.log('Voir la classe:', modalState.selectedQuestion);
                     break;
 
                 default:
@@ -163,7 +117,8 @@ const ListeClasses = () => {
     // ===========================
 
     const handleCreateClasse = useCallback(() => {
-        setCreateModalVisible(true);
+        setSelectedClassForEdit(null); // null = mode création
+        setClassModalVisible(true);
     }, []);
 
     // ===========================
@@ -225,21 +180,12 @@ const ListeClasses = () => {
             </div>
 
             {/* ===========================
-                MODAL DE CRÉATION DE CLASSE
+                MODAL UNIFIÉ (Création ET Modification)
                 =========================== */}
-            <CreateClassModal
-                visible={createModalVisible}
-                onClose={handleCreateModalClose}
-                onSuccess={handleCreateSuccess}
-            />
-
-            {/* ===========================
-                MODAL DE MODIFICATION DE CLASSE
-                =========================== */}
-            <EditClassModal
-                visible={editModalVisible}
-                onClose={handleEditModalClose}
-                onSuccess={handleEditSuccess}
+            <ClassModal
+                visible={classModalVisible}
+                onClose={handleClassModalClose}
+                onSuccess={handleClassModalSuccess}
                 selectedClass={selectedClassForEdit}
             />
 

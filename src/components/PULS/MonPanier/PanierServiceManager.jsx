@@ -283,7 +283,6 @@ export const panierTableConfig = {
             flexGrow: 1,
             minWidth: 180,
             cellType: 'actions',
-            fixed: 'right'
         }
     ],
     searchableFields: ['nomComplet', 'email', 'contact', 'fonction', 'diplome', 'domaine', 'ecole'],
