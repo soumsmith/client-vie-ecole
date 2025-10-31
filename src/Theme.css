@@ -748,6 +748,15 @@
   opacity: 0.4;
 }
 
+.action-delete-icone-style {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid #ef4444 !important; /* contour */
+  border-radius: 20% !important; /* arrondi */
+  padding: 4px !important; /* espace autour de l'icône */
+}
+
 .hero-section {
   padding: 60px 60px 40px;
   display: grid;

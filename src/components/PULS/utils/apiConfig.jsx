@@ -1422,7 +1422,7 @@ const useEmploiDuTempsUrls = () => {
          * @param {number} activiteId - ID de l'activité
          */
         deleteActivite: (activiteId) =>
-            `${baseUrl}activite/${activiteId}`,
+            `${baseUrl}activite/delete/${activiteId}`,
 
     }), [baseUrl]);
 };

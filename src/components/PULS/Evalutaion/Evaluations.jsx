@@ -504,6 +504,7 @@ const EvaluationFilters = ({
     onClear,
     loading = false,
     error = null,
+    onCreateNew,
     selectedClasse,
     selectedMatiere,
     selectedPeriode,
@@ -605,7 +606,7 @@ const EvaluationFilters = ({
             )}
 
             <Row gutter={20}>
-                <Col xs={24} sm={12} md={8}>
+                <Col xs={24} sm={12} md={6}>
                     <div style={{ marginBottom: 20 }}>
                         <label style={{
                             display: 'block',
@@ -634,7 +635,7 @@ const EvaluationFilters = ({
                     </div>
                 </Col>
 
-                <Col xs={24} sm={12} md={8}>
+                <Col xs={24} sm={12} md={6}>
                     <div style={{ marginBottom: 20 }}>
                         <label style={{
                             display: 'block',
@@ -735,6 +736,32 @@ const EvaluationFilters = ({
                             >
                                 <FiRotateCcw size={16} />
                             </Button>
+                        </div>
+                    </div>
+                </Col>
+                <Col xs={24} sm={12} md={4}>
+                    <div style={{ marginBottom: 20 }}>
+                        <label style={{
+                            display: 'block',
+                            marginBottom: 8,
+                            fontWeight: '500',
+                            color: 'transparent',
+                            fontSize: '14px'
+                        }}>
+                            Action
+                        </label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      
+
+                            {/* 🆕 Ligne 2 : Nouvelle Évaluation */}
+                            <GradientButton
+                                icon={<FiPlus size={16} />}
+                                text="Nouvelle Évaluation"
+                                onClick={onCreateNew}
+                                //disabled={!selectedClasse || loading}
+                                //variant="success"
+                                style={{ width: '100%', height: '40px' }}
+                            />
                         </div>
                     </div>
                 </Col>
@@ -1162,6 +1189,7 @@ const Evaluations = () => {
                             onClear={handleClearSearch}
                             loading={searchLoading}
                             error={searchError}
+                            onCreateNew={handleCreateEvaluation}
                             selectedClasse={selectedClasse}
                             selectedMatiere={selectedMatiere}
                             selectedPeriode={selectedPeriode}

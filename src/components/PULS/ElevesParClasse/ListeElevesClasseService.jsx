@@ -590,12 +590,12 @@ export const listeElevesClasseTableConfig = {
         'contact_principal'
     ],
     actions: [
-        {
-            type: 'view',
-            icon: <FiEye size={17} />,
-            tooltip: 'Voir le profil complet de l\'élève',
-            color: '#3498db'
-        },
+        // {
+        //     type: 'view',
+        //     icon: <FiEye size={17} />,
+        //     tooltip: 'Voir le profil complet de l\'élève',
+        //     color: '#3498db'
+        // },
         {
             type: 'edit',
             icon: <FiEdit size={17} />,

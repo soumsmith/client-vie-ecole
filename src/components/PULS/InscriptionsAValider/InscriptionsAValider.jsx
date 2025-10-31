@@ -615,7 +615,7 @@ const InscriptionsAValider = () => {
                                     
                                     defaultPageSize={15}
                                     pageSizeOptions={[10, 15, 25, 50]}
-                                    tableHeight={650}
+                                    tableHeight={750}
                                     
                                     enableRefresh={true}
                                     enableCreate={false}

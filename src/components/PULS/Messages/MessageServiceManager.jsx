@@ -112,7 +112,7 @@ export const messagesTableConfig = {
             flexGrow: 1,
             minWidth: 160,
             cellType: 'actions',
-            fixed: 'right'
+            // fixed: 'right'
         }
     ],
     searchableFields: ['fullName', 'sujet', 'message'],
