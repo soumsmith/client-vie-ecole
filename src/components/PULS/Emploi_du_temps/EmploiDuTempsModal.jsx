@@ -438,9 +438,7 @@ const EmploiDuTempsModal = ({
     }
   }, [formData.classeId, formData.jourId, formData.heureDeb, formData.heureFin, type, verifierDisponibilite]);
 
-  // ===========================
-  // SAUVEGARDE - CORRIGÉE
-  // ===========================
+
   const handleSave = async () => {
     if (!isFormValid()) {
       Swal.fire({
@@ -468,28 +466,85 @@ const EmploiDuTempsModal = ({
     setIsSubmitting(true);
 
     try {
-      // Récupérer les objets complets pour l'API
+      // Récupérer les objets complets
       const classe = classes.find(c => c.id === formData.classeId);
       const jour = jours.find(j => j.id === formData.jourId);
-      const matiere = matieres.find(m => m.matiere.id === formData.matiereId)?.matiere;
+      const matiereData = matieres.find(m => m.matiere.id === formData.matiereId);
       const salle = verfication.sallesDisponibles.find(s => s.id === formData.salleId);
       const typeActivite = typesActivite.find(t => t.id === formData.typeActiviteId);
 
-      const activiteData = {
-        jour: { id: jour.id, libelle: null },
-        heureDeb: formData.heureDeb,
-        heureFin: formData.heureFin,
-        matiere: { id: matiere.id, libelle: null },
-        classe: { id: classe.id, libelle: null },
-        salle: { id: salle.id, libelle: null },
-        typeActivite: { id: typeActivite.id, libelle: null },
-        user: dynamicUserId,
-        annee: dynamicAcademicYearId.toString(),
-        ecole: { id: dynamicEcoleId.toString() },
-        profPrincipal: null,
-      };
+      let activiteData;
 
-      const response = await saveActivite(activiteData, apiUrls, type);  // AJOUT apiUrls
+      if (type === "edit") {
+        // FORMAT COMPLET POUR LA MODIFICATION
+        activiteData = {
+          id: activite.id || activite.raw_data?.id, // ID de l'activité à modifier
+          annee: dynamicAcademicYearId.toString(),
+          classe: {
+            ...classe,
+            branche: classe.branche || activite.raw_data?.classe?.branche,
+            ecole: classe.ecole || activite.raw_data?.classe?.ecole,
+          },
+          dateCreation: activite.dateCreation || activite.raw_data?.dateCreation,
+          dateUpdate: new Date().toISOString(),
+          ecole: {
+            id: dynamicEcoleId.toString(),
+            code: activite.raw_data?.ecole?.code || "",
+            identifiantVieEcole: activite.raw_data?.ecole?.identifiantVieEcole || "",
+            libelle: activite.raw_data?.ecole?.libelle || "",
+            niveauEnseignement: activite.raw_data?.ecole?.niveauEnseignement || null,
+            nomSignataire: activite.raw_data?.ecole?.nomSignataire || "",
+            tel: activite.raw_data?.ecole?.tel || "",
+          },
+          heureDeb: formData.heureDeb,
+          heureFin: formData.heureFin,
+          jour: {
+            code: jour.code,
+            id: jour.id,
+            idSys: jour.idSys || jour.id,
+            libelle: jour.libelle,
+          },
+          matiere: {
+            ...matiereData,
+            matiere: matiereData.matiere,
+            ecole: matiereData.ecole || activite.raw_data?.matiere?.ecole,
+            niveauEnseignement: matiereData.niveauEnseignement || activite.raw_data?.matiere?.niveauEnseignement,
+          },
+          salle: {
+            code: salle.code,
+            id: salle.id,
+            libelle: salle.libelle,
+            ecole: salle.ecole || activite.raw_data?.salle?.ecole,
+          },
+          statut: activite.statut || activite.raw_data?.statut || "ACT",
+          typeActivite: {
+            id: typeActivite.id,
+            libelle: typeActivite.libelle,
+            niveauEnseignement: typeActivite.niveauEnseignement,
+            typeSeance: typeActivite.typeSeance || "EVAL",
+          },
+          user: dynamicUserId.toString(),
+        };
+      } else {
+        // FORMAT SIMPLE POUR LA CRÉATION
+        activiteData = {
+          jour: { id: jour.id, libelle: null },
+          heureDeb: formData.heureDeb,
+          heureFin: formData.heureFin,
+          matiere: { id: matiereData.matiere.id, libelle: null },
+          classe: { id: classe.id, libelle: null },
+          salle: { id: salle.id, libelle: null },
+          typeActivite: { id: typeActivite.id, libelle: null },
+          user: dynamicUserId,
+          annee: dynamicAcademicYearId.toString(),
+          ecole: { id: dynamicEcoleId.toString() },
+          profPrincipal: null,
+        };
+      }
+
+      console.log('Données envoyées:', activiteData);
+
+      const response = await saveActivite(activiteData, apiUrls, type);
 
       await Swal.fire({
         icon: "success",
