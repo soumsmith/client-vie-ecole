@@ -1299,7 +1299,7 @@ const Evaluations = () => {
                                     pageSizeOptions={[10, 15, 25, 50]}
                                     tableHeight={600}
                                     enableRefresh={true}
-                                    enableCreate={true}
+                                    enableCreate={false}
                                     createButtonText="Nouvelle Évaluation"
                                     selectable={false}
                                     rowKey="id"

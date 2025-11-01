@@ -489,9 +489,7 @@ const EmploiDuTempsModal = ({
         profPrincipal: null,
       };
 
-      console.log('Données à sauvegarder:', activiteData);
-
-      const response = await saveActivite(activiteData, apiUrls);  // AJOUT apiUrls
+      const response = await saveActivite(activiteData, apiUrls, type);  // AJOUT apiUrls
 
       await Swal.fire({
         icon: "success",

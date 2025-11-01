@@ -279,7 +279,7 @@ export const classesTableConfig = {
             flexGrow: 0.8,
             minWidth: 120,
             cellType: 'actions',
-            fixed: 'right'
+            // fixed: 'right'
         }
     ],
     
