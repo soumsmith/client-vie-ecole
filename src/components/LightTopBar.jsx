@@ -212,6 +212,8 @@ const LightTopBar = ({
     return allCards.length; // Afficher toutes les cartes sur grand écran
   };
 
+  const academicYearInfo = JSON.parse(localStorage.getItem('academicYearInfo'));
+
   // Préparer toutes les cartes
   const allCards = [
     {
@@ -223,7 +225,7 @@ const LightTopBar = ({
     academicData && {
       icon: "📅",
       label: "Année scolaire",
-      value: academicData.customLibelle || academicData.libelle,
+      value: academicYearInfo.anneeLibelle,//academicData.customLibelle || academicData.libelle,
       bgColor: "success"
     },
     academicData?.niveauEnseignement && {
@@ -235,7 +237,7 @@ const LightTopBar = ({
     academicData?.periodicite && {
       icon: "⏱️",
       label: "Périodicité",
-      value: academicData.periodicite.libelle,
+      value: academicYearInfo.periodeLibelle,
       bgColor: "warning"
     },
     {

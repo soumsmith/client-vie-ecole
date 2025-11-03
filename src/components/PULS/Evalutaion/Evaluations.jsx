@@ -756,7 +756,7 @@ const EvaluationFilters = ({
                             {/* 🆕 Ligne 2 : Nouvelle Évaluation */}
                             <GradientButton
                                 icon={<FiPlus size={16} />}
-                                text="Nouvelle Évaluation"
+                                text="Ajouter Évaluation"
                                 onClick={onCreateNew}
                                 //disabled={!selectedClasse || loading}
                                 //variant="success"
@@ -1161,10 +1161,6 @@ const Evaluations = () => {
     }, [modalState.type, modalState.selectedItem, handleCloseModal, handleDeleteEvaluation]);
 
     const handleCreateEvaluation = useCallback(() => {
-        if (!selectedClasse) {
-            showErrorAlert('Veuillez d\'abord sélectionner une classe avant de créer une évaluation');
-            return;
-        }
         setSelectedEvaluation(null);
         setModalMode('create');
         setShowEvaluationModal(true);
