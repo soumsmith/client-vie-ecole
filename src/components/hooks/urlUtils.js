@@ -6,7 +6,7 @@ const getFullUrl = () => {
   }
   
   // En production, utiliser l'URL complète de l'API
-  return 'http://46.105.52.105:8889/api/';
+  return 'https://api-pro.pouls-scolaire.net/api/';
 };
 
 export const rootUrl = getFullUrl();

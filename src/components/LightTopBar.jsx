@@ -213,6 +213,7 @@ const LightTopBar = ({
   };
 
   const academicYearInfo = JSON.parse(localStorage.getItem('academicYearInfo'));
+  academicYearInfo.periodeLibelle
 
   // Préparer toutes les cartes
   const allCards = [

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import getFullUrl from '../hooks/urlUtils';
 import { useUserContext } from '../../hooks/useUserContext';
+import Swal from 'sweetalert2'; // 🆕 Importer SweetAlert2
+
 
 /**
  * Hook pour la gestion de la connexion utilisateur
@@ -781,9 +783,6 @@ const useLoginData = (config) => {
     // FONCTION DE CONNEXION COMPLÈTE
     // ===========================
 
-    /**
-     * Soumet le formulaire de connexion ou de récupération de mot de passe
-     */
     const submitLogin = async (formData) => {
         setSubmitError(null);
         setSubmitting(true);
@@ -796,6 +795,15 @@ const useLoginData = (config) => {
                 console.log('🔑 Mode récupération de mot de passe détecté');
 
                 const result = await handlePasswordRecovery(formData);
+
+                // 🆕 Notification de succès pour la récupération
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Email envoyé !',
+                    text: result.message,
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#10b981'
+                });
 
                 return {
                     success: true,
@@ -824,6 +832,47 @@ const useLoginData = (config) => {
             const data = response.data;
             let userProfil = "";
 
+            // 🆕 VÉRIFIER D'ABORD LES CAS D'ÉCHEC SPÉCIFIQUES
+            if (data === "Ce compte a expiré!") {
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Compte expiré',
+                    text: 'Votre compte a expiré. Veuillez contacter l\'administrateur.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#ef4444'
+                });
+
+                throw new Error('Ce compte a expiré!');
+            }
+
+            // 🆕 VÉRIFIER SI C'EST JUSTE UNE VALIDATION DE MOT DE PASSE (pas une vraie connexion)
+            if (data === "Mot de passe correct!") {
+                await Swal.fire({
+                    icon: 'info',
+                    title: 'Mot de passe correct',
+                    text: 'Votre mot de passe est correct, mais la connexion complète a échoué.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3b82f6'
+                });
+
+                throw new Error('Mot de passe correct mais connexion incomplète');
+            }
+
+            if (data === "Profil ou code école incorrect!") {
+                await Swal.fire({
+                    icon: 'warning',
+                    title: 'Profil ou code école incorrect',
+                    text: 'Le profil ou l\'école selectionné incorrect',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#f6953bff'
+                });
+
+                throw new Error('Mot de passe correct mais connexion incomplète');
+            }
+
+            //
+
+            // ✅ CONDITION DE SUCCÈS (sans les deux cas problématiques)
             const isSuccess = response.status === 200 && data && (
                 data?.success === true ||
                 data?.status === 'success' ||
@@ -836,17 +885,12 @@ const useLoginData = (config) => {
                 data === "Professeur" ||
                 data === "Admin" ||
                 data === "Educateur" ||
-                data === "Directeur des études(DE)" ||
-                data === "Mot de passe correct!"||
-                data === "Ce compte a expiré!" // Nouvelle ajout
+                data === "Directeur des études(DE)"
             );
-
-            // 
 
             if (isSuccess) {
                 console.log('✅ Connexion réussie !');
                 const profils = {
-                    "Mot de passe correct!": "Candidat",
                     "Directeur des études(DE)": "DE"
                 };
 
@@ -861,7 +905,7 @@ const useLoginData = (config) => {
                 const basicUserData = {
                     email: formData.email,
                     schoolId: formData.schoolId,
-                    schoolLabel: schoolLabel, // 🆕 Ajout du libellé de l'école
+                    schoolLabel: schoolLabel,
                     profileId: formData.profileId,
                     loginTime: new Date().toISOString(),
                     userType: config.modalType || 'user',
@@ -870,7 +914,7 @@ const useLoginData = (config) => {
 
                 localStorage.setItem('userProfil', userProfil);
                 localStorage.setItem('userData', JSON.stringify(basicUserData));
-                localStorage.setItem('schoolLabel', schoolLabel); // 🆕 Stockage séparé du libellé
+                localStorage.setItem('schoolLabel', schoolLabel);
                 localStorage.setItem('isAuthenticated', 'true');
                 localStorage.setItem('userType', config.modalType || 'user');
 
@@ -882,7 +926,6 @@ const useLoginData = (config) => {
                         formData.profileId
                     );
 
-                    // 🆕 AJOUTER LE LIBELLÉ DE L'ÉCOLE AUX DONNÉES COMPLÈTES
                     completeUserData.schoolLabel = schoolLabel;
 
                     let finalUserProfile = userProfil;
@@ -902,27 +945,46 @@ const useLoginData = (config) => {
                         completeUserData.userProfile = finalUserProfile;
                     }
 
-                    // 🆕 Sauvegarder completeUserData avec le schoolLabel
                     localStorage.setItem('completeUserData', JSON.stringify(completeUserData));
 
                     updateFromLoginData({ userCompleteData: completeUserData });
+
+                    // 🆕 NOTIFICATION DE SUCCÈS AVANT LA REDIRECTION
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Connexion réussie !',
+                        text: `Bienvenue ${finalUserProfile || userProfil}`,
+                        timer: 2000,
+                        showConfirmButton: false,
+                        timerProgressBar: true
+                    });
 
                     return {
                         success: true,
                         data,
                         userCompleteData: completeUserData,
                         userProfile: finalUserProfile,
-                        schoolLabel: schoolLabel, // 🆕 Retourner aussi le libellé
+                        schoolLabel: schoolLabel,
                         method: method
                     };
                 } catch (userDataError) {
                     console.warn('⚠️ Connexion réussie mais erreur lors de la récupération des données utilisateur:', userDataError.message);
+
+                    // 🆕 NOTIFICATION D'AVERTISSEMENT
+                    await Swal.fire({
+                        icon: 'warning',
+                        title: 'Connexion partiellement réussie',
+                        text: 'Certaines données n\'ont pas pu être récupérées',
+                        confirmButtonText: 'Continuer',
+                        confirmButtonColor: '#f59e0b'
+                    });
+
                     return {
                         success: true,
                         data,
                         userCompleteData: null,
                         userProfile: userProfil,
-                        schoolLabel: schoolLabel, // 🆕 Retourner le libellé même en cas d'erreur
+                        schoolLabel: schoolLabel,
                         method: method,
                         warning: 'Connexion réussie mais certaines données utilisateur n\'ont pas pu être récupérées'
                     };
@@ -935,11 +997,25 @@ const useLoginData = (config) => {
         } catch (error) {
             console.error('❌ Erreur de connexion:', error.message);
 
+            // 🆕 NOTIFICATION D'ERREUR
+            let errorTitle = 'Erreur de connexion';
+            let errorText = error.message || 'Une erreur est survenue';
+
             if (error.message.includes('CORS') || error.code === 'ERR_NETWORK') {
-                setSubmitError('Erreur de connexion au serveur. Vérifiez votre connexion.');
+                errorTitle = 'Erreur réseau';
+                errorText = 'Erreur de connexion au serveur. Vérifiez votre connexion.';
+                setSubmitError(errorText);
             } else {
                 setSubmitError(error.message || 'Erreur de connexion');
             }
+
+            // await Swal.fire({
+            //     icon: 'error',
+            //     title: errorTitle,
+            //     text: errorText,
+            //     confirmButtonText: 'Réessayer',
+            //     confirmButtonColor: '#ef4444'
+            // });
 
             return { success: false, data: null };
         } finally {
