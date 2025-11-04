@@ -1417,6 +1417,9 @@ const useEmploiDuTempsUrls = () => {
         saveActivite: () =>
             `${baseUrl}activite/saveAndDisplay`,
 
+        updateActivite: () =>
+            `${baseUrl}activite/update-display`,
+
         /**
          * Supprimer une activité
          * @param {number} activiteId - ID de l'activité

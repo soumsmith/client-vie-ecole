@@ -319,11 +319,11 @@ const LoginModal = ({ open, onClose, config, onSuccess }) => {
           )}
 
           {/* Affichage des erreurs de soumission */}
-          {submitError && (
+          {/* {submitError && (
             <Message showIcon type="error" style={{ marginTop: '15px' }}>
               {submitError}
             </Message>
-          )}
+          )} */}
         </Form>
       </Modal.Body>
 

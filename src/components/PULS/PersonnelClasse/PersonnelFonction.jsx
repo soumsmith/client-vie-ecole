@@ -50,7 +50,8 @@ const PersonnelFonctionFilters = ({
     loading = false,
     error = null,
     selectedFonction,
-    onFonctionChange
+    onFonctionChange,
+    onCreateNew
 }) => {
     const [formError, setFormError] = useState(null);
 
@@ -98,29 +99,22 @@ const PersonnelFonctionFilters = ({
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'space-between',
                 gap: 12,
                 marginBottom: 25,
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                {/* <div style={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    borderRadius: '10px',
-                    padding: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <FiUserCheck size={18} color="white" />
-                </div> */}
-                <IconBox icon={FiUserCheck} />
-                <div>
-                    <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
-                        Affectations Personnel par Fonction
-                    </h5>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
-                        Sélectionnez une fonction pour voir les personnels et leurs classes assignées
-                    </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <IconBox icon={FiUserCheck} />
+                    <div>
+                        <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
+                            Affectations Personnel par Fonction
+                        </h5>
+                        <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
+                            Sélectionnez une fonction pour voir les personnels et leurs classes assignées
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -142,24 +136,25 @@ const PersonnelFonctionFilters = ({
             )}
 
             {/* Formulaire de filtres */}
-            <Row gutter={20}>
-                <Col xs={24} sm={16} md={14}>
-                    <div style={{ marginBottom: 20 }}>
-                        <label style={{
-                            display: 'block',
-                            marginBottom: 8,
-                            fontWeight: '500',
-                            color: '#475569',
-                            fontSize: '14px'
-                        }}>
+            <Row gutter={[16, 16]}>
+                {/* === Champ Fonction === */}
+                <Col xs={24} sm={24} md={14} lg={14}>
+                    <div style={{ marginBottom: 16 }}>
+                        <label
+                            style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: 500,
+                                color: '#475569',
+                                fontSize: 14,
+                            }}
+                        >
                             Fonction *
                         </label>
                         <SelectPicker
                             data={fonctionsData}
                             value={selectedFonction}
-                            onChange={(value) => {
-                                onFonctionChange(value);
-                            }}
+                            onChange={onFonctionChange}
                             placeholder="Choisir une fonction"
                             searchable
                             style={{ width: '100%' }}
@@ -171,19 +166,30 @@ const PersonnelFonctionFilters = ({
                     </div>
                 </Col>
 
-                <Col xs={24} sm={8} md={6}>
-                    <div style={{ marginBottom: 20 }}>
-                        <label style={{
-                            display: 'block',
-                            marginBottom: 8,
-                            fontWeight: '500',
-                            color: 'transparent',
-                            fontSize: '14px'
-                        }}>
+                {/* === Actions === */}
+                <Col xs={24} sm={24} md={10} lg={10}>
+                    <div style={{ marginBottom: 16 }}>
+                        <label
+                            style={{
+                                display: 'block',
+                                marginBottom: 8,
+                                fontWeight: 500,
+                                color: 'transparent',
+                                fontSize: 14,
+                            }}
+                        >
                             Action
                         </label>
-                        <div style={{ display: 'flex', gap: 8, height: '40px' }}>
-                            {/* ✨ NOUVEAU : Utilisation de GradientButton */}
+
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: 8,
+                                justifyContent: 'flex-start',
+                            }}
+                        >
+                            {/* 🔍 Bouton Afficher */}
                             <GradientButton
                                 icon={<FiSearch size={16} />}
                                 text="Afficher"
@@ -192,25 +198,36 @@ const PersonnelFonctionFilters = ({
                                 disabled={isDataLoading || loading || !selectedFonction}
                                 onClick={handleSearch}
                                 variant="primary"
-                                style={{ flex: 1 }}
+                                style={{ flex: 1, minWidth: 120 }}
                             />
 
+                            {/* 🔄 Bouton Réinitialiser */}
                             <Button
                                 onClick={handleClear}
                                 disabled={loading}
                                 style={{
-                                    minWidth: '45px',
-                                    borderRadius: '8px',
-                                    border: '1px solid #e2e8f0'
+                                    minWidth: 45,
+                                    borderRadius: 8,
+                                    border: '1px solid #e2e8f0',
                                 }}
                                 size="lg"
                             >
                                 <FiRotateCcw size={16} />
                             </Button>
+
+                            {/* ➕ Nouvelle Affectation */}
+                            <GradientButton
+                                icon={<FiPlus size={16} />}
+                                text="Nouvelle Affectation"
+                                onClick={onCreateNew}
+                                variant="success"
+                                style={{ flex: 1, minWidth: 180,  background:'linear-gradient(135deg, #667eea 0%, #667eea 100%)', }}
+                            />
                         </div>
                     </div>
                 </Col>
             </Row>
+
 
             {/* Indicateur de progression */}
             <div style={{ marginTop: 15 }}>
@@ -558,6 +575,7 @@ const PersonnelFonction = () => {
                             error={searchError}
                             selectedFonction={selectedFonction}
                             onFonctionChange={setSelectedFonction}
+                            onCreateNew={handleCreateAffectation}
                         />
                     </div>
                 </div>
@@ -675,15 +693,13 @@ const PersonnelFonction = () => {
 
                                     onAction={handleTableActionLocal}
                                     onRefresh={handleRefresh}
-                                    onCreateNew={handleCreateAffectation}
 
                                     defaultPageSize={personnelFonctionTableConfig.pageSize}
                                     pageSizeOptions={[10, 15, 25, 50]}
                                     tableHeight={650}
 
                                     enableRefresh={true}
-                                    enableCreate={true}
-                                    createButtonText="Nouvelle Affectation"
+                                    enableCreate={false}
                                     selectable={false}
                                     rowKey="id"
 
@@ -703,52 +719,6 @@ const PersonnelFonction = () => {
                                         }
                                     ]}
                                 />
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Aucun résultat - style moderne */}
-                {searchPerformed && affectations?.length === 0 && !searchLoading && (
-                    <div className="row">
-                        <div className="col-lg-12">
-                            <div style={{
-                                background: 'white',
-                                borderRadius: '15px',
-                                padding: '40px',
-                                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                                border: '1px solid rgba(245, 158, 11, 0.15)',
-                                textAlign: 'center'
-                            }}>
-                                <div style={{
-                                    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                                    borderRadius: '20px',
-                                    padding: '20px',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    marginBottom: 20
-                                }}>
-                                    <FiUserCheck size={40} color="white" />
-                                </div>
-                                <h5 style={{ margin: '0 0 10px 0', color: '#1e293b', fontWeight: '600' }}>
-                                    Aucune affectation trouvée
-                                </h5>
-                                <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
-                                    Cette fonction n'a aucun personnel affecté ou les données ne sont pas encore disponibles.
-                                </p>
-                                <Button
-                                    appearance="primary"
-                                    style={{
-                                        marginTop: 15,
-                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                        border: 'none'
-                                    }}
-                                    startIcon={<FiPlus />}
-                                    onClick={handleCreateAffectation}
-                                >
-                                    Créer une nouvelle affectation
-                                </Button>
                             </div>
                         </div>
                     </div>

@@ -355,7 +355,7 @@ export const useActivitesByClasseJour = (classeId, jourId, refreshTrigger = 0) =
     const [activites, setActivites] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-     const apiUrls = useAllApiUrls();
+    const apiUrls = useAllApiUrls();
     const { ecoleId: dynamicEcoleId } = usePulsParams();
 
     const fetchActivites = async (skipCache = false) => {
@@ -492,40 +492,22 @@ export const getActivitesByClasseJour = async (annee, classe, jour, apiUrls) => 
     }
 };
 
-/**
- * Sauvegarder une activité (FONCTION EXISTANTE)
- */
-export const saveActivite = async (activiteData, apiUrls) => {
+export const saveActivite = async (activiteData, apiUrls, type) => {
+    const url = type === "edit" ? apiUrls.emploiDuTemps.updateActivite() : apiUrls.emploiDuTemps.saveActivite();
     try {
-        console.log('=== DONNÉES À SAUVEGARDER ===');
-        console.log(JSON.stringify(activiteData, null, 2));
-        console.log('=============================');
-
-        const response = await axios.post(
-            apiUrls.emploiDuTemps.saveActivite(),
-            activiteData,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                timeout: 10000
-            }
-        );
-
-        console.log('Réponse de sauvegarde:', response.data);
-        return response.data;
+        const { data } = await axios.post(url, activiteData);
+        console.log("✅ Activité sauvegardée :", data);
+        return data;
     } catch (error) {
-        console.error('Erreur lors de la sauvegarde:', error);
-
-        if (error.response) {
-            console.error('Statut d\'erreur sauvegarde:', error.response.status);
-            console.error('Données d\'erreur sauvegarde:', error.response.data);
+        const { response } = error;
+        console.error("❌ Erreur lors de la sauvegarde :", response?.data || error.message);
+        if (response) {
+            console.error("Statut :", response.status);
         }
-
         throw error;
     }
 };
+
 
 /**
  * Supprimer une activité (FONCTION EXISTANTE)
@@ -577,86 +559,86 @@ export const clearClasseCache = (classeId) => {
 // Configuration corrigée du tableau pour les activités
 export const activitesTableConfig = {
     columns: [
-      {
-        title: 'Heure début',           // Changé de 'label' à 'title'
-        dataKey: 'heureDeb',           // Changé de 'key' à 'dataKey'
-        width: 120,
-        sortable: true,
-        cellRenderer: (value, rowData) => (  // Changé de 'render' à 'cellRenderer'
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <FiClock size={14} style={{ color: '#f59e0b' }} />
-            <span style={{ fontWeight: '500', color: '#374151' }}>{value}</span>
-          </div>
-        )
-      },
-      {
-        title: 'Heure fin',            // Changé de 'label' à 'title'
-        dataKey: 'heureFin',          // Changé de 'key' à 'dataKey'
-        width: 120,
-        sortable: true,
-        cellRenderer: (value, rowData) => (  // Changé de 'render' à 'cellRenderer'
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <FiClock size={14} style={{ color: '#f59e0b' }} />
-            <span style={{ fontWeight: '500', color: '#374151' }}>{value}</span>
-          </div>
-        )
-      },
-      {
-        title: 'Matière',             // Changé de 'label' à 'title'
-        dataKey: 'matiere',          // Changé de 'key' à 'dataKey'
-        flexGrow: 1,
-        sortable: true,
-        cellRenderer: (value, rowData) => {  // Changé de 'render' à 'cellRenderer'
-          const matiereLabel = value?.libelle || rowData?.matiere?.libelle || value || 'Non définie';
-          return (
-            <span style={{ 
-              backgroundColor: '#f3f4f6',
-              color: '#374151',
-              padding: '4px 8px',
-              borderRadius: '6px',
-              fontSize: '13px',
-              fontWeight: '500'
-            }}>
-              {matiereLabel}
-            </span>
-          );
-        }
-      },
-      {
-        title: 'Salle',               // Changé de 'label' à 'title'
-        dataKey: 'salle',            // Changé de 'key' à 'dataKey'
-        width: 120,
-        cellRenderer: (value, rowData) => {  // Changé de 'render' à 'cellRenderer'
-          const salleLabel = value?.libelle || rowData?.salle?.libelle || value || 'Non définie';
-          return (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#6b7280' }}>
-                {salleLabel}
-              </span>
-            </div>
-          );
-        }
-      },
-      {
-        title: 'Type',                // Changé de 'label' à 'title'
-        dataKey: 'typeActivite',     // Changé de 'key' à 'dataKey'
-        width: 100,
-        cellRenderer: (value, rowData) => {  // Changé de 'render' à 'cellRenderer'
-          const typeLabel = value?.libelle || rowData?.typeActivite?.libelle || value || 'Non défini';
-          return (
-            <span style={{ 
-              backgroundColor: '#e0f2fe',
-              color: '#0277bd',
-              padding: '2px 6px',
-              borderRadius: '4px',
-              fontSize: '12px',
-              fontWeight: '500'
-            }}>
-              {typeLabel}
-            </span>
-          );
-        }
-      },
+        {
+            title: 'Heure début',           // Changé de 'label' à 'title'
+            dataKey: 'heureDeb',           // Changé de 'key' à 'dataKey'
+            width: 120,
+            sortable: true,
+            cellRenderer: (value, rowData) => (  // Changé de 'render' à 'cellRenderer'
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiClock size={14} style={{ color: '#f59e0b' }} />
+                    <span style={{ fontWeight: '500', color: '#374151' }}>{value}</span>
+                </div>
+            )
+        },
+        {
+            title: 'Heure fin',            // Changé de 'label' à 'title'
+            dataKey: 'heureFin',          // Changé de 'key' à 'dataKey'
+            width: 120,
+            sortable: true,
+            cellRenderer: (value, rowData) => (  // Changé de 'render' à 'cellRenderer'
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiClock size={14} style={{ color: '#f59e0b' }} />
+                    <span style={{ fontWeight: '500', color: '#374151' }}>{value}</span>
+                </div>
+            )
+        },
+        {
+            title: 'Matière',             // Changé de 'label' à 'title'
+            dataKey: 'matiere',          // Changé de 'key' à 'dataKey'
+            flexGrow: 1,
+            sortable: true,
+            cellRenderer: (value, rowData) => {  // Changé de 'render' à 'cellRenderer'
+                const matiereLabel = value?.libelle || rowData?.matiere?.libelle || value || 'Non définie';
+                return (
+                    <span style={{
+                        backgroundColor: '#f3f4f6',
+                        color: '#374151',
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        fontWeight: '500'
+                    }}>
+                        {matiereLabel}
+                    </span>
+                );
+            }
+        },
+        {
+            title: 'Salle',               // Changé de 'label' à 'title'
+            dataKey: 'salle',            // Changé de 'key' à 'dataKey'
+            width: 120,
+            cellRenderer: (value, rowData) => {  // Changé de 'render' à 'cellRenderer'
+                const salleLabel = value?.libelle || rowData?.salle?.libelle || value || 'Non définie';
+                return (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ color: '#6b7280' }}>
+                            {salleLabel}
+                        </span>
+                    </div>
+                );
+            }
+        },
+        {
+            title: 'Type',                // Changé de 'label' à 'title'
+            dataKey: 'typeActivite',     // Changé de 'key' à 'dataKey'
+            width: 100,
+            cellRenderer: (value, rowData) => {  // Changé de 'render' à 'cellRenderer'
+                const typeLabel = value?.libelle || rowData?.typeActivite?.libelle || value || 'Non défini';
+                return (
+                    <span style={{
+                        backgroundColor: '#e0f2fe',
+                        color: '#0277bd',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        fontSize: '12px',
+                        fontWeight: '500'
+                    }}>
+                        {typeLabel}
+                    </span>
+                );
+            }
+        },
         {
             title: 'Actions',
             dataKey: 'actions',
@@ -670,24 +652,24 @@ export const activitesTableConfig = {
     actions: [
         {
             type: 'view',
-            icon: <FiEye size={17}/>,
+            icon: <FiEye size={17} />,
             tooltip: 'Voir les détails',
             color: '#6366f1'
         },
         {
             type: 'edit',
-            icon: <FiEdit  size={17}/>,
+            icon: <FiEdit size={17} />,
             tooltip: 'Modifier l\'activité',
             color: '#f59e0b'
         },
         {
             type: 'delete',
-            icon: <FiTrash2 size={17}/>,
+            icon: <FiTrash2 size={17} />,
             tooltip: 'Supprimer l\'activité',
             color: '#ef4444'
         }
     ]
-  };
+};
 
 // Configuration du tableau pour l'emploi du temps (CONFIGURATION EXISTANTE)
 export const emploiDuTempsTableConfig = {

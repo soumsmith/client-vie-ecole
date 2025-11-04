@@ -437,7 +437,25 @@ export const statutOptions = [
  */
 const rapportFunctions = {
     R01: async (params) => {
-        const { ecoleId, periode, annee, classe, niveauEnseignementId } = params;
+        const {
+            ecoleId,
+            periode,
+            annee,
+            classe,
+            niveauEnseignementId,
+            decompresserBulletin,
+            changerPositionLogo,
+            supprimerFiligramme,
+            changerPositionRepublique,
+            pivoterPhotosVersLaDroite,
+            utiliserModeleSecondaire,
+            activerDistinctions,
+            utiliserModeleBTS,
+            testLourd,
+            utiliserModeleSuperieurBTS,
+            formatEcoleArabe  // ✅ AJOUTÉ
+        } = params;
+
         const periodeLabel = getPeriodeLabel(periode, params.periodes);
         const anneeLabel = getAnneeLabel(annee, params.annees);
 
@@ -448,17 +466,45 @@ const rapportFunctions = {
             classe,
             niveauEnseignementId,
             periodeLabel,
-            anneeLabel
+            anneeLabel,
+            decompresserBulletin,
+            changerPositionLogo,
+            supprimerFiligramme,
+            changerPositionRepublique,
+            pivoterPhotosVersLaDroite,
+            utiliserModeleSecondaire,
+            activerDistinctions,
+            utiliserModeleBTS,
+            testLourd,
+            utiliserModeleSuperieurBTS,
+            formatEcoleArabe  // ✅ AJOUTÉ
         });
-
-        // URL exacte selon l'exemple fourni
-        const url = `${getFullUrl()}imprimer-bulletin-list/spider-bulletin/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}/true/${niveauEnseignementId}/true/true/true/true/false/true/false/false/false/false`;
+        const url = `${getFullUrl()}imprimer-bulletin-list/spider-bulletin/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}/${decompresserBulletin}/${niveauEnseignementId}/${changerPositionLogo}/${!supprimerFiligramme}/${changerPositionRepublique}/${pivoterPhotosVersLaDroite}/${utiliserModeleSecondaire}/${activerDistinctions}/${utiliserModeleBTS}/${testLourd}/${utiliserModeleSuperieurBTS}/${formatEcoleArabe}`;
 
         return downloadFile(url, `Bulletin_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
     },
 
     R02: async (params) => {
-        const { ecoleId, periode, annee, classe, matriculeEleves, niveauEnseignementId } = params;
+        const {
+            ecoleId,
+            periode,
+            annee,
+            classe,
+            matriculeEleves,
+            niveauEnseignementId,
+            decompresserBulletin,
+            changerPositionLogo,
+            supprimerFiligramme,
+            changerPositionRepublique,
+            pivoterPhotosVersLaDroite,
+            utiliserModeleSecondaire,
+            activerDistinctions,
+            utiliserModeleBTS,
+            testLourd,
+            utiliserModeleSuperieurBTS,
+            formatEcoleArabe  // ✅ AJOUTÉ
+        } = params;
+
         const periodeLabel = getPeriodeLabel(periode, params.periodes);
         const anneeLabel = getAnneeLabel(annee, params.annees);
 
@@ -470,11 +516,22 @@ const rapportFunctions = {
             matriculeEleves,
             niveauEnseignementId,
             periodeLabel,
-            anneeLabel
+            anneeLabel,
+            decompresserBulletin,
+            changerPositionLogo,
+            supprimerFiligramme,
+            changerPositionRepublique,
+            pivoterPhotosVersLaDroite,
+            utiliserModeleSecondaire,
+            activerDistinctions,
+            utiliserModeleBTS,
+            testLourd,
+            utiliserModeleSuperieurBTS,
+            formatEcoleArabe  // ✅ AJOUTÉ
         });
 
-        // URL pour bulletin par matricule
-        const url = `${getFullUrl()}imprimer-bulletin-list/spider-bulletin-matricule/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}/${matriculeEleves}/true/${niveauEnseignementId}/true/true/true/true/false/true/false/false/false/false`;
+        // Construction de l'URL avec les vrais paramètres du formulaire
+        const url = `${getFullUrl()}imprimer-bulletin-list/spider-bulletin-matricule/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}/${matriculeEleves}/${decompresserBulletin}/${niveauEnseignementId}/${changerPositionLogo}/${!supprimerFiligramme}/${changerPositionRepublique}/${pivoterPhotosVersLaDroite}/${utiliserModeleSecondaire}/${activerDistinctions}/${utiliserModeleBTS}/${testLourd}/${utiliserModeleSuperieurBTS}/${formatEcoleArabe}`;
 
         return downloadFile(url, `Bulletin_${matriculeEleves}_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -527,27 +584,73 @@ const rapportFunctions = {
     },
 
     R07: async (params) => {
-        const { ecoleId, periode, annee, classe } = params;
+        const {
+            ecoleId,
+            periode,
+            annee,
+            classe,
+            changerPositionLogo,
+            supprimerFiligramme,
+            changerPositionRepublique,
+            pivoterPhotosVersLaDroite,
+            activerDistinctions
+        } = params;
+
         const periodeLabel = getPeriodeLabel(periode, params.periodes);
         const anneeLabel = getAnneeLabel(annee, params.annees);
         const classeLabel = getClasseLabel(classe, params.classes);
 
-        console.log('🔄 R07 - Paramètres:', { ecoleId, periodeLabel, anneeLabel, classeLabel });
+        console.log('🔄 R07 - Paramètres:', {
+            ecoleId,
+            periodeLabel,
+            anneeLabel,
+            classeLabel,
+            changerPositionLogo,
+            supprimerFiligramme,
+            changerPositionRepublique,
+            pivoterPhotosVersLaDroite,
+            activerDistinctions
+        });
 
-        const url = `${getFullUrl()}imprimer-livret-list/spider-livret/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(classeLabel)}/true/true/true/true/true`;
+        // Construction de l'URL avec les vrais paramètres du formulaire
+        const url = `${getFullUrl()}imprimer-livret-list/spider-livret/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(classeLabel)}/${changerPositionLogo}/${!supprimerFiligramme}/${changerPositionRepublique}/${pivoterPhotosVersLaDroite}/${activerDistinctions}`;
 
         return downloadFile(url, `Livret_Scolaire_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
     },
 
     R08: async (params) => {
-        const { ecoleId, periode, annee, classe, matriculeEleves } = params;
+        const {
+            ecoleId,
+            periode,
+            annee,
+            classe,
+            matriculeEleves,
+            changerPositionLogo,
+            supprimerFiligramme,
+            changerPositionRepublique,
+            pivoterPhotosVersLaDroite,
+            activerDistinctions
+        } = params;
+
         const periodeLabel = getPeriodeLabel(periode, params.periodes);
         const anneeLabel = getAnneeLabel(annee, params.annees);
         const classeLabel = getClasseLabel(classe, params.classes);
 
-        console.log('🔄 R08 - Paramètres:', { ecoleId, periodeLabel, anneeLabel, classeLabel, matriculeEleves });
+        console.log('🔄 R08 - Paramètres:', {
+            ecoleId,
+            periodeLabel,
+            anneeLabel,
+            classeLabel,
+            matriculeEleves,
+            changerPositionLogo,
+            supprimerFiligramme,
+            changerPositionRepublique,
+            pivoterPhotosVersLaDroite,
+            activerDistinctions
+        });
 
-        const url = `${getFullUrl()}imprimer-livret-list/spider-livret-matricule/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(classeLabel)}/${matriculeEleves}/true/true/true/true/true`;
+        // Construction de l'URL avec les vrais paramètres du formulaire
+        const url = `${getFullUrl()}imprimer-livret-list/spider-livret-matricule/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(classeLabel)}/${matriculeEleves}/${changerPositionLogo}/${!supprimerFiligramme}/${changerPositionRepublique}/${pivoterPhotosVersLaDroite}/${activerDistinctions}`;
 
         return downloadFile(url, `Livret_Scolaire_${matriculeEleves}_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
     },
@@ -795,7 +898,76 @@ const rapportFunctions = {
         const url = `${getFullUrl()}imprimer-etats/liste-classe-arabe/${classe}/${annee}`;
 
         return downloadFile(url, `liste_de_classe_${classeLabel.replace(/\s+/g, '_')}.pdf`);
-    }
+    },
+
+    R32: async (params) => {
+        const { ecoleId, periode, annee, classe } = params;
+        const periodeLabel = getPeriodeLabel(periode, params.periodes);
+        const anneeLabel = getAnneeLabel(annee, params.annees);
+        const classeLabel = getClasseLabel(classe, params.classes);
+
+        console.log('🔄 R32 - Paramètres:', { ecoleId, periodeLabel, anneeLabel, classe, classeLabel });
+
+        const url = `${getFullUrl()}imprimer-proces-verbal/imprimer-proces-verbalv2/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}/${classe}/${encodeURIComponent(classeLabel)}`;
+
+        return downloadFile(url, `Proces_verbal_conseil_de_classe_${classeLabel.replace(/\s+/g, '_')}.pdf`);
+    },
+
+    R33: async (params) => {
+        const {
+            ecoleId,
+            periode,
+            annee,
+            classe,
+            niveauEnseignementId,
+            decompresserBulletin,
+            changerPositionLogo,
+            supprimerFiligramme,
+            changerPositionRepublique,
+            pivoterPhotosVersLaDroite,
+            utiliserModeleSecondaire,
+            activerDistinctions,
+            utiliserModeleBTS,
+            testLourd,
+            formatEcoleArabe,
+            imprimerBulletinAPartir,
+            imprimerBulletinJusqua,
+            formatAvecPiedPage  // ✅ AJOUTÉ
+        } = params;
+
+        const periodeLabel = getPeriodeLabel(periode, params.periodes);
+        const anneeLabel = getAnneeLabel(annee, params.annees);
+
+        console.log('🔄 R33 - Paramètres:', {
+            ecoleId,
+            periode,
+            annee,
+            classe,
+            niveauEnseignementId,
+            periodeLabel,
+            anneeLabel,
+            imprimerBulletinAPartir,
+            imprimerBulletinJusqua,
+            formatAvecPiedPage
+        });
+
+        // Construction de l'URL avec la plage d'impression et piedPage à la fin
+        const url = `${getFullUrl()}imprimer-bulletin-list/spider-bulletin/${ecoleId}/${encodeURIComponent(periodeLabel)}/${encodeURIComponent(anneeLabel)}/${classe}/${decompresserBulletin}/${niveauEnseignementId}/${changerPositionLogo}/${!supprimerFiligramme}/${changerPositionRepublique}/${pivoterPhotosVersLaDroite}/${utiliserModeleSecondaire}/${activerDistinctions}/${utiliserModeleBTS}/${testLourd}/${formatEcoleArabe}/${imprimerBulletinAPartir}/${imprimerBulletinJusqua}/${formatAvecPiedPage}`;
+
+        return downloadFile(url, `Bulletin_plage_${imprimerBulletinAPartir}_a_${imprimerBulletinJusqua}_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
+    },
+
+    R34: async (params) => {
+        const { ecoleId, periode, annee } = params;
+        const periodeLabel = getPeriodeLabel(periode, params.periodes);
+        const anneeLabel = getAnneeLabel(annee, params.annees);
+
+        console.log('🔄 R34 - Paramètres:', { ecoleId, periodeLabel, anneeLabel, annee });
+
+        const url = `${getFullUrl()}imprimer-matrice-Annuelle/imprimer-spider-annuelle-dfa-ecole-xls/${ecoleId}/${encodeURIComponent(anneeLabel)}/${encodeURIComponent(periodeLabel)}/${annee}`;
+
+        return downloadFile(url, `matrice_Annuelle_avec_dfa_ecole.xls`);
+    },
 };
 
 /**

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import {
     Panel,
     SelectPicker,
@@ -67,7 +67,7 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
         formatAvecPiedPage: false,
         supprimerFiligramme: true,
         changerPositionLogo: true,
-        pivoterPhotosVersLaDroite: false,
+        pivoterPhotosVersLaDroite: true,
         changerPositionRepublique: true,
         utiliserModeleSecondaire: false,
         activerDistinctions: true,
@@ -76,6 +76,7 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
         testLourd: false,
         imprimerBulletinAPartir: 0,
         imprimerBulletinJusqua: 200,
+        formatEcoleArabe: false,
 
         // Paramètres élèves
         avecPhoto: false,
@@ -142,7 +143,7 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
         }
 
         // Validation spécifique selon le code du rapport
-        const needsClasse = ['R01', 'R02', 'R07', 'R08', 'R10', 'R19', 'R20', 'R21', 'R23', 'R25', 'R27', 'R28', 'R29', 'R31'].includes(rapport.code);
+        const needsClasse = ['R01', 'R02', 'R07', 'R08', 'R10', 'R19', 'R20', 'R21', 'R23', 'R25', 'R27', 'R28', 'R29', 'R31', 'R32', 'R33'].includes(rapport.code);
         const needsMatricule = ['R02', 'R08', 'R16', 'R22'].includes(rapport.code);
         const needsMatiere = ['R24', 'R27'].includes(rapport.code);
         const needsBranche = ['R26', 'R30'].includes(rapport.code);
@@ -322,6 +323,32 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
     const inputStyle = {
         marginBottom: '16px'
     };
+
+
+    // SELECTION AUTOMATIQUES DES COMBOX DE ANNEE ET PERIODE EN COURS
+
+    useEffect(() => {
+        if (annees.length > 0 && !parametres.annee) {
+            const derniereAnnee = annees[annees.length - 1]?.value;
+            handleParametreChange('annee', derniereAnnee);
+        }
+    }, [annees]);
+
+    useEffect(() => {
+        const academicYearInfo = JSON.parse(localStorage.getItem('academicYearInfo'));
+
+        if (periodes.length > 0 && academicYearInfo?.periodeLibelle && !parametres.periode) {
+            // Trouver la période qui correspond au libellé
+            const periodeCorrespondante = periodes.find(
+                p => p.label === academicYearInfo.periodeLibelle ||
+                    p.value === academicYearInfo.periodeLibelle
+            );
+
+            if (periodeCorrespondante) {
+                handleParametreChange('periode', periodeCorrespondante.value);
+            }
+        }
+    }, [periodes]);
 
     // ===========================
     // RENDU DU COMPOSANT
@@ -563,6 +590,7 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                 {[
                                     { key: 'decompresserBulletin', label: 'Décompresser bulletin' },
                                     { key: 'supprimerFiligramme', label: 'Supprimer filigramme' },
+                                    { key: 'formatAvecPiedPage', label: 'Format avec pied de page' },
                                     { key: 'changerPositionLogo', label: 'Repositionner logo' },
                                     { key: 'pivoterPhotosVersLaDroite', label: 'Pivoter photos' },
                                     { key: 'changerPositionRepublique', label: 'Position République' },
@@ -570,7 +598,9 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                     { key: 'activerDistinctions', label: 'Activer distinctions' },
                                     { key: 'utiliserModeleBTS', label: 'Modèle BTS' },
                                     { key: 'utiliserModeleSuperieurBTS', label: 'Modèle supérieur BTS' },
-                                    { key: 'testLourd', label: 'Test lourd' }
+                                    { key: 'testLourd', label: 'Test lourd' },
+                                    { key: 'formatEcoleArabe', label: 'Format école Arabe' },
+
                                 ].map(({ key, label }) => (
                                     <Col key={key} xs={24} sm={12} md={8} lg={6}>
                                         <div style={{
@@ -581,7 +611,7 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                             padding: '8px 0'
                                         }}>
                                             <Toggle
-                                                size="sm"
+                                                size="md"
                                                 checked={parametres[key]}
                                                 onChange={(checked) => handleParametreChange(key, checked)}
                                             />
@@ -590,6 +620,49 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                     </Col>
                                 ))}
                             </Row>
+                            <Row gutter={24}>
+                                <Col xs={24} sm={12}>
+                                    <label style={labelStyle}>Imprimer à partir du bulletin N°</label>
+                                    <InputNumber
+                                        value={parametres.imprimerBulletinAPartir}
+                                        onChange={(value) => handleParametreChange('imprimerBulletinAPartir', value)}
+                                        min={0}
+                                        max={200}
+                                        style={{ width: '100%' }}
+                                        size="md"
+                                    />
+                                    <Text style={{ fontSize: '12px', color: '#6c757d', marginTop: '4px' }}>
+                                        Par défaut: 0 (premier bulletin)
+                                    </Text>
+                                </Col>
+                                <Col xs={24} sm={12}>
+                                    <label style={labelStyle}>Imprimer jusqu'au bulletin N°</label>
+                                    <InputNumber
+                                        value={parametres.imprimerBulletinJusqua}
+                                        onChange={(value) => handleParametreChange('imprimerBulletinJusqua', value)}
+                                        min={0}
+                                        max={200}
+                                        style={{ width: '100%' }}
+                                        size="md"
+                                    />
+                                    <Text style={{ fontSize: '12px', color: '#6c757d', marginTop: '4px' }}>
+                                        Par défaut: 200 (tous les bulletins)
+                                    </Text>
+                                </Col>
+                            </Row>
+
+                            {/* <div style={{
+                                marginTop: '16px',
+                                padding: '12px',
+                                backgroundColor: '#f8f9fa',
+                                borderRadius: '6px',
+                                borderLeft: '3px solid #4a90e2'
+                            }}>
+                                <Text style={{ fontSize: '13px', color: '#495057' }}>
+                                    💡 <strong>Astuce :</strong> Ces paramètres sont utilisés uniquement pour le rapport R33 (Bulletin avec plage d'impression).
+                                    Laissez les valeurs par défaut pour imprimer tous les bulletins.
+                                </Text>
+                            </div> */}
                         </div>
                     </Card>
 

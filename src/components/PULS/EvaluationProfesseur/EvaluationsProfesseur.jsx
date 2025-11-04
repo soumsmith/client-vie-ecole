@@ -309,16 +309,6 @@ const ProfesseurInfoCard = ({ professeurInfo, selectedEnseignantName, selectedPe
                     </p>
                 </div>
             </div>
-
-            {/* Badge récapitulatif */}
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                <Badge color="blue" style={{ fontSize: '12px' }}>
-                    ID: {professeurInfo.profPersonnelId}
-                </Badge>
-                <Badge color="green" style={{ fontSize: '12px' }}>
-                    Max: {professeurInfo.max} évaluation(s)
-                </Badge>
-            </div>
         </div>
     );
 };
