@@ -327,12 +327,14 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
 
     // SELECTION AUTOMATIQUES DES COMBOX DE ANNEE ET PERIODE EN COURS
 
-    useEffect(() => {
-        if (annees.length > 0 && !parametres.annee) {
-            const derniereAnnee = annees[annees.length - 1]?.value;
-            handleParametreChange('annee', derniereAnnee);
-        }
-    }, [annees]);
+    // useEffect(() => {
+    //     if (annees.length > 0 && !parametres.annee) {
+    //         const derniereAnnee = annees[annees.length - 1]?.value;
+    //         handleParametreChange('annee', derniereAnnee);
+    //     }
+    // }, [annees]);
+
+    // academicYearInfo.anneeLibelle
 
     useEffect(() => {
         const academicYearInfo = JSON.parse(localStorage.getItem('academicYearInfo'));
@@ -340,8 +342,8 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
         if (periodes.length > 0 && academicYearInfo?.periodeLibelle && !parametres.periode) {
             // Trouver la période qui correspond au libellé
             const periodeCorrespondante = periodes.find(
-                p => p.label === academicYearInfo.periodeLibelle ||
-                    p.value === academicYearInfo.periodeLibelle
+                p => p.label === academicYearInfo?.periodeLibelle ||
+                    p.value === academicYearInfo?.periodeLibelle
             );
 
             if (periodeCorrespondante) {
@@ -349,6 +351,22 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
             }
         }
     }, [periodes]);
+
+    useEffect(() => {
+        const academicYearInfo = JSON.parse(localStorage.getItem('academicYearInfo'));
+
+        if (annees.length > 0 && academicYearInfo?.anneeLibelle && !parametres.annee) {
+            // Trouver la période qui correspond au libellé
+            const anneeCorrespondante = annees.find(
+                p => p.label === academicYearInfo.anneeLibelle ||
+                    p.value === academicYearInfo.anneeLibelle
+            );
+
+            if (anneeCorrespondante) {
+                handleParametreChange('annee', anneeCorrespondante.value);
+            }
+        }
+    }, [annees]);
 
     // ===========================
     // RENDU DU COMPOSANT
