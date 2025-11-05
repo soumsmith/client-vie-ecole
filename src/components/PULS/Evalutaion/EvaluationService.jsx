@@ -23,6 +23,7 @@ import { useAllApiUrls } from "../utils/apiConfig";
 import { usePulsParams } from "../../hooks/useDynamicParams";
 import axios from "axios";
 import { useAppParams } from '../utils/apiConfig';
+import { getUserProfile } from "../../hooks/userUtils";
 
 // ===========================
 // CONFIGURATION GLOBALE (VALEURS PAR DÉFAUT)
@@ -279,6 +280,35 @@ export const useEvaluationsData = (refreshTrigger = 0) => {
 // CONFIGURATION DU TABLEAU DES ÉVALUATIONS
 // ===========================
 export const getEvaluationsTableConfig = (callbacks = {}) => {
+
+  const userProfile = getUserProfile();
+
+  // Définir les actions en fonction du profil
+  const actions = [
+    {
+      type: "view",
+      icon: <FiEye size={17} />,
+      tooltip: "Voir les détails de l'évaluation",
+      color: "#3498db",
+    },
+    {
+      type: "edit",
+      icon: <FiEdit size={17} />,
+      tooltip: "Modifier l'évaluation",
+      color: "#f39c12",
+    },
+  ];
+
+  // Ajouter le bouton de suppression uniquement si ce n'est pas un Professeur
+  if (userProfile !== "Professeur") {
+    actions.push({
+      type: "delete",
+      icon: <FiTrash2 size={17} />,
+      tooltip: "Supprimer l'évaluation",
+      color: "#e74c3c",
+    });
+  }
+
   return {
     columns: [
       {
@@ -494,7 +524,7 @@ export const getEvaluationsTableConfig = (callbacks = {}) => {
         flexGrow: 1,
         minWidth: 120,
         cellType: "actions",
-        fixed: "right",
+        // fixed: "right",
       },
     ],
     filterConfigs: [
@@ -542,26 +572,7 @@ export const getEvaluationsTableConfig = (callbacks = {}) => {
       "classe",
       "description_complete",
     ],
-    actions: [
-      {
-        type: "view",
-        icon: <FiEye size={17} />,
-        tooltip: "Voir les détails de l'évaluation",
-        color: "#3498db",
-      },
-      {
-        type: "edit",
-        icon: <FiEdit size={17} />,
-        tooltip: "Modifier l'évaluation",
-        color: "#f39c12",
-      },
-      {
-        type: "delete",
-        icon: <FiTrash2 size={17} />,
-        tooltip: "Supprimer l'évaluation",
-        color: "#e74c3c",
-      },
-    ],
+    actions: actions, // Utiliser le tableau d'actions construit dynamiquement
     defaultSortField: "date_display",
     defaultSortOrder: "desc",
     pageSize: 10,

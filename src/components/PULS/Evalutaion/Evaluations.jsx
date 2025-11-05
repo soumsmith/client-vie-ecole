@@ -751,7 +751,7 @@ const EvaluationFilters = ({
                             Action
                         </label>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      
+
 
                             {/* 🆕 Ligne 2 : Nouvelle Évaluation */}
                             <GradientButton
@@ -843,6 +843,7 @@ const Evaluations = () => {
         isInitialized,
         isReady,
     } = usePulsParams();
+    console.log("personnelInfo====>", personnelInfo?.personnelConnecteDetail?.profil);
 
 
     // ===========================
@@ -1304,51 +1305,6 @@ const Evaluations = () => {
                                         panel: { minHeight: "600px", border: "none", boxShadow: "none" },
                                     }}
                                 />
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {searchPerformed && evaluations?.length === 0 && !searchLoading && (
-                    <div className="row">
-                        <div className="col-lg-12">
-                            <div style={{
-                                background: 'white',
-                                borderRadius: '15px',
-                                padding: '40px',
-                                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                                border: '1px solid rgba(245, 158, 11, 0.15)',
-                                textAlign: 'center'
-                            }}>
-                                <div style={{
-                                    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                                    borderRadius: '20px',
-                                    padding: '20px',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    marginBottom: 20
-                                }}>
-                                    <FiCalendar size={40} color="white" />
-                                </div>
-                                <h5 style={{ margin: '0 0 10px 0', color: '#1e293b', fontWeight: '600' }}>
-                                    Aucune évaluation trouvée
-                                </h5>
-                                <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
-                                    Aucun résultat pour ces critères de recherche. Essayez d'élargir vos filtres.
-                                </p>
-                                <Button
-                                    appearance="primary"
-                                    style={{
-                                        marginTop: 15,
-                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                        border: 'none'
-                                    }}
-                                    startIcon={<FiPlus />}
-                                    onClick={handleCreateEvaluation}
-                                >
-                                    Créer une nouvelle évaluation
-                                </Button>
                             </div>
                         </div>
                     </div>

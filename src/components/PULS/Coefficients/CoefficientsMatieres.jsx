@@ -1,20 +1,20 @@
 import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { 
-    Button, 
-    Panel, 
-    Row, 
-    Col, 
-    Message, 
-    Loader, 
+import {
+    Button,
+    Panel,
+    Row,
+    Col,
+    Message,
+    Loader,
     Badge,
     Steps,
     Notification,
     toaster
 } from 'rsuite';
-import { 
-    FiBookOpen, 
+import {
+    FiBookOpen,
     FiHash,
     FiSave,
     FiDownload,
@@ -25,23 +25,24 @@ import {
 // Import des composants et services
 import { useCommonState } from '../../hooks/useCommonState';
 import DataTable from "../../DataTable";
-import { 
+import {
     useCoefficientsMatieresData,
     coefficientsTableConfig
 } from './CoefficientsMatieresService';
 import CoefficientsFilters from './CoefficientsFilters'; // Import du composant mis à jour
 import AddCoefficientModal from './AddCoefficientModal'; // Import du modal mis à jour avec useMatieresEcoleData
 import IconBox from "../Composant/IconBox";
+import Swal from 'sweetalert2';
 
 
 // ===========================
 // COMPOSANT D'EN-TÊTE AVEC STATISTIQUES ET ACTIONS AMÉLIORÉ
 // ===========================
-const CoefficientsStatsHeader = ({ 
-    coefficients, 
-    loading, 
-    modifiedCoefficients, 
-    onSave, 
+const CoefficientsStatsHeader = ({
+    coefficients,
+    loading,
+    modifiedCoefficients,
+    onSave,
     onExport,
     showSaveButton = false
 }) => {
@@ -67,7 +68,7 @@ const CoefficientsStatsHeader = ({
     const totalMatieres = coefficients.length;
     const matieresModifiees = modifiedCoefficients.size;
     const matieresAvecErreur = coefficients.filter(c => c.hasError).length;
-    
+
     // Répartition par catégorie
     const categories = [...new Set(coefficients.map(c => c.categorie_libelle))];
     const categoriesStats = categories.map(cat => ({
@@ -76,7 +77,7 @@ const CoefficientsStatsHeader = ({
     })).slice(0, 4);
 
     // Moyenne des coefficients
-    const moyenneCoeff = totalMatieres > 0 ? 
+    const moyenneCoeff = totalMatieres > 0 ?
         (coefficients.reduce((sum, c) => sum + c.coefficient, 0) / totalMatieres).toFixed(1) : 0;
 
     const hasModifications = matieresModifiees > 0;
@@ -91,9 +92,9 @@ const CoefficientsStatsHeader = ({
             marginBottom: '20px'
         }}>
             {/* En-tête */}
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: 12,
                 marginBottom: 20,
@@ -117,7 +118,7 @@ const CoefficientsStatsHeader = ({
                     {(hasModifications || showSaveButton) && (
                         <Button
                             appearance="primary"
-                            style={{ 
+                            style={{
                                 background: 'linear-gradient(135deg, #059669 0%, #16a34a 100%)',
                                 border: 'none',
                                 borderRadius: '8px'
@@ -129,7 +130,7 @@ const CoefficientsStatsHeader = ({
                             Enregistrer {hasModifications ? `(${matieresModifiees})` : ''}
                         </Button>
                     )}
-                    
+
                     {/* <Button
                         appearance="ghost"
                         style={{ 
@@ -172,17 +173,17 @@ const CoefficientsStatsHeader = ({
                         borderRadius: '8px',
                         border: `1px solid ${matieresModifiees > 0 ? '#fed7aa' : '#bbf7d0'}`
                     }}>
-                        <div style={{ 
-                            fontSize: '24px', 
-                            fontWeight: '700', 
+                        <div style={{
+                            fontSize: '24px',
+                            fontWeight: '700',
                             color: matieresModifiees > 0 ? '#d97706' : '#16a34a'
                         }}>
                             {matieresModifiees}
                         </div>
-                        <div style={{ 
-                            fontSize: '12px', 
+                        <div style={{
+                            fontSize: '12px',
                             color: matieresModifiees > 0 ? '#d97706' : '#16a34a',
-                            fontWeight: '500' 
+                            fontWeight: '500'
                         }}>
                             Modifiées
                         </div>
@@ -197,17 +198,17 @@ const CoefficientsStatsHeader = ({
                         borderRadius: '8px',
                         border: `1px solid ${matieresAvecErreur > 0 ? '#fecaca' : '#e2e8f0'}`
                     }}>
-                        <div style={{ 
-                            fontSize: '24px', 
-                            fontWeight: '700', 
+                        <div style={{
+                            fontSize: '24px',
+                            fontWeight: '700',
                             color: matieresAvecErreur > 0 ? '#dc2626' : '#64748b'
                         }}>
                             {matieresAvecErreur}
                         </div>
-                        <div style={{ 
-                            fontSize: '12px', 
+                        <div style={{
+                            fontSize: '12px',
                             color: matieresAvecErreur > 0 ? '#dc2626' : '#64748b',
-                            fontWeight: '500' 
+                            fontWeight: '500'
                         }}>
                             Erreurs
                         </div>
@@ -235,9 +236,9 @@ const CoefficientsStatsHeader = ({
             {/* Badges informatifs des catégories */}
             <div style={{ marginTop: 15, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {categoriesStats.map((catStat, index) => (
-                    <Badge 
-                        key={catStat.category} 
-                        color={['green', 'blue', 'orange', 'violet'][index % 4]} 
+                    <Badge
+                        key={catStat.category}
+                        color={['green', 'blue', 'orange', 'violet'][index % 4]}
                         style={{ fontSize: '11px' }}
                     >
                         {catStat.count} {catStat.category}
@@ -339,7 +340,7 @@ const CoefficientsMatieres = () => {
 
     const handleSaveAdd = useCallback(async (result) => {
         console.log('✅ Nouvelle matière ajoutée:', result);
-        
+
         toaster.push(
             <Notification type="success" header="Matière ajoutée">
                 La matière a été ajoutée avec succès à la branche.
@@ -357,22 +358,37 @@ const CoefficientsMatieres = () => {
     // GESTION DE LA SAUVEGARDE
     // ===========================
     const handleSave = useCallback(async () => {
-        const result = await saveModifications();
-        
-        if (result.success) {
-            toaster.push(
-                <Notification type="success" header="Sauvegarde réussie">
-                    {result.message}
-                </Notification>,
-                { duration: 4000 }
-            );
-        } else {
-            toaster.push(
-                <Notification type="error" header="Erreur de sauvegarde">
-                    {result.message}
-                </Notification>,
-                { duration: 6000 }
-            );
+        const result = await Swal.fire({
+            title: 'Confirmer la sauvegarde',
+            text: 'Voulez-vous vraiment enregistrer les modifications ?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Oui, enregistrer',
+            cancelButtonText: 'Annuler'
+        });
+
+        if (result.isConfirmed) {
+            const saveResult = await saveModifications();
+
+            if (saveResult.success) {
+                Swal.fire({
+                    title: 'Sauvegarde réussie !',
+                    text: saveResult.message,
+                    icon: 'success',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Erreur de sauvegarde',
+                    text: saveResult.message,
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
+            }
         }
     }, [saveModifications]);
 
@@ -442,8 +458,8 @@ const CoefficientsMatieres = () => {
     // RENDU DU COMPOSANT
     // ===========================
     return (
-        <div style={{ 
-             
+        <div style={{
+
             minHeight: '100vh',
             padding: '20px 0'
         }}>
@@ -467,7 +483,7 @@ const CoefficientsMatieres = () => {
                 {searchPerformed && (
                     <div className="row">
                         <div className="col-lg-12">
-                            <CoefficientsStatsHeader 
+                            <CoefficientsStatsHeader
                                 coefficients={coefficients}
                                 loading={searchLoading}
                                 modifiedCoefficients={modifiedCoefficients}
@@ -567,28 +583,28 @@ const CoefficientsMatieres = () => {
                                 <DataTable
                                     title="Coefficients des Matières"
                                     subtitle="matière(s) trouvée(s)"
-                                    
+
                                     data={coefficients}
                                     loading={searchLoading}
                                     error={null}
-                                    
+
                                     columns={tableConfigWithCallbacks.columns}
                                     searchableFields={tableConfigWithCallbacks.searchableFields}
                                     filterConfigs={tableConfigWithCallbacks.filterConfigs}
                                     actions={tableConfigWithCallbacks.actions}
-                                    
+
                                     onAction={handleTableActionLocal}
                                     onRefresh={handleRefresh}
-                                    
+
                                     defaultPageSize={20}
                                     pageSizeOptions={[10, 20, 30, 50]}
                                     tableHeight={650}
-                                    
+
                                     enableRefresh={true}
                                     enableCreate={false}
                                     selectable={false}
                                     rowKey="id"
-                                    
+
                                     customStyles={{
                                         container: { backgroundColor: "transparent" },
                                         panel: { minHeight: "650px", border: "none", boxShadow: "none" },

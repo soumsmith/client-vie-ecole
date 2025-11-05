@@ -159,7 +159,7 @@ export const useCahierDeTexteData = (classeId, matiereId, refreshTrigger = 0) =>
         try {
             setLoading(true);
             setError(null);
-         
+
             const response = await axios.get(apiUrls.matieres.progressionSeance(classeId, matiereId));
 
             const processedData = response.data && Array.isArray(response.data)

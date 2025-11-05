@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
     Panel,
     SelectPicker,
@@ -38,7 +38,10 @@ import {
     statutOptions,
     genererRapportParCode,
     rapportsTableConfig,
-    clearRapportsCache
+    clearRapportsCache,
+    validateRapportParameters,
+    getRapportRequirements,
+    REQUIREMENT_LABELS
 } from './RapportsServiceManager';
 
 const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
@@ -120,81 +123,28 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
         }));
     }, []);
 
+    /**
+     * Gestionnaire de génération de rapport avec validation dynamique
+     */
     const handleGenererRapport = useCallback(async (rapport) => {
-        // Validation des paramètres obligatoires
-        if (!parametres.annee) {
+        console.log('🔄 Génération du rapport demandée:', rapport.code, rapport.nom);
+        console.log('📋 Paramètres actuels:', parametres);
+        console.log('✅ Exigences du rapport:', rapport.requirements);
+
+        // Validation dynamique des paramètres
+        const validation = validateRapportParameters(rapport.code, parametres);
+
+        if (!validation.valid) {
+            const firstError = validation.errors[0];
+            
             Swal.fire({
                 icon: 'warning',
                 title: 'Paramètres manquants',
-                text: 'Veuillez sélectionner une année.',
-                confirmButtonColor: '#4a90e2'
-            });
-            return;
-        }
-
-        if (!parametres.annuel && !parametres.periode) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Paramètres manquants',
-                text: 'Veuillez sélectionner une période ou activer le mode annuel.',
-                confirmButtonColor: '#4a90e2'
-            });
-            return;
-        }
-
-        // Validation spécifique selon le code du rapport
-        const needsClasse = ['R01', 'R02', 'R07', 'R08', 'R10', 'R19', 'R20', 'R21', 'R23', 'R25', 'R27', 'R28', 'R29', 'R31', 'R32', 'R33'].includes(rapport.code);
-        const needsMatricule = ['R02', 'R08', 'R16', 'R22'].includes(rapport.code);
-        const needsMatiere = ['R24', 'R27'].includes(rapport.code);
-        const needsBranche = ['R26', 'R30'].includes(rapport.code);
-
-        if (needsClasse && !parametres.classe) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Paramètres manquants',
-                text: 'Ce rapport nécessite la sélection d\'une classe.',
-                confirmButtonColor: '#4a90e2'
-            });
-            return;
-        }
-
-        if (needsMatricule && !parametres.matriculeEleves) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Paramètres manquants',
-                text: 'Ce rapport nécessite la saisie d\'un matricule.',
-                confirmButtonColor: '#4a90e2'
-            });
-            return;
-        }
-
-        if (needsMatiere && !parametres.matiere) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Paramètres manquants',
-                text: 'Ce rapport nécessite la sélection d\'une matière.',
-                confirmButtonColor: '#4a90e2'
-            });
-            return;
-        }
-
-        if (needsBranche && !parametres.niveau) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Paramètres manquants',
-                text: 'Ce rapport nécessite la sélection d\'un niveau.',
-                confirmButtonColor: '#4a90e2'
-            });
-            return;
-        }
-
-        // Validation matricule/classe pour certains rapports
-        if (['R14', 'R15'].includes(rapport.code) && !parametres.classe && !parametres.matriculeEleves) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Paramètres manquants',
-                text: 'Ce rapport nécessite soit une classe, soit un matricule.',
-                confirmButtonColor: '#4a90e2'
+                text: firstError.message,
+                confirmButtonColor: '#4a90e2',
+                footer: validation.errors.length > 1 
+                    ? `${validation.errors.length - 1} autre(s) paramètre(s) manquant(s)`
+                    : null
             });
             return;
         }
@@ -202,7 +152,27 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
         // Confirmation avec SweetAlert
         const result = await Swal.fire({
             title: 'Générer le rapport',
-            text: `Voulez-vous générer le rapport "${rapport.nom}" ?`,
+            html: `
+                <div style="text-align: left; margin-top: 10px;">
+                    <p style="margin-bottom: 15px;">Voulez-vous générer le rapport <strong>"${rapport.nom}"</strong> ?</p>
+                    ${Object.entries(rapport.requirements || {})
+                        .filter(([key, value]) => value)
+                        .length > 0 ? `
+                        <div style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; margin-top: 10px;">
+                            <p style="margin: 0 0 8px 0; font-weight: 600; color: #495057;">Paramètres sélectionnés :</p>
+                            <ul style="margin: 0; padding-left: 20px; color: #6c757d;">
+                                ${parametres.annee ? `<li>Année : <strong>${annees.find(a => a.value === parametres.annee)?.libelle}</strong></li>` : ''}
+                                ${parametres.periode && !parametres.annuel ? `<li>Période : <strong>${periodes.find(p => p.value === parametres.periode)?.libelle}</strong></li>` : ''}
+                                ${parametres.annuel ? `<li>Mode : <strong>Annuel</strong></li>` : ''}
+                                ${parametres.classe && rapport.requirements?.needsClasse ? `<li>Classe : <strong>${classes.find(c => c.value === parametres.classe)?.libelle}</strong></li>` : ''}
+                                ${parametres.matriculeEleves && rapport.requirements?.needsMatricule ? `<li>Matricule : <strong>${parametres.matriculeEleves}</strong></li>` : ''}
+                                ${parametres.matiere && rapport.requirements?.needsMatiere ? `<li>Matière : <strong>${matieres.find(m => m.value === parametres.matiere)?.libelle}</strong></li>` : ''}
+                                ${parametres.niveau && rapport.requirements?.needsBranche ? `<li>Niveau : <strong>${branches.find(b => b.value === parametres.niveau)?.libelle}</strong></li>` : ''}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+            `,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#4a90e2',
@@ -211,7 +181,8 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
             cancelButtonText: 'Annuler',
             background: '#ffffff',
             customClass: {
-                popup: 'swal-custom-popup'
+                popup: 'swal-custom-popup',
+                htmlContainer: 'swal-html-container'
             }
         });
 
@@ -223,7 +194,12 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
             // Afficher le loader
             Swal.fire({
                 title: 'Génération en cours...',
-                text: 'Veuillez patienter pendant la génération du rapport.',
+                html: `
+                    <div style="text-align: center;">
+                        <p>Veuillez patienter pendant la génération du rapport.</p>
+                        <p style="font-weight: 600; color: #4a90e2; margin-top: 10px;">${rapport.nom}</p>
+                    </div>
+                `,
                 icon: 'info',
                 allowOutsideClick: false,
                 allowEscapeKey: false,
@@ -251,20 +227,28 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
             Swal.fire({
                 icon: 'success',
                 title: 'Rapport généré !',
-                text: `Le rapport "${downloadResult.filename}" a été téléchargé avec succès.`,
+                html: `
+                    <div style="text-align: center;">
+                        <p>Le rapport <strong>"${downloadResult.filename}"</strong> a été téléchargé avec succès.</p>
+                        <p style="color: #6c757d; font-size: 14px; margin-top: 10px;">
+                            Taille : ${(downloadResult.size / 1024).toFixed(2)} Ko
+                        </p>
+                    </div>
+                `,
                 confirmButtonColor: '#27ae60',
                 background: '#ffffff'
             });
 
         } catch (error) {
-            console.error('Erreur lors de la génération:', error);
+            console.error('❌ Erreur lors de la génération:', error);
 
             Swal.fire({
                 icon: 'error',
                 title: 'Erreur de génération',
                 text: error.message || 'Une erreur est survenue lors de la génération du rapport.',
                 confirmButtonColor: '#e74c3c',
-                background: '#ffffff'
+                background: '#ffffff',
+                footer: '<a href="#" style="color: #4a90e2;">Besoin d\'aide ? Contactez le support</a>'
             });
         } finally {
             setGenerating(false);
@@ -286,7 +270,40 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
     };
 
     // ===========================
-    // STYLES LIGHT
+    // SÉLECTION AUTOMATIQUE ANNÉE ET PÉRIODE EN COURS
+    // ===========================
+    useEffect(() => {
+        const academicYearInfo = JSON.parse(localStorage.getItem('academicYearInfo'));
+
+        if (periodes.length > 0 && academicYearInfo?.periodeLibelle && !parametres.periode) {
+            const periodeCorrespondante = periodes.find(
+                p => p.label === academicYearInfo.periodeLibelle ||
+                    p.value === academicYearInfo.periodeLibelle
+            );
+
+            if (periodeCorrespondante) {
+                handleParametreChange('periode', periodeCorrespondante.value);
+            }
+        }
+    }, [periodes]);
+
+    useEffect(() => {
+        const academicYearInfo = JSON.parse(localStorage.getItem('academicYearInfo'));
+
+        if (annees.length > 0 && academicYearInfo?.anneeLibelle && !parametres.annee) {
+            const anneeCorrespondante = annees.find(
+                p => p.label === academicYearInfo.anneeLibelle ||
+                    p.value === academicYearInfo.anneeLibelle
+            );
+
+            if (anneeCorrespondante) {
+                handleParametreChange('annee', anneeCorrespondante.value);
+            }
+        }
+    }, [annees]);
+
+    // ===========================
+    // STYLES
     // ===========================
     const cardStyle = {
         marginBottom: '24px',
@@ -324,50 +341,6 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
         marginBottom: '16px'
     };
 
-
-    // SELECTION AUTOMATIQUES DES COMBOX DE ANNEE ET PERIODE EN COURS
-
-    // useEffect(() => {
-    //     if (annees.length > 0 && !parametres.annee) {
-    //         const derniereAnnee = annees[annees.length - 1]?.value;
-    //         handleParametreChange('annee', derniereAnnee);
-    //     }
-    // }, [annees]);
-
-    // academicYearInfo.anneeLibelle
-
-    useEffect(() => {
-        const academicYearInfo = JSON.parse(localStorage.getItem('academicYearInfo'));
-
-        if (periodes.length > 0 && academicYearInfo?.periodeLibelle && !parametres.periode) {
-            // Trouver la période qui correspond au libellé
-            const periodeCorrespondante = periodes.find(
-                p => p.label === academicYearInfo?.periodeLibelle ||
-                    p.value === academicYearInfo?.periodeLibelle
-            );
-
-            if (periodeCorrespondante) {
-                handleParametreChange('periode', periodeCorrespondante.value);
-            }
-        }
-    }, [periodes]);
-
-    useEffect(() => {
-        const academicYearInfo = JSON.parse(localStorage.getItem('academicYearInfo'));
-
-        if (annees.length > 0 && academicYearInfo?.anneeLibelle && !parametres.annee) {
-            // Trouver la période qui correspond au libellé
-            const anneeCorrespondante = annees.find(
-                p => p.label === academicYearInfo.anneeLibelle ||
-                    p.value === academicYearInfo.anneeLibelle
-            );
-
-            if (anneeCorrespondante) {
-                handleParametreChange('annee', anneeCorrespondante.value);
-            }
-        }
-    }, [annees]);
-
     // ===========================
     // RENDU DU COMPOSANT
     // ===========================
@@ -385,6 +358,9 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                 }
                 .swal2-content {
                     color: #495057 !important;
+                }
+                .swal-html-container {
+                    text-align: left !important;
                 }
             `}</style>
 
@@ -618,7 +594,6 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                     { key: 'utiliserModeleSuperieurBTS', label: 'Modèle supérieur BTS' },
                                     { key: 'testLourd', label: 'Test lourd' },
                                     { key: 'formatEcoleArabe', label: 'Format école Arabe' },
-
                                 ].map(({ key, label }) => (
                                     <Col key={key} xs={24} sm={12} md={8} lg={6}>
                                         <div style={{
@@ -668,19 +643,6 @@ const EcranRapports = ({ ecoleId = 38, niveauEnseignementId = 2 }) => {
                                     </Text>
                                 </Col>
                             </Row>
-
-                            {/* <div style={{
-                                marginTop: '16px',
-                                padding: '12px',
-                                backgroundColor: '#f8f9fa',
-                                borderRadius: '6px',
-                                borderLeft: '3px solid #4a90e2'
-                            }}>
-                                <Text style={{ fontSize: '13px', color: '#495057' }}>
-                                    💡 <strong>Astuce :</strong> Ces paramètres sont utilisés uniquement pour le rapport R33 (Bulletin avec plage d'impression).
-                                    Laissez les valeurs par défaut pour imprimer tous les bulletins.
-                                </Text>
-                            </div> */}
                         </div>
                     </Card>
 
