@@ -92,7 +92,8 @@ export const useMatieresByClasseData = (classeId, refreshTrigger = 0) => {
             setError(null);
 
             // Utilisation de l'API fournie
-            const response = await axios.get(apiUrls.matieres.getMariereByClasse(classeId));
+            const response = await axios.get(apiUrls.personnel.getMatiereClasseByProfClasse(classeId));
+            //apiUrls.matieres.getMariereByClasse(classeId)
 
             const processedMatieres = response.data && Array.isArray(response.data)
                 ? response.data.map(item => ({

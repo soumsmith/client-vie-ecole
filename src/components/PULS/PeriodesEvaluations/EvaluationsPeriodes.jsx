@@ -197,10 +197,10 @@ const EvaluationsPeriodes = () => {
                 title: 'Confirmer l\'ajout',
                 html: `
                     <div style="text-align: left; padding: 10px;">
-                        <p><strong>Période :</strong> ${data.periodeLibelle}</p>
-                        <p><strong>Niveau :</strong> ${data.niveauLibelle}</p>
-                        <p><strong>Type d'évaluation :</strong> ${data.typeEvaluationLibelle}</p>
-                        <p><strong>Numéro :</strong> ${data.numero}</p>
+                        <p><strong>Période :</strong> ${data?.periodeLibelle}</p>
+                        <p><strong>Niveau :</strong> ${data?.niveauLibelle}</p>
+                        <p><strong>Type d'évaluation :</strong> ${data?.typeEvaluationLibelle}</p>
+                        <p><strong>Numéro :</strong> ${data?.numero}</p>
                     </div>
                 `,
                 icon: 'question',

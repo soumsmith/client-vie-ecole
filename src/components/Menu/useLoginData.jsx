@@ -846,7 +846,7 @@ const useLoginData = (config) => {
             }
 
             // 🆕 VÉRIFIER SI C'EST JUSTE UNE VALIDATION DE MOT DE PASSE (pas une vraie connexion)
-            if (data === "Mot de passe correct!") {
+            if (data === "Mot de passe correct!" || data === "Login ou mot de passe incorrect!") {
                 await Swal.fire({
                     icon: 'info',
                     title: 'Mot de passe correct',
