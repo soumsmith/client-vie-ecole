@@ -718,9 +718,9 @@ const Layout = ({ onLogout }) => {
               pageTitle={getPageTitle()}
               onLogout={handleLogout}
               userInfo={{
-                name: personnelInfo?.nom || personnelInfo?.name || "Utilisateur",
+                name: personnelInfo?.personnelConnecteDetail?.personnelnom || personnelInfo?.personnelConnecteDetail?.personnelnom + " " + personnelInfo?.personnelConnecteDetail?.personnelprenom || personnelInfo?.personnelConnecteDetail?.personnelprenom || "Utilisateur",
                 role: userProfil || "Membre",
-                email: personnelInfo?.email || "user@example.com",
+                email: personnelInfo?.personnelConnecteDetail?.candidat_email || personnelInfo?.candidatDetails?.candidat_email || "user@example.com",
                 avatar: personnelInfo?.avatar || ""
               }}
               breadcrumbItems={getBreadcrumbItems()}

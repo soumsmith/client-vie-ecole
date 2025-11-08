@@ -360,7 +360,9 @@ const TeacherDashboard = () => {
     });
 
     const apiUrls = useAllApiUrls();
-    const { userId } = usePulsParams();
+
+     const { ecoleId: dynamicEcoleId, academicYearId: dynamicAcademicYearId, personnelInfo: personnelInfo, userId } = usePulsParams();
+      
 
     // Récupérer les séances avec le hook personnalisé
     const {
@@ -407,6 +409,9 @@ const TeacherDashboard = () => {
 
             mappedClasses.sort((a, b) => a.ordre - b.ordre);
             setClasses(mappedClasses);
+
+
+            //personnelInfo?.personnelConnecteDetail?.personnelnom
 
             // Extraire les informations du professeur depuis la première séance
             if (seances.length > 0 && seances[0].professeur) {
@@ -497,7 +502,7 @@ const TeacherDashboard = () => {
                             fontSize: '16px',
                             fontStyle: 'italic'
                         }}>
-                            Bienvenue, {professor.prenom} {professor.nom}
+                            Bienvenue, {personnelInfo?.personnelConnecteDetail?.personnelnom} {personnelInfo?.personnelConnecteDetail?.personnelprenom}
                         </p>
                     </div>
                     <Button

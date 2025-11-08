@@ -291,7 +291,7 @@ const SearchForm = ({
                 </Col>
 
                 {showMatiereFilter && (
-                    <Col xs={24} sm={12} md={8}>
+                    <Col xs={24} sm={12} md={showMatiereFilter ? 6 : 10}>
                         <div style={{ marginBottom: 20 }}>
                             <label style={{
                                 display: 'block',
@@ -345,7 +345,7 @@ const SearchForm = ({
                     </Col>
                 )}
 
-                <Col xs={24} sm={12} md={showMatiereFilter ? 8 : 10}>
+                <Col xs={24} sm={12} md={showMatiereFilter ? 6 : 10}>
                     <div style={{ marginBottom: 20 }}>
                         <label style={{
                             display: 'block',

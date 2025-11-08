@@ -198,11 +198,11 @@ export const useSurveillantsData = () => {
  */
 export const checkCreneauDisponibiliteSeance = async (
     apiUrls,  // ✅ Ajouté comme paramètre
-    academicYearId, 
-    classe, 
-    jour, 
-    heureDeb, 
-    heureFin, 
+    academicYearId,
+    classe,
+    jour,
+    heureDeb,
+    heureFin,
     dateSeance = null
 ) => {
     console.log('=== VÉRIFICATION CRÉNEAU SÉANCE ===');
@@ -213,7 +213,7 @@ export const checkCreneauDisponibiliteSeance = async (
     console.log('heureFin:', heureFin);
     console.log('dateSeance:', dateSeance);
     console.log('==================================');
-    
+
     // ❌ SUPPRIMEZ CETTE LIGNE
     // const apiUrls = useAllApiUrls();
 
@@ -283,15 +283,7 @@ export const saveSeance = async (seanceData, apiUrls) => {  // ✅ Ajouté apiUr
 
         const response = await axios.post(
             url,
-            seanceData,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                timeout: 10000
-            }
-        );
+            seanceData);
 
         console.log('Réponse de sauvegarde séance:', response.data);
         return response.data;
@@ -511,7 +503,7 @@ export const seancesSaisiesTableConfig = {
             flexGrow: 1,
             minWidth: 160,
             cellType: 'actions',
-            fixed: 'right'
+            // fixed: 'right'
         }
     ],
     searchableFields: ['classe', 'matiere', 'professeur', 'typeActivite'],
@@ -538,19 +530,19 @@ export const seancesSaisiesTableConfig = {
     actions: [
         {
             type: 'view',
-            icon: <FiEye />,
+            icon: <FiEye size={17} />,
             tooltip: 'Voir les détails',
             color: '#6366f1'
         },
         {
             type: 'edit',
-            icon: <FiEdit />,
+            icon: <FiEdit size={17} />,
             tooltip: 'Modifier la séance',
             color: '#f59e0b'
         },
         {
             type: 'delete',
-            icon: <FiTrash2 />,
+            icon: <FiTrash2 size={17} />,
             tooltip: 'Supprimer la séance',
             color: '#ef4444'
         }

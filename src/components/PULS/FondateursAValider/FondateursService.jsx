@@ -360,7 +360,7 @@ export const fondateursTableConfig = {
             flexGrow: 1,
             minWidth: 120,
             cellType: 'actions',
-            fixed: 'right'
+            // fixed: 'right'
         }
     ],
     filterConfigs: [
@@ -411,33 +411,33 @@ export const fondateursTableConfig = {
         'contact2'
     ],
     actions: [
-        {
-            type: 'validate',
-            icon: <FiCheck />,
-            tooltip: 'Valider le fondateur',
-            color: '#22c55e'
-        },
-        {
-            type: 'reject',
-            icon: <FiX />,
-            tooltip: 'Refuser le fondateur',
-            color: '#ef4444'
-        },
-        {
-            type: 'view',
-            icon: <FiEye />,
-            tooltip: 'Voir les détails',
-            color: '#3498db'
-        },
+        // {
+        //     type: 'validate',
+        //     icon: <FiCheck size={17} />,
+        //     tooltip: 'Valider le fondateur',
+        //     color: '#22c55e'
+        // },
+        // {
+        //     type: 'reject',
+        //     icon: <FiX size={17} />,
+        //     tooltip: 'Refuser le fondateur',
+        //     color: '#ef4444'
+        // },
+        // {
+        //     type: 'view',
+        //     icon: <FiEye size={17} />,
+        //     tooltip: 'Voir les détails',
+        //     color: '#3498db'
+        // },
         {
             type: 'edit',
-            icon: <FiEdit />,
+            icon: <FiEdit size={17} />,
             tooltip: 'Modifier les informations',
             color: '#f39c12'
         },
         {
             type: 'download',
-            icon: <FiDownload />,
+            icon: <FiDownload size={17} />,
             tooltip: 'Télécharger les informations',
             color: '#9b59b6'
         }

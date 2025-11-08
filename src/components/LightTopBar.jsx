@@ -24,6 +24,11 @@ import MessageIcon from '@rsuite/icons/Message';
 import ExitIcon from '@rsuite/icons/Exit';
 import MoreIcon from '@rsuite/icons/More';
 import { useNavigate } from 'react-router-dom';
+import {
+    FiSearch,
+    FiUser
+} from 'react-icons/fi';
+import { VscWordWrap } from 'react-icons/vsc';
 
 
 
@@ -191,17 +196,34 @@ const LightTopBar = ({
 
   const timeStr = formatDateTime(currentDateTime);
 
+  const handleViewProfile = () => {
+  // Exemple : rediriger vers la page de profil
+  navigate("/profil"); // si tu utilises react-router
+  // ou ouvrir un modal si c’est un affichage local
+};
+
+
   // Menu utilisateur avec icônes unicode (pas de dépendance externe)
   const userMenuItems = [
-    { divider: true },
-    {
-      label: "Déconnexion",
-      icon: <ExitIcon className="text-danger" />,
-      action: handleLogout,
-      danger: true,
-      description: "Fermer la session"
-    }
-  ];
+  // { divider: true },
+  // {
+  //   label: "Nom utilisateur",
+  //   icon: <FiUser className="text-primary" />, // à remplacer par ton icône (ex: <UserOutlined /> ou <User />)
+  //   action: handleViewProfile, // fonction à définir pour ouvrir le profil
+  //   description: "Voir les informations du compte"
+  // },
+  // {
+  //   divider: true
+  // },
+  {
+    label: "Déconnexion",
+    icon: <ExitIcon className="text-danger" />,
+    action: handleLogout,
+    danger: true,
+    description: "Fermer la session"
+  }
+];
+
 
   // Déterminer le nombre de cartes à afficher selon la largeur d'écran
   const getMaxVisibleCards = () => {
@@ -933,11 +955,11 @@ const LightTopBar = ({
                       <div
                         {...props}
                         ref={ref}
-                        className="user-profile-toggle"
+                        // className="user-profile-toggle"
                       >
-                        <div className="user-info d-none d-lg-block">
+                        {/* <div className="user-info d-none d-lg-block">
                           <div className="user-role">{userInfo.role}</div>
-                        </div>
+                        </div> */}
                         <Avatar
                           circle
                           size="sm"
@@ -966,7 +988,7 @@ const LightTopBar = ({
                         </FlexboxGrid.Item>
                         <FlexboxGrid.Item colspan={18}>
                           <div className="ms-2">
-                            <div className="fw-bold text-dark">{userInfo.name}</div>
+                            <div className="fw-bold text-dark" style={{wordWrap: 'break-word', overflow : 'break-word',  whiteSpace: 'normal'}}>{userInfo.name}</div>
                             <div className="text-muted small">{userInfo.email}</div>
                             <span className="badge bg-primary rounded-pill mt-1" style={{ fontSize: '10px' }}>
                               {userInfo.role}

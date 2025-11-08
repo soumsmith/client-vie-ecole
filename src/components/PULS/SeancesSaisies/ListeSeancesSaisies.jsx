@@ -223,7 +223,7 @@ const ListeSeancesSaisies = () => {
         const count = seancesSaisies.length;
         if (count === 0) return "Aucune séance saisie";
         if (count === 1) return "1 séance saisie";
-        return `${count} séances saisies`;
+        return `séances saisies`; //${count} 
     };
 
     // ===========================
