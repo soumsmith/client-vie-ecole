@@ -119,6 +119,67 @@ const formatDate = (dateString) => {
   }
 };
 
+export const downloadFile = async (url, filename) => {
+    try {
+        console.log('📡 URL de téléchargement:', url);
+        console.log('📁 Nom de fichier:', filename);
+
+        const response = await axios({
+            method: 'GET',
+            url: url,
+            responseType: 'blob',
+            timeout: 120000,
+            headers: {
+                'Accept': 'application/pdf, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.wordprocessingml.document, */*',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.data || response.data.size === 0) {
+            throw new Error('Le fichier généré est vide. Vérifiez les paramètres.');
+        }
+
+        let mimeType = response.headers['content-type'] || '';
+        const blob = new Blob([response.data], {
+            type: mimeType || 'application/octet-stream'
+        });
+
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = filename;
+        link.style.display = 'none';
+
+        document.body.appendChild(link);
+        link.click();
+
+        setTimeout(() => {
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(downloadUrl);
+        }, 100);
+
+        console.log('✅ Téléchargement déclenché avec succès');
+        return { success: true, filename, size: blob.size };
+
+    } catch (error) {
+        console.error('❌ Erreur de téléchargement:', error);
+        
+        if (error.code === 'ECONNABORTED') {
+            throw new Error('La génération du rapport a pris trop de temps. Veuillez réessayer.');
+        }
+
+        if (error.response) {
+            if (error.response.status === 404) {
+                throw new Error('Rapport non trouvé. Vérifiez les paramètres sélectionnés.');
+            } else if (error.response.status === 500) {
+                throw new Error('Erreur serveur lors de la génération. Veuillez réessayer.');
+            }
+        }
+
+        throw new Error(error.response?.data?.message || error.message || 'Erreur lors de la génération du rapport');
+    }
+};
+
 // ===========================
 // HOOK POUR RÉCUPÉRER LES CLASSES PAR BRANCHE
 // ===========================

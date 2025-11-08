@@ -27,6 +27,7 @@ import {
     downloadPvEvaluation
 } from './PvEvaluationService';
 import { usePeriodesData, useClassesData, useMatieresData } from "../utils/CommonDataService";
+import { useAllApiUrls } from '../utils/apiConfig';
 import IconBox from "../Composant/IconBox";
 import GradientButton from '../../GradientButton';
 
@@ -228,18 +229,16 @@ const PvEvaluationFilters = ({
                     <div className="pv-form-group">
                         <label className="pv-form-label-transparent">Action</label>
                         <div className="pv-actions-container">
-                            {/*  */}
                             <GradientButton
                                 icon={<FiSearch size={16} />}
-                                text="Recherche"
+                                text="Rechercher"
                                 loadingText="Chargement..."
                                 loading={loading}
-                                isabled={isDataLoading || loading || !selectedClasse || !selectedMatiere || !selectedPeriode}
+                                disabled={isDataLoading || loading || !selectedClasse || !selectedMatiere || !selectedPeriode}
                                 onClick={handleSearch}
                                 variant="primary"
                                 style={{ flex: 1 }}
                             />
-
 
                             <Button
                                 onClick={handleClear}
@@ -286,6 +285,7 @@ const PvEvaluationFilters = ({
 // ===========================
 const PvEvaluations = () => {
     const navigate = useNavigate();
+    const apiUrls = useAllApiUrls(); // ✅ AJOUT : Récupération de apiUrls
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [selectedClasse, setSelectedClasse] = useState(null);
     const [selectedMatiere, setSelectedMatiere] = useState(null);
@@ -366,8 +366,8 @@ const PvEvaluations = () => {
                 { placement: 'topEnd', duration: 2000 }
             );
 
-            // Appel de la fonction de téléchargement avec le CODE
-            await downloadPvEvaluation(selectedClasse, evaluation.code);
+            // ✅ CORRECTION : Passer apiUrls comme 3ème paramètre
+            await downloadPvEvaluation(selectedClasse, evaluation.code, apiUrls);
 
             // Notification de succès
             toaster.push(
@@ -399,7 +399,7 @@ const PvEvaluations = () => {
                 return newSet;
             });
         }
-    }, [selectedClasse]);
+    }, [selectedClasse, apiUrls]); // ✅ AJOUT : apiUrls dans les dépendances
 
     // ===========================
     // GESTION DE LA RECHERCHE
