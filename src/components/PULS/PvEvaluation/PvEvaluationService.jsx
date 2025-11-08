@@ -608,7 +608,6 @@ export const pvEvaluationsTableConfig = {
         {
             type: 'download',
             icon: <FiDownload size={17} />,
-            tooltip: 'Télécharger le PV',
             color: '#9b59b6'
         }
     ],

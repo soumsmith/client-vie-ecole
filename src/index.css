@@ -74,6 +74,50 @@ button:focus-visible {
 
 .rs-table-cell-content {
   min-width: 120px !important;
+  overflow: visible !important;
+}
+
+/* Correction du double scroll dans les DataTables */
+.datatable-container {
+  position: relative;
+}
+
+.datatable-container .rs-panel-body {
+  overflow: visible !important;
+}
+
+.datatable-container .rs-table {
+  overflow: visible !important;
+}
+
+.datatable-container .rs-table-body-wrapper {
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+}
+
+.datatable-container .rs-table-body-row-wrapper {
+  overflow: visible !important;
+}
+
+.datatable-container .rs-table-cell {
+  overflow: visible !important;
+}
+
+.datatable-container .rs-table-cell-content {
+  overflow: visible !important;
+}
+
+.datatable-container .rs-button-group {
+  overflow: visible !important;
+}
+
+.datatable-container .rs-btn {
+  overflow: visible !important;
+}
+
+/* Empêcher le double scroll au niveau du Panel */
+.rs-panel-body .datatable-container {
+  overflow: visible !important;
 }
 
 body {

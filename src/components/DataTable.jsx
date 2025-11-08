@@ -12,8 +12,6 @@ import {
   Pagination,
   FlexboxGrid,
   Badge,
-  Whisper,
-  Tooltip,
   Message,
   Checkbox,
   Divider,
@@ -629,22 +627,23 @@ const DataTable = ({
 
         case 'actions':
           return (
-            <Cell {...props} style={{ padding: '6px' }}>
-              <ButtonGroup size="xs" className='d-flex'>
+            <Cell {...props} style={{ padding: '6px', overflow: 'visible' }}>
+              <ButtonGroup size="xs" className='d-flex' style={{ overflow: 'visible' }}>
                 {actions.map((action, index) => (
-                  <Whisper key={`${action.type}-${index}`} speaker={<Tooltip>{action.tooltip}</Tooltip>}>
-                    <Button
-                      appearance="subtle"
-                      onClick={handleActionButtonClick(action.type, rowData)}
-                      className='mx-auto'
-                      style={{
-                        padding: '4px 8px',
-                        color: action.color || 'inherit'
-                      }}
-                    >
-                      {action.icon}
-                    </Button>
-                  </Whisper>
+                  <Button
+                    key={`${action.type}-${index}`}
+                    appearance="subtle"
+                    onClick={handleActionButtonClick(action.type, rowData)}
+                    className='mx-auto'
+                    title={action.tooltip || action.label || ''}
+                    style={{
+                      padding: '4px 8px',
+                      color: action.color || 'inherit',
+                      overflow: 'visible'
+                    }}
+                  >
+                    {action.icon}
+                  </Button>
                 ))}
               </ButtonGroup>
             </Cell>
@@ -726,9 +725,7 @@ const DataTable = ({
   // ==================== STYLES POUR LE SCROLL RESPONSIVE ====================
   const tableContainerStyle = {
     width: '100%',
-    overflowX: 'auto',
-    WebkitOverflowScrolling: 'touch', // Smooth scroll sur iOS
-    scrollbarWidth: 'thin', // Firefox
+    position: 'relative',
   };
 
   // ==================== RENDU PRINCIPAL ====================
@@ -896,7 +893,31 @@ const DataTable = ({
         )}
 
         {/* ==================== TABLEAU PRINCIPAL AVEC SCROLL RESPONSIVE ==================== */}
-        <div style={tableContainerStyle}>
+        <style>{`
+          .datatable-container {
+            position: relative;
+          }
+          .datatable-container > .rs-table {
+            overflow: visible !important;
+          }
+          .datatable-container .rs-table-body-wrapper {
+            overflow-x: auto !important;
+            overflow-y: auto !important;
+          }
+          .datatable-container .rs-table-body-row-wrapper {
+            overflow: visible !important;
+          }
+          .datatable-container .rs-table-cell {
+            overflow: visible !important;
+          }
+          .datatable-container .rs-table-cell-content {
+            overflow: visible !important;
+          }
+          .datatable-container .rs-table-body-row-wrapper > div {
+            overflow: visible !important;
+          }
+        `}</style>
+        <div style={tableContainerStyle} className="datatable-container">
           <Table
             height={tableHeight}
             width={tableWidth} // ✅ Largeur dynamique pour le scroll

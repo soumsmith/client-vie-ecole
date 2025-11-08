@@ -12,8 +12,6 @@ import {
   Pagination,
   FlexboxGrid,
   Badge,
-  Whisper,
-  Tooltip,
   Message,
   Checkbox,
   Divider,
@@ -35,23 +33,23 @@ const { Column, HeaderCell, Cell } = Table;
  */
 const useTableDimensions = (minContentWidth = 1000) => {
   const [tableWidth, setTableWidth] = useState('100%');
-  
+
   useEffect(() => {
     const calculateMinWidth = () => {
       const screenWidth = window.innerWidth;
-      
+
       if (screenWidth < minContentWidth) {
         setTableWidth(minContentWidth);
       } else {
         setTableWidth('100%');
       }
     };
-    
+
     calculateMinWidth();
     window.addEventListener('resize', calculateMinWidth);
     return () => window.removeEventListener('resize', calculateMinWidth);
   }, [minContentWidth]);
-  
+
   return tableWidth;
 };
 
@@ -99,8 +97,8 @@ const DataTable = ({
 
   // ==================== NOUVELLE CONFIGURATION POUR MODE ÉTUDIANT ====================
   displayMode = 'classic',
-  onAbsenceChange = () => {},
-  onNoteChange = () => {},
+  onAbsenceChange = () => { },
+  onNoteChange = () => { },
 
   // ==================== CONFIGURATION DES COLONNES ====================
   columns = [],
@@ -111,7 +109,7 @@ const DataTable = ({
 
   // ==================== CONFIGURATION DES ACTIONS ====================
   actions = [],
-  onAction = () => {},
+  onAction = () => { },
 
   // ==================== CONFIGURATION DE LA PAGINATION ====================
   defaultPageSize = 10,
@@ -120,7 +118,7 @@ const DataTable = ({
   // ==================== CONFIGURATION DE LA SÉLECTION ====================
   selectable = false,
   selectedItems = [],
-  onSelectionChange = () => {},
+  onSelectionChange = () => { },
   rowKey = 'id',
 
   // ==================== CONFIGURATION ADDITIONNELLE ====================
@@ -133,7 +131,7 @@ const DataTable = ({
   createButtonLoading = false, // 👈 AJOUT
 
   // ==================== CALLBACKS ====================
-  onRefresh = () => {},
+  onRefresh = () => { },
   onCreateClick = null, // 👈 AJOUT - Callback direct pour le bouton créer
 
   // ==================== STYLES PERSONNALISÉS ====================
@@ -152,7 +150,7 @@ const DataTable = ({
 
   const [expandedRows, setExpandedRows] = useState({});
   const [expandedMatieres, setExpandedMatieres] = useState({});
-const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
+  const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
 
   const tableWidth = useTableDimensions(minTableWidth);
 
@@ -423,10 +421,10 @@ const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
   const handleCreateClick = useCallback((event) => {
     event.preventDefault();
     event.stopPropagation();
-    
+
     console.log('🎯 DataTable - Clic sur bouton créer');
     console.log('📋 onCreateClick disponible:', !!onCreateClick);
-    
+
     // Priorité à onCreateClick si fourni, sinon utiliser onAction
     if (onCreateClick) {
       console.log('✅ Appel de onCreateClick');
@@ -441,7 +439,7 @@ const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
 
   const StudentExpandCell = useCallback(({ rowData, ...props }) => {
     const isExpanded = expandedRows[rowData[rowKey]];
-    
+
     return (
       <Cell {...props} style={{ padding: '6px' }}>
         <IconButton
@@ -545,19 +543,19 @@ const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
     return (
       <div {...props} style={{ padding: '8px' }}>
         <div id='noteMoyene'>
-          <div style={{ 
-            fontWeight: 'bold', 
-            fontSize: '13px', 
+          <div style={{
+            fontWeight: 'bold',
+            fontSize: '13px',
             color: '#2c3e50',
             marginBottom: '4px',
-            whiteSpace: 'nowrap' 
+            whiteSpace: 'nowrap'
           }}>
-            {String(rowData.nom).replace(/['"]/g, '').trim()} 
+            {String(rowData.nom).replace(/['"]/g, '').trim()}
           </div>
-          <div style={{ 
-            fontSize: '13px', 
+          <div style={{
+            fontSize: '13px',
             color: '#868e96',
-            fontWeight: 'bold', 
+            fontWeight: 'bold',
           }}>
             {String(rowData.prenom).replace(/['"]/g, '').trim()}
           </div>
@@ -597,7 +595,7 @@ const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
             <h6 style={{ marginBottom: '16px', color: '#2c3e50' }}>
               Détail des matières et notes
             </h6>
-            
+
             <div className="table-responsive">
               <table className="table table-bordered table-sm">
                 <thead className="table-light">
@@ -625,7 +623,7 @@ const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
                         </td>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <div 
+                            <div
                               style={{
                                 width: '8px',
                                 height: '8px',
@@ -655,7 +653,7 @@ const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
                           {matiere.coefficient}
                         </td>
                         <td className="text-center">
-                          <Badge 
+                          <Badge
                             color={getNoteColor(matiere.moyenne, 20)}
                             style={{ fontSize: '0.9em' }}
                           >
@@ -682,7 +680,7 @@ const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
                                   <div key={noteIndex} className="col-md-4 col-sm-6 mb-2">
                                     <div className="border p-2 rounded">
                                       <div className="d-flex justify-content-between align-items-center">
-                                        <Badge 
+                                        <Badge
                                           color={getNoteColor(note.note, note.noteSur)}
                                           style={{ fontSize: '1em' }}
                                         >
@@ -773,7 +771,7 @@ const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
 
       if (displayMode === 'student') {
         if (column.cellType === 'student-photo') {
-          return <StudentPhotoCell rowData={rowData} {...props}/>;
+          return <StudentPhotoCell rowData={rowData} {...props} />;
         }
         if (column.cellType === 'student-name') {
           return <StudentNameCell rowData={rowData} {...props} />;
@@ -885,21 +883,22 @@ const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
 
         case 'actions':
           return (
-            <Cell {...props} style={{ padding: '6px' }}>
-              <ButtonGroup size="xs">
+            <Cell {...props} style={{ padding: '6px', overflow: 'visible' }}>
+              <ButtonGroup size="xs" style={{ overflow: 'visible' }}>
                 {actions.map((action, index) => (
-                  <Whisper key={index} speaker={<Tooltip>{action.tooltip}</Tooltip>}>
-                    <Button
-                      appearance="subtle"
-                      onClick={handleActionButtonClick(action.type, rowData)}
-                      style={{
-                        padding: '4px 8px',
-                        color: action.color || 'inherit'
-                      }}
-                    >
-                      {action.icon}
-                    </Button>
-                  </Whisper>
+                  <Button
+                    key={index}
+                    appearance="subtle"
+                    onClick={handleActionButtonClick(action.type, rowData)}
+                    title={action.tooltip || action.label || ''}
+                    style={{
+                      padding: '4px 8px',
+                      color: action.color || 'inherit',
+                      overflow: 'visible'
+                    }}
+                  >
+                    {action.icon}
+                  </Button>
                 ))}
               </ButtonGroup>
             </Cell>
@@ -968,9 +967,7 @@ const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
 
   const tableContainerStyle = {
     width: '100%',
-    overflowX: 'auto',
-    WebkitOverflowScrolling: 'touch',
-    scrollbarWidth: 'thin',
+    position: 'relative',
   };
 
   // ==================== RENDU PRINCIPAL ====================
@@ -1025,7 +1022,7 @@ const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
                   onClick={handleCreateClick}
                   loading={createButtonLoading} // 👈 AJOUT
                   disabled={createButtonLoading || loading} // 👈 AJOUT
-                  className={`datatable-add-btn-${academicYear?.niveauEnseignement?.libelle.replace(/[\s()]/g, '')} datatable-add-btn-niveauEnseignement-${academicYear?.niveauEnseignement?.id}`} 
+                  className={`datatable-add-btn-${academicYear?.niveauEnseignement?.libelle.replace(/[\s()]/g, '')} datatable-add-btn-niveauEnseignement-${academicYear?.niveauEnseignement?.id}`}
 
                 >
                   {createButtonText}
@@ -1140,10 +1137,42 @@ const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
         )}
 
         {/* Tableau principal */}
-        <div style={tableContainerStyle}>
+        <style>{`
+          .datatable-container {
+            position: relative;
+          }
+          .datatable-container > .rs-table {
+            overflow: visible !important;
+          }
+          .datatable-container .rs-table-body-wrapper {
+            overflow-x: auto !important;
+            overflow-y: auto !important;
+          }
+          .datatable-container .rs-table-body-row-wrapper {
+            overflow: visible !important;
+          }
+          .datatable-container .rs-table-cell {
+            overflow: visible !important;
+          }
+          .datatable-container .rs-table-cell-content {
+            overflow: visible !important;
+          }
+          .datatable-container .rs-table-body-row-wrapper > div {
+            overflow: visible !important;
+          }
+          .datatable-container #notesEtMoyennes {
+            overflow-x: auto !important;
+            overflow-y: visible !important;
+            max-width: 100%;
+          }
+          .datatable-container #notesEtMoyennes table {
+            margin-bottom: 0 !important;
+          }
+        `}</style>
+        <div style={tableContainerStyle} className="datatable-container">
           {displayMode === 'student' ? (
-            <div id='notesEtMoyennes' style={{ border: '1px solid #e9ecef', borderRadius: '8px' }}>
-              <table className="table table-hover mb-0" style={{ tableLayout: 'fixed' }}>
+            <div id='notesEtMoyennes' style={{ border: '1px solid #e9ecef', borderRadius: '8px', overflowX: 'auto', overflowY: 'visible' }}>
+              <table className="table table-hover mb-0" style={{ tableLayout: 'fixed', width: '100%' }}>
                 <thead className="table-light">
                   <tr style={{ height: '50px' }}>
                     <th className="align-middle" style={{ width: '50px' }}></th>
@@ -1155,10 +1184,10 @@ const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
                       />
                     </th>}
                     {columns.map((column, index) => (
-                      <th 
-                        key={column.dataKey || index} 
-                        className='photo-etidiant align-middle'  
-                        style={{ 
+                      <th
+                        key={column.dataKey || index}
+                        className='photo-etidiant align-middle'
+                        style={{
                           width: column.minWidth || 50
                         }}
                       >
@@ -1196,7 +1225,7 @@ const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
                           );
                         })}
                       </tr>
-                      
+
                       {renderStudentExpandedContent(etudiant)}
                     </React.Fragment>
                   ))}
