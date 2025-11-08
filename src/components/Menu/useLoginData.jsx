@@ -858,7 +858,7 @@ const useLoginData = (config) => {
                 throw new Error('Mot de passe correct mais connexion incomplète');
             }
 
-            if (data === "Profil ou code école incorrect!") {
+            if (data === "Profil ou code école incorrect!" || data === "Profil  incorrect!" ) {
                 await Swal.fire({
                     icon: 'warning',
                     title: 'Profil ou code école incorrect',
