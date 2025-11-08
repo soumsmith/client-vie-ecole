@@ -1,6 +1,6 @@
 /**
  * Service pour la gestion des PV Évaluations
- * VERSION COMPLÈTE avec téléchargement corrigé
+ * VERSION CORRIGÉE avec téléchargement fonctionnel
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -59,81 +59,116 @@ const determineStatut = (evaluation) => {
 };
 
 // ===========================
+// FONCTION DE TÉLÉCHARGEMENT GÉNÉRIQUE
+// ===========================
+/**
+ * Fonction de téléchargement de fichiers (inspirée du code des rapports)
+ * @param {string} url - URL du fichier à télécharger
+ * @param {string} filename - Nom du fichier de destination
+ * @returns {Promise<object>}
+ */
+const downloadFile = async (url, filename) => {
+    try {
+        console.log('📡 URL de téléchargement:', url);
+        console.log('📁 Nom de fichier:', filename);
+
+        const response = await axios({
+            method: 'GET',
+            url: url,
+            responseType: 'blob',
+            timeout: 120000,
+            headers: {
+                'Accept': 'application/pdf, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.wordprocessingml.document, */*',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.data || response.data.size === 0) {
+            throw new Error('Le fichier généré est vide. Vérifiez les paramètres.');
+        }
+
+        let mimeType = response.headers['content-type'] || '';
+        const blob = new Blob([response.data], {
+            type: mimeType || 'application/octet-stream'
+        });
+
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = filename;
+        link.style.display = 'none';
+
+        document.body.appendChild(link);
+        link.click();
+
+        setTimeout(() => {
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(downloadUrl);
+        }, 100);
+
+        console.log('✅ Téléchargement déclenché avec succès');
+        return { success: true, filename, size: blob.size };
+
+    } catch (error) {
+        console.error('❌ Erreur de téléchargement:', error);
+
+        if (error.code === 'ECONNABORTED') {
+            throw new Error('La génération du rapport a pris trop de temps. Veuillez réessayer.');
+        }
+
+        if (error.response) {
+            if (error.response.status === 404) {
+                throw new Error('Rapport non trouvé. Vérifiez les paramètres sélectionnés.');
+            } else if (error.response.status === 500) {
+                throw new Error('Erreur serveur lors de la génération. Veuillez réessayer.');
+            }
+        }
+
+        throw new Error(error.response?.data?.message || error.message || 'Erreur lors de la génération du rapport');
+    }
+};
+
+// ===========================
 // FONCTION DE TÉLÉCHARGEMENT DU PV
 // ===========================
 /**
  * Télécharge le PV d'une évaluation
  * @param {string|number} classeId - ID de la classe
  * @param {string} code - Code de l'évaluation
+ * @param {object} apiUrls - Configuration des URLs API
  * @returns {Promise<boolean>}
  */
-export const downloadPvEvaluation = async (classeId, code) => {
+export const downloadPvEvaluation = async (classeId, code, apiUrls) => {
     try {
         if (!classeId) {
             throw new Error('ID de classe manquant');
         }
-        
+
         if (!code) {
             throw new Error('Code de l\'évaluation manquant');
         }
 
+        if (!apiUrls) {
+            throw new Error('Configuration API manquante');
+        }
+
         console.log('🔽 Téléchargement du PV - Classe:', classeId, 'Code:', code);
-        
+
         // Construction de l'URL complète
-        const downloadUrl = `${getFullUrl()}imprimer-proces-verbal/imprimer-proces-verbal/${classeId}/${code}`;
+        const downloadUrl = apiUrls.evaluations.imprimerProcesVerbal(classeId, code);
         console.log('📥 URL de téléchargement:', downloadUrl);
-
-        // Appel API avec axios
-        const response = await axios.get(downloadUrl, {
-            responseType: 'blob',
-            timeout: 30000,
-        });
-
-        console.log('✅ Réponse reçue:', response);
-
-        // Vérifier si la réponse contient des données
-        if (!response.data || response.data.size === 0) {
-            throw new Error('Le fichier téléchargé est vide');
-        }
-
-        // Récupérer le nom du fichier
-        let fileName = `PV_Evaluation_${code}.pdf`;
-        const contentDisposition = response.headers['content-disposition'];
-        if (contentDisposition) {
-            const fileNameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-            if (fileNameMatch && fileNameMatch[1]) {
-                fileName = fileNameMatch[1].replace(/['"]/g, '');
-            }
-        }
-
-        console.log('📄 Nom du fichier:', fileName);
-
-        // Créer un blob URL et déclencher le téléchargement
-        const blob = new Blob([response.data], { 
-            type: response.headers['content-type'] || 'application/pdf' 
-        });
-        const blobUrl = window.URL.createObjectURL(blob);
-
-        // Créer un lien de téléchargement
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = fileName;
         
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const fileName = `PV_Evaluation_${code}.doc`;
+        
+        // Appel de la fonction de téléchargement
+        const response = await downloadFile(downloadUrl, fileName);
 
-        // Libérer l'URL blob
-        setTimeout(() => {
-            window.URL.revokeObjectURL(blobUrl);
-        }, 100);
-
-        console.log('✅ Téléchargement réussi !');
+        console.log('✅ Téléchargement réussi !', response);
         return true;
 
     } catch (error) {
         console.error('❌ Erreur lors du téléchargement du PV:', error);
-        
+
         if (error.response) {
             if (error.response.status === 404) {
                 throw new Error('PV non trouvé. Vérifiez que l\'évaluation existe.');
@@ -196,20 +231,20 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
 
             // Appel API
             const response = await axios.get(
-                apiUrls.evaluations.getClasseMatierePeriodie({ 
-                    classeId, 
-                    matiereId, 
-                    periodeId, 
-                    annee: params.academicYearId 
+                apiUrls.evaluations.getClasseMatierePeriodie({
+                    classeId,
+                    matiereId,
+                    periodeId,
+                    annee: params.academicYearId
                 })
             );
-            
+
             // Traitement des évaluations
             let processedEvaluations = [];
             if (response.data && Array.isArray(response.data)) {
                 processedEvaluations = response.data.map((evaluation, index) => {
                     const statut = determineStatut(evaluation);
-                    
+
                     return {
                         id: evaluation.id || `eval-${index}`,
                         code: evaluation.code || `eval-${index}`,
@@ -225,7 +260,7 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
                         duree_raw: evaluation.duree || '02-00',
                         noteSur: evaluation.noteSur || '20',
                         note_sur_display: `/${evaluation.noteSur || '20'}`,
-                        
+
                         matiere: evaluation.matiereEcole?.libelle || 'Matière inconnue',
                         matiere_id: evaluation.matiereEcole?.id || matiereId,
                         matiere_code: evaluation.matiereEcole?.code || '',
@@ -233,37 +268,37 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
                         matiere_numOrdre: evaluation.matiereEcole?.numOrdre || 0,
                         matiere_pec: evaluation.matiereEcole?.pec || 0,
                         matiere_bonus: evaluation.matiereEcole?.bonus || 0,
-                        
+
                         periode: evaluation.periode?.libelle || 'Période inconnue',
                         periode_id: evaluation.periode?.id || periodeId,
                         periode_coef: parseFloat(evaluation.periode?.coef || '1.0'),
                         periode_niveau: evaluation.periode?.niveau || 1,
                         periode_isfinal: evaluation.periode?.isfinal || '',
-                        
+
                         classe: evaluation.classe?.libelle || 'Classe inconnue',
                         classe_id: evaluation.classe?.id || classeId,
                         classe_code: evaluation.classe?.code || '',
                         classe_effectif: evaluation.classe?.effectif || 0,
-                        
+
                         ecole: evaluation.classe?.ecole?.libelle || 'École inconnue',
                         ecole_id: evaluation.classe?.ecole?.id,
                         ecole_code: evaluation.classe?.ecole?.code || '',
                         ecole_tel: evaluation.classe?.ecole?.tel || '',
                         ecole_signataire: evaluation.classe?.ecole?.nomSignataire || '',
-                        
+
                         serie: evaluation.classe?.branche?.serie?.libelle || '',
                         filiere: evaluation.classe?.branche?.filiere?.libelle || '',
                         niveau: evaluation.classe?.branche?.niveau?.libelle || '',
-                        
+
                         annee: evaluation.annee?.libelle || 'Année inconnue',
                         annee_id: evaluation.annee?.id,
                         annee_debut: evaluation.annee?.anneeDebut || 2024,
                         annee_statut: evaluation.annee?.statut || 'DIFFUSE',
-                        
+
                         statut: statut,
                         statut_display: statut,
                         etat_original: evaluation.etat || '',
-                        
+
                         heure: evaluation.heure || '',
                         dateLimite: evaluation.dateLimite || '',
                         user: evaluation.user || '',
@@ -272,11 +307,11 @@ export const usePvEvaluationsData = (refreshTrigger = 0) => {
                         pec: evaluation.pec || 0,
                         coefficient: parseFloat(evaluation.periode?.coef || '1.0'),
                         nombreEleves: evaluation.classe?.effectif || 0,
-                        
+
                         evaluation_display: `${evaluation.type?.libelle || 'Devoir'} N°${evaluation.numero || (index + 1)}`,
                         description_complete: `${evaluation.type?.libelle || 'Devoir'} de ${evaluation.matiereEcole?.libelle || 'Matière'} - ${evaluation.periode?.libelle || 'Période'}`,
                         details_display: `${formatDuration(evaluation.duree)} • /${evaluation.noteSur || '20'} • ${evaluation.classe?.effectif || 0} élèves`,
-                        
+
                         raw_data: evaluation
                     };
                 });
@@ -370,16 +405,16 @@ export const pvEvaluationsTableConfig = {
             cellType: 'custom',
             customRenderer: (rowData) => (
                 <div>
-                    <div style={{ 
-                        fontWeight: '600', 
+                    <div style={{
+                        fontWeight: '600',
                         color: '#1e293b',
                         fontSize: '14px',
                         marginBottom: '2px'
                     }}>
                         {rowData.evaluation_display}
                     </div>
-                    <div style={{ 
-                        fontSize: '11px', 
+                    <div style={{
+                        fontSize: '11px',
                         color: '#64748b',
                         display: 'flex',
                         alignItems: 'center',
@@ -401,15 +436,15 @@ export const pvEvaluationsTableConfig = {
             cellType: 'custom',
             customRenderer: (rowData) => (
                 <div>
-                    <div style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
                         gap: '6px',
                         marginBottom: '2px'
                     }}>
                         <FiBookOpen size={12} color="#10b981" />
-                        <span style={{ 
-                            fontSize: '13px', 
+                        <span style={{
+                            fontSize: '13px',
                             color: '#059669',
                             fontWeight: '500'
                         }}>
@@ -417,8 +452,8 @@ export const pvEvaluationsTableConfig = {
                         </span>
                     </div>
                     {rowData.matiere_categorie && (
-                        <div style={{ 
-                            fontSize: '11px', 
+                        <div style={{
+                            fontSize: '11px',
                             color: '#64748b'
                         }}>
                             {rowData.matiere_categorie}
@@ -439,8 +474,8 @@ export const pvEvaluationsTableConfig = {
                     <Badge color="blue" style={{ fontSize: '12px', marginBottom: '4px' }}>
                         {rowData.periode}
                     </Badge>
-                    <div style={{ 
-                        fontSize: '11px', 
+                    <div style={{
+                        fontSize: '11px',
                         color: '#64748b',
                         display: 'flex',
                         alignItems: 'center',
@@ -471,16 +506,16 @@ export const pvEvaluationsTableConfig = {
             cellType: 'custom',
             customRenderer: (rowData) => (
                 <div>
-                    <div style={{ 
-                        fontWeight: '600', 
+                    <div style={{
+                        fontWeight: '600',
                         color: '#1e293b',
                         fontSize: '13px',
                         marginBottom: '2px'
                     }}>
                         {rowData.classe}
                     </div>
-                    <div style={{ 
-                        fontSize: '11px', 
+                    <div style={{
+                        fontSize: '11px',
                         color: '#64748b'
                     }}>
                         {rowData.serie} {rowData.filiere}
@@ -502,9 +537,9 @@ export const pvEvaluationsTableConfig = {
                     'Terminée': { bg: '#dcfce7', text: '#16a34a', border: '#22c55e' },
                     'Annulée': { bg: '#fee2e2', text: '#dc2626', border: '#ef4444' }
                 };
-                
+
                 const colors = colorMap[rowData.statut_display] || colorMap['Programmée'];
-                
+
                 return (
                     <div style={{
                         padding: '4px 8px',

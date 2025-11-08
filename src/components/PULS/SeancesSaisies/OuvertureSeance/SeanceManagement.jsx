@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import Swal from 'sweetalert2';
 import {
     SelectPicker,
     Button,
@@ -43,7 +44,7 @@ import IconBox from "../../Composant/IconBox";
 // ===========================
 // COMPOSANT DE FORMULAIRE DE RECHERCHE
 // ===========================
-const SearchForm = ({ onSearch, onClear, loading = false, error = null }) => {
+const SearchForm = ({ onSearch, onClear, onOpenSeance, loading = false, error = null }) => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedClasse, setSelectedClasse] = useState(null);
     const [filterByClasse, setFilterByClasse] = useState(false); // Switch state
@@ -106,20 +107,41 @@ const SearchForm = ({ onSearch, onClear, loading = false, error = null }) => {
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'space-between',
                 gap: 12,
                 marginBottom: 25,
                 paddingBottom: 15,
                 borderBottom: '1px solid #f1f5f9'
             }}>
-                <IconBox icon={FiSearch} />
-                <div>
-                    <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
-                        Recherche des Séances
-                    </h5>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
-                        Sélectionnez une date {filterByClasse ? 'et une classe' : 'pour afficher les séances'}
-                    </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <IconBox icon={FiSearch} />
+                    <div>
+                        <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
+                            Recherche des Séances
+                        </h5>
+                        <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
+                            Sélectionnez une date {filterByClasse ? 'et une classe' : 'pour afficher les séances'}
+                        </p>
+                    </div>
                 </div>
+
+                {/* ⭐ BOUTON OUVRIR SÉANCE */}
+                <Button
+                    appearance="primary"
+                    size="lg"
+                    style={{
+                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                        border: 'none',
+                        borderRadius: '10px',
+                        padding: '10px 20px',
+                        fontWeight: '600',
+                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)',
+                        whiteSpace: 'nowrap'
+                    }}
+                    onClick={onOpenSeance}
+                >
+                    <FiPlusCircle style={{ marginRight: 8 }} /> Ouvrir Séance
+                </Button>
             </div>
 
             {(formError || error) && (
@@ -367,7 +389,7 @@ const SeanceDetailsModal = ({ open, onClose, seance, details, loading }) => {
                                             <th style={thStyle}>Matière</th>
                                             <th style={thStyle}>Professeur</th>
                                             <th style={thStyle}>Surveillant</th>
-                                            <th style={thStyle}>Action</th>
+                                            {/* <th style={thStyle}>Action</th> */}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -492,6 +514,7 @@ const tdStyle = {
 const OuvertureSeanceModal = ({ open, onClose, onGenerate }) => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedClasse, setSelectedClasse] = useState(null);
+    const [filterByClasse, setFilterByClasse] = useState(false); // ⭐ NOUVEAU: Switch state
     const [generating, setGenerating] = useState(false);
 
     const {
@@ -499,14 +522,29 @@ const OuvertureSeanceModal = ({ open, onClose, onGenerate }) => {
         loading: classesLoading
     } = useClassesData();
 
+    // ⭐ Handler pour le toggle
+    const handleToggleChange = (checked) => {
+        setFilterByClasse(checked);
+        if (!checked) {
+            setSelectedClasse(null); // Reset classe si on désactive
+        }
+    };
+
     const handleGenerate = async () => {
-        if (!selectedDate || !selectedClasse) {
+        if (!selectedDate) {
+            return;
+        }
+
+        // ⭐ La validation de classe dépend du switch
+        if (filterByClasse && !selectedClasse) {
             return;
         }
 
         setGenerating(true);
-        const formattedDate = selectedDate ? selectedDate.toLocaleDateString('fr-FR') : null;
-        await onGenerate(formattedDate, selectedClasse);
+        // ✅ CORRECTION: Format ISO de la date (YYYY-MM-DD)
+        const formattedDate = selectedDate.toISOString().split('T')[0];
+        // ⭐ Passer null si filterByClasse est false
+        await onGenerate(formattedDate, filterByClasse ? selectedClasse : null);
         setGenerating(false);
     };
 
@@ -518,11 +556,7 @@ const OuvertureSeanceModal = ({ open, onClose, onGenerate }) => {
         >
             <Modal.Body style={{ padding: 0 }}>
                 {/* En-tête élégant */}
-                <div style={{
-                    padding: '30px',
-                    background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
-                    borderBottom: '1px solid #e2e8f0'
-                }}>
+                <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 15 }}>
                         <div style={{
                             width: '48px',
@@ -574,26 +608,79 @@ const OuvertureSeanceModal = ({ open, onClose, onGenerate }) => {
 
                         <Col xs={24}>
                             <div style={{ marginBottom: 25 }}>
-                                <label style={{
-                                    display: 'block',
-                                    marginBottom: 10,
-                                    fontWeight: '500',
-                                    color: '#334155',
-                                    fontSize: '14px'
+                                {/* ⭐ NOUVEAU: Label avec Toggle intégré */}
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    marginBottom: 10
                                 }}>
-                                    Classe concernée *
-                                </label>
+                                    <label style={{
+                                        fontWeight: '500',
+                                        color: '#334155',
+                                        fontSize: '14px',
+                                        margin: 0
+                                    }}>
+                                        Classe {filterByClasse && <span style={{ color: '#ef4444' }}>*</span>}
+                                    </label>
+
+                                    {/* ⭐ COMPOSANT TOGGLE DE RSUITE */}
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 10,
+                                        transition: 'all 0.3s'
+                                    }}>
+                                        <span style={{
+                                            fontSize: '13px',
+                                            color: filterByClasse ? '#1e40af' : '#64748b',
+                                            fontWeight: '500',
+                                            transition: 'color 0.3s'
+                                        }}>
+                                            {filterByClasse ? 'Activé' : 'Désactivé'}
+                                        </span>
+                                        <Toggle
+                                            checked={filterByClasse}
+                                            onChange={handleToggleChange}
+                                            checkedChildren="ON"
+                                            unCheckedChildren="OFF"
+                                            size="sm"
+                                            disabled={generating}
+                                        />
+                                    </div>
+                                </div>
+
                                 <SelectPicker
                                     data={classes}
                                     value={selectedClasse}
                                     onChange={setSelectedClasse}
-                                    placeholder="Choisir une classe"
+                                    placeholder={filterByClasse ? "Choisir une classe" : "Génération pour toute l'école"}
                                     searchable
                                     style={{ width: '100%' }}
                                     loading={classesLoading}
+                                    disabled={!filterByClasse || classesLoading || generating}
                                     cleanable={false}
                                     size="lg"
                                 />
+
+                                {/* Info bulle */}
+                                {!filterByClasse && (
+                                    <div style={{
+                                        marginTop: 8,
+                                        fontSize: '12px',
+                                        color: '#64748b',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 5,
+                                        padding: '8px 12px',
+                                        background: '#f8fafc',
+                                        borderRadius: '6px',
+                                        border: '1px solid #e2e8f0'
+                                    }}>
+                                        <FiInfo size={14} />
+                                        <span>Les séances seront générées pour toutes les classes de l'école</span>
+                                    </div>
+                                )}
                             </div>
                         </Col>
                     </Row>
@@ -603,7 +690,7 @@ const OuvertureSeanceModal = ({ open, onClose, onGenerate }) => {
                         appearance="primary"
                         onClick={handleGenerate}
                         loading={generating}
-                        disabled={!selectedDate || !selectedClasse || generating}
+                        disabled={!selectedDate || (filterByClasse && !selectedClasse) || generating}
                         block
                         size="lg"
                         style={{
@@ -629,11 +716,8 @@ const OuvertureSeanceModal = ({ open, onClose, onGenerate }) => {
 
                 {/* Footer simple */}
                 <div style={{
-                    padding: '20px 30px',
-                    borderTop: '1px solid #e2e8f0',
-                    background: '#fafafa',
                     display: 'flex',
-                    justifyContent: 'center'
+                    justifyContent: 'right'
                 }}>
                     <Button
                         onClick={onClose}
@@ -858,7 +942,7 @@ const getMessageTypeBadgeColor = (type) => {
 // ===========================
 const SeanceManagement = () => {
     const toaster = useToaster();
-    const { academicYearId, ecoleId } = usePulsParams(); // Ajout de ecoleId
+    const { academicYearId, ecoleId } = usePulsParams();
 
     // Hooks de recherche et génération
     const {
@@ -901,7 +985,7 @@ const SeanceManagement = () => {
             params.date,
             params.classeId,
             params.filterByClasse,
-            ecoleId // Passage de l'ecoleId
+            ecoleId
         );
     }, [searchSeances, ecoleId]);
 
@@ -922,38 +1006,124 @@ const SeanceManagement = () => {
         );
     }, [currentSearchParams, fetchSeanceDetails]);
 
-    // Gestion de la génération
+    // ✅ GESTION DE LA GÉNÉRATION AVEC SWEETALERT
     const handleGenerate = useCallback(async (date, classeId) => {
-        console.log('🔄 Génération séances:', { date, classeId, academicYearId });
+        console.log('🔄 Génération séances:', { date, ecoleId, academicYearId, classeId });
 
-        const result = await generateSeances(date, classeId, academicYearId);
+        // ⭐ ÉTAPE 1: Confirmation SweetAlert
+        const confirmResult = await Swal.fire({
+            title: 'Confirmation de génération',
+            html: `
+                <div style="text-align: left; padding: 10px;">
+                    <p style="margin-bottom: 15px; color: #64748b;">
+                        Vous êtes sur le point de générer les séances avec les paramètres suivants :
+                    </p>
+                    <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <div style="margin-bottom: 8px;">
+                            <strong style="color: #334155;">📅 Date:</strong> 
+                            <span style="color: #64748b;">${new Date(date).toLocaleDateString('fr-FR')}</span>
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <strong style="color: #334155;">🏫 École:</strong> 
+                            <span style="color: #64748b;">ID ${ecoleId}</span>
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <strong style="color: #334155;">🎯 Classe:</strong> 
+                            <span style="color: #64748b;">${classeId ? `ID ${classeId}` : 'Toutes les classes'}</span>
+                        </div>
+                        <div>
+                            <strong style="color: #334155;">📚 Année académique:</strong> 
+                            <span style="color: #64748b;">ID ${academicYearId}</span>
+                        </div>
+                    </div>
+                </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: '✓ Confirmer',
+            cancelButtonText: '✕ Annuler',
+            customClass: {
+                popup: 'swal2-custom-popup',
+                confirmButton: 'swal2-confirm-custom',
+                cancelButton: 'swal2-cancel-custom'
+            }
+        });
 
-        if (result && result.success) {
-            toaster.push(
-                <Message type="success" showIcon closable>
-                    <strong>Succès !</strong><br />
-                    Séances générées avec succès
-                </Message>,
-                { placement: 'topEnd', duration: 4000 }
-            );
+        // Si l'utilisateur annule
+        if (!confirmResult.isConfirmed) {
+            return;
+        }
+
+        // ⭐ ÉTAPE 2: Génération avec les BONS paramètres
+        // Si classeId est null, on envoie ecoleId, sinon on envoie classeId
+        const result = await generateSeances(date, classeId || ecoleId, academicYearId);
+
+        // ⭐ ÉTAPE 3: Affichage du résultat avec SweetAlert personnalisé
+        if (result && result.messages && result.messages.length > 0) {
+            const firstMessage = result.messages[0];
+            const messageType = firstMessage.type?.toLowerCase() || 'info';
+            
+            // Construction du HTML pour afficher tous les messages
+            const messagesHtml = result.messages.map(msg => `
+                <div style="
+                    background: ${messageType === 'success' ? '#dcfce7' : messageType === 'error' ? '#fee2e2' : '#dbeafe'}; 
+                    padding: 15px; 
+                    border-radius: 8px; 
+                    margin-bottom: 10px;
+                    border-left: 4px solid ${messageType === 'success' ? '#10b981' : messageType === 'error' ? '#ef4444' : '#3b82f6'};
+                ">
+                    <div style="font-weight: 600; color: #1e293b; margin-bottom: 5px;">
+                        ${msg.title || 'Information'}
+                    </div>
+                    <div style="color: #475569; fontSize: 14px;">
+                        ${msg.detail || 'Aucun détail disponible'}
+                    </div>
+                </div>
+            `).join('');
+
+            await Swal.fire({
+                title: messageType === 'success' ? 'Génération réussie !' : 
+                       messageType === 'error' ? 'Erreur de génération' : 
+                       'Information',
+                html: `
+                    <div style="text-align: left; padding: 10px;">
+                        ${messagesHtml}
+                    </div>
+                `,
+                icon: messageType === 'success' ? 'success' : 
+                      messageType === 'error' ? 'error' : 
+                      'info',
+                confirmButtonColor: messageType === 'success' ? '#10b981' : '#3b82f6',
+                confirmButtonText: 'D\'accord',
+                customClass: {
+                    popup: 'swal2-custom-popup'
+                }
+            });
 
             setShowOuvertureModal(false);
-            setShowRecapModal(true);
 
             // Rafraîchir la liste si on a les paramètres
             if (currentSearchParams) {
-                await searchSeances(currentSearchParams.date, currentSearchParams.classeId);
+                await searchSeances(
+                    currentSearchParams.date, 
+                    currentSearchParams.classeId,
+                    currentSearchParams.filterByClasse,
+                    ecoleId
+                );
             }
         } else {
-            toaster.push(
-                <Message type="error" showIcon closable>
-                    <strong>Erreur</strong><br />
-                    {result?.message || 'Erreur lors de la génération'}
-                </Message>,
-                { placement: 'topEnd', duration: 5000 }
-            );
+            // Cas où il n'y a pas de messages dans la réponse
+            await Swal.fire({
+                title: 'Erreur',
+                text: result?.message || 'Une erreur est survenue lors de la génération',
+                icon: 'error',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'D\'accord'
+            });
         }
-    }, [academicYearId, generateSeances, currentSearchParams, searchSeances, toaster]);
+    }, [academicYearId, ecoleId, generateSeances, currentSearchParams, searchSeances]);
 
     // Configuration des colonnes
     const columns = [
@@ -965,7 +1135,6 @@ const SeanceManagement = () => {
             sortable: true,
             cellType: 'custom',
             customRenderer: (rowData, value) => {
-                console.log('rowData:', rowData, 'value:', value);
                 return formatDateInDayMonthYear(rowData.dateSeance || value);
             }
         },
@@ -1019,6 +1188,7 @@ const SeanceManagement = () => {
                 <SearchForm
                     onSearch={handleSearch}
                     onClear={handleClearSearch}
+                    onOpenSeance={() => setShowOuvertureModal(true)}
                     loading={searchLoading}
                     error={searchError}
                 />
@@ -1081,16 +1251,6 @@ const SeanceManagement = () => {
                                     <h5 style={{ margin: 0, color: '#334155', fontWeight: '600' }}>
                                         Liste des séances ouvertes
                                     </h5>
-                                    <Button
-                                        appearance="primary"
-                                        style={{
-                                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                                            border: 'none'
-                                        }}
-                                        onClick={() => setShowOuvertureModal(true)}
-                                    >
-                                        <FiPlusCircle /> Ouvrir Séance
-                                    </Button>
                                 </div>
 
                                 <DataTable
@@ -1142,6 +1302,24 @@ const SeanceManagement = () => {
                     result={generationResult}
                 />
             </div>
+
+            {/* Style personnalisé pour SweetAlert */}
+            <style jsx>{`
+                .swal2-custom-popup {
+                    border-radius: 15px !important;
+                    padding: 20px !important;
+                }
+                .swal2-confirm-custom {
+                    border-radius: 8px !important;
+                    padding: 10px 24px !important;
+                    font-weight: 500 !important;
+                }
+                .swal2-cancel-custom {
+                    border-radius: 8px !important;
+                    padding: 10px 24px !important;
+                    font-weight: 500 !important;
+                }
+            `}</style>
         </div>
     );
 };

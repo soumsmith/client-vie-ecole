@@ -46,6 +46,8 @@ import { useAllApiUrls } from "../utils/apiConfig";
 import { usePulsParams } from "../../hooks/useDynamicParams";
 import IconBox from "../Composant/IconBox";
 import GradientButton from '../../GradientButton';
+import { getUserProfile } from "../../hooks/userUtils";
+
 
 
 // ===========================
@@ -105,6 +107,7 @@ const EvaluationModal = ({
 
     const { periodes } = usePeriodesData();
     const { classes } = useClassesData();
+    const isProfesseur = getUserProfile() === "Professeur";
 
 
 
@@ -424,6 +427,7 @@ const EvaluationModal = ({
                                 style={{ width: '100%' }}
                                 placeholder="Sélectionner date et heure"
                                 cleanable={false}
+                                disabled={isProfesseur}
                                 showMeridian={false}
                                 ranges={[
                                     {
