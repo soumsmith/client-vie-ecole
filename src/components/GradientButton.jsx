@@ -51,7 +51,7 @@ const GradientButton = ({
             disabled={disabled}
             style={defaultStyle}
             size={size}
-            className={`btn-action-${academicYear.niveauEnseignement?.libelle.replace(/[\s()]/g, '')}`}
+            className={`btn-action-${academicYear?.niveauEnseignement?.libelle.replace(/[\s()]/g, '')}`}
             {...otherProps}
         >
             {!loading && icon && <span style={{ display: 'flex', alignItems: 'center' }}>{icon}</span>}

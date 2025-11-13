@@ -27,7 +27,7 @@ export const routeConfig = {
   eventDetails: "/",
   news: "/",
   newsDetails: "/",
-  contact: "/",
+  contact: "/contact",
   donations: "/",
   donationDetails: "/",
   volunteers: "/"
@@ -266,12 +266,12 @@ export const navigationData = {
     //   ]
     // },
 
-    // {
-    //   id: 6,
-    //   text: "Contact",
-    //   link: routeConfig.contact,
-    //   type: "route"
-    // }
+    {
+      id: 6,
+      text: "Contact",
+      link: routeConfig.contact,
+      type: "route"
+    }
   ],
   cta: {
     icon: "paroti-icon-volunteer",

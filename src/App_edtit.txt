@@ -13,11 +13,18 @@ import Paroti from './components/ParotiCharity/ParotiCharity';
 import './Theme.css';
 import { getUserProfile } from "./components/hooks/userUtils";
 
-// Composants de pages publiques
+// Importez vos composants de pages publiques ici
 import ContactPage from './components/ParotiCharity/ContactPage';
 // import AboutPage from './pages/AboutPage';
 // import TeamPage from './pages/TeamPage';
-// etc...
+// import ProgramsPage from './pages/ProgramsPage';
+// import ProgramDetailsPage from './pages/ProgramDetailsPage';
+// import EventsPage from './pages/EventsPage';
+// import EventDetailsPage from './pages/EventDetailsPage';
+// import NewsPage from './pages/NewsPage';
+// import NewsDetailsPage from './pages/NewsDetailsPage';
+// import DonationsPage from './pages/DonationsPage';
+// import VolunteersPage from './pages/VolunteersPage';
 
 function App() {
   return (
@@ -69,6 +76,22 @@ function AppContent() {
   const hideFilterFor = ['Fondateur', 'SuperAdmin'];
   const showMatiereFilter = !hideFilterFor.includes(userProfile || '');
 
+  // Définir les routes publiques (accessibles sans authentification)
+  const publicRoutes = [
+    { path: "/contact", element: <ContactPage /> },
+    // { path: "/about", element: <AboutPage /> },
+    // { path: "/apropos", element: <AboutPage /> },
+    // { path: "/team", element: <TeamPage /> },
+    // { path: "/programs", element: <ProgramsPage /> },
+    // { path: "/program-details/:id", element: <ProgramDetailsPage /> },
+    // { path: "/events", element: <EventsPage /> },
+    // { path: "/event-details/:id", element: <EventDetailsPage /> },
+    // { path: "/news", element: <NewsPage /> },
+    // { path: "/news-details/:id", element: <NewsDetailsPage /> },
+    // { path: "/donations", element: <DonationsPage /> },
+    // { path: "/volunteers", element: <VolunteersPage /> }
+  ];
+
   // Afficher un loader si les données ne sont pas encore initialisées
   if (!isInitialized) {
     return (
@@ -89,33 +112,22 @@ function AppContent() {
               ROUTES PUBLIQUES (sans authentification)
           ======================================== */}
           
-          {/* Page d'accueil */}
-          <Route path="/" element={<Paroti typeInscription={'home'} />} />
-          
           {/* Pages d'inscription */}
+          <Route path="/" element={<Paroti typeInscription={'home'} />} />
           <Route path="/inscription/etablissement" element={<Paroti typeInscription={'etablissement'} />} />
           <Route path="/inscription/profesionel" element={<Paroti typeInscription={'professionel'} />} />
           
-          {/* Pages publiques */}
-          <Route path="/contact" element={<ContactPage />} />
-          {/* <Route path="/about" element={<AboutPage />} />
-          <Route path="/apropos" element={<AboutPage />} />
-          <Route path="/team" element={<TeamPage />} />
-          <Route path="/programs" element={<ProgramsPage />} />
-          <Route path="/program-details/:id" element={<ProgramDetailsPage />} />
-          <Route path="/events" element={<EventsPage />} />
-          <Route path="/event-details/:id" element={<EventDetailsPage />} />
-          <Route path="/news" element={<NewsPage />} />
-          <Route path="/news-details/:id" element={<NewsDetailsPage />} />
-          <Route path="/donations" element={<DonationsPage />} />
-          <Route path="/volunteers" element={<VolunteersPage />} /> */}
+          {/* Routes publiques dynamiques */}
+          {publicRoutes.map((route, index) => (
+            <Route key={index} path={route.path} element={route.element} />
+          ))}
 
           {/* ========================================
               ROUTES PROTÉGÉES (avec authentification)
           ======================================== */}
           
-          {/* Toutes les autres routes nécessitent une authentification */}
-          <Route path="/*" element={
+          {/* Toutes les routes sous /dashboard nécessitent une authentification */}
+          <Route path="/dashboard/*" element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
               <LayoutWrapper
                 profileId={profileId}
@@ -126,22 +138,35 @@ function AppContent() {
               />
             </ProtectedRoute>
           } />
+
+          {/* ========================================
+              GESTION DES ROUTES NON TROUVÉES
+          ======================================== */}
+          
+          {/* Redirection par défaut vers la page d'accueil */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </div>
   );
 }
 
-// Composant de protection des routes
+// ========================================
+// COMPOSANT DE PROTECTION DES ROUTES
+// ========================================
 function ProtectedRoute({ isAuthenticated, children }) {
+  // Si l'utilisateur n'est pas authentifié, rediriger vers la page d'accueil
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
   
+  // Si authentifié, afficher le contenu protégé
   return children;
 }
 
-// Wrapper pour la page d'accueil
+// ========================================
+// WRAPPER POUR LA PAGE D'ACCUEIL
+// ========================================
 function LandingWrapper() {
   const navigate = useNavigate();
 
@@ -161,7 +186,9 @@ function LandingWrapper() {
   );
 }
 
-// Wrapper pour le layout principal
+// ========================================
+// WRAPPER POUR LE LAYOUT PRINCIPAL
+// ========================================
 function LayoutWrapper({ profileId, userId, email, personnelInfo, isAuthenticated }) {
   const navigate = useNavigate();
 

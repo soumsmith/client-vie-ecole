@@ -462,7 +462,7 @@ export const ecolesTableConfig = {
             flexGrow: 1,
             minWidth: 120,
             cellType: 'actions',
-            fixed: 'right'
+            // fixed: 'right'
         }
     ],
     filterConfigs: [

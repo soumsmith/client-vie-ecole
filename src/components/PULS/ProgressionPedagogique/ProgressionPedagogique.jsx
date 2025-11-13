@@ -39,11 +39,14 @@ import {
 } from 'react-icons/fi';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
+import Swal from 'sweetalert2';
 import { useAllApiUrls } from '../utils/apiConfig';
 import { getFromCache, setToCache } from '../utils/cacheUtils';
 import { usePulsParams } from '../../hooks/useDynamicParams';
 import axios from 'axios';
 import getFullUrl from "../../hooks/urlUtils";
+import GradientButton from '../../GradientButton';
+import IconBox from "../Composant/IconBox";
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -75,7 +78,7 @@ const modernStyles = {
             medium: '#D1D5DB'
         }
     },
-    
+
     // Espacements cohérents
     spacing: {
         xs: '4px',
@@ -85,7 +88,7 @@ const modernStyles = {
         xl: '32px',
         xxl: '48px'
     },
-    
+
     // Ombres modernes
     shadows: {
         sm: '0 1px 3px rgba(0, 0, 0, 0.05)',
@@ -93,7 +96,7 @@ const modernStyles = {
         lg: '0 8px 25px rgba(0, 0, 0, 0.12)',
         colored: '0 4px 20px rgba(99, 102, 241, 0.15)'
     },
-    
+
     // Border radius
     radius: {
         sm: '6px',
@@ -110,7 +113,7 @@ const modernStyles = {
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // ===========================
-// HOOKS PERSONNALISÉS (gardés identiques)
+// HOOKS PERSONNALISÉS
 // ===========================
 
 const useNiveauxEnseignement = () => {
@@ -394,9 +397,9 @@ const ModernCard = ({ children, className = '', hover = false, ...props }) => {
     } : {};
 
     return (
-        <div 
+        <div
             {...props}
-            style={{...baseStyle, ...hoverStyle}}
+            style={{ ...baseStyle, ...hoverStyle }}
             className={`modern-card ${className}`}
         >
             {children}
@@ -456,18 +459,21 @@ const ModernButton = ({ children, variant = 'primary', size = 'md', icon, loadin
 };
 
 // En-tête avec gradient
-const GradientHeader = ({ title, subtitle, action }) => (
-    <ModernCard style={{
-        background: `linear-gradient(135deg, ${modernStyles.colors.primary} 0%, ${modernStyles.colors.primaryLight} 100%)`,
-        color: 'white',
-        border: 'none',
-        marginBottom: modernStyles.spacing.lg
-    }}>
-        <div style={{ 
+const GradientHeader = ({ title, subtitle, action, academicYear }) => (
+    <ModernCard
+        className={`ecole-id-${academicYear?.niveauEnseignement?.id || ''} dashboard-head-card-${academicYear?.niveauEnseignement?.libelle.replace(/[\s()]/g, '')}`}
+        style={{
+            //background: `linear-gradient(135deg, ${modernStyles.colors.primary} 0%, ${modernStyles.colors.primaryLight} 100%)`,
+            color: 'white',
+            border: 'none',
+            marginBottom: modernStyles.spacing.lg
+
+        }}>
+        <div style={{
             padding: modernStyles.spacing.xl,
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center' 
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
         }}>
             <div style={{ flex: 1 }}>
                 <div style={{
@@ -476,7 +482,7 @@ const GradientHeader = ({ title, subtitle, action }) => (
                     gap: modernStyles.spacing.md,
                     marginBottom: modernStyles.spacing.sm
                 }}>
-                    <div style={{
+                    {/* <div style={{
                         background: 'rgba(255, 255, 255, 0.2)',
                         borderRadius: modernStyles.radius.md,
                         padding: modernStyles.spacing.md,
@@ -485,9 +491,10 @@ const GradientHeader = ({ title, subtitle, action }) => (
                         justifyContent: 'center',
                         backdropFilter: 'blur(10px)'
                     }}>
-                        <FiBookOpen size={24} />
-                    </div>
-                    <h1 style={{
+                        <FiBookOpen size={24} className="text-white" />
+                    </div> */}
+                    <IconBox icon={FiBookOpen} size={24} />
+                    <h1 className="text-white" style={{
                         margin: 0,
                         fontSize: '28px',
                         fontWeight: '700',
@@ -496,7 +503,7 @@ const GradientHeader = ({ title, subtitle, action }) => (
                         {title}
                     </h1>
                 </div>
-                <p style={{
+                <p className="text-white" style={{
                     margin: 0,
                     fontSize: '16px',
                     opacity: 0.9,
@@ -518,7 +525,7 @@ const GradientHeader = ({ title, subtitle, action }) => (
 // COMPOSANT PRINCIPAL REDESIGNÉ
 // ===========================
 const ProgressionPedagogique = () => {
-    // États principaux (gardés identiques)
+    // États principaux
     const [showLoadModal, setShowLoadModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [progressions, setProgressions] = useState([]);
@@ -533,7 +540,7 @@ const ProgressionPedagogique = () => {
     const [fileData, setFileData] = useState([]);
     const [fileInfo, setFileInfo] = useState(null);
 
-    // Hooks (gardés identiques)
+    // Hooks
     const { niveaux, loading: niveauxLoading, error: niveauxError } = useNiveauxEnseignement();
     const { periodes, loading: periodesLoading, error: periodesError } = usePeriodes();
     const { annees: anneesGlobales, loading: anneesLoading } = useAnneesGlobales();
@@ -547,7 +554,95 @@ const ProgressionPedagogique = () => {
 
     const apiUrls = useAllApiUrls();
 
-    // Fonctions (gardées identiques mais appelées avec le nouveau design)
+    // ===========================
+    // FONCTIONS UTILITAIRES
+    // ===========================
+
+    // Fonction pour formater les dates
+    const formatDateToString = (date) => {
+        if (!date) return null;
+
+        // Si c'est déjà une chaîne au format dd/MM/yyyy, la retourner telle quelle
+        if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+            return date;
+        }
+
+        // Si c'est un objet Date
+        if (date instanceof Date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // Si c'est une chaîne dans un autre format, essayer de la parser
+        if (typeof date === 'string') {
+            const parts = date.split('/');
+            if (parts.length === 3) {
+                return date;
+            }
+        }
+
+        return null;
+    };
+
+    // Fonction de validation complète
+    const validateProgressionData = () => {
+        const errors = [];
+
+        // Validation des champs de base
+        if (!selectedNiveau) {
+            errors.push('Le niveau d\'enseignement est obligatoire');
+        }
+        if (!selectedAnneeModal) {
+            errors.push('L\'année scolaire est obligatoire');
+        }
+        if (!selectedBranche) {
+            errors.push('La branche est obligatoire');
+        }
+        if (!selectedMatiere) {
+            errors.push('La matière est obligatoire');
+        }
+
+        // Validation du fichier
+        if (fileData.length === 0) {
+            errors.push('Veuillez importer un fichier avec des données');
+        }
+
+        // Validation des données du fichier
+        fileData.forEach((row, index) => {
+            const rowNumber = index + 1;
+
+            if (!row['Période']) {
+                errors.push(`Ligne ${rowNumber}: La période est obligatoire`);
+            }
+            if (!row['Date début']) {
+                errors.push(`Ligne ${rowNumber}: La date de début est obligatoire`);
+            }
+            if (!row['Date fin']) {
+                errors.push(`Ligne ${rowNumber}: La date de fin est obligatoire`);
+            }
+            if (!row['Numéro leçon']) {
+                errors.push(`Ligne ${rowNumber}: Le numéro de leçon est obligatoire`);
+            }
+            if (!row['Titre Leçon'] || row['Titre Leçon'].trim() === '') {
+                errors.push(`Ligne ${rowNumber}: Le titre de la leçon est obligatoire`);
+            }
+            if (!row['heure'] || row['heure'] <= 0) {
+                errors.push(`Ligne ${rowNumber}: Le nombre d'heures est obligatoire et doit être supérieur à 0`);
+            }
+            if (!row['Nbre Séance'] || row['Nbre Séance'] <= 0) {
+                errors.push(`Ligne ${rowNumber}: Le nombre de séances est obligatoire et doit être supérieur à 0`);
+            }
+        });
+
+        return errors;
+    };
+
+    // ===========================
+    // FONCTIONS DE GESTION
+    // ===========================
+
     const loadProgressionsByAnnee = useCallback(async (anneeId) => {
         if (!anneeId) return;
 
@@ -587,7 +682,7 @@ const ProgressionPedagogique = () => {
         }
     }, [apiUrls, dynamicEcoleId]);
 
-    // Fonctions de gestion des fichiers (gardées identiques)
+    // Fonctions de gestion des fichiers
     const parseFile = (file) => {
         const fileExtension = file.name.toLowerCase().split('.').pop();
 
@@ -634,7 +729,7 @@ const ProgressionPedagogique = () => {
         }
     };
 
-    // Composants de cellules (gardés identiques)
+    // Composants de cellules
     const PeriodeCell = ({ rowData, dataKey, onChange, ...props }) => {
         return (
             <Cell {...props}>
@@ -701,7 +796,7 @@ const ProgressionPedagogique = () => {
         );
     };
 
-    // Fonctions de gestion (gardées identiques)
+    // Fonctions de gestion des modifications
     const handleTableChange = (rowData, dataKey, value) => {
         const newData = fileData.map(item =>
             item === rowData ? { ...item, [dataKey]: value } : item
@@ -722,28 +817,117 @@ const ProgressionPedagogique = () => {
         setShowEditModal(true);
     };
 
+    // Fonction de sauvegarde des modifications
     const handleSaveModifications = async () => {
         if (!selectedProgression) return;
+
+        // Validation des détails
+        const errors = [];
+        progressionDetails.forEach((detail, index) => {
+            const rowNumber = index + 1;
+
+            if (!detail.periode || !detail.periode.id) {
+                errors.push(`Ligne ${rowNumber}: La période est obligatoire`);
+            }
+            if (!detail.dateDeb) {
+                errors.push(`Ligne ${rowNumber}: La date de début est obligatoire`);
+            }
+            if (!detail.dateFin) {
+                errors.push(`Ligne ${rowNumber}: La date de fin est obligatoire`);
+            }
+            if (!detail.numLecon) {
+                errors.push(`Ligne ${rowNumber}: Le numéro de leçon est obligatoire`);
+            }
+            if (!detail.titre || detail.titre.trim() === '') {
+                errors.push(`Ligne ${rowNumber}: Le titre est obligatoire`);
+            }
+            if (!detail.heure || detail.heure <= 0) {
+                errors.push(`Ligne ${rowNumber}: Le nombre d'heures doit être supérieur à 0`);
+            }
+            if (!detail.nbreSeance || detail.nbreSeance <= 0) {
+                errors.push(`Ligne ${rowNumber}: Le nombre de séances doit être supérieur à 0`);
+            }
+        });
+
+        if (errors.length > 0) {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Erreurs de validation',
+                html: `
+                    <div style="text-align: left;">
+                        <p>Veuillez corriger les erreurs suivantes :</p>
+                        <ul style="margin-top: 10px;">
+                            ${errors.map(error => `<li>${error}</li>`).join('')}
+                        </ul>
+                    </div>
+                `,
+                confirmButtonText: 'Compris',
+                confirmButtonColor: '#6366F1',
+                width: '600px'
+            });
+            return;
+        }
+
+        // Confirmation
+        const result = await Swal.fire({
+            title: 'Confirmer les modifications',
+            html: `
+                <div style="text-align: left; padding: 20px;">
+                    <p style="margin-bottom: 15px; color: #6B7280;">Vous êtes sur le point de modifier la progression :</p>
+                    <div style="background: #F3F4F6; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <p style="margin: 5px 0;"><strong>Branche :</strong> ${selectedProgression.branche}</p>
+                        <p style="margin: 5px 0;"><strong>Matière :</strong> ${selectedProgression.matiere}</p>
+                        <p style="margin: 5px 0;"><strong>Nombre de leçons :</strong> ${progressionDetails.length}</p>
+                    </div>
+                    <p style="color: #6B7280;">Voulez-vous enregistrer ces modifications ?</p>
+                </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Oui, modifier',
+            cancelButtonText: 'Annuler',
+            confirmButtonColor: '#6366F1',
+            cancelButtonColor: '#9CA3AF',
+            reverseButtons: true,
+            width: '600px'
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
 
         try {
             setLoading(true);
 
             const dataToSave = {
                 progressionId: selectedProgression.id,
-                details: progressionDetails.map(detail => ({
-                    ...detail,
-                    dateDeb: typeof detail.dateDeb === 'object' ?
-                        detail.dateDeb.toLocaleDateString('fr-FR') : detail.dateDeb,
-                    dateFin: typeof detail.dateFin === 'object' ?
-                        detail.dateFin.toLocaleDateString('fr-FR') : detail.dateFin
+                datas: progressionDetails.map(detail => ({
+                    id: detail.id,
+                    periode: {
+                        id: typeof detail.periode === 'object' ? detail.periode.id : detail.periode
+                    },
+                    dateDeb: formatDateToString(detail.dateDeb),
+                    dateFin: formatDateToString(detail.dateFin),
+                    numLecon: Number(detail.numLecon),
+                    ordre: Number(detail.ordre),
+                    titre: String(detail.titre).trim(),
+                    heure: Number(detail.heure),
+                    nbreSeance: Number(detail.nbreSeance)
                 }))
             };
 
+            console.log('Données de modification à envoyer:', dataToSave);
+
             await axios.put(`${getFullUrl()}progression/${selectedProgression.id}/update-details`, dataToSave);
 
-            Notification.success({
-                title: 'Succès',
-                description: 'Modifications sauvegardées avec succès'
+            await Swal.fire({
+                icon: 'success',
+                title: 'Modifications enregistrées !',
+                text: 'Les modifications ont été sauvegardées avec succès.',
+                confirmButtonText: 'Super !',
+                confirmButtonColor: '#10B981',
+                timer: 3000,
+                timerProgressBar: true
             });
 
             setShowEditModal(false);
@@ -754,63 +938,135 @@ const ProgressionPedagogique = () => {
             }
         } catch (error) {
             console.error('Erreur lors de la sauvegarde:', error);
-            Notification.error({
+
+            await Swal.fire({
+                icon: 'error',
                 title: 'Erreur de sauvegarde',
-                description: error.response?.data?.message || 'Erreur lors de la sauvegarde des modifications'
+                text: error.response?.data?.message || 'Une erreur est survenue lors de la sauvegarde des modifications.',
+                confirmButtonText: 'Fermer',
+                confirmButtonColor: '#EF4444'
             });
         } finally {
             setLoading(false);
         }
     };
 
+    // Fonction de sauvegarde principale
     const handleSave = async () => {
-        if (!selectedNiveau || !selectedAnneeModal || !selectedBranche || !selectedMatiere) {
-            Notification.error({
-                title: 'Erreur de validation',
-                description: 'Veuillez remplir tous les champs obligatoires'
+        // Validation des données
+        const validationErrors = validateProgressionData();
+
+        if (validationErrors.length > 0) {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Erreurs de validation',
+                html: `
+                    <div style="text-align: left;">
+                        <p>Veuillez corriger les erreurs suivantes :</p>
+                        <ul style="margin-top: 10px;">
+                            ${validationErrors.map(error => `<li>${error}</li>`).join('')}
+                        </ul>
+                    </div>
+                `,
+                confirmButtonText: 'Compris',
+                confirmButtonColor: '#6366F1',
+                width: '600px'
             });
             return;
         }
 
-        if (fileData.length === 0) {
-            Notification.error({
-                title: 'Erreur de validation',
-                description: 'Veuillez importer un fichier avec des données'
-            });
+        // Confirmation avant sauvegarde
+        const result = await Swal.fire({
+            title: 'Confirmer l\'enregistrement',
+            html: `
+                <div style="text-align: left; padding: 20px;">
+                    <p style="margin-bottom: 15px; color: #6B7280;">Vous êtes sur le point d'enregistrer une progression avec les informations suivantes :</p>
+                    <div style="background: #F3F4F6; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <p style="margin: 5px 0;"><strong>Niveau :</strong> ${niveaux.find(n => n.value === selectedNiveau)?.label}</p>
+                        <p style="margin: 5px 0;"><strong>Année :</strong> ${anneesNiveau.find(a => a.value === selectedAnneeModal)?.label}</p>
+                        <p style="margin: 5px 0;"><strong>Branche :</strong> ${branches.find(b => b.value === selectedBranche)?.label}</p>
+                        <p style="margin: 5px 0;"><strong>Matière :</strong> ${matieres.find(m => m.value === selectedMatiere)?.label}</p>
+                        <p style="margin: 5px 0;"><strong>Nombre de leçons :</strong> ${fileData.length}</p>
+                    </div>
+                    <p style="color: #6B7280;">Voulez-vous continuer ?</p>
+                </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Oui, enregistrer',
+            cancelButtonText: 'Annuler',
+            confirmButtonColor: '#6366F1',
+            cancelButtonColor: '#9CA3AF',
+            reverseButtons: true,
+            width: '600px'
+        });
+
+        if (!result.isConfirmed) {
             return;
         }
 
         try {
             setLoading(true);
 
+            // Transformation des données au nouveau format
             const progressionData = {
-                niveauId: selectedNiveau,
-                anneeId: selectedAnneeModal,
-                brancheId: selectedBranche,
-                matiereId: selectedMatiere,
-                ecoleId: dynamicEcoleId,
-                academicYearId: dynamicAcademicYearId,
-                details: fileData
+                niveau: {
+                    id: selectedNiveau
+                },
+                annee: {
+                    id: selectedAnneeModal
+                },
+                branche: {
+                    id: selectedBranche
+                },
+                matiere: {
+                    id: selectedMatiere
+                },
+                datas: fileData.map(row => ({
+                    periode: {
+                        id: typeof row['Période'] === 'object' ? row['Période'].id : row['Période']
+                    },
+                    dateDeb: formatDateToString(row['Date début']),
+                    dateFin: formatDateToString(row['Date fin']),
+                    numLecon: Number(row['Numéro leçon']),
+                    titre: String(row['Titre Leçon']).trim(),
+                    heure: Number(row['heure']),
+                    nbreSeance: Number(row['Nbre Séance'])
+                }))
             };
 
-            const response = await axios.post(`${getFullUrl()}progression/save`, progressionData);
+            console.log('Données à envoyer:', progressionData);
 
-            Notification.success({
-                title: 'Succès',
-                description: 'Progression sauvegardée avec succès'
+            const response = await axios.post(`${getFullUrl()}progression/handle-save`, progressionData);
+
+            // Succès avec SweetAlert
+            await Swal.fire({
+                icon: 'success',
+                title: 'Progression enregistrée !',
+                text: 'La progression pédagogique a été enregistrée avec succès.',
+                confirmButtonText: 'Super !',
+                confirmButtonColor: '#10B981',
+                timer: 3000,
+                timerProgressBar: true
             });
 
             setShowLoadModal(false);
             resetForm();
 
+            // Recharger la liste si une année est sélectionnée
             if (selectedAnnee) {
                 loadProgressionsByAnnee(selectedAnnee);
             }
         } catch (error) {
             console.error('Erreur lors de la sauvegarde:', error);
-            Notification.error({
+
+            // Erreur avec SweetAlert
+            await Swal.fire({
+                icon: 'error',
                 title: 'Erreur de sauvegarde',
-                description: error.response?.data?.message || 'Erreur lors de la sauvegarde de la progression'
+                text: error.response?.data?.message || 'Une erreur est survenue lors de l\'enregistrement de la progression.',
+                confirmButtonText: 'Fermer',
+                confirmButtonColor: '#EF4444'
             });
         } finally {
             setLoading(false);
@@ -825,6 +1081,8 @@ const ProgressionPedagogique = () => {
         setFileData([]);
         setFileInfo(null);
     };
+    const academicYear = JSON.parse(localStorage.getItem('academicYearMain'));
+
 
     return (
         <div style={{
@@ -837,6 +1095,8 @@ const ProgressionPedagogique = () => {
                 <GradientHeader
                     title="Progressions Pédagogiques"
                     subtitle="Gérez et suivez efficacement les progressions pédagogiques par matière et niveau"
+                    academicYear={academicYear}
+
                     action={
                         <ModernButton
                             size="lg"
@@ -867,17 +1127,7 @@ const ProgressionPedagogique = () => {
                                 alignItems: 'center',
                                 gap: modernStyles.spacing.md
                             }}>
-                                <div style={{
-                                    background: `linear-gradient(135deg, ${modernStyles.colors.primary} 0%, ${modernStyles.colors.primaryLight} 100%)`,
-                                    borderRadius: modernStyles.radius.md,
-                                    padding: modernStyles.spacing.md,
-                                    color: 'white',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
-                                    <FiCalendar size={20} />
-                                </div>
+                                <IconBox icon={FiCalendar} size={24} />
                                 <div>
                                     <h3 style={{
                                         margin: 0,
@@ -908,7 +1158,7 @@ const ProgressionPedagogique = () => {
                                     }
                                 }}
                                 placeholder="Sélectionner l'année scolaire..."
-                                style={{ 
+                                style={{
                                     width: '100%',
                                 }}
                                 size="lg"
@@ -982,7 +1232,7 @@ const ProgressionPedagogique = () => {
                             height={500}
                             data={progressions}
                             loading={loading}
-                            style={{ 
+                            style={{
                                 borderRadius: 0,
                                 '--rs-table-border-color': modernStyles.colors.border.light
                             }}
@@ -1056,47 +1306,6 @@ const ProgressionPedagogique = () => {
                                 </Cell>
                             </Column>
                         </Table>
-
-                        {progressions.length === 0 && !loading && (
-                            <div style={{
-                                textAlign: 'center',
-                                padding: `${modernStyles.spacing.xxl} ${modernStyles.spacing.lg}`,
-                                background: `linear-gradient(135deg, ${modernStyles.colors.background.subtle} 0%, #FFFFFF 100%)`
-                            }}>
-                                <div style={{
-                                    background: `linear-gradient(135deg, ${modernStyles.colors.primary} 0%, ${modernStyles.colors.primaryLight} 100%)`,
-                                    borderRadius: modernStyles.radius.full,
-                                    width: '80px',
-                                    height: '80px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    margin: '0 auto 24px auto',
-                                    color: 'white'
-                                }}>
-                                    <FiBookOpen size={32} />
-                                </div>
-                                <h3 style={{
-                                    margin: '0 0 8px 0',
-                                    color: modernStyles.colors.text.primary,
-                                    fontSize: '20px',
-                                    fontWeight: '600'
-                                }}>
-                                    Aucune progression trouvée
-                                </h3>
-                                <p style={{
-                                    margin: 0,
-                                    color: modernStyles.colors.text.secondary,
-                                    fontSize: '16px',
-                                    lineHeight: '1.5'
-                                }}>
-                                    {selectedAnnee ? 
-                                        'Aucune progression n\'est disponible pour cette année scolaire' : 
-                                        'Sélectionnez une année scolaire pour voir les progressions disponibles'
-                                    }
-                                </p>
-                            </div>
-                        )}
                     </div>
                 </ModernCard>
             </div>
@@ -1112,20 +1321,19 @@ const ProgressionPedagogique = () => {
                 style={{ '--rs-modal-border-radius': modernStyles.radius.lg }}
             >
                 <Modal.Header style={{
-                    background: `linear-gradient(135deg, ${modernStyles.colors.primary} 0%, ${modernStyles.colors.primaryLight} 100%)`,
                     color: 'white',
                     borderRadius: `${modernStyles.radius.lg} ${modernStyles.radius.lg} 0 0`,
-                    padding: modernStyles.spacing.xl
                 }}>
                     <Modal.Title style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <div style={{
+                        {/* <div style={{
                             background: 'rgba(255, 255, 255, 0.2)',
                             borderRadius: modernStyles.radius.md,
                             padding: modernStyles.spacing.md,
                             backdropFilter: 'blur(10px)'
                         }}>
                             <FiPlus size={20} />
-                        </div>
+                        </div> */}
+                        <IconBox icon={FiPlus} size={20} />
                         <div>
                             <div style={{ fontSize: '22px', fontWeight: '700', marginBottom: '4px' }}>
                                 Nouvelle Progression Pédagogique
@@ -1139,9 +1347,9 @@ const ProgressionPedagogique = () => {
 
                 <Modal.Body style={{ padding: modernStyles.spacing.xl }}>
                     {(niveauxError || periodesError) && (
-                        <Message 
-                            type="error" 
-                            style={{ 
+                        <Message
+                            type="error"
+                            style={{
                                 marginBottom: modernStyles.spacing.lg,
                                 borderRadius: modernStyles.radius.md
                             }}
@@ -1287,7 +1495,7 @@ const ProgressionPedagogique = () => {
                             }} />
                             Import du fichier
                         </h4>
-                        
+
                         <div style={{
                             border: `2px dashed ${modernStyles.colors.border.medium}`,
                             borderRadius: modernStyles.radius.lg,
@@ -1303,19 +1511,18 @@ const ProgressionPedagogique = () => {
                                 draggable
                                 autoUpload={false}
                             >
-                                <div style={{
-                                    padding: modernStyles.spacing.xxl,
+                                <div className="py-2" style={{
                                     textAlign: 'center'
                                 }}>
                                     <div style={{
                                         background: `linear-gradient(135deg, ${modernStyles.colors.primary} 0%, ${modernStyles.colors.primaryLight} 100%)`,
                                         borderRadius: modernStyles.radius.full,
-                                        width: '80px',
-                                        height: '80px',
+                                        width: '50px',
+                                        height: '50px',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        margin: '0 auto 24px auto',
+                                        margin: '20px auto 20px auto',
                                         color: 'white'
                                     }}>
                                         <FiUpload size={32} />
@@ -1336,14 +1543,14 @@ const ProgressionPedagogique = () => {
                                     }}>
                                         Glissez-déposez votre fichier ici ou cliquez pour parcourir
                                     </p>
-                                    <div style={{
+                                    {/* <div style={{
                                         display: 'inline-flex',
                                         gap: modernStyles.spacing.sm
                                     }}>
                                         <Badge style={{ background: modernStyles.colors.primary, color: 'white' }}>CSV</Badge>
                                         <Badge style={{ background: modernStyles.colors.accent, color: 'white' }}>XLS</Badge>
                                         <Badge style={{ background: modernStyles.colors.warning, color: 'white' }}>XLSX</Badge>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </Uploader>
                         </div>
@@ -1371,8 +1578,8 @@ const ProgressionPedagogique = () => {
                                     <FiFile size={20} />
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                    <div style={{ 
-                                        fontWeight: '600', 
+                                    <div style={{
+                                        fontWeight: '600',
                                         color: modernStyles.colors.text.primary,
                                         fontSize: '15px'
                                     }}>
@@ -1421,7 +1628,7 @@ const ProgressionPedagogique = () => {
                                 }} />
                                 Aperçu des données • {fileData.length} enregistrement{fileData.length !== 1 ? 's' : ''}
                             </h4>
-                            
+
                             <div style={{
                                 maxHeight: '400px',
                                 overflow: 'auto',
@@ -1430,14 +1637,14 @@ const ProgressionPedagogique = () => {
                                 background: modernStyles.colors.background.card
                             }}>
                                 <Table
-                                    height={Math.min(400, fileData.length * 46 + 46)}
+                                    height={Math.min(600, fileData.length * 46 + 100)}
                                     data={fileData}
                                     bordered
                                     style={{
                                         '--rs-table-border-color': modernStyles.colors.border.light
                                     }}
                                 >
-                                    <Column width={120}>
+                                    <Column width={150}>
                                         <HeaderCell style={{
                                             background: modernStyles.colors.background.subtle,
                                             fontWeight: '600',
@@ -1451,7 +1658,7 @@ const ProgressionPedagogique = () => {
                                         />
                                     </Column>
 
-                                    <Column width={120}>
+                                    <Column width={150}>
                                         <HeaderCell style={{
                                             background: modernStyles.colors.background.subtle,
                                             fontWeight: '600',
@@ -1465,7 +1672,7 @@ const ProgressionPedagogique = () => {
                                         />
                                     </Column>
 
-                                    <Column width={120}>
+                                    <Column width={150}>
                                         <HeaderCell style={{
                                             background: modernStyles.colors.background.subtle,
                                             fontWeight: '600',
@@ -1490,7 +1697,7 @@ const ProgressionPedagogique = () => {
                                         <Cell dataKey="Semaine" />
                                     </Column>
 
-                                    <Column width={100}>
+                                    <Column width={80}>
                                         <HeaderCell style={{
                                             background: modernStyles.colors.background.subtle,
                                             fontWeight: '600',
@@ -1501,7 +1708,7 @@ const ProgressionPedagogique = () => {
                                         <Cell dataKey="Numéro leçon" />
                                     </Column>
 
-                                    <Column flexGrow={1} minWidth={200}>
+                                    <Column flexGrow={1} minWidth={300}>
                                         <HeaderCell style={{
                                             background: modernStyles.colors.background.subtle,
                                             fontWeight: '600',
@@ -1540,8 +1747,6 @@ const ProgressionPedagogique = () => {
                 </Modal.Body>
 
                 <Modal.Footer style={{
-                    padding: modernStyles.spacing.xl,
-                    background: modernStyles.colors.background.subtle,
                     borderRadius: `0 0 ${modernStyles.radius.lg} ${modernStyles.radius.lg}`,
                     display: 'flex',
                     justifyContent: 'flex-end',
@@ -1556,13 +1761,23 @@ const ProgressionPedagogique = () => {
                     >
                         Annuler
                     </ModernButton>
-                    <ModernButton
+                    {/* <ModernButton
                         onClick={handleSave}
                         loading={loading}
                         icon={<FiSave />}
                     >
-                        Enregistrer la progression
-                    </ModernButton>
+                        Enregistrer
+                    </ModernButton> */}
+                    <GradientButton
+                        icon={<FiSave size={16} />}
+                        text="Enregistrer"
+                        loadingText="Chargement..."
+                        loading={loading}
+                        //disabled={isDataLoading || loading || !selectedFonction}
+                        onClick={handleSave}
+                        variant="primary"
+                    // style={{ flex: 1 }}
+                    />
                 </Modal.Footer>
             </Modal>
 
@@ -1577,10 +1792,8 @@ const ProgressionPedagogique = () => {
                 style={{ '--rs-modal-border-radius': modernStyles.radius.lg }}
             >
                 <Modal.Header style={{
-                    background: `linear-gradient(135deg, ${modernStyles.colors.primary} 0%, ${modernStyles.colors.primaryLight} 100%)`,
                     color: 'white',
                     borderRadius: `${modernStyles.radius.lg} ${modernStyles.radius.lg} 0 0`,
-                    padding: modernStyles.spacing.xl
                 }}>
                     <Modal.Title style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         <div style={{
@@ -1602,7 +1815,7 @@ const ProgressionPedagogique = () => {
                     </Modal.Title>
                 </Modal.Header>
 
-                <Modal.Body style={{ padding: modernStyles.spacing.xl }}>
+                <Modal.Body >
                     {selectedProgression && (
                         <div style={{
                             background: `linear-gradient(135deg, ${modernStyles.colors.background.subtle} 0%, #FFFFFF 100%)`,
@@ -1635,8 +1848,8 @@ const ProgressionPedagogique = () => {
                                     borderRadius: modernStyles.radius.sm,
                                     border: `1px solid ${modernStyles.colors.border.light}`
                                 }}>
-                                    <span style={{ 
-                                        fontWeight: '500', 
+                                    <span style={{
+                                        fontWeight: '500',
                                         color: modernStyles.colors.text.secondary,
                                         fontSize: '13px',
                                         textTransform: 'uppercase',
@@ -1644,7 +1857,7 @@ const ProgressionPedagogique = () => {
                                     }}>
                                         Branche
                                     </span>
-                                    <div style={{ 
+                                    <div style={{
                                         color: modernStyles.colors.text.primary,
                                         fontWeight: '600',
                                         fontSize: '15px',
@@ -1659,8 +1872,8 @@ const ProgressionPedagogique = () => {
                                     borderRadius: modernStyles.radius.sm,
                                     border: `1px solid ${modernStyles.colors.border.light}`
                                 }}>
-                                    <span style={{ 
-                                        fontWeight: '500', 
+                                    <span style={{
+                                        fontWeight: '500',
                                         color: modernStyles.colors.text.secondary,
                                         fontSize: '13px',
                                         textTransform: 'uppercase',
@@ -1668,7 +1881,7 @@ const ProgressionPedagogique = () => {
                                     }}>
                                         Matière
                                     </span>
-                                    <div style={{ 
+                                    <div style={{
                                         color: modernStyles.colors.text.primary,
                                         fontWeight: '600',
                                         fontSize: '15px',
@@ -1689,8 +1902,8 @@ const ProgressionPedagogique = () => {
                             borderRadius: modernStyles.radius.md
                         }}>
                             <Loader size="md" />
-                            <p style={{ 
-                                marginTop: modernStyles.spacing.lg, 
+                            <p style={{
+                                marginTop: modernStyles.spacing.lg,
                                 color: modernStyles.colors.text.secondary,
                                 fontSize: '16px'
                             }}>
@@ -1726,7 +1939,7 @@ const ProgressionPedagogique = () => {
                                         background: modernStyles.colors.background.card
                                     }}>
                                         <Table
-                                            height={Math.min(500, progressionDetails.length * 46 + 46)}
+                                            height={Math.min(500, progressionDetails.length * 46 + 100)}
                                             data={progressionDetails}
                                             bordered
                                             style={{
@@ -1891,7 +2104,6 @@ const ProgressionPedagogique = () => {
                 </Modal.Body>
 
                 <Modal.Footer style={{
-                    padding: modernStyles.spacing.xl,
                     background: modernStyles.colors.background.subtle,
                     borderRadius: `0 0 ${modernStyles.radius.lg} ${modernStyles.radius.lg}`,
                     display: 'flex',
